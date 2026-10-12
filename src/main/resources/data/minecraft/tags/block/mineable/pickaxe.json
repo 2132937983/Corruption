@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "corruption:corruption",
+    "corruption:infected_block",
+    "corruption:arcunum",
+    "corruption:arcunum_end",
+    "corruption:spirit",
+    "corruption:spirit_deepslate",
+    "corruption:malice"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "corruption:corrupted_remnant",
+    "corruption:corrupted_dragon",
+    "corruption:malice_vine",
+    "corruption:greed"
+  ]
+}

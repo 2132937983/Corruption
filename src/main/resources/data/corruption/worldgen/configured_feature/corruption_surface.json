@@ -1,0 +1,6 @@
+{
+  "type": "corruption:corruption_surface",
+  "config": {
+    "state": { "Name": "corruption:corruption" }
+  }
+}
