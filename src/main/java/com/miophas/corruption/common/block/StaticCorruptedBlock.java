@@ -159,7 +159,7 @@ public final class StaticCorruptedBlock extends CorruptionBlock implements net.m
         return InfectionConfig.corruptedBlocksFlammable() ? 5 : 0;
     }
     @Override protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
-        return List.of(GeneratedCorruption.stack(state), ModItems.corruptionDustDrop(params.getLevel().getRandom()));
+        return List.of(ModItems.corruptionDustDrop(params.getLevel().getRandom()));
     }
     @Override public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) { return GeneratedCorruption.stack(state); }
     @Override public MutableComponent getName() { return Component.translatable("block.corruption.infected_block.variant", original.getName()); }

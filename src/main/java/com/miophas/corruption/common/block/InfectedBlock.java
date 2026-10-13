@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -82,9 +81,7 @@ public final class InfectedBlock extends CorruptionBlock implements EntityBlock 
 
     @Override
     protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
-        return List.of(params.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof InfectedBlockEntity entity
-                ? InfectedBlockItem.of(entity.sourceTag()) : InfectedBlockItem.of(Blocks.STONE.defaultBlockState()),
-                ModItems.corruptionDustDrop(params.getLevel().getRandom()));
+        return List.of(ModItems.corruptionDustDrop(params.getLevel().getRandom()));
     }
 
     @Override
