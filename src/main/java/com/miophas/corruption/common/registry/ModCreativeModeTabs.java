@@ -23,6 +23,9 @@ public final class ModCreativeModeTabs {
                         output.accept(ModItems.CORRUPTION_CRYSTAL.get());
                         output.accept(ModItems.ANCIENT_CORRUPTION_CRYSTAL.get());
                         output.accept(ModItems.HARMONIZED_CORRUPTION_CRYSTAL.get());
+                        output.accept(ModItems.CORRUPTION_REMAIN.get());
+                        output.accept(ModItems.LEAF_WINNOWER.get());
+                        output.accept(ModItems.PURE_LEAF.get());
                         output.accept(ModItems.CORRUPTION.get());
                         output.accept(ModItems.MALICE.get());
                         output.accept(ModItems.CORRUPTION_TEETH.get());

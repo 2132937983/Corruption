@@ -2,6 +2,7 @@ package com.miophas.corruption.common.registry;
 
 import com.miophas.corruption.Corruption;
 import com.miophas.corruption.common.item.InfectedBlockItem;
+import com.miophas.corruption.common.item.LeafWinnowerItem;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -19,6 +20,13 @@ public final class ModItems {
             ITEMS.register("ancient_corruption_crystal", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> HARMONIZED_CORRUPTION_CRYSTAL =
             ITEMS.register("harmonized_corruption_crystal", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> CORRUPTION_REMAIN =
+            ITEMS.register("corruption_remain", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> PURE_LEAF =
+            ITEMS.register("pure_leaf", () -> new Item(new Item.Properties()));
+    // 59 uses, the same as a wooden hoe.
+    public static final DeferredItem<LeafWinnowerItem> LEAF_WINNOWER =
+            ITEMS.register("leaf_winnower", () -> new LeafWinnowerItem(new Item.Properties().durability(59)));
     public static final DeferredItem<net.minecraft.world.item.BucketItem> CORRUPTED_WATER_BUCKET = ITEMS.register("corrupted_water_bucket",
             () -> new net.minecraft.world.item.BucketItem(ModFluids.WATER.get(), new Item.Properties().craftRemainder(net.minecraft.world.item.Items.BUCKET).stacksTo(1)));
     public static final DeferredItem<net.minecraft.world.item.BucketItem> CORRUPTED_LAVA_BUCKET = ITEMS.register("corrupted_lava_bucket",

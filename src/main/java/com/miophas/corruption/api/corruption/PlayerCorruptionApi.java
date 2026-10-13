@@ -5,6 +5,8 @@ import com.miophas.corruption.core.corruption.PlayerCorruptionRules;
 /** Progression policy exposed independently of player storage, rendering and effects. */
 public final class PlayerCorruptionApi {
     public static int max(){return PlayerCorruptionRules.MAX;}
+    /** Number of hearts the corruption bar is drawn with. */
+    public static int hearts(){return PlayerCorruptionRules.HEARTS;}
     public static int curseGain(){return PlayerCorruptionRules.CURSE_GAIN;}
     public static int increase(int value,int gain){return PlayerCorruptionRules.increase(value,gain);}
     public static int heartFill(int value,int index){return PlayerCorruptionRules.heartFill(value,index);}

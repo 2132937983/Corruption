@@ -18,7 +18,7 @@ public final class CorruptionHud {
         renderHearts(gui,x,y,PlayerCorruption.value(player));client.gui.leftHeight+=11;
     }
     public static void renderHearts(GuiGraphics gui,int x,int y,int value){
-        for(int i=0;i<10;i++)gui.blit(TEXTURE,x+i*8,y,PlayerCorruptionApi.heartFill(value,i)*9,0,9,9,27,9);
+        for(int i=0;i<PlayerCorruptionApi.hearts();i++)gui.blit(TEXTURE,x+i*8,y,PlayerCorruptionApi.heartFill(value,i)*9,0,9,9,27,9);
     }
     private CorruptionHud(){}
 }

@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "corruption:arcunum",
+    "corruption:arcunum_end",
+    "corruption:spirit",
+    "corruption:spirit_deepslate"
+  ]
+}
