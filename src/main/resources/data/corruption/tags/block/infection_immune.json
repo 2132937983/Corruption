@@ -6,6 +6,7 @@
     "minecraft:reinforced_deepslate",
     "#minecraft:leaves",
     "corruption:eldritch",
-    "corruption:eerie"
+    "corruption:eerie",
+    "corruption:corruption_bench"
   ]
 }

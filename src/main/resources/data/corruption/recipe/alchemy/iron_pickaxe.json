@@ -1,0 +1,17 @@
+{
+  "type": "corruption:alchemy_shaped",
+  "slots": {
+    "0": {
+      "item": "minecraft:iron_ingot",
+      "count": 2
+    },
+    "1": {
+      "item": "minecraft:stick",
+      "count": 3
+    }
+  },
+  "result": {
+    "id": "minecraft:iron_pickaxe",
+    "count": 1
+  }
+}

@@ -68,6 +68,10 @@ public final class CorruptionClient {
                 com.miophas.corruption.common.client.entity.MaliceVineModel::createBodyLayer);
         event.registerLayerDefinition(com.miophas.corruption.common.client.entity.GreedModel.LAYER_LOCATION,
                 com.miophas.corruption.common.client.entity.GreedModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.BaalModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.BaalModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.AgaresModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.AgaresModel::createBodyLayer);
     }
 
     @SubscribeEvent
@@ -79,6 +83,8 @@ public final class CorruptionClient {
         event.registerEntityRenderer(ModEntities.MALICE_VINE.get(), com.miophas.corruption.common.client.entity.MaliceVineRenderer::new);
         event.registerEntityRenderer(ModEntities.GREED.get(), com.miophas.corruption.common.client.entity.GreedRenderer::new);
         event.registerEntityRenderer(ModEntities.GREED_PROJECTILE.get(), com.miophas.corruption.common.client.entity.GreedProjectileRenderer::new);
+        event.registerEntityRenderer(ModEntities.BAAL.get(), com.miophas.corruption.common.client.entity.BaalRenderer::new);
+        event.registerEntityRenderer(ModEntities.AGARES.get(), com.miophas.corruption.common.client.entity.AgaresRenderer::new);
     }
 
     @SubscribeEvent

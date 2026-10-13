@@ -1,0 +1,21 @@
+{
+  "type": "corruption:alchemy_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:bucket",
+      "count": 1
+    },
+    {
+      "item": "corruption:corruption_dust",
+      "count": 8
+    },
+    {
+      "item": "corruption:corruption_crystal",
+      "count": 2
+    }
+  ],
+  "result": {
+    "id": "corruption:flowing_corruption_bucket",
+    "count": 1
+  }
+}

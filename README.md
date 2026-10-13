@@ -134,6 +134,20 @@ com.miophas.corruption
 {"replace": false, "values": ["other_mod:stone_stairs"]}
 ```
 
+## 巴尔
+
+`corruption:baal` 是腐化阵营的巨像。目前只能用 `/summon corruption:baal` 召唤，没有自然生成、刷怪蛋和掉落物。
+
+- **体型**：模型按常规的 16 像素一格制作，高 374 像素，渲染和判定统一放大 `BaalRules.SCALE` 倍（默认 10）：背部利爪顶端约 234 格，头顶 185 格，肩宽约 143 格，从吻部到尾尖约 240 格。只改这一个常量即可整体缩放，判定箱、攻击距离和步幅随之变化。
+- **移动**：体型远超原版碰撞与寻路的适用范围，因此不参与方块碰撞和重力，而是跟随身体中心附近的地面高度：取 5 个采样点的平均值，忽略树叶，水域取水底（所以会涉水而行），每 tick 最多升降 1 格。它不破坏方块，腿会与山体穿插；不会走进未加载的区块。
+- **步态**：双腿由 `core/corruption/BaalRules.gait` 按反向运动学计算，着地的蹄子相对地面不滑动。服务端的腿部判定箱和客户端模型使用同一组结果，一个完整步态周期前进 100 格。
+- **判定**：本体碰撞箱只是 6×10 格的占位箱，无法被选中；实际受击部位是 23 个跟随身体和双腿的 `PartEntity`，头部是弱点（伤害 ×2）。生命值为原版属性上限 1024，护甲 20，盔甲韧性 12，并且只承受 25% 的伤害。只有带攻击者的伤害有效，火焰、溺水、窒息和腐化阵营成员都伤不到它，`/kill` 仍然有效。
+- **行为**：优先追击 512 格内最近的生存玩家，否则追击伤害过它的生物。行走时每次落蹄造成范围伤害（半径 26 格，中心 30 点）；目标在 70 格内时原地抬蹄践踏（半径 60 格，中心 50 点）；目标在正前方 125 格内时弯腰挥臂砸地（半径 34 格，中心 70 点）。伤害向边缘衰减到 30%，并把命中的生物击飞。目标进入 192 格时咆哮，使范围内所有非腐化阵营生物获得 15 秒腐化咒蚀 II，此后每 60 秒一次。
+- **死亡**：在 8 秒内跪倒并沉入地面，不使用原版的侧翻动画。
+- **表现**：`baal_eyes.png` 是发光层，眼睛、胸腔核心和最亮的裂痕在黑暗中可见；显示 Boss 血条并使天空变暗。音效暂时借用原版的坚守者、末影龙和爆炸并降低音调。
+
+数值都在 `core/corruption/BaalRules`，通过 `api/corruption/BaalApi` 提供给实体、模型和渲染器。模型由 `gamemodels/baal/build_model.js` 在 Blockbench 中生成，`export_model.py` 导出 `.bbmodel`、两张纹理和 `BaalGeometry.java`；腿骨长度与静止角度在 `BaalRules` 里重复了一份，修改模型的腿时须同步。`BaalModelTest` 用烘焙后的真实模型核对蹄子和砸地的手是否落在伤害判定的位置，`BaalServerTest` 在测试服务器上实际召唤巴尔并逐 tick 运行。
+
 ## 配置与调速指令
 
 进入世界或启动服务端后，自动生成 `config/corruption-server.toml`。开发客户端对应 `run/config/corruption-server.toml`。如果某个存档已有 `serverconfig/corruption-server.toml`，NeoForge 会优先使用该存档的文件，指令也会保存到当前实际加载的文件。
@@ -196,6 +210,7 @@ scanBlocksPerBatch = 2048
 /give @s corruption:corruption
 /locate biome corruption:corruption
 /particle corruption:corruption_scream ~ ~1 ~ 0 0.035 0 1 0
+/summon corruption:baal
 ```
 
 定位后传送到对应地下坐标查看洞穴地面。群系本身仍较稀有，定位点也可能处于实心岩层中。

@@ -1,0 +1,88 @@
+package com.miophas.corruption.common.alchemy;
+
+import com.miophas.corruption.common.registry.ModRecipes;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.Map;
+import java.util.TreeMap;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
+
+/**
+ * Ingredients with amounts in named slots. A slot the recipe does not name must be empty.
+ * There is no mirroring or shifting as in a crafting grid: the five points are distinct places.
+ */
+public final class ShapedAlchemyRecipe implements AlchemyRecipe {
+    /** JSON object keys are text, so slots are written "0" to "4". */
+    private static final Codec<Integer> SLOT = Codec.STRING.comapFlatMap(text -> {
+        try {
+            int slot = Integer.parseInt(text);
+            return slot >= 0 && slot < SLOTS ? DataResult.success(slot) : DataResult.error(() -> "Slot must be 0 to " + (SLOTS - 1) + ": " + text);
+        } catch (NumberFormatException notANumber) {
+            return DataResult.error(() -> "Not a slot number: " + text);
+        }
+    }, String::valueOf);
+    public static final MapCodec<ShapedAlchemyRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            Codec.unboundedMap(SLOT, SizedIngredient.FLAT_CODEC)
+                    .validate(slots -> slots.isEmpty() ? DataResult.error(() -> "A shaped alchemy recipe needs at least one slot") : DataResult.success(slots))
+                    .fieldOf("slots").forGetter(ShapedAlchemyRecipe::slots),
+            ItemStack.STRICT_CODEC.fieldOf("result").forGetter(recipe -> recipe.result)).apply(instance, ShapedAlchemyRecipe::new));
+    public static final StreamCodec<RegistryFriendlyByteBuf, ShapedAlchemyRecipe> STREAM_CODEC = StreamCodec.of((buffer, recipe) -> {
+        buffer.writeVarInt(recipe.slots.size());
+        recipe.slots.forEach((slot, ingredient) -> {
+            buffer.writeVarInt(slot);
+            SizedIngredient.STREAM_CODEC.encode(buffer, ingredient);
+        });
+        ItemStack.STREAM_CODEC.encode(buffer, recipe.result);
+    }, buffer -> {
+        Map<Integer, SizedIngredient> slots = new TreeMap<>();
+        for (int count = buffer.readVarInt(); count > 0; count--) slots.put(buffer.readVarInt(), SizedIngredient.STREAM_CODEC.decode(buffer));
+        return new ShapedAlchemyRecipe(slots, ItemStack.STREAM_CODEC.decode(buffer));
+    });
+
+    private final Map<Integer, SizedIngredient> slots;
+    private final ItemStack result;
+
+    public ShapedAlchemyRecipe(Map<Integer, SizedIngredient> slots, ItemStack result) {
+        this.slots = java.util.Collections.unmodifiableMap(new TreeMap<>(slots));
+        for (int slot : this.slots.keySet()) if (slot < 0 || slot >= SLOTS) throw new IllegalArgumentException("No such bench slot: " + slot);
+        this.result = result;
+    }
+
+    /** In slot order. */
+    public Map<Integer, SizedIngredient> slots() { return slots; }
+
+    @Override public int[] consumption(AlchemyInput input) {
+        int[] taken = new int[input.size()];
+        for (int slot = 0; slot < input.size(); slot++) {
+            SizedIngredient wanted = slots.get(slot);
+            ItemStack placed = input.getItem(slot);
+            if (wanted == null ? !placed.isEmpty() : !wanted.test(placed)) return null;
+            if (wanted != null) taken[slot] = wanted.count();
+        }
+        return taken;
+    }
+
+    @Override public ItemStack assemble(AlchemyInput input, HolderLookup.Provider registries) { return result.copy(); }
+    @Override public ItemStack getResultItem(HolderLookup.Provider registries) { return result; }
+    /** One entry per slot, empty where the recipe wants nothing. */
+    @Override public NonNullList<Ingredient> getIngredients() {
+        NonNullList<Ingredient> bySlot = NonNullList.withSize(SLOTS, Ingredient.EMPTY);
+        slots.forEach((slot, ingredient) -> bySlot.set(slot, ingredient.ingredient()));
+        return bySlot;
+    }
+    @Override public RecipeSerializer<?> getSerializer() { return ModRecipes.ALCHEMY_SHAPED.get(); }
+
+    public static final class Serializer implements RecipeSerializer<ShapedAlchemyRecipe> {
+        @Override public MapCodec<ShapedAlchemyRecipe> codec() { return CODEC; }
+        @Override public StreamCodec<RegistryFriendlyByteBuf, ShapedAlchemyRecipe> streamCodec() { return STREAM_CODEC; }
+    }
+}

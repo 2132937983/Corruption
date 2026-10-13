@@ -39,6 +39,9 @@ public final class Corruption {
         com.miophas.corruption.common.registry.ModEffects.EFFECTS.register(modEventBus);
         com.miophas.corruption.common.registry.ModPotions.POTIONS.register(modEventBus);
         com.miophas.corruption.common.registry.ModSounds.SOUNDS.register(modEventBus);
+        com.miophas.corruption.common.registry.ModMenus.MENUS.register(modEventBus);
+        com.miophas.corruption.common.registry.ModRecipes.TYPES.register(modEventBus);
+        com.miophas.corruption.common.registry.ModRecipes.SERIALIZERS.register(modEventBus);
         ModCreativeModeTabs.TABS.register(modEventBus);
         ModFeatures.FEATURES.register(modEventBus);
         NeoForge.EVENT_BUS.register(InfectionEvents.class);

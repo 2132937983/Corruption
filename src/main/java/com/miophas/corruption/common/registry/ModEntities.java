@@ -2,6 +2,8 @@ package com.miophas.corruption.common.registry;
 
 import com.miophas.corruption.Corruption;
 import com.miophas.corruption.common.entity.CorruptedRemnant;
+import com.miophas.corruption.api.corruption.AgaresApi;
+import com.miophas.corruption.api.corruption.BaalApi;
 import com.miophas.corruption.api.corruption.RemnantCombatApi;
 import com.miophas.corruption.api.plant.LivingPlantApi;
 import com.miophas.corruption.api.plant.LivingPlantKind;
@@ -45,6 +47,15 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.GreedProjectile>> GREED_PROJECTILE = TYPES.register("greed_projectile",
             () -> EntityType.Builder.of(com.miophas.corruption.common.entity.GreedProjectile::new, MobCategory.MISC)
                     .sized(.7F, .7F).clientTrackingRange(8).updateInterval(2).build("corruption:greed_projectile"));
+    /** Its own box is a small stand-in; the hitboxes are its parts. Sent from far off and every tick, so its stride stays in step. */
+    public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.Baal>> BAAL = TYPES.register("baal",
+            () -> EntityType.Builder.of(com.miophas.corruption.common.entity.Baal::new, MobCategory.MONSTER)
+                    .sized(BaalApi.bodyWidthBlocks(), BaalApi.bodyHeightBlocks()).eyeHeight(BaalApi.eyeHeightBlocks())
+                    .fireImmune().clientTrackingRange(32).updateInterval(1).build("corruption:baal"));
+    public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.Agares>> AGARES = TYPES.register("agares",
+            () -> EntityType.Builder.of(com.miophas.corruption.common.entity.Agares::new, MobCategory.MONSTER)
+                    .sized(AgaresApi.bodyWidthBlocks(), AgaresApi.bodyHeightBlocks()).eyeHeight(AgaresApi.eyeHeightBlocks())
+                    .fireImmune().clientTrackingRange(32).updateInterval(1).build("corruption:agares"));
 
     @SubscribeEvent
     public static void attributes(EntityAttributeCreationEvent event) {
@@ -52,6 +63,8 @@ public final class ModEntities {
         event.put(CORRUPTED_DRAGON.get(), CorruptedRemnant.attributes().build());
         event.put(MALICE_VINE.get(), com.miophas.corruption.common.entity.MaliceVine.attributes().build());
         event.put(GREED.get(), com.miophas.corruption.common.entity.Greed.attributes().build());
+        event.put(BAAL.get(), com.miophas.corruption.common.entity.Baal.attributes().build());
+        event.put(AGARES.get(), com.miophas.corruption.common.entity.Agares.attributes().build());
     }
 
     private ModEntities() {}

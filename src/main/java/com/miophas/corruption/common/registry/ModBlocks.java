@@ -27,6 +27,9 @@ public final class ModBlocks {
             () -> new com.miophas.corruption.common.block.CorruptedLiquidBlock(ModFluids.LAVA.get(), true, BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.LAVA)));
     public static final DeferredBlock<com.miophas.corruption.common.block.FlowingCorruptionBlock> FLOWING_CORRUPTION = BLOCKS.register(com.miophas.corruption.api.corruption.CorruptionCurseApi.flowingCorruption().id(),
             () -> new com.miophas.corruption.common.block.FlowingCorruptionBlock(ModFluids.FLOWING_CORRUPTION.get(), BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.WATER).mapColor(MapColor.COLOR_PURPLE)));
+    public static final DeferredBlock<com.miophas.corruption.common.block.CorruptionBenchBlock> CORRUPTION_BENCH = BLOCKS.registerBlock("corruption_bench",
+            com.miophas.corruption.common.block.CorruptionBenchBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE)
+                    .instrument(NoteBlockInstrument.BASS).strength(2.5F).sound(SoundType.WOOD));
     public static final DeferredBlock<InfectedBlock> INFECTED_BLOCK = BLOCKS.registerBlock("infected_block",
             InfectedBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD)
                     .instrument(NoteBlockInstrument.BASS).strength(2.0F).sound(INFECTED_SOUND).dynamicShape());

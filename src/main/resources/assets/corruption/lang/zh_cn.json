@@ -69,6 +69,8 @@
   "corruption.configuration.infection.enabled": "启用腐化传染",
   "corruption.configuration.infection.enabled.tooltip": "控制腐化方块的传染。关闭后暂停扫描与转化，重新开启后继续蔓延。",
   "commands.corruption.enabled": "腐化传染：%s",
+  "entity.corruption.agares": "阿加雷斯",
+  "entity.corruption.baal": "巴尔",
   "entity.corruption.corrupted_dragon": "腐化末影龙",
   "entity.corruption.corrupted_dragon_fireball": "腐化龙火球",
   "entity.corruption.corrupted_dragon_breath": "腐化龙息",
@@ -81,5 +83,8 @@
   "subtitles.corruption.entity.corrupted_remnant.ambient": "腐化残躯：低吼",
   "subtitles.corruption.entity.corrupted_remnant.attack": "腐化残躯：攻击",
   "subtitles.corruption.entity.corrupted_remnant.hurt": "腐化残躯：受伤",
-  "subtitles.corruption.entity.corrupted_remnant.death": "腐化残躯：死亡"
+  "subtitles.corruption.entity.corrupted_remnant.death": "腐化残躯：死亡",
+  "block.corruption.corruption_bench": "腐化工作台",
+  "container.corruption.corruption_bench": "腐化工作台",
+  "corruption.jei.alchemy": "炼金"
 }

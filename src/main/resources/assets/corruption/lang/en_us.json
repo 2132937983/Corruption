@@ -69,6 +69,8 @@
   "corruption.configuration.infection.enabled": "Enable corruption infection",
   "corruption.configuration.infection.enabled.tooltip": "Master switch for block infection. Pauses discovery and conversions; re-enabling resumes spread.",
   "commands.corruption.enabled": "Corruption infection: %s",
+  "entity.corruption.agares": "Agares",
+  "entity.corruption.baal": "Baal",
   "entity.corruption.corrupted_dragon": "Corrupted Ender Dragon",
   "entity.corruption.corrupted_dragon_fireball": "Corrupted Dragon Fireball",
   "entity.corruption.corrupted_dragon_breath": "Corrupted Dragon Breath",
@@ -81,5 +83,8 @@
   "subtitles.corruption.entity.corrupted_remnant.ambient": "Corrupted Remnant groans",
   "subtitles.corruption.entity.corrupted_remnant.attack": "Corrupted Remnant attacks",
   "subtitles.corruption.entity.corrupted_remnant.hurt": "Corrupted Remnant hurts",
-  "subtitles.corruption.entity.corrupted_remnant.death": "Corrupted Remnant dies"
+  "subtitles.corruption.entity.corrupted_remnant.death": "Corrupted Remnant dies",
+  "block.corruption.corruption_bench": "Corruption Bench",
+  "container.corruption.corruption_bench": "Corruption Bench",
+  "corruption.jei.alchemy": "Alchemy"
 }

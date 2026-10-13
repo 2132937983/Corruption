@@ -26,6 +26,7 @@ public final class ModCreativeModeTabs {
                         output.accept(ModItems.CORRUPTION_REMAIN.get());
                         output.accept(ModItems.LEAF_WINNOWER.get());
                         output.accept(ModItems.PURE_LEAF.get());
+                        output.accept(ModItems.CORRUPTION_BENCH.get());
                         output.accept(ModItems.CORRUPTION.get());
                         output.accept(ModItems.MALICE.get());
                         output.accept(ModItems.CORRUPTION_TEETH.get());

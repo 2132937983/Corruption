@@ -144,7 +144,11 @@ configurations {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // Lets a unit test ask for a real, throwaway server (EphemeralTestServerProvider) to put entities in.
+    testImplementation "net.neoforged:testframework:${neo_version}"
     implementation "com.github.glitchfiend:TerraBlender-neoforge:${minecraft_version}-4.1.0.8"
+    // JEI's API, for the alchemy recipe plugin. Compile-only: the mod must still load without JEI.
+    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:19.57.0.451"
     // Development runtime mods for Minecraft 1.21.1 / NeoForge.
     localRuntime("mezz.jei:jei-${minecraft_version}-neoforge:19.57.0.451") {
         // The full mod jar already bundles JEI modules and its configuration library.
