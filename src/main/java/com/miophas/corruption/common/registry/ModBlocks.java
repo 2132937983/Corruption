@@ -59,7 +59,7 @@ public final class ModBlocks {
     private static DeferredBlock<CorruptionBlock> ore(String name, float hardness, SoundType sound) {
         return BLOCKS.registerBlock(name, CorruptionBlock::new, BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_RED).strength(hardness, 6.0F).sound(sound)
-                .requiresCorrectToolForDrops().noLootTable());
+                .requiresCorrectToolForDrops());
     }
     private static BlockBehaviour.Properties plantProperties() {
         return BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).noCollission().noOcclusion()

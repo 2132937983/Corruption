@@ -19,6 +19,10 @@ public final class ModCreativeModeTabs {
                     .withTabsBefore(CreativeModeTabs.NATURAL_BLOCKS)
                     .icon(() -> ModItems.CORRUPTION.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
+                        output.accept(ModItems.CORRUPTION_DUST.get());
+                        output.accept(ModItems.CORRUPTION_CRYSTAL.get());
+                        output.accept(ModItems.ANCIENT_CORRUPTION_CRYSTAL.get());
+                        output.accept(ModItems.HARMONIZED_CORRUPTION_CRYSTAL.get());
                         output.accept(ModItems.CORRUPTION.get());
                         output.accept(ModItems.MALICE.get());
                         output.accept(ModItems.CORRUPTION_TEETH.get());

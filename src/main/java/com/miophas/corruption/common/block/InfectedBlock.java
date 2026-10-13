@@ -2,6 +2,7 @@ package com.miophas.corruption.common.block;
 
 import com.miophas.corruption.common.blockentity.InfectedBlockEntity;
 import com.miophas.corruption.common.item.InfectedBlockItem;
+import com.miophas.corruption.common.registry.ModItems;
 import com.miophas.corruption.common.config.InfectionConfig;
 import com.mojang.serialization.MapCodec;
 import java.util.List;
@@ -82,7 +83,8 @@ public final class InfectedBlock extends CorruptionBlock implements EntityBlock 
     @Override
     protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
         return List.of(params.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof InfectedBlockEntity entity
-                ? InfectedBlockItem.of(entity.sourceTag()) : InfectedBlockItem.of(Blocks.STONE.defaultBlockState()));
+                ? InfectedBlockItem.of(entity.sourceTag()) : InfectedBlockItem.of(Blocks.STONE.defaultBlockState()),
+                ModItems.corruptionDustDrop(params.getLevel().getRandom()));
     }
 
     @Override

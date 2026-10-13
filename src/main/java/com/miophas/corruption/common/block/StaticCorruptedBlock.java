@@ -2,6 +2,7 @@ package com.miophas.corruption.common.block;
 
 import com.miophas.corruption.common.registry.GeneratedCorruption;
 import com.miophas.corruption.common.registry.ModBlocks;
+import com.miophas.corruption.common.registry.ModItems;
 import com.miophas.corruption.common.config.InfectionConfig;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -157,7 +158,9 @@ public final class StaticCorruptedBlock extends CorruptionBlock implements net.m
     @Override public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
         return InfectionConfig.corruptedBlocksFlammable() ? 5 : 0;
     }
-    @Override protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) { return List.of(GeneratedCorruption.stack(state)); }
+    @Override protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
+        return List.of(GeneratedCorruption.stack(state), ModItems.corruptionDustDrop(params.getLevel().getRandom()));
+    }
     @Override public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) { return GeneratedCorruption.stack(state); }
     @Override public MutableComponent getName() { return Component.translatable("block.corruption.infected_block.variant", original.getName()); }
 }
