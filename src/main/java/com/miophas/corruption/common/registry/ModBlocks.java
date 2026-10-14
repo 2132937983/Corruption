@@ -9,6 +9,7 @@ import com.miophas.corruption.common.block.CorruptionTeethBlock;
 import com.miophas.corruption.common.block.EldritchVineBlock;
 import com.miophas.corruption.common.block.EerieBlock;
 import com.miophas.corruption.common.block.LostSoulBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -45,6 +46,9 @@ public final class ModBlocks {
     public static final DeferredBlock<MaliceBlock> MALICE = BLOCKS.registerBlock("malice", MaliceBlock::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(1.5F, 6.0F)
                     .sound(SoundType.SCULK).requiresCorrectToolForDrops());
+    public static final DeferredBlock<Block> CORRUPTION_ARCANE_BRICK = BLOCKS.registerBlock("corruption_arcane_brick",
+            Block::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(1.5F, 6.0F)
+                    .sound(SoundType.STONE).requiresCorrectToolForDrops());
     public static final DeferredBlock<CorruptionTeethBlock> CORRUPTION_TEETH = BLOCKS.registerBlock("corruption_teeth",
             CorruptionTeethBlock::new, plantProperties());
     public static final DeferredBlock<CorruptionPlantBlock> MALICE_GRASS = plant("malice_grass");

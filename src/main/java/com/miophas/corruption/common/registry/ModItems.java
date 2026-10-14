@@ -41,6 +41,8 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> CORRUPTION_BENCH = ITEMS.registerSimpleBlockItem("corruption_bench", ModBlocks.CORRUPTION_BENCH);
     public static final DeferredItem<BlockItem> ARCUNUM = ITEMS.registerSimpleBlockItem("arcunum", ModBlocks.ARCUNUM);
     public static final DeferredItem<BlockItem> MALICE = ITEMS.registerSimpleBlockItem("malice", ModBlocks.MALICE);
+    public static final DeferredItem<BlockItem> CORRUPTION_ARCANE_BRICK =
+            ITEMS.registerSimpleBlockItem("corruption_arcane_brick", ModBlocks.CORRUPTION_ARCANE_BRICK);
     public static final DeferredItem<BlockItem> CORRUPTION_TEETH = ITEMS.registerSimpleBlockItem("corruption_teeth", ModBlocks.CORRUPTION_TEETH);
     public static final DeferredItem<BlockItem> MALICE_GRASS = ITEMS.registerSimpleBlockItem("malice_grass", ModBlocks.MALICE_GRASS);
     public static final DeferredItem<BlockItem> WHISPER_BLOOM = ITEMS.registerSimpleBlockItem("whisper_bloom", ModBlocks.WHISPER_BLOOM);

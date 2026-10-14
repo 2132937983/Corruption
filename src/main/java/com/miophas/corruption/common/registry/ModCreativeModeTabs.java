@@ -29,6 +29,7 @@ public final class ModCreativeModeTabs {
                         output.accept(ModItems.CORRUPTION_BENCH.get());
                         output.accept(ModItems.CORRUPTION.get());
                         output.accept(ModItems.MALICE.get());
+                        output.accept(ModItems.CORRUPTION_ARCANE_BRICK.get());
                         output.accept(ModItems.CORRUPTION_TEETH.get());
                         output.accept(ModItems.MALICE_GRASS.get());
                         output.accept(ModItems.WHISPER_BLOOM.get());
