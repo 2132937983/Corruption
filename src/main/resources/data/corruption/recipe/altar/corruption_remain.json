@@ -1,0 +1,21 @@
+{
+  "type": "corruption:altar_shapeless",
+  "pillars": [
+    {
+      "item": "minecraft:rotten_flesh"
+    },
+    {
+      "item": "minecraft:bone"
+    },
+    {
+      "item": "minecraft:spider_eye"
+    },
+    {
+      "item": "corruption:corruption_dust"
+    }
+  ],
+  "result": {
+    "id": "corruption:corruption_remain",
+    "count": 4
+  }
+}

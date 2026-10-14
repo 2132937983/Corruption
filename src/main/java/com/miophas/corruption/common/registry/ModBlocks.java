@@ -49,6 +49,32 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CORRUPTION_ARCANE_BRICK = BLOCKS.registerBlock("corruption_arcane_brick",
             Block::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(1.5F, 6.0F)
                     .sound(SoundType.STONE).requiresCorrectToolForDrops());
+    /** Nine corrupted brass, stored. */
+    public static final DeferredBlock<Block> CORRUPTED_BRASS_BLOCK = BLOCKS.registerBlock("corrupted_brass_block",
+            Block::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(3.0F, 6.0F)
+                    .sound(SoundType.COPPER).requiresCorrectToolForDrops());
+    /** Cooks up to seven things together with a fluid and Corruption Energy; see BrassCauldronBlockEntity. */
+    public static final DeferredBlock<com.miophas.corruption.common.block.BrassCauldronBlock> BRASS_CAULDRON = BLOCKS.registerBlock("brass_cauldron",
+            com.miophas.corruption.common.block.BrassCauldronBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(2.0F)
+                    .sound(SoundType.COPPER).requiresCorrectToolForDrops().noOcclusion());
+    /** Holds one item for an altar's rites; see AltarPillarBlock. */
+    public static final DeferredBlock<com.miophas.corruption.common.block.AltarPillarBlock> ALTAR_PILLAR = BLOCKS.registerBlock("altar_pillar",
+            com.miophas.corruption.common.block.AltarPillarBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(1.5F, 6.0F)
+                    .sound(SoundType.STONE).requiresCorrectToolForDrops().noOcclusion());
+    /** The middle of an altar: binds creatures and performs rites; see AltarOfferingBlock. */
+    public static final DeferredBlock<com.miophas.corruption.common.block.AltarOfferingBlock> ALTAR_OFFERING = BLOCKS.registerBlock("altar_offering",
+            com.miophas.corruption.common.block.AltarOfferingBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(1.5F, 6.0F)
+                    .sound(SoundType.STONE).requiresCorrectToolForDrops().noOcclusion()
+                    .lightLevel(state -> state.getValue(com.miophas.corruption.common.block.AltarOfferingBlock.ALTAR) == com.miophas.corruption.common.altar.AltarMode.BINDING ? 7 : 0));
+    /** Shows a key to the arcane, and copies its strings onto parchment; see ArcaneLecternBlockEntity. */
+    public static final DeferredBlock<com.miophas.corruption.common.block.ArcaneLecternBlock> CORRUPTION_ARCANE_LECTERN = BLOCKS.registerBlock("corruption_arcane_lectern",
+            com.miophas.corruption.common.block.ArcaneLecternBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.5F)
+                    .sound(SoundType.STONE).requiresCorrectToolForDrops().lightLevel(state -> 7).noOcclusion());
+    /** Lit while it works; see ArcaneTransmuterBlockEntity. */
+    public static final DeferredBlock<com.miophas.corruption.common.block.ArcaneTransmuterBlock> CORRUPTION_ARCANE_TRANSMUTER = BLOCKS.registerBlock("corruption_arcane_transmuter",
+            com.miophas.corruption.common.block.ArcaneTransmuterBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(3.5F)
+                    .sound(SoundType.STONE).requiresCorrectToolForDrops()
+                    .lightLevel(state -> state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT) ? 9 : 0));
     public static final DeferredBlock<CorruptionTeethBlock> CORRUPTION_TEETH = BLOCKS.registerBlock("corruption_teeth",
             CorruptionTeethBlock::new, plantProperties());
     public static final DeferredBlock<CorruptionPlantBlock> MALICE_GRASS = plant("malice_grass");

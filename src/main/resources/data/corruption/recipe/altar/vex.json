@@ -1,0 +1,22 @@
+{
+  "type": "corruption:altar_shapeless",
+  "pillars": [
+    {
+      "item": "minecraft:phantom_membrane"
+    },
+    {
+      "item": "corruption:corruption_crystal"
+    }
+  ],
+  "offering": "minecraft:villager",
+  "blocks": [
+    { "at": [2, 2], "block": "#minecraft:soul_fire_base_blocks" },
+    { "at": [2, -2], "block": "#minecraft:soul_fire_base_blocks" },
+    { "at": [-2, -2], "block": "#minecraft:soul_fire_base_blocks" },
+    { "at": [-2, 2], "block": "#minecraft:soul_fire_base_blocks" }
+  ],
+  "time": 80,
+  "result": {
+    "entity": "minecraft:vex"
+  }
+}

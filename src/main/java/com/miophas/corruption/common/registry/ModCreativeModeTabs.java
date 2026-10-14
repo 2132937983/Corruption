@@ -1,6 +1,8 @@
 package com.miophas.corruption.common.registry;
 
 import com.miophas.corruption.Corruption;
+import com.miophas.corruption.api.energy.CorruptionEnergyApi;
+import com.miophas.corruption.api.energy.CorruptionEnergyCarrier;
 import com.miophas.corruption.common.item.InfectedBlockItem;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.core.registries.Registries;
@@ -30,6 +32,24 @@ public final class ModCreativeModeTabs {
                         output.accept(ModItems.CORRUPTION.get());
                         output.accept(ModItems.MALICE.get());
                         output.accept(ModItems.CORRUPTION_ARCANE_BRICK.get());
+                        output.accept(ModItems.CORRUPTION_ARCANE_TRANSMUTER.get());
+                        // A candle as the transmuter makes it, carrying all it can.
+                        net.minecraft.world.item.ItemStack candle = new net.minecraft.world.item.ItemStack(ModItems.CORRUPTION_CANDLE.get());
+                        CorruptionEnergyCarrier carrier = CorruptionEnergyCarrier.of(candle);
+                        output.accept(CorruptionEnergyCarrier.charged(candle, carrier == null ? CorruptionEnergyApi.kilo(10) : carrier.capacity()));
+                        output.accept(ModItems.CORRUPTION_ARCANE_LECTERN.get());
+                        output.accept(ModItems.ALTAR_OFFERING.get());
+                        output.accept(ModItems.ALTAR_PILLAR.get());
+                        output.accept(ModItems.CORRUPTED_BRASS.get());
+                        output.accept(ModItems.CORRUPTED_BRASS_BLOCK.get());
+                        output.accept(ModItems.BRASS_CAULDRON.get());
+                        output.accept(ModItems.CLAVICULA_SALOMONIS.get());
+                        output.accept(ModItems.PARCHMENT.get());
+                        output.accept(ModItems.INK.get());
+                        // A parchment bearing each string the data holds, for trying recipes that will ask for them.
+                        net.minecraft.world.item.ItemStack parchment = new net.minecraft.world.item.ItemStack(ModItems.PARCHMENT.get());
+                        parameters.holders().lookup(com.miophas.corruption.api.arcane.ArcaneString.REGISTRY).ifPresent(strings -> strings.listElementIds()
+                                .forEach(string -> output.accept(com.miophas.corruption.api.arcane.ArcaneApi.inscribed(parchment, string))));
                         output.accept(ModItems.CORRUPTION_TEETH.get());
                         output.accept(ModItems.MALICE_GRASS.get());
                         output.accept(ModItems.WHISPER_BLOOM.get());

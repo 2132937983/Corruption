@@ -11,6 +11,9 @@ public final class ModParticles {
     public static final DeferredRegister<ParticleType<?>> TYPES = DeferredRegister.create(Registries.PARTICLE_TYPE, Corruption.MOD_ID);
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CORRUPTION_SCREAM =
             TYPES.register("corruption_scream", () -> new SimpleParticleType(false));
+    /** The motes that drift out of a working arcane transmuter. */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CORRUPTION_PARTICLE =
+            TYPES.register("corruption_particle", () -> new SimpleParticleType(false));
 
     private ModParticles() {}
 }

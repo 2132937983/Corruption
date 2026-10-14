@@ -1,0 +1,16 @@
+{
+  "type": "corruption:brass_cooking",
+  "ingredients": [
+    {
+      "item": "minecraft:red_mushroom"
+    }
+  ],
+  "fluid": {
+    "fluid": "minecraft:water",
+    "amount": 10
+  },
+  "energy": "10CE",
+  "result": {
+    "id": "minecraft:mushroom_stew"
+  }
+}

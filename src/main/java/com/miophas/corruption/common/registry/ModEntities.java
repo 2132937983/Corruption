@@ -35,6 +35,10 @@ public final class ModEntities {
             () -> EntityType.Builder.of(CorruptedRemnant::new, MobCategory.MONSTER)
                     .sized(RemnantCombatApi.definition().width(), RemnantCombatApi.definition().height())
                     .clientTrackingRange(10).updateInterval(3).build("corruption:corrupted_remnant"));
+    /** The purple bolt that strikes an altar as a rite completes: lightning that burns and hurts nothing. */
+    public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.CorruptLightning>> CORRUPT_LIGHTNING = TYPES.register("corrupt_lightning",
+            () -> EntityType.Builder.<com.miophas.corruption.common.entity.CorruptLightning>of(com.miophas.corruption.common.entity.CorruptLightning::new, MobCategory.MISC)
+                    .noSave().sized(0, 0).clientTrackingRange(16).updateInterval(Integer.MAX_VALUE).build("corruption:corrupt_lightning"));
     public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.MaliceVine>> MALICE_VINE = TYPES.register("malice_vine",
             () -> EntityType.Builder.of(com.miophas.corruption.common.entity.MaliceVine::new, MobCategory.MISC)
                     .sized(LivingPlantApi.definition(LivingPlantKind.MALICE_VINE).width(0), LivingPlantApi.definition(LivingPlantKind.MALICE_VINE).height(0))

@@ -30,6 +30,7 @@ public final class Corruption {
         modEventBus.addListener(InfectionConfig::onUnloading);
         com.miophas.corruption.common.registry.ModFluids.TYPES.register(modEventBus);
         com.miophas.corruption.common.registry.ModFluids.FLUIDS.register(modEventBus);
+        com.miophas.corruption.common.registry.ModDataComponents.TYPES.register(modEventBus);
         ModBlocks.BLOCKS.register(modEventBus);
         ModBlockEntities.TYPES.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);

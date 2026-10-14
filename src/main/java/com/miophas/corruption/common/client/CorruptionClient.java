@@ -43,6 +43,7 @@ public final class CorruptionClient {
     public static void setup(FMLClientSetupEvent event) {
         ModList.get().getModContainerById(Corruption.MOD_ID).orElseThrow()
                 .registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        event.enqueueWork(ArcaneTooltip::registerItemProperties);
     }
 
     @SubscribeEvent
@@ -90,11 +91,13 @@ public final class CorruptionClient {
     @SubscribeEvent
     public static void reload(net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent event) {
         event.registerReloadListener(CrimsonTextures.INSTANCE);
+        event.registerReloadListener(GuiTiles.GUI);
     }
 
     @SubscribeEvent
     public static void particles(RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(ModParticles.CORRUPTION_SCREAM.get(), CorruptionScreamParticle.Provider::new);
+        event.registerSpriteSet(ModParticles.CORRUPTION_PARTICLE.get(), com.miophas.corruption.common.client.particle.CorruptionParticle.Provider::new);
     }
 
     @SubscribeEvent

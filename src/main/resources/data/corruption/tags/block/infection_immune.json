@@ -7,6 +7,12 @@
     "#minecraft:leaves",
     "corruption:eldritch",
     "corruption:eerie",
-    "corruption:corruption_bench"
+    "corruption:corruption_bench",
+    "corruption:corruption_arcane_transmuter",
+    "corruption:corruption_arcane_lectern",
+    "corruption:corrupted_brass_block",
+    "corruption:brass_cauldron",
+    "corruption:altar_pillar",
+    "corruption:altar_offering"
   ]
 }

@@ -1,0 +1,13 @@
+{
+  "type": "corruption:arcane_transmutation",
+  "ingredient": {
+    "tag": "c:candles"
+  },
+  "energy": "10KCE",
+  "result": {
+    "id": "corruption:corruption_candle",
+    "components": {
+      "corruption:corruption_energy": "10KCE"
+    }
+  }
+}

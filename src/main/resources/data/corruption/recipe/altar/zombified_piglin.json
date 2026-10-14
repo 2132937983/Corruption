@@ -1,0 +1,19 @@
+{
+  "type": "corruption:altar_shapeless",
+  "pillars": [
+    {
+      "item": "corruption:corruption_dust"
+    },
+    {
+      "item": "corruption:corruption_dust"
+    },
+    {
+      "item": "corruption:corruption_dust"
+    }
+  ],
+  "offering": "minecraft:pig",
+  "time": 80,
+  "result": {
+    "entity": "minecraft:zombified_piglin"
+  }
+}

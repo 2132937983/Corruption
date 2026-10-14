@@ -8,6 +8,12 @@
     "corruption:spirit",
     "corruption:spirit_deepslate",
     "corruption:malice",
-    "corruption:corruption_arcane_brick"
+    "corruption:corruption_arcane_brick",
+    "corruption:corruption_arcane_transmuter",
+    "corruption:corruption_arcane_lectern",
+    "corruption:corrupted_brass_block",
+    "corruption:brass_cauldron",
+    "corruption:altar_pillar",
+    "corruption:altar_offering"
   ]
 }

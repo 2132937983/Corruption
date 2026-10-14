@@ -1,0 +1,26 @@
+{
+  "type": "corruption:altar_shaped",
+  "pillars": {
+    "1": {
+      "item": "corruption:corruption_crystal"
+    },
+    "2": {
+      "item": "corruption:corrupted_brass"
+    },
+    "3": {
+      "item": "corruption:corruption_crystal"
+    },
+    "4": {
+      "item": "corruption:corrupted_brass"
+    },
+    "5": {
+      "item": "corruption:corruption_crystal"
+    },
+    "6": {
+      "item": "corruption:corrupted_brass"
+    }
+  },
+  "result": {
+    "id": "corruption:ancient_corruption_crystal"
+  }
+}

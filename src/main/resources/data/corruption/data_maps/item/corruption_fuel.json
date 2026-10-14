@@ -1,0 +1,8 @@
+{
+  "values": {
+    "corruption:corruption_dust": {
+      "energy": "0.1KCE",
+      "ticks": 10
+    }
+  }
+}

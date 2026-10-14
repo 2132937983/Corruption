@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "corruption:block/brass_cauldron"
+    },
+    "lit=true": {
+      "model": "corruption:block/brass_cauldron"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "corruption:altar_shapeless",
+  "pillars": [
+    {
+      "item": "corruption:corruption_remain"
+    },
+    {
+      "item": "corruption:corruption_dust"
+    },
+    {
+      "item": "corruption:corruption_dust"
+    }
+  ],
+  "corruption": 10,
+  "result": {
+    "id": "corruption:malice",
+    "count": 4
+  }
+}

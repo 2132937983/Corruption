@@ -1,0 +1,27 @@
+{
+  "type": "corruption:altar_shaped",
+  "pillars": {
+    "1": {
+      "item": "corruption:corruption_candle"
+    },
+    "3": {
+      "item": "corruption:corruption_crystal"
+    },
+    "5": {
+      "item": "corruption:corruption_crystal"
+    }
+  },
+  "blocks": [
+    { "at": [0, 1], "block": "#minecraft:candles" },
+    { "at": [1, 1], "block": "#minecraft:candles" },
+    { "at": [1, 0], "block": "#minecraft:candles" },
+    { "at": [1, -1], "block": "#minecraft:candles" },
+    { "at": [0, -1], "block": "#minecraft:candles" },
+    { "at": [-1, -1], "block": "#minecraft:candles" },
+    { "at": [-1, 0], "block": "#minecraft:candles" },
+    { "at": [-1, 1], "block": "#minecraft:candles" }
+  ],
+  "result": {
+    "id": "corruption:harmonized_corruption_crystal"
+  }
+}
