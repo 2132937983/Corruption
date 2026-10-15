@@ -458,3 +458,146 @@ A review of this session's code found the issues below; all are fixed, and the b
 - `common/client/WheelSectorsTest`: sector geometry for 1-12 slots, dead zone, empty slots not choosable.
 - `SpellServerTest`'s pedestal test now checks only what still applies (pickaxe, drops itself).
 
+---
+
+## 12. Session after §11: the arcane charger, spells of the Key, and a spell damage of its own
+
+Everything below was done after the §10/§11 review fixes, on top of `0.0.0.8`. Like the rest of this document it was **never built and never run** — only the IDE's diagnostics were checked — so read §12.9 before trusting any of it.
+
+### 12.1 The arcane charger: the block that was missing
+
+The only way to charge a wand was the `arcane_transmutation` recipe in the transmuter (all-or-nothing, must pay the full amount, and the machine is not a charger). There was no "block fills an item" path at all: `EnergyPouring` only moved energy **item → block**.
+
+Design settled with the user: a dedicated block, **no GUI**, fed **only** from outside (so the existing sneak-pour and any add-on's cables work with no new interaction code), and the transmuter recipe kept as a shortcut.
+
+- `common/block/ArcaneChargerBlock` — right-click with something that has energy to give → `EnergyPouring.pour` **without the sneak** the rest of the mod asks for (the charger is made to be fed); a tool with nothing to give → set on it; what lies there → taken back; broken → the item is spat out, the store's energy is lost.
+- `common/blockentity/ArcaneChargerBlockEntity` — one item and a store of its own (`CAPACITY = 100 KCE`, offered to the world as `view(Long.MAX_VALUE, 0)`: energy may be put in, never taken out). A step of the store goes into the item each tick, until the store is spent or the item full.
+- `common/energy/EnergyCharging` — the mirror of `EnergyIntake`: `chargeable` / `step(item, store)`. **Tools only** (see §12.2): a battery pours out what it carries, it is not charged here.
+- `api/energy/EnergyCharger` — the slot (`charge` / `put` / `take` / `isEmpty`) plus `sparksOwed()`, so the block asks **for the interface only**, and the store for the capability (`CorruptionEnergyApi.storage(level, pos, side)`), never for the mod's own block entity. An add-on's charger works with the same block.
+- `common/client/ArcaneChargerRenderer` — the item floats over the block, turning.
+- Registration: `ModBlocks.CORRUPTION_ARCANE_CHARGER` (full cube: `noOcclusion` dropped, default shape), `ModBlockEntities.ARCANE_CHARGER`, `ModItems.CORRUPTION_ARCANE_CHARGER`, the creative tab, `ModCapabilities` (`CorruptionEnergyCapabilities.BLOCK`), `CorruptionClient` renderer, the `mineable/pickaxe` tag, a loot table, blockstate + block/item models and both lang files (`腐化奥术充能台` / `Corrupted Arcane Charger`).
+
+**Bug found and fixed during play-testing:** a stack of **more than one** Corruption Candle could not be poured in. `ArcaneChargerBlock.givesEnergy` asked `CorruptionEnergyStorage.extract(...)`, and `CarriedEnergy.canExtract()` is false for a stack of several by design (a stack reports what all of them carry together but moves nothing; only whole-item `extractAll` moves any). It now asks `CorruptionEnergyApi.carriesEnergy(stack)` — which copies the stack down to one item first, the same question `EnergyPouring.pouring()` asks — so a stack of candles pours exactly as it does anywhere else.
+
+### 12.2 Tools are not batteries
+
+A wand used to be defined the same way a Corruption Candle is: an entry in the `corruption_energy_carrier` data map (`capacity`, `consumed`). That makes a wand a **battery** — poured out whole, gone once spent. The user asked for tools to be their own thing, in `core`, with an `api` interface for common to implement.
+
+| Layer | File | What it says |
+|---|---|---|
+| `core` | `core/energy/EnergyTool` | the rules of a tool: `capacity`, `step` (how much goes in at once), `held` / `taken` / `takes`. A tool's charge is drawn on by what it is used for and is **never used up**. |
+| `api` | `api/energy/CorruptionEnergyTool` | the interface an item implements: `tool()`, plus bridges `of` / `held` / `storage` / `charged`. Its storage is a `CarriedEnergy(capacity, consumed = false, …)`, so it never leaves the stack. |
+| `common` | `common/item/CorruptionArcaneStickItem` | extends `ArcaneCastingItem`, which now says its own capacity and step in code (`DEFAULT_TOOL` = 20 KCE, a KCE a step). |
+
+(*supersedes* §1.3): `ArcaneCastingItem` no longer extends `CorruptionEnergyItem` (that class is the **battery** base: capacity from the data map, `extractAll` / `extractStep`); it extends `Item` and implements `CorruptionEnergyTool`, and draws its own energy bar. The wand was **removed from `corruption_energy_carrier.json`**, which now names the candle alone. `ModCapabilities` answers with a tool's store first, then a carrier's; `CarriedEnergyTooltip` and the creative tab follow.
+
+Consequences, all intended: a wand is no longer fuel and no longer appears in JEI's fuel list; the charger charges **tools only** (a candle is not one).
+
+### 12.3 Spells: twelve of them, from the Key of Solomon
+
+Research (web): *Clavicula Salomonis* (**《所罗门之钥》**, 14th–15th c.) is a book of pentacles, planetary hours and conjurations — it has no 72 demons. The mod's `corruption:baal` and `corruption:agares` come from the **Lesser Key** (*Lemegeton Clavicula Salomonis*, 17th c., five books), whose first book **Ars Goetia** lists the 72 spirits. So "the entries of the book" are the Ars Goetia's, and the mod's existing two match the received text.
+
+Eight spells joined (Ars Goetia #3–#10), each with a Latin arcane string, a meaning in both languages, a spell, and an entry in the key's tag: `vassago`, `gamigin`, `marbas`, `valefor`, `amon`, `barbatos`, `paimon`, `buer` (*supersedes* §3's "the mod's own four"). A key may name its strings in the tag, so `corruption:clavicula_salomonis` now reveals twelve.
+
+The **action vocabulary grew from six to thirteen** (§3's table is superseded by the one below) — seven new kinds so a data pack can express what the rest of the book does without new code:
+
+| `type` | Fields (* = required, else the default) | What it does |
+|---|---|---|
+| `apply_effect` | `effect`* · `target` (`self`/`nearby`) · `radius` (0) · `duration` (200) · `amplifier` (0) | a mob effect (blindness, levitation, withering… are all this) |
+| `damage` | `amount` (4) · `radius` (3) · `damage_type` ("") | hurts, with the spell's own mark unless it names a kind (§12.4) |
+| `ignite_area` 🆕 | `radius` (3) · `seconds` (8) | sets creatures alight |
+| `freeze_area` | `radius` (3) · `ticks` (200) | chills and stings |
+| `corrupt_area` | `radius` (3) · `chance` (0.25) | corrupts the ground through `ServerInfectionWorld` (64 blocks a cast at most) |
+| `summon` | `entity`* · `count` (1) | brings creatures forth (in the `spell_summons` tag; see §12.6) |
+| `lightning` 🆕 | `radius` (4) · `count` (1) | strikes lightning about the origin |
+| `explode` 🆕 | `power` (2) · `breaks_blocks` (false) | bursts; the ground is left whole unless told otherwise |
+| `teleport` 🆕 | `distance` (8) | carries the caster where they look, short of what is in the way |
+| `weather` 🆕 | `sky` (`clear`/`rain`/`thunder`) · `ticks` (6000) | tells the sky what to do |
+| `pacify` 🆕 | `radius` (8) | quiets everything near: no grudges, no targets |
+| `give_item` 🆕 | `item`* · `count` (1) | puts items in the caster's hands |
+| `launch_bolt` | `entity` (`corruption:spell_bolt`) · `speed` (1.0) · `inaccuracy` (0) · `on_hit` ([]) · `look` ("") 🆕 | flies a bolt that carries any action; `look` is what the mod's own bolt is drawn as (§12.6) |
+
+`SpellAction.Sky` is a plain Java enum with a hand-written codec (core must stay `java.*`-only); `SpellCodecs.Kind` keeps `StringRepresentable.fromEnum`, so the parse errors are unchanged.
+
+### 12.4 A spell's hurt is a kind of its own
+
+New: `corruption:arcane_spell` (a damage type of the mod's own, with its own death message), the tag `corruption:spell`, and `api/arcane/ArcaneDamage` — `SPELL`, `SPELL_DAMAGE`, `source(level, caster[, type])` and, for whoever needs it, **`isSpell(DamageSource)`**. The `damage` action used the game's `indirectMagic` before; now it carries the mark.
+
+The point, in the user's words: a class of creature that **only a spell can kill**. A mob asks `ArcaneDamage.isSpell(source)` in `isInvulnerableTo` (or `hurt`) and turns everything else away.
+
+**A `damage` action may also name its own kind** (`damage_type`, data). The `corruption` spell uses `corruption:corruption` — the corruption's own erosion — so it hurts as corruption does:
+
+- the corruption's children (`CorruptedRemnant`, `AnchoredLivingPlant`) are **already proof against it** (`isInvulnerableTo`), with no entity code changed — the user's "within the design";
+- a death by it **reanimates** (`ReanimationEvents` already answers for that type);
+- its death message is the corruption's ("被怨念撕得粉碎，堕入了虚无").
+- The spell also **lost its area infection** (`corrupt_area` removed): it is now a bolt that hurts, nothing more.
+
+`corruption:corruption` was added to the `corruption:spell` tag so `isSpell` still answers for that spell. Flagged trade-off (§12.9): the environmental corruption damage (blocks, plants, the curse's pulse) then answers to `isSpell` too, so a "spells only" creature could be hurt by corrupted ground. Removing it from the tag restores the strict reading at the cost of `isSpell(corruption spell)` being false.
+
+`ArcaneDamage` lives in `api/arcane` (self-contained, so add-ons can use it and `api` need not reach `common`, which `ArcaneRulesTest` enforces); the mod's two older types stay in `common/registry/ModDamageTypes`. Two places, deliberately — worth a look.
+
+### 12.5 Reading a spell
+
+A spell could be written but not understood: the tooltip listed the wand's slots and nothing about what they did.
+
+`api/arcane/SpellText` turns a `SpellRule` into lines in words — **the same lines** under the wand's tooltip, under the wheel, and (later) in JEI:
+
+- a creature, an item and a mob effect are named **by the game's own name** for them, so the lines read in the player's language;
+- numbers as a player reads them: 400 ticks is "20 s", 0.25 is "25%", whole numbers lose the `.0`;
+- a bolt's payload is told under it ("命中后：" / "Where it strikes:"), indented;
+- **the damage kind is shown only when the spell names one** (silence for everyone's default mark): the corruption spell reads "伤害 6（半径 2.5 · **腐化咒蚀**）". An unknown kind falls back to its id.
+
+Where it shows: the wand tooltip lists the slots, then "效果：" and the **chosen** spell's lines, then the key hint; the wheel draws the chosen spell's lines under its name (at most four, so a short screen cannot overflow). New lang keys: 22 a language (`spell.corruption.*`, `tooltip.corruption.wand_effects`, `damage.corruption.corruption`). `entity.corruption.spell_bolt` was **missing** and is now defined — without it the bolt's line read `entity.corruption.spell_bolt`.
+
+### 12.6 Summons withdrawn, numbers retuned, and a bolt you can look at
+
+For the time being, the user asked that **no spell bring creatures forth**: the `summon` action was removed from `baal`, `gamigin` and `paimon` (the action itself, the `spell_summons` tag and `SpellSummons` all stay for later).
+
+Retuning, as asked: **every spell's cooldown is 40 ticks (2 s)** and **every spell leaves its caster 1 more corrupted** (Baal was 3, Paimon 2; the rest were 0 or 1).
+
+**Baal's fireball needed 120 damage**, and this is where the data model bit back: a **vanilla** `minecraft:small_fireball` does what the game has it do — about 5 damage and a little fire — and **never reads `on_hit`**; only the mod's own bolt carries a payload. So Baal now flies the mod's bolt, and a new field keeps the look:
+
+- `look` (*new*), through all three layers: `SpellAction.LaunchBolt(…, String look)`, `SpellCodecs` (`look`, default `""`), `SpellProjectile.carrying(actions, look)` — the id of an item whose model the bolt is drawn as, saved with the entity (`Look` in its NBT), `""` or an unknown id meaning the corruption's crystal. The four-argument `LaunchBolt` constructor and the one-argument `carrying` are kept, so nothing else had to change.
+- Baal: `look: "minecraft:fire_charge"` (a fireball to look at), speed 1.5, and `on_hit` = **120 damage (radius 3)** + `ignite_area` (radius 3, 5 s).
+- This also answers the earlier "what about an ice ball?" — `look: "minecraft:snowball"` and a `freeze_area` payload, all in data.
+
+### 12.7 Tests updated so the build stays green
+
+Two assertions encoded the old data and were rewritten (*both files in `src/test`*):
+
+- `api/arcane/SpellCodecsTest`: the `corruption` spell's payload is now `Damage(6, 2.5, "corruption:corruption")` (the `Corrupt` action is gone); Baal's second action is no longer a `Summon`, so the test now asserts its `look` and its 120-damage payload — which also covers the new field;
+- checked and left alone: `SpellServerTest` (it casts `agares` and only asserts that a cooldown *applies*, never its length), `SpellProjectileServerTest` (uses the one-argument `carrying`), `SpellCastingTest` (whole-record equality on `Damage` still compiles through its convenience constructors).
+
+### 12.8 The twelve spells as they now stand
+
+| Spell | Energy | Cooldown | Corruption (min / gain) | What it does |
+|---|---|---|---|---|
+| `corruption` 腐化吞噬万物 | 1 KCE | 40 | 5 / +1 | bolt 1.2 → 6 damage (r 2.5, **corruption's own hurt**) |
+| `transmutation` 溶解，再重新凝结 | 2 KCE | 40 | — / +1 | corrupts the ground (3, 25%) + 4 damage (r 3), at the caster |
+| `baal` 巴尔 | 4 KCE | 40 | 10 / +1 | fireball-looking bolt 1.5 → **120 damage** (r 3) + ignite (r 3, 5 s) |
+| `agares` 阿加雷斯 | 2 KCE | 40 | — / +1 | resistance II 20 s + freeze (r 4, 10 s) |
+| `vassago` 瓦沙克 | 2 KCE | 40 | — / +1 | glowing within 12 (30 s) + night vision |
+| `gamigin` 加米金 | 3 KCE | 40 | — / +1 | resistance 20 s |
+| `marbas` 马尔巴斯 | 2 KCE | 40 | — / +1 | regeneration II 15 s + absorption II 30 s |
+| `valefor` 瓦列弗 | 1 KCE | 40 | — / +1 | invisibility 15 s + speed II 20 s |
+| `amon` 阿蒙 | 3 KCE | 40 | — / +1 | 8 damage (r 5) + glowing within 12 |
+| `barbatos` 巴巴托斯 | 2 KCE | 40 | — / +1 | luck II + night vision, 60 s |
+| `paimon` 拜蒙 | 4 KCE | 40 | 10 / +1 | hero of the village 60 s |
+| `buer` 布耶尔 | 2 KCE | 40 | — / +1 | instant health II + regeneration 20 s |
+
+### 12.9 ⚠️ Unverified, and known gaps
+
+1. **Never built, never run.** This whole section was checked by the IDE's diagnostics only (0 errors). The tests updated in §12.7 have not been run. Build before trusting anything here.
+2. **Looking at it in game matters most for**: the spark arc over the charger (count, height, turn — `CorruptionSparkParticle.START_SIZE = .16` was a guess), the no-sneak pour, the wheel/tooltip readout layout (`EFFECT_LINES = 4`), the fireball `look`, and the bolt's saved look.
+3. **Requested but not yet done**: a data switch so a `damage` action may **bypass armour** (a real "true damage"). A damage type cannot be altered per hit — armour is bypassed only by a type in `minecraft:bypasses_armor` — so the switch needs a second arcane damage type that is tagged that way, and the `damage` field to choose it.
+4. **Still thin**: `gamigin` (3 KCE for one resistance) and `paimon` (4 KCE and a corruption threshold of 10 for hero of the village) lost the creature each used to bring, and Baal is a single bolt.
+5. **The `corruption:spell` tag trade-off** in §12.4 (environmental corruption answers to `isSpell`).
+6. **`min_corruption: 10`** remains on `baal` and `paimon`; creative play is free and unaffected, survival needs 10 corruption to cast either.
+7. **`summon`** is now unused by the data but fully wired (tag, `SpellSummons`, `SpellEffects.summon`); the tests still exercise it directly.
+
+### 12.10 Files touched in this section
+
+- **New Java (10)**: `core/energy/EnergyTool`, `api/energy/CorruptionEnergyTool`, `api/energy/EnergyCharger`, `api/arcane/ArcaneDamage`, `api/arcane/SpellText`, `common/energy/EnergyCharging`, `common/block/ArcaneChargerBlock`, `common/blockentity/ArcaneChargerBlockEntity`, `common/client/ArcaneChargerRenderer`, `common/client/particle/CorruptionSparkParticle`.
+- **New data / resources**: `damage_type/arcane_spell.json`, `tags/damage_type/spell.json`, `particles/corruption_spark_particle.json`, `arcane_string/{vassago,gamigin,marbas,valefor,amon,barbatos,paimon,buer}.json`, `arcane_spell/` the same eight, the charger's blockstate, block and item models, and its loot table.
+- **Modified**: `core/arcane/SpellAction` (seven new actions, `Damage.type`, `LaunchBolt.look`), `api/arcane/SpellCodecs` (their codecs, `damage_type`, `look`), `api/arcane/ArcaneCastingItem` (a tool, not a battery), `common/client/ArcaneTooltip` (the readout under the wand), `common/arcane/SpellEffects` (seven new effects, the damage kind), `common/entity/SpellProjectile` (a look, saved), `common/client/SpellWheelScreen` (the readout), `common/registry/{ModBlocks,ModBlockEntities,ModItems,ModCreativeModeTabs,ModCapabilities,ModParticles,ModTags}`, `CorruptionClient`, `common/client/CarriedEnergyTooltip`, `data_maps/item/corruption_energy_carrier.json` (the wand removed), the tag `clavicula_salomonis`, every `arcane_spell` file, and both lang files.
+
