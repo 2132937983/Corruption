@@ -1,0 +1,31 @@
+{
+  "energy": "7KCE",
+  "cooldown": 200,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "summon",
+      "entity": "minecraft:cave_spider",
+      "count": 3
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:glowing",
+      "target": "nearby",
+      "radius": 12,
+      "duration": 600
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 3,
+      "particles": [
+        {
+          "particle": "minecraft:item_slime",
+          "count": 20
+        }
+      ]
+    }
+  ]
+}

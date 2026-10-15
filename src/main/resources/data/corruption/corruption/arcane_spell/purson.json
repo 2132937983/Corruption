@@ -1,0 +1,50 @@
+{
+  "energy": "5KCE",
+  "cooldown": 60,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:glowing",
+      "target": "nearby",
+      "radius": 12,
+      "duration": 600
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:night_vision",
+      "target": "self",
+      "duration": 1200
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:luck",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "sphere",
+      "radius": 3,
+      "particles": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 40
+        }
+      ]
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 6,
+      "particles": [
+        {
+          "particle": "minecraft:note",
+          "count": 16
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "energy": "6KCE",
+  "cooldown": 40,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slow_falling",
+      "target": "self",
+      "duration": 600
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:jump_boost",
+      "target": "self",
+      "duration": 600,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:speed",
+      "target": "self",
+      "duration": 600
+    },
+    {
+      "type": "particles",
+      "shape": "spiral",
+      "radius": 1.2,
+      "height": 2.5,
+      "particles": [
+        {
+          "particle": "minecraft:white_ash",
+          "count": 30,
+          "spread": 0.1
+        },
+        {
+          "particle": "minecraft:flame",
+          "count": 20,
+          "spread": 0.05
+        }
+      ]
+    }
+  ]
+}

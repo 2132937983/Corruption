@@ -1,0 +1,34 @@
+{
+  "energy": "3KCE",
+  "cooldown": 40,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:resistance",
+      "target": "self",
+      "duration": 600,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:absorption",
+      "target": "self",
+      "duration": 600
+    },
+    {
+      "type": "particles",
+      "shape": "spiral",
+      "radius": 1,
+      "height": 2.5,
+      "particles": [
+        {
+          "particle": "minecraft:dust",
+          "count": 40,
+          "spread": 0.05,
+          "color": "#B0202A"
+        }
+      ]
+    }
+  ]
+}

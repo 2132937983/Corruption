@@ -40,6 +40,10 @@ public final class ModEntities {
                     .sized(RemnantCombatApi.definition().width(), RemnantCombatApi.definition().height())
                     .clientTrackingRange(10).updateInterval(3).build("corruption:corrupted_remnant"));
     /** The purple bolt that strikes an altar as a rite completes: lightning that burns and hurts nothing. */
+    /** A spell's effect, drawn on the client where a spell's "visual" action sets it down; never saved. */
+    public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.SpellVisualEntity>> SPELL_VISUAL = TYPES.register("spell_visual",
+            () -> EntityType.Builder.<com.miophas.corruption.common.entity.SpellVisualEntity>of(com.miophas.corruption.common.entity.SpellVisualEntity::new, MobCategory.MISC)
+                    .noSave().fireImmune().sized(.1F, .1F).clientTrackingRange(12).updateInterval(Integer.MAX_VALUE).build("corruption:spell_visual"));
     public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.CorruptLightning>> CORRUPT_LIGHTNING = TYPES.register("corrupt_lightning",
             () -> EntityType.Builder.<com.miophas.corruption.common.entity.CorruptLightning>of(com.miophas.corruption.common.entity.CorruptLightning::new, MobCategory.MISC)
                     .noSave().sized(0, 0).clientTrackingRange(16).updateInterval(Integer.MAX_VALUE).build("corruption:corrupt_lightning"));
@@ -64,6 +68,10 @@ public final class ModEntities {
             () -> EntityType.Builder.of(com.miophas.corruption.common.entity.Agares::new, MobCategory.MONSTER)
                     .sized(AgaresApi.bodyWidthBlocks(), AgaresApi.bodyHeightBlocks()).eyeHeight(AgaresApi.eyeHeightBlocks())
                     .fireImmune().clientTrackingRange(32).updateInterval(1).build("corruption:agares"));
+    /** Andromalius, the seventy-second spirit: a hell serpent with its forebody raised, two blocks across and four high. */
+    public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.Andromalius>> ANDROMALIUS = TYPES.register("andromalius",
+            () -> EntityType.Builder.of(com.miophas.corruption.common.entity.Andromalius::new, MobCategory.MONSTER)
+                    .sized(2F, 4F).eyeHeight(3.7F).fireImmune().clientTrackingRange(10).build("corruption:andromalius"));
 
     @SubscribeEvent
     public static void attributes(EntityAttributeCreationEvent event) {
@@ -73,6 +81,7 @@ public final class ModEntities {
         event.put(GREED.get(), com.miophas.corruption.common.entity.Greed.attributes().build());
         event.put(BAAL.get(), com.miophas.corruption.common.entity.Baal.attributes().build());
         event.put(AGARES.get(), com.miophas.corruption.common.entity.Agares.attributes().build());
+        event.put(ANDROMALIUS.get(), com.miophas.corruption.common.entity.Andromalius.attributes().build());
     }
 
     private ModEntities() {}

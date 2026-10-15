@@ -1,0 +1,41 @@
+{
+  "energy": "8KCE",
+  "cooldown": 200,
+  "min_corruption": 12,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "summon",
+      "entity": "minecraft:vex",
+      "count": 3
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:wither",
+      "target": "nearby",
+      "radius": 6,
+      "duration": 160,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "spiral",
+      "radius": 2,
+      "height": 3,
+      "particles": [
+        {
+          "particle": "minecraft:soul",
+          "count": 40,
+          "spread": 0.05,
+          "speed": 0.02
+        },
+        {
+          "particle": "minecraft:sculk_soul",
+          "count": 20,
+          "spread": 0.05,
+          "speed": 0.02
+        }
+      ]
+    }
+  ]
+}

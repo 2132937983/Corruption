@@ -13,12 +13,20 @@ import com.miophas.corruption.common.registry.ModMenus;
 import com.miophas.corruption.common.registry.ModRecipes;
 import com.miophas.corruption.common.transmutation.ArcaneTransmuterBlockEntity;
 import com.miophas.corruption.common.transmutation.ArcaneTransmuterMenu;
+import com.miophas.corruption.api.arcane.ArcaneApi;
+import com.miophas.corruption.api.arcane.ArcaneString;
+import com.miophas.corruption.api.arcane.SpellText;
+import com.miophas.corruption.api.energy.CorruptionEnergyApi;
+import com.miophas.corruption.core.arcane.SpellRule;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.handlers.IGuiClickableArea;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
+import mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter;
+import mezz.jei.api.ingredients.subtypes.UidContext;
 import mezz.jei.api.recipe.IFocusFactory;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.runtime.IRecipesGui;
@@ -29,13 +37,17 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
+import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 /**
- * Shows alchemy, Corrupted Arcane Transmutation, brass cauldron cooking, altar rites, the corruption's spells and the fuels that power them in JEI. JEI finds this class by
+ * Shows alchemy, Corrupted Arcane Transmutation, brass cauldron cooking, altar rites, the corruption's spells and the fuels that power them in JEI,
+ * and gives each spell's parchment a page saying what its spell does. JEI finds this class by
  * its annotation and nothing else refers to it, so the mod still loads when JEI is not installed.
  */
 @JeiPlugin
@@ -58,8 +70,44 @@ public final class CorruptionJeiPlugin implements IModPlugin {
             registration.addRecipes(BrassCookingCategory.TYPE, level.getRecipeManager().getAllRecipesFor(ModRecipes.BRASS_COOKING.get()));
             registration.addRecipes(AltarRiteCategory.TYPE, level.getRecipeManager().getAllRecipesFor(ModRecipes.ALTAR.get()));
         }
-        registration.addRecipes(ArcaneSpellsCategory.TYPE, ArcaneSpellsCategory.entries());
+        List<ArcaneSpellsCategory.Entry> spells = ArcaneSpellsCategory.entries();
+        registration.addRecipes(ArcaneSpellsCategory.TYPE, spells);
+        for (ArcaneSpellsCategory.Entry spell : spells) registration.addItemStackInfo(ArcaneSpellsCategory.parchment(spell), parchmentInfo(spell));
         registration.addRecipes(CorruptionFuelCategory.TYPE, CorruptionFuelCategory.entries());
+    }
+
+    /**
+     * Each parchment bearing a string is its own entry, told apart by what it bears, so that a spell's parchment
+     * leads to that spell and carries a page of its own.
+     */
+    @Override public void registerItemSubtypes(ISubtypeRegistration registration) {
+        registration.registerSubtypeInterpreter(ModItems.PARCHMENT.get(), new ISubtypeInterpreter<ItemStack>() {
+            @Override public Object getSubtypeData(ItemStack stack, UidContext context) {
+                ResourceKey<ArcaneString> string = ArcaneApi.inscription(stack);
+                return string == null ? null : string.location();
+            }
+            @Override public String getLegacyStringSubtypeInfo(ItemStack stack, UidContext context) {
+                ResourceKey<ArcaneString> string = ArcaneApi.inscription(stack);
+                return string == null ? "" : string.location().toString();
+            }
+        });
+    }
+
+    /**
+     * A spell's parchment's page: which spell it bears and how it is used, what a cast costs and asks of the caster,
+     * and what the spell does, line by line.
+     */
+    private static Component[] parchmentInfo(ArcaneSpellsCategory.Entry spell) {
+        SpellRule rule = spell.spell().rule();
+        List<Component> page = new ArrayList<>();
+        page.add(Component.translatable("corruption.jei.parchment_info", ArcaneSpellsCategory.name(spell)));
+        page.add(Component.translatable("corruption.jei.spell_energy", CorruptionEnergyApi.format(rule.energy())));
+        if (rule.cooldown() > 0) page.add(Component.translatable("corruption.jei.spell_cooldown", rule.cooldown()));
+        if (rule.minCorruption() > 0) page.add(Component.translatable("corruption.jei.spell_corruption", rule.minCorruption()));
+        if (rule.corrupts()) page.add(Component.translatable("corruption.jei.spell_corruption_gain", rule.corruptionGain()));
+        page.add(Component.translatable("tooltip.corruption.wand_effects"));
+        for (Component line : SpellText.lines(rule)) page.add(Component.literal(line.getString()));
+        return page.toArray(Component[]::new);
     }
 
     /** Each machine appears beside its categories, and clicking it in JEI lists what it does. */
@@ -68,7 +116,8 @@ public final class CorruptionJeiPlugin implements IModPlugin {
         registration.addRecipeCatalysts(ArcaneTransmutationCategory.TYPE, ModBlocks.CORRUPTION_ARCANE_TRANSMUTER.get());
         registration.addRecipeCatalysts(BrassCookingCategory.TYPE, ModBlocks.BRASS_CAULDRON.get());
         registration.addRecipeCatalysts(AltarRiteCategory.TYPE, ModBlocks.ALTAR_OFFERING.get(), ModBlocks.ALTAR_PILLAR.get());
-        registration.addRecipeCatalysts(ArcaneSpellsCategory.TYPE, ModBlocks.CORRUPTION_ARCANE_PEDESTAL.get(), ModItems.CORRUPTION_ARCANE_STICK.get());
+        registration.addRecipeCatalysts(ArcaneSpellsCategory.TYPE, ModBlocks.CORRUPTION_ARCANE_PEDESTAL.get());
+        for (var wand : ModItems.WANDS) registration.addRecipeCatalysts(ArcaneSpellsCategory.TYPE, wand.get());
         registration.addRecipeCatalysts(CorruptionFuelCategory.TYPE, ModBlocks.CORRUPTION_ARCANE_TRANSMUTER.get(), ModBlocks.BRASS_CAULDRON.get());
     }
 

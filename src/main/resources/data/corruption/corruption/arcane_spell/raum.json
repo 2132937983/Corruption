@@ -1,0 +1,48 @@
+{
+  "energy": "6KCE",
+  "cooldown": 60,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "damage",
+      "amount": 8,
+      "radius": 5
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:weakness",
+      "target": "nearby",
+      "radius": 5,
+      "duration": 300,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:hunger",
+      "target": "nearby",
+      "radius": 5,
+      "duration": 300,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:luck",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 2
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 2,
+      "particles": [
+        {
+          "particle": "minecraft:squid_ink",
+          "count": 30,
+          "spread": 0.6
+        }
+      ]
+    }
+  ]
+}

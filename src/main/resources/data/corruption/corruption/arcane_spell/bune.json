@@ -1,0 +1,32 @@
+{
+  "energy": "5KCE",
+  "cooldown": 200,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "summon",
+      "entity": "minecraft:skeleton",
+      "count": 2
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 3,
+      "particles": [
+        {
+          "particle": "minecraft:soul",
+          "count": 24,
+          "spread": 0.1,
+          "speed": 0.02
+        },
+        {
+          "particle": "minecraft:sculk_soul",
+          "count": 12,
+          "spread": 0.1,
+          "speed": 0.02
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "type": "corruption:alchemy_shaped",
+  "slots": {
+    "0": {
+      "item": "corruption:rune_slate",
+      "count": 1
+    },
+    "1": {
+      "item": "corruption:shadow_silk",
+      "count": 2
+    },
+    "2": {
+      "item": "corruption:soul_resin",
+      "count": 2
+    },
+    "3": {
+      "item": "corruption:cursed_iron_ingot",
+      "count": 2
+    },
+    "4": {
+      "item": "corruption:bloodstone",
+      "count": 1
+    }
+  },
+  "result": {
+    "id": "corruption:chaos_catalyst"
+  }
+}

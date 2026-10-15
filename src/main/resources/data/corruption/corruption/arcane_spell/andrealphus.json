@@ -1,0 +1,59 @@
+{
+  "energy": "8KCE",
+  "cooldown": 100,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:levitation",
+      "target": "self",
+      "duration": 40,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slow_falling",
+      "target": "self",
+      "duration": 1200
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:speed",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:jump_boost",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 2
+    },
+    {
+      "type": "particles",
+      "shape": "spiral",
+      "radius": 1.5,
+      "height": 3,
+      "particles": [
+        {
+          "particle": "minecraft:dust",
+          "count": 40,
+          "spread": 0.05,
+          "color": "#1A8C7A"
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 40,
+          "spread": 0.05,
+          "color": "#2A4FB0"
+        },
+        {
+          "particle": "minecraft:end_rod",
+          "count": 12
+        }
+      ]
+    }
+  ]
+}

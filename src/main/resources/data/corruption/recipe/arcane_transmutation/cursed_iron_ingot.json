@@ -1,0 +1,11 @@
+{
+  "type": "corruption:arcane_transmutation",
+  "ingredient": {
+    "tag": "c:ingots/iron",
+    "count": 1
+  },
+  "energy": "5KCE",
+  "result": {
+    "id": "corruption:cursed_iron_ingot"
+  }
+}

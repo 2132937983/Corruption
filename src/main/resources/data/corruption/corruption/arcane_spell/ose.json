@@ -1,0 +1,56 @@
+{
+  "energy": "7KCE",
+  "cooldown": 80,
+  "min_corruption": 12,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:nausea",
+      "target": "nearby",
+      "radius": 8,
+      "duration": 300
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slowness",
+      "target": "nearby",
+      "radius": 8,
+      "duration": 300,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:weakness",
+      "target": "nearby",
+      "radius": 8,
+      "duration": 300,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:speed",
+      "target": "self",
+      "duration": 600,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:jump_boost",
+      "target": "self",
+      "duration": 600,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "sphere",
+      "radius": 3,
+      "particles": [
+        {
+          "particle": "minecraft:witch",
+          "count": 40
+        }
+      ]
+    }
+  ]
+}

@@ -33,6 +33,7 @@ public final class Corruption {
         com.miophas.corruption.common.registry.ModDataComponents.TYPES.register(modEventBus);
         ModBlocks.BLOCKS.register(modEventBus);
         ModBlockEntities.TYPES.register(modEventBus);
+        com.miophas.corruption.common.registry.ModArmorMaterials.MATERIALS.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
         ModParticles.TYPES.register(modEventBus);
         ModEntities.TYPES.register(modEventBus);

@@ -1,0 +1,52 @@
+{
+  "energy": "9KCE",
+  "cooldown": 120,
+  "min_corruption": 14,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "pacify",
+      "radius": 12
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:nausea",
+      "target": "nearby",
+      "radius": 12,
+      "duration": 300
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:weakness",
+      "target": "nearby",
+      "radius": 12,
+      "duration": 600,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:mining_fatigue",
+      "target": "nearby",
+      "radius": 12,
+      "duration": 600,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "sphere",
+      "radius": 4,
+      "particles": [
+        {
+          "particle": "minecraft:witch",
+          "count": 40
+        },
+        {
+          "particle": "minecraft:enchant",
+          "count": 40,
+          "spread": 0.1,
+          "speed": 0.2
+        }
+      ]
+    }
+  ]
+}

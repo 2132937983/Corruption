@@ -9,6 +9,7 @@ public final class PlayerCorruptionApi {
     public static int hearts(){return PlayerCorruptionRules.HEARTS;}
     public static int curseGain(){return PlayerCorruptionRules.CURSE_GAIN;}
     public static int increase(int value,int gain){return PlayerCorruptionRules.increase(value,gain);}
+    public static int decrease(int value,int amount){return PlayerCorruptionRules.decrease(value,amount);}
     public static int heartFill(int value,int index){return PlayerCorruptionRules.heartFill(value,index);}
     public static boolean completed(int before,int after){return PlayerCorruptionRules.completed(before,after);}
     private PlayerCorruptionApi(){}

@@ -1,12 +1,13 @@
 package com.miophas.corruption.common.arcane;
 
 import com.miophas.corruption.api.arcane.ArcaneCasting;
+import com.miophas.corruption.common.registry.ModEntities;
+import net.minecraft.core.particles.ParticleOptions;
 import com.miophas.corruption.api.arcane.ArcaneDamage;
-import com.miophas.corruption.api.corruption.PlayerCorruptionApi;
 import com.miophas.corruption.common.entity.PlayerCorruption;
 import com.miophas.corruption.common.entity.SpellProjectile;
+import com.miophas.corruption.common.entity.SpellVisualEntity;
 import com.miophas.corruption.common.infection.ServerInfectionWorld;
-import com.miophas.corruption.common.registry.ModAttachments;
 import com.miophas.corruption.common.registry.ModTags;
 import com.miophas.corruption.core.arcane.SpellAction;
 import java.util.ArrayList;
@@ -15,11 +16,11 @@ import java.util.List;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -27,6 +28,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -58,6 +60,12 @@ public final class SpellEffects implements ArcaneCasting.World {
     private static final int MAX_CORRUPTION_RADIUS = 8;
     /** How many blocks one cast may corrupt at most, so a wide spell cannot cost the server dear. */
     private static final int MAX_CORRUPTED_BLOCKS = 64;
+    /** How near where lightning falls a creature must be to be hurt by it, beyond the hurt lightning itself does. */
+    private static final double STRIKE_REACH = 1.75;
+    /** How loud a spell's effect sounds: as loud as thunder, heard a long way off. */
+    private static final float VISUAL_VOLUME = 4.0F;
+    /** How far above and below the origin a strike looks for ground to land on. */
+    private static final int STRIKE_ABOVE = 2, STRIKE_BELOW = 12;
     /** How many places round the origin a summoned creature is tried at before it is set down at the origin itself. */
     private static final int SUMMON_TRIES = 8;
 
@@ -78,17 +86,22 @@ public final class SpellEffects implements ArcaneCasting.World {
             case SpellAction.Weather weather -> weather(caster, origin, weather);
             case SpellAction.Pacify pacify -> pacify(caster, origin, pacify);
             case SpellAction.GiveItem give -> give(caster, origin, give);
+            case SpellAction.Push push -> push(caster, origin, push);
+            case SpellAction.Spectacle spectacle -> show(caster, origin, spectacle);
+            case SpellAction.Visual visual -> visual(caster, origin, visual);
             case SpellAction.LaunchBolt bolt -> launch(caster, origin, bolt);
         }
     }
 
     @Override public int corruption(ServerPlayer caster) { return PlayerCorruption.value(caster); }
 
-    /** Casting leaves the caster more corrupted, as the corruption's own curse does, but never in creative or spectator play. */
+    /**
+     * Casting leaves the caster more corrupted, as the corruption's own curse does (and what they wear may hold some
+     * of it back: see PlayerCorruption.raise), but never in creative or spectator play.
+     */
     @Override public void corrupt(ServerPlayer caster, int gain) {
         if (gain <= 0 || caster.isCreative() || caster.isSpectator()) return;
-        int before = PlayerCorruption.value(caster), after = PlayerCorruptionApi.increase(before, gain);
-        if (after != before) caster.setData(ModAttachments.PLAYER_CORRUPTION, after);
+        PlayerCorruption.raise(caster, gain);
     }
 
     /** Gives a mob effect to the caster alone, or to everything near the origin. */
@@ -184,13 +197,29 @@ public final class SpellEffects implements ArcaneCasting.World {
         EntityType<?> type = EntityType.byString(action.entity()).orElse(null);
         if (type == null || !type.is(ModTags.SPELL_BOLTS)) return;
         ServerLevel level = caster.serverLevel();
-        if (!(type.create(level) instanceof Projectile bolt)) return;
-        if (bolt instanceof SpellProjectile spell) spell.carrying(action.onHit(), action.look());
-        bolt.setOwner(caster);
-        bolt.setPos(origin.launch());
-        Vec3 way = origin.direction();
-        bolt.shoot(way.x, way.y, way.z, (float) action.speed(), action.inaccuracy());
-        level.addFreshEntity(bolt);
+        for (int one = 0; one < action.count(); one++) {
+            if (!(type.create(level) instanceof Projectile bolt)) return;
+            if (bolt instanceof SpellProjectile spell) spell.flying(action);
+            bolt.setOwner(caster);
+            if (action.from() == SpellAction.Source.SKY) {
+                Vec3 at = origin.at();
+                double angle = level.random.nextDouble() * Math.PI * 2, out = Math.sqrt(level.random.nextDouble()) * action.fan();
+                bolt.setPos(at.x + Math.cos(angle) * out, at.y + action.height(), at.z + Math.sin(angle) * out);
+                bolt.shoot(0, -1, 0, (float) action.speed(), action.inaccuracy());
+            } else {
+                Vec3 way = fanned(origin.direction(), one, action.count(), action.fan());
+                bolt.setPos(origin.launch());
+                bolt.shoot(way.x, way.y, way.z, (float) action.speed(), action.inaccuracy());
+            }
+            level.addFreshEntity(bolt);
+        }
+    }
+
+    /** The way one bolt of a volley flies: the gaze turned about the upright by its share of the fan, the first at one edge of it and the last at the other. */
+    static Vec3 fanned(Vec3 way, int one, int count, double fan) {
+        if (count <= 1 || fan <= 0) return way;
+        double degrees = -fan / 2 + fan * one / (count - 1);
+        return way.yRot((float) Math.toRadians(degrees));
     }
 
     /** Everything living within this far of the origin, the caster left out. */
@@ -206,19 +235,117 @@ public final class SpellEffects implements ArcaneCasting.World {
         for (LivingEntity target : nearby(caster, origin, action.radius())) target.setRemainingFireTicks(action.seconds() * 20);
     }
 
-    /** Strikes lightning about the origin, each bolt falling on whatever stands highest where it lands. */
+    /**
+     * Strikes lightning about the origin, each bolt falling on the ground there: where a spell's bolt struck, in a
+     * cave or under a roof as much as in the open, not on the surface high above it.
+     */
     private void lightning(ServerPlayer caster, ArcaneCasting.Origin origin, SpellAction.Lightning action) {
         ServerLevel level = caster.serverLevel();
         Vec3 at = origin.at();
         double reach = Math.max(0, action.radius());
         for (int strike = 0; strike < action.count(); strike++) {
             double angle = level.random.nextDouble() * Math.PI * 2, out = level.random.nextDouble() * reach;
-            BlockPos under = BlockPos.containing(at.x + Math.cos(angle) * out, at.y, at.z + Math.sin(angle) * out);
-            Entity bolt = EntityType.LIGHTNING_BOLT.create(level);
+            BlockPos column = BlockPos.containing(at.x + Math.cos(angle) * out, at.y, at.z + Math.sin(angle) * out);
+            Entity bolt = (action.corrupt() ? ModEntities.CORRUPT_LIGHTNING.get() : EntityType.LIGHTNING_BOLT).create(level);
             if (bolt == null) continue;
-            bolt.moveTo(Vec3.atBottomCenterOf(level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, under)));
+            Vec3 falls = Vec3.atBottomCenterOf(groundAt(level, column));
+            bolt.moveTo(falls);
             level.addFreshEntity(bolt);
+            if (action.damage() > 0) {
+                DamageSource hurt = ArcaneDamage.source(level, caster, action.damageType());
+                Vec3 middle = falls.add(0, 1, 0);
+                for (LivingEntity target : nearby(caster, new ArcaneCasting.Origin(middle, middle, Vec3.ZERO), STRIKE_REACH))
+                    target.hurt(hurt, (float) action.damage());
+            }
         }
+    }
+
+    /**
+     * Where a strike in this column lands: on the highest ground a little above the origin's height or under it,
+     * so that lightning called where a bolt struck a wall, a floor or a creature falls right there. With no ground
+     * within reach (over a chasm, say), at the origin's height.
+     */
+    static BlockPos groundAt(BlockGetter level, BlockPos column) {
+        for (int up = STRIKE_ABOVE; up >= -STRIKE_BELOW; up--) {
+            BlockPos at = column.above(up);
+            if (!level.getBlockState(at).blocksMotion() && level.getBlockState(at.below()).blocksMotion()) return at;
+        }
+        return column;
+    }
+
+    /** Thrusts everything near the origin away from it, or draws it in, lifting it as it goes. */
+    private void push(ServerPlayer caster, ArcaneCasting.Origin origin, SpellAction.Push action) {
+        Vec3 at = origin.at();
+        for (LivingEntity target : nearby(caster, origin, action.radius())) {
+            Vec3 away = target.position().subtract(at).multiply(1, 0, 1);
+            if (away.lengthSqr() < 1e-4) away = new Vec3(caster.getRandom().nextDouble() - .5, 0, caster.getRandom().nextDouble() - .5);
+            away = away.normalize().scale(action.strength());
+            target.push(away.x, action.lift(), away.z);
+            target.hurtMarked = true;
+        }
+    }
+
+    /**
+     * Sets a spell's effect down on the ground under the origin, for the clients to draw (see
+     * {@link SpellVisualEntity}), and sounds it there.
+     */
+    private void visual(ServerPlayer caster, ArcaneCasting.Origin origin, SpellAction.Visual action) {
+        ServerLevel level = caster.serverLevel();
+        Vec3 at = origin.at();
+        BlockPos ground = groundAt(level, BlockPos.containing(at));
+        SpellVisualEntity shown = ModEntities.SPELL_VISUAL.get().create(level);
+        if (shown == null) return;
+        shown.showing(action, caster.getYRot());
+        shown.moveTo(at.x, ground.getY(), at.z, caster.getYRot(), 0);
+        level.addFreshEntity(shown);
+        if (action.sound().isEmpty()) return;
+        ResourceLocation id = ResourceLocation.tryParse(action.sound());
+        SoundEvent sound = id == null ? null : BuiltInRegistries.SOUND_EVENT.get(id);
+        if (sound != null) level.playSound(null, at.x, at.y, at.z, sound, SoundSource.PLAYERS, VISUAL_VOLUME, 1.0F);
+    }
+
+    /** Draws a spell's particles in their shape about the origin: a sight, nothing more. */
+    private void show(ServerPlayer caster, ArcaneCasting.Origin origin, SpellAction.Spectacle action) {
+        ServerLevel level = caster.serverLevel();
+        Vec3 at = origin.at();
+        for (SpellAction.Particles particles : action.particles()) {
+            ParticleOptions options = SpellProjectile.options(particles);
+            if (options == null || particles.count() <= 0) continue;
+            if (action.shape() == SpellAction.Shape.BURST) {
+                level.sendParticles(options, at.x, at.y, at.z, particles.count(), particles.spread() + action.radius() / 2, particles.spread() + action.radius() / 2,
+                        particles.spread() + action.radius() / 2, particles.speed());
+                continue;
+            }
+            for (int point = 0; point < particles.count(); point++) {
+                Vec3 offset = shapePoint(action.shape(), action.radius(), action.height(), point, particles.count());
+                level.sendParticles(options, at.x + offset.x, at.y + offset.y, at.z + offset.z, 1, particles.spread(), particles.spread(), particles.spread(), particles.speed());
+            }
+        }
+    }
+
+    /**
+     * Where one of so many points of a shape lies, from its middle: round a ring at the middle's height; over a
+     * sphere, spread evenly; up a column from the middle; or twice round a spiral rising from it.
+     */
+    static Vec3 shapePoint(SpellAction.Shape shape, double radius, double height, int point, int points) {
+        double share = points <= 1 ? 0 : (double) point / (points - 1);
+        return switch (shape) {
+            case BURST -> Vec3.ZERO;
+            case RING -> {
+                double angle = Math.PI * 2 * point / Math.max(1, points);
+                yield new Vec3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
+            }
+            case SPHERE -> {
+                double up = 1 - 2 * (point + .5) / Math.max(1, points), across = Math.sqrt(Math.max(0, 1 - up * up));
+                double angle = point * Math.PI * (3 - Math.sqrt(5));
+                yield new Vec3(Math.cos(angle) * across * radius, up * radius, Math.sin(angle) * across * radius);
+            }
+            case COLUMN -> new Vec3(0, height * share, 0);
+            case SPIRAL -> {
+                double angle = Math.PI * 4 * share;
+                yield new Vec3(Math.cos(angle) * radius, height * share, Math.sin(angle) * radius);
+            }
+        };
     }
 
     /** Bursts about the origin, breaking the ground only if the spell says so. */

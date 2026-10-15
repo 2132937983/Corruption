@@ -1,0 +1,127 @@
+{
+  "energy": "45KCE",
+  "cooldown": 200,
+  "min_corruption": 16,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:light_pillar",
+      "radius": 2.5,
+      "height": 40,
+      "ticks": 60,
+      "accent": "#FFD24A",
+      "shake": 0.5,
+      "sound": "minecraft:entity.wither.spawn"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:magic_circle",
+      "radius": 6,
+      "height": 3,
+      "ticks": 60
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:levitation",
+      "target": "self",
+      "duration": 60,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slow_falling",
+      "target": "self",
+      "duration": 1200
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:resistance",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 3
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:regeneration",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:strength",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 3
+    },
+    {
+      "type": "particles",
+      "shape": "spiral",
+      "radius": 2,
+      "height": 6,
+      "particles": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 64,
+          "spread": 0.05,
+          "speed": 0.02
+        },
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 60,
+          "spread": 0.05
+        }
+      ]
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.4,
+      "count": 8,
+      "fan": 315,
+      "trail": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 1,
+          "spread": 0.05
+        },
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.05
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 16,
+          "spread": 0.4,
+          "speed": 0.05
+        },
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 16,
+          "spread": 0.4
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 3,
+          "height": 2,
+          "ticks": 14,
+          "shake": 0.15
+        },
+        {
+          "type": "lightning",
+          "radius": 1.5,
+          "count": 3,
+          "corrupt": true,
+          "damage": 60,
+          "damage_type": "corruption:corruption"
+        }
+      ]
+    }
+  ]
+}

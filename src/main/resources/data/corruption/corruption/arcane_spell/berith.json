@@ -1,0 +1,31 @@
+{
+  "energy": "6KCE",
+  "cooldown": 200,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "give_item",
+      "item": "minecraft:gold_nugget",
+      "count": 6
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 1,
+      "particles": [
+        {
+          "particle": "minecraft:dust",
+          "count": 30,
+          "spread": 0.4,
+          "color": "#FFD24A"
+        },
+        {
+          "particle": "minecraft:wax_on",
+          "count": 12,
+          "spread": 0.4
+        }
+      ]
+    }
+  ]
+}

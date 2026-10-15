@@ -5,10 +5,12 @@ import com.miophas.corruption.core.arcane.Codex;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -74,6 +76,23 @@ public final class ArcaneApi {
         List<String> ids = new ArrayList<>();
         for (Holder<ArcaneString> string : strings(registries, stack)) string.unwrapKey().ifPresent(key -> ids.add(id(key)));
         return ids.isEmpty() ? Codex.EMPTY : new Codex(ids);
+    }
+
+    /**
+     * Every item that is a key revealing this string, in the order the items were registered: where a player finds
+     * it. None if no key reveals it, as for a string an add-on writes without a book.
+     */
+    public static List<ItemStack> keysTo(HolderLookup.Provider registries, ResourceKey<ArcaneString> string) {
+        if (registries == null || string == null) return List.of();
+        HolderLookup.RegistryLookup<ArcaneString> strings = registries.lookup(ArcaneString.REGISTRY).orElse(null);
+        if (strings == null) return List.of();
+        List<Item> keys = new ArrayList<>();
+        BuiltInRegistries.ITEM.getDataMap(ArcaneKey.DATA_MAP).forEach((item, key) -> {
+            boolean reveals = strings.get(key.strings()).map(set -> set.stream().anyMatch(held -> held.is(string))).orElse(false);
+            if (reveals) BuiltInRegistries.ITEM.getOptional(item).ifPresent(keys::add);
+        });
+        keys.sort(Comparator.comparingInt(BuiltInRegistries.ITEM::getId));
+        return keys.stream().map(ItemStack::new).toList();
     }
 
     /** What a reader carrying these items makes of a string: its meaning if any of them is a key that reveals it, else only its glyphs. */

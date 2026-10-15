@@ -25,7 +25,9 @@ import org.junit.jupiter.api.Test;
 
 /** Ties the lectern's code to its files: the slots and list to the GUI picture, and the arcane's data to its readers. */
 class ArcaneLecternTest {
-    private static final String[] STRINGS = {"baal", "agares", "corruption", "transmutation"};
+    /** The Clavicula's strings, in its tag's order: the first ten spirits of the Ars Goetia, then the corruption's own two. */
+    /** What the Prologue reveals: the corruption's own arts. The other books are BooksAndWandsTest's. */
+    private static final String[] STRINGS = {"corruption", "transmutation", "corruption_barrage", "corruption_nova", "corruption_vortex", "corruption_tempest", "corruption_rain"};
 
     private static InputStream resource(String path) {
         InputStream in = ArcaneLecternTest.class.getResourceAsStream(path);
@@ -40,13 +42,13 @@ class ArcaneLecternTest {
     }
     private static int rgb(BufferedImage image, int x, int y) { return image.getRGB(x, y) & 0xFFFFFF; }
 
-    @Test void theStringsAreDataAndTheClaviculaHoldsThemAll() throws Exception {
+    @Test void theStringsAreDataAndThePrologueHoldsTheCorruptionsOwn() throws Exception {
         var tag = json("/data/corruption/tags/corruption/arcane_string/clavicula_salomonis.json").getAsJsonArray("values");
         for (String name : STRINGS) {
             ArcaneString string = ArcaneString.CODEC.parse(JsonOps.INSTANCE, json("/data/corruption/corruption/arcane_string/" + name + ".json")).getOrThrow();
             assertFalse(string.text().isBlank());
             assertEquals("arcane.corruption." + name, ((TranslatableContents) string.meaning().getContents()).getKey());
-            assertTrue(tag.contains(new JsonPrimitive("corruption:" + name)), "the Clavicula reveals " + name);
+            assertTrue(tag.contains(new JsonPrimitive("corruption:" + name)), "the Prologue reveals " + name);
         }
         assertEquals(STRINGS.length, tag.size());
         assertTrue(ArcaneString.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString("{\"text\": \"\", \"meaning\": \"x\"}")).isError(), "a string has an arcane form");
@@ -121,7 +123,7 @@ class ArcaneLecternTest {
             JsonObject lang = json("/assets/corruption/lang/" + language + ".json");
             for (String key : new String[]{"item.corruption.clavicula_salomonis", "item.corruption.parchment", "item.corruption.parchment.inscribed",
                     "block.corruption.corruption_arcane_lectern", "container.corruption.corruption_arcane_lectern", "gui.corruption.transcribe",
-                    "gui.corruption.lectern_empty", "tooltip.corruption.parchment_blank", "tooltip.corruption.unreadable", "tooltip.corruption.unknown_string",
+                    "gui.corruption.lectern_empty", "tooltip.corruption.parchment_blank", "tooltip.corruption.unknown_string",
                     "tooltip.corruption.key_strings", "tooltip.corruption.key_hint", "item.corruption.ink", "tooltip.corruption.ink_left"})
                 assertTrue(lang.has(key), language + " is missing " + key);
             for (var check : com.miophas.corruption.core.arcane.Transcription.Check.values())

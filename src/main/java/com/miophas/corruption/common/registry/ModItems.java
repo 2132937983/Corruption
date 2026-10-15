@@ -2,11 +2,15 @@ package com.miophas.corruption.common.registry;
 
 import com.miophas.corruption.Corruption;
 import com.miophas.corruption.common.item.BasicCorruptionEnergyItem;
+import com.miophas.corruption.common.item.CorruptionArcaneStickItem;
+import com.miophas.corruption.common.item.CorruptionMaterialItem;
 import com.miophas.corruption.common.item.InfectedBlockItem;
 import com.miophas.corruption.common.item.ParchmentItem;
 import com.miophas.corruption.common.item.LeafWinnowerItem;
 import net.minecraft.util.RandomSource;
+import java.util.List;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.BlockItem;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -18,9 +22,13 @@ public final class ModItems {
             ITEMS.register("corruption_dust", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> CORRUPTION_STICK =
             ITEMS.register("corruption_stick", () -> new Item(new Item.Properties()));
-    /** The wand: a casting tool, carrying Corruption Energy and the spells it has been taught. */
-    public static final DeferredItem<com.miophas.corruption.common.item.CorruptionArcaneStickItem> CORRUPTION_ARCANE_STICK =
-            ITEMS.register("corruption_arcane_stick", () -> new com.miophas.corruption.common.item.CorruptionArcaneStickItem(new Item.Properties()));
+    /** The wands: casting tools, carrying Corruption Energy and the spells they have been taught, one to a tier. */
+    public static final DeferredItem<CorruptionArcaneStickItem> NOVICE_CORRUPTION_ARCANE_STICK = wand("novice_corruption_arcane_stick", CorruptionArcaneStickItem.Tier.NOVICE);
+    /** The Basic wand, the first the mod had, which keeps its id. */
+    public static final DeferredItem<CorruptionArcaneStickItem> CORRUPTION_ARCANE_STICK = wand("corruption_arcane_stick", CorruptionArcaneStickItem.Tier.BASIC);
+    public static final DeferredItem<CorruptionArcaneStickItem> INTERMEDIATE_CORRUPTION_ARCANE_STICK =
+            wand("intermediate_corruption_arcane_stick", CorruptionArcaneStickItem.Tier.INTERMEDIATE);
+    public static final DeferredItem<CorruptionArcaneStickItem> ADVANCED_CORRUPTION_ARCANE_STICK = wand("advanced_corruption_arcane_stick", CorruptionArcaneStickItem.Tier.ADVANCED);
     public static final DeferredItem<Item> CORRUPTION_MIXTURE_LEV0 =
             ITEMS.register("corruption_mixture_lev0", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> CORRUPTION_CRYSTAL =
@@ -34,9 +42,30 @@ public final class ModItems {
     /** Carries the 10 KCE its making cost (data_maps/item/corruption_energy_carrier.json) and burns down a KCE at a time. */
     public static final DeferredItem<BasicCorruptionEnergyItem> CORRUPTION_CANDLE = ITEMS.register("corruption_candle",
             () -> new BasicCorruptionEnergyItem(new Item.Properties(), com.miophas.corruption.api.energy.CorruptionEnergyApi.kilo(1)));
-    /** The key to the corruption's arcane: on the arcane lectern it reveals the strings data_maps/item/arcane_key.json gives it. */
-    public static final DeferredItem<Item> CLAVICULA_SALOMONIS = ITEMS.register("clavicula_salomonis",
-            () -> new Item(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.EPIC)));
+    /**
+     * The keys to the corruption's arcane: on the arcane lectern each reveals the strings data_maps/item/arcane_key.json
+     * gives it. The Prologue (the first key the mod had, which keeps its id) holds the corruption's own arts; the
+     * eight books of the Key, the seventy-two spirits of the Ars Goetia, nine to a book; the Ascension, the planetary
+     * pentacles; the Lesser Key, the ancients' five arts.
+     */
+    public static final DeferredItem<Item> CLAVICULA_SALOMONIS = key("clavicula_salomonis", Rarity.EPIC);
+    public static final DeferredItem<Item> CLAVICULA_SALOMONIS_I = key("clavicula_salomonis_i", Rarity.UNCOMMON);
+    public static final DeferredItem<Item> CLAVICULA_SALOMONIS_II = key("clavicula_salomonis_ii", Rarity.UNCOMMON);
+    public static final DeferredItem<Item> CLAVICULA_SALOMONIS_III = key("clavicula_salomonis_iii", Rarity.UNCOMMON);
+    public static final DeferredItem<Item> CLAVICULA_SALOMONIS_IV = key("clavicula_salomonis_iv", Rarity.UNCOMMON);
+    public static final DeferredItem<Item> CLAVICULA_SALOMONIS_V = key("clavicula_salomonis_v", Rarity.RARE);
+    public static final DeferredItem<Item> CLAVICULA_SALOMONIS_VI = key("clavicula_salomonis_vi", Rarity.RARE);
+    public static final DeferredItem<Item> CLAVICULA_SALOMONIS_VII = key("clavicula_salomonis_vii", Rarity.RARE);
+    public static final DeferredItem<Item> CLAVICULA_SALOMONIS_VIII = key("clavicula_salomonis_viii", Rarity.RARE);
+    public static final DeferredItem<Item> CLAVICULA_SALOMONIS_ASCENSION = key("clavicula_salomonis_ascension", Rarity.EPIC);
+    public static final DeferredItem<Item> LEMEGETON = key("lemegeton", Rarity.EPIC);
+    /** The keys, in the order they are read: the Prologue, the eight books, the Ascension, the Lesser Key. */
+    public static final List<DeferredItem<Item>> KEYS = List.of(CLAVICULA_SALOMONIS, CLAVICULA_SALOMONIS_I, CLAVICULA_SALOMONIS_II,
+            CLAVICULA_SALOMONIS_III, CLAVICULA_SALOMONIS_IV, CLAVICULA_SALOMONIS_V, CLAVICULA_SALOMONIS_VI, CLAVICULA_SALOMONIS_VII,
+            CLAVICULA_SALOMONIS_VIII, CLAVICULA_SALOMONIS_ASCENSION, LEMEGETON);
+    /** The wands, lowest tier first. */
+    public static final List<DeferredItem<CorruptionArcaneStickItem>> WANDS = List.of(NOVICE_CORRUPTION_ARCANE_STICK, CORRUPTION_ARCANE_STICK,
+            INTERMEDIATE_CORRUPTION_ARCANE_STICK, ADVANCED_CORRUPTION_ARCANE_STICK);
     /** Made from leather; bears one arcane string once copied onto at the arcane lectern. */
     public static final DeferredItem<ParchmentItem> PARCHMENT = ITEMS.register("parchment", () -> new ParchmentItem(new Item.Properties()));
     /** How many copies a bottle of ink is good for. */
@@ -47,6 +76,46 @@ public final class ModItems {
      */
     public static final DeferredItem<Item> INK = ITEMS.register("ink",
             () -> new Item(new Item.Properties().durability(INK_USES).craftRemainder(net.minecraft.world.item.Items.GLASS_BOTTLE)));
+    /**
+     * The corruption's raw materials, made and used only in the mod's own machines and rites: the transmuter, the
+     * cauldron, the bench and the altar (gamemodels/corruption_materials/write_materials.py writes their recipes).
+     */
+    public static final DeferredItem<CorruptionMaterialItem> VOID_ASH = material("void_ash");
+    public static final DeferredItem<CorruptionMaterialItem> CURSED_IRON_INGOT = material("cursed_iron_ingot");
+    public static final DeferredItem<CorruptionMaterialItem> BLIGHTED_BONE = material("blighted_bone");
+    public static final DeferredItem<CorruptionMaterialItem> TAINTED_FLESH = material("tainted_flesh");
+    /** Bottled: it stacks to sixteen, and leaves its bottle when a machine uses it. */
+    public static final DeferredItem<CorruptionMaterialItem> CORRUPTED_ICHOR = ITEMS.register("corrupted_ichor",
+            () -> new CorruptionMaterialItem(new Item.Properties().stacksTo(16).craftRemainder(net.minecraft.world.item.Items.GLASS_BOTTLE)));
+    public static final DeferredItem<CorruptionMaterialItem> MALICE_FIBER = material("malice_fiber");
+    public static final DeferredItem<CorruptionMaterialItem> SOUL_RESIN = material("soul_resin");
+    public static final DeferredItem<CorruptionMaterialItem> SHADOW_SILK = material("shadow_silk");
+    public static final DeferredItem<CorruptionMaterialItem> BLOODSTONE = material("bloodstone");
+    public static final DeferredItem<CorruptionMaterialItem> RUNE_SLATE = material("rune_slate");
+    public static final DeferredItem<CorruptionMaterialItem> ELDRITCH_MEMBRANE = material("eldritch_membrane");
+    public static final DeferredItem<CorruptionMaterialItem> ABYSSAL_PEARL = ITEMS.register("abyssal_pearl",
+            () -> new CorruptionMaterialItem(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final DeferredItem<CorruptionMaterialItem> CORRUPTED_HEARTSTONE = ITEMS.register("corrupted_heartstone",
+            () -> new CorruptionMaterialItem(new Item.Properties().rarity(Rarity.RARE)));
+    public static final DeferredItem<CorruptionMaterialItem> CHAOS_CATALYST = ITEMS.register("chaos_catalyst",
+            () -> new CorruptionMaterialItem(new Item.Properties().rarity(Rarity.RARE)));
+    /** The materials, rawest first. */
+    public static final List<DeferredItem<CorruptionMaterialItem>> MATERIALS = List.of(VOID_ASH, CURSED_IRON_INGOT, BLIGHTED_BONE, TAINTED_FLESH,
+            CORRUPTED_ICHOR, MALICE_FIBER, SOUL_RESIN, SHADOW_SILK, BLOODSTONE, RUNE_SLATE, ELDRITCH_MEMBRANE, ABYSSAL_PEARL, CORRUPTED_HEARTSTONE, CHAOS_CATALYST);
+    /** Bread baked through with the corruption: eaten for no hunger at all, it leaves its eater one point more corrupted. */
+    public static final DeferredItem<com.miophas.corruption.common.item.CorruptedBreadItem> CORRUPTED_BREAD = ITEMS.register("corrupted_bread",
+            () -> new com.miophas.corruption.common.item.CorruptedBreadItem(new Item.Properties()));
+    /** Water steeped with pure leaves: drunk, it takes a point of corruption away and leaves its bottle. */
+    public static final DeferredItem<com.miophas.corruption.api.corruption.CorruptionPurifyingItem> PURIFIED_WATER = ITEMS.register("purified_water",
+            () -> new com.miophas.corruption.api.corruption.CorruptionPurifyingItem(new Item.Properties().stacksTo(16),
+                    new com.miophas.corruption.core.corruption.CorruptionPurifier(1), net.minecraft.world.item.UseAnim.DRINK, net.minecraft.world.item.Items.GLASS_BOTTLE));
+    /** The robe, four pieces woven with pure leaves, which hold back the corruption's growth in their wearer. */
+    public static final DeferredItem<com.miophas.corruption.common.item.RobeArmorItem> ROBE_HOOD = robe("robe_hood", net.minecraft.world.item.ArmorItem.Type.HELMET);
+    public static final DeferredItem<com.miophas.corruption.common.item.RobeArmorItem> ROBE = robe("robe", net.minecraft.world.item.ArmorItem.Type.CHESTPLATE);
+    public static final DeferredItem<com.miophas.corruption.common.item.RobeArmorItem> ROBE_LEGGINGS = robe("robe_leggings", net.minecraft.world.item.ArmorItem.Type.LEGGINGS);
+    public static final DeferredItem<com.miophas.corruption.common.item.RobeArmorItem> ROBE_BOOTS = robe("robe_boots", net.minecraft.world.item.ArmorItem.Type.BOOTS);
+    /** The robe's pieces, head to foot. */
+    public static final List<DeferredItem<com.miophas.corruption.common.item.RobeArmorItem>> ROBE_SET = List.of(ROBE_HOOD, ROBE, ROBE_LEGGINGS, ROBE_BOOTS);
     public static final DeferredItem<Item> PURE_LEAF =
             ITEMS.register("pure_leaf", () -> new Item(new Item.Properties()));
     // 59 uses, the same as a wooden hoe.
@@ -91,6 +160,22 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> ARCUNUM_END = ITEMS.registerSimpleBlockItem("arcunum_end", ModBlocks.ARCUNUM_END);
     public static final DeferredItem<BlockItem> SPIRIT = ITEMS.registerSimpleBlockItem("spirit", ModBlocks.SPIRIT);
     public static final DeferredItem<BlockItem> SPIRIT_DEEPSLATE = ITEMS.registerSimpleBlockItem("spirit_deepslate", ModBlocks.SPIRIT_DEEPSLATE);
+
+    private static DeferredItem<CorruptionArcaneStickItem> wand(String id, CorruptionArcaneStickItem.Tier tier) {
+        return ITEMS.register(id, () -> new CorruptionArcaneStickItem(new Item.Properties(), tier));
+    }
+
+    private static DeferredItem<com.miophas.corruption.common.item.RobeArmorItem> robe(String id, net.minecraft.world.item.ArmorItem.Type type) {
+        return ITEMS.register(id, () -> new com.miophas.corruption.common.item.RobeArmorItem(type));
+    }
+
+    private static DeferredItem<CorruptionMaterialItem> material(String id) {
+        return ITEMS.register(id, () -> new CorruptionMaterialItem(new Item.Properties()));
+    }
+
+    private static DeferredItem<Item> key(String id, Rarity rarity) {
+        return ITEMS.register(id, () -> new Item(new Item.Properties().stacksTo(1).rarity(rarity)));
+    }
 
     /** Roll of 1-2 corruption dust, granted as an extra drop by corrupted blocks. */
     public static ItemStack corruptionDustDrop(RandomSource random) {

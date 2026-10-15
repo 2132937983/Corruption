@@ -1,0 +1,82 @@
+{
+  "energy": "30KCE",
+  "cooldown": 90,
+  "min_corruption": 14,
+  "corruption_gain": 2,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:magic_circle",
+      "radius": 10,
+      "height": 2,
+      "ticks": 50,
+      "color": "#6E6E7A",
+      "accent": "#C8C8D8"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:shockwave",
+      "radius": 12,
+      "height": 3,
+      "ticks": 26,
+      "color": "#6E6E7A",
+      "accent": "#E0E0F0",
+      "shake": 0.7,
+      "sound": "minecraft:entity.warden.sonic_boom"
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 10,
+      "particles": [
+        {
+          "particle": "minecraft:large_smoke",
+          "count": 64,
+          "spread": 0.2,
+          "speed": 0.02
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 60,
+          "spread": 0.2,
+          "color": "#303030"
+        }
+      ]
+    },
+    {
+      "type": "push",
+      "radius": 10,
+      "strength": 2.4,
+      "lift": 1
+    },
+    {
+      "type": "damage",
+      "amount": 45,
+      "radius": 10
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slowness",
+      "target": "nearby",
+      "radius": 10,
+      "duration": 300,
+      "amplifier": 3
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:mining_fatigue",
+      "target": "nearby",
+      "radius": 10,
+      "duration": 300,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:wither",
+      "target": "nearby",
+      "radius": 10,
+      "duration": 200,
+      "amplifier": 2
+    }
+  ]
+}

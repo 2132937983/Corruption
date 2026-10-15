@@ -1,0 +1,50 @@
+{
+  "energy": "7KCE",
+  "cooldown": 200,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:luck",
+      "target": "self",
+      "duration": 2400,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:haste",
+      "target": "self",
+      "duration": 2400,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:night_vision",
+      "target": "self",
+      "duration": 2400
+    },
+    {
+      "type": "give_item",
+      "item": "minecraft:emerald",
+      "count": 1
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 1,
+      "particles": [
+        {
+          "particle": "minecraft:happy_villager",
+          "count": 30,
+          "spread": 0.4
+        },
+        {
+          "particle": "minecraft:wax_on",
+          "count": 10,
+          "spread": 0.4
+        }
+      ]
+    }
+  ]
+}

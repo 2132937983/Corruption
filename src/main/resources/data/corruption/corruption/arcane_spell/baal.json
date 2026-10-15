@@ -8,6 +8,44 @@
       "type": "launch_bolt",
       "speed": 1.5,
       "look": "minecraft:fire_charge",
+      "trail": [
+        {
+          "particle": "minecraft:flame",
+          "count": 3,
+          "spread": 0.12,
+          "speed": 0.01
+        },
+        {
+          "particle": "minecraft:smoke",
+          "count": 1,
+          "spread": 0.1,
+          "speed": 0.02
+        },
+        {
+          "particle": "minecraft:lava",
+          "count": 1,
+          "spread": 0.05
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:flame",
+          "count": 40,
+          "spread": 0.6,
+          "speed": 0.08
+        },
+        {
+          "particle": "minecraft:lava",
+          "count": 12,
+          "spread": 0.4
+        },
+        {
+          "particle": "minecraft:large_smoke",
+          "count": 10,
+          "spread": 0.5,
+          "speed": 0.03
+        }
+      ],
       "on_hit": [
         {
           "type": "damage",

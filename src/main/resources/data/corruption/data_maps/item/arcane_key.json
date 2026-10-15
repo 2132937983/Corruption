@@ -2,6 +2,36 @@
   "values": {
     "corruption:clavicula_salomonis": {
       "strings": "#corruption:clavicula_salomonis"
+    },
+    "corruption:clavicula_salomonis_i": {
+      "strings": "#corruption:clavicula_salomonis_i"
+    },
+    "corruption:clavicula_salomonis_ii": {
+      "strings": "#corruption:clavicula_salomonis_ii"
+    },
+    "corruption:clavicula_salomonis_iii": {
+      "strings": "#corruption:clavicula_salomonis_iii"
+    },
+    "corruption:clavicula_salomonis_iv": {
+      "strings": "#corruption:clavicula_salomonis_iv"
+    },
+    "corruption:clavicula_salomonis_v": {
+      "strings": "#corruption:clavicula_salomonis_v"
+    },
+    "corruption:clavicula_salomonis_vi": {
+      "strings": "#corruption:clavicula_salomonis_vi"
+    },
+    "corruption:clavicula_salomonis_vii": {
+      "strings": "#corruption:clavicula_salomonis_vii"
+    },
+    "corruption:clavicula_salomonis_viii": {
+      "strings": "#corruption:clavicula_salomonis_viii"
+    },
+    "corruption:clavicula_salomonis_ascension": {
+      "strings": "#corruption:clavicula_salomonis_ascension"
+    },
+    "corruption:lemegeton": {
+      "strings": "#corruption:lemegeton"
     }
   }
 }

@@ -10,6 +10,8 @@
     "corruption:corruption_bench",
     "corruption:corruption_arcane_transmuter",
     "corruption:corruption_arcane_lectern",
+    "corruption:corruption_arcane_pedestal",
+    "corruption:corruption_arcane_charger",
     "corruption:corrupted_brass_block",
     "corruption:brass_cauldron",
     "corruption:altar_pillar",

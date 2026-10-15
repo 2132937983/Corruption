@@ -1,0 +1,45 @@
+{
+  "energy": "8KCE",
+  "cooldown": 100,
+  "min_corruption": 12,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:glowing",
+      "target": "nearby",
+      "radius": 12,
+      "duration": 600
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:speed",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:strength",
+      "target": "self",
+      "duration": 1200
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 5,
+      "particles": [
+        {
+          "particle": "minecraft:crit",
+          "count": 30
+        },
+        {
+          "particle": "minecraft:smoke",
+          "count": 20,
+          "spread": 0.1,
+          "speed": 0.02
+        }
+      ]
+    }
+  ]
+}

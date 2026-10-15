@@ -1,16 +1,11 @@
 {
   "values": [
-    "corruption:baal",
-    "corruption:agares",
-    "corruption:vassago",
-    "corruption:gamigin",
-    "corruption:marbas",
-    "corruption:valefor",
-    "corruption:amon",
-    "corruption:barbatos",
-    "corruption:paimon",
-    "corruption:buer",
     "corruption:corruption",
-    "corruption:transmutation"
+    "corruption:transmutation",
+    "corruption:corruption_barrage",
+    "corruption:corruption_nova",
+    "corruption:corruption_vortex",
+    "corruption:corruption_tempest",
+    "corruption:corruption_rain"
   ]
 }

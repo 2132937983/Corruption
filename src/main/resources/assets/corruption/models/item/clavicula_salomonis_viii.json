@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "corruption:item/clavicula_salomonis_viii"
+  }
+}

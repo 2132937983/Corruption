@@ -14,9 +14,17 @@ public final class ModParticles {
     /** The motes that drift out of a working arcane transmuter. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CORRUPTION_PARTICLE =
             TYPES.register("corruption_particle", () -> new SimpleParticleType(false));
-    /** The sparks of stored Corruption Energy an arcane charger holds over itself. */
+    /** The sparks of Corruption Energy an arcane charger sends into the item it charges. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CORRUPTION_SPARK_PARTICLE =
             TYPES.register("corruption_spark_particle", () -> new SimpleParticleType(false));
+    /**
+     * Andromalius's eye, flashed before one player's eyes as an elder guardian's face is: sent to that player alone,
+     * at their own position, and drawn over their view (GazeParticle).
+     */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> ANDROMALIUS_GAZE =
+            TYPES.register("andromalius_gaze", () -> new SimpleParticleType(true));
+    /** How long a spark flies, in ticks: one sent this many times its speed away arrives as it goes out. */
+    public static final int SPARK_FLIGHT = 8;
 
     private ModParticles() {}
 }

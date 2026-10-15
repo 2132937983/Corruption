@@ -1,0 +1,39 @@
+{
+  "energy": "3KCE",
+  "cooldown": 40,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:weakness",
+      "target": "nearby",
+      "radius": 8,
+      "duration": 300,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slowness",
+      "target": "nearby",
+      "radius": 8,
+      "duration": 200
+    },
+    {
+      "type": "particles",
+      "shape": "sphere",
+      "radius": 3,
+      "particles": [
+        {
+          "particle": "minecraft:heart",
+          "count": 24
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 30,
+          "spread": 0.1,
+          "color": "#E0507A"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "energy": "8KCE",
+  "cooldown": 80,
+  "min_corruption": 12,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:fire_resistance",
+      "target": "self",
+      "duration": 600
+    },
+    {
+      "type": "particles",
+      "shape": "sphere",
+      "radius": 3,
+      "particles": [
+        {
+          "particle": "minecraft:flame",
+          "count": 64,
+          "spread": 0.05,
+          "speed": 0.02
+        },
+        {
+          "particle": "minecraft:soul_fire_flame",
+          "count": 30,
+          "spread": 0.05,
+          "speed": 0.02
+        }
+      ]
+    },
+    {
+      "type": "ignite_area",
+      "radius": 6,
+      "seconds": 10
+    },
+    {
+      "type": "damage",
+      "amount": 8,
+      "radius": 6
+    }
+  ]
+}

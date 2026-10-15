@@ -24,12 +24,4 @@ public interface EnergyCharger {
 
     /** Whether anything lies there. */
     boolean isEmpty();
-
-    /**
-     * How many sparks the item is owed for the energy it has been given since this was last asked — one for each
-     * step of a charge, so that a charge is something to watch rather than something that has already happened.
-     * A machine that shows its charging some other way need not answer, and owes nothing; this is asked while
-     * drawing, so only ever on the client.
-     */
-    default int sparksOwed() { return 0; }
 }

@@ -1,0 +1,36 @@
+{
+  "energy": "6KCE",
+  "cooldown": 200,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "summon",
+      "entity": "minecraft:zombie",
+      "count": 2
+    },
+    {
+      "type": "summon",
+      "entity": "minecraft:husk",
+      "count": 1
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 3,
+      "particles": [
+        {
+          "particle": "minecraft:soul_fire_flame",
+          "count": 24,
+          "spread": 0.05,
+          "speed": 0.01
+        },
+        {
+          "particle": "minecraft:small_flame",
+          "count": 12,
+          "spread": 0.05
+        }
+      ]
+    }
+  ]
+}

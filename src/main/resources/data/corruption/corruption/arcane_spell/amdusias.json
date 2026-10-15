@@ -1,0 +1,37 @@
+{
+  "energy": "8KCE",
+  "cooldown": 100,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "particles",
+      "shape": "sphere",
+      "radius": 4,
+      "particles": [
+        {
+          "particle": "minecraft:note",
+          "count": 48
+        }
+      ]
+    },
+    {
+      "type": "pacify",
+      "radius": 12
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:regeneration",
+      "target": "self",
+      "duration": 400,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:levitation",
+      "target": "nearby",
+      "radius": 6,
+      "duration": 60
+    }
+  ]
+}

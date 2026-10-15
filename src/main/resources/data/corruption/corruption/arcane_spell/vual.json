@@ -1,0 +1,34 @@
+{
+  "energy": "5KCE",
+  "cooldown": 40,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "pacify",
+      "radius": 12
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:weakness",
+      "target": "nearby",
+      "radius": 10,
+      "duration": 600,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "sphere",
+      "radius": 3,
+      "particles": [
+        {
+          "particle": "minecraft:heart",
+          "count": 20
+        },
+        {
+          "particle": "minecraft:note",
+          "count": 10
+        }
+      ]
+    }
+  ]
+}

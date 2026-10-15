@@ -1,0 +1,48 @@
+{
+  "energy": "7KCE",
+  "cooldown": 80,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:levitation",
+      "target": "nearby",
+      "radius": 8,
+      "duration": 80,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slow_falling",
+      "target": "self",
+      "duration": 400
+    },
+    {
+      "type": "particles",
+      "shape": "column",
+      "radius": 0,
+      "height": 4,
+      "particles": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 40,
+          "spread": 0.1
+        }
+      ]
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 8,
+      "particles": [
+        {
+          "particle": "minecraft:enchant",
+          "count": 30,
+          "spread": 0.1,
+          "speed": 0.2
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "energy": "14KCE",
+  "cooldown": 70,
+  "min_corruption": 12,
+  "corruption_gain": 2,
+  "actions": [
+    {
+      "type": "launch_bolt",
+      "speed": 1.6,
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 2,
+          "spread": 0.06
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 1,
+          "spread": 0.05,
+          "color": "#71334C"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 30,
+          "spread": 0.5,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 20,
+          "spread": 0.5,
+          "color": "#71334C"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:magic_circle",
+          "radius": 5,
+          "height": 2,
+          "ticks": 40
+        },
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 6,
+          "height": 2,
+          "ticks": 16,
+          "shake": 0.4
+        },
+        {
+          "type": "particles",
+          "shape": "ring",
+          "radius": 5,
+          "particles": [
+            {
+              "particle": "corruption:corruption_particle",
+              "count": 48,
+              "spread": 0.1,
+              "speed": 0.02
+            },
+            {
+              "particle": "minecraft:dust",
+              "count": 32,
+              "spread": 0.2,
+              "color": "#71334C"
+            }
+          ]
+        },
+        {
+          "type": "lightning",
+          "radius": 5,
+          "count": 10,
+          "corrupt": true,
+          "damage": 22,
+          "damage_type": "corruption:corruption"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 5,
+          "duration": 100,
+          "amplifier": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "corruption:item/tool/novice_corruption_arcane_stick"
+  }
+}

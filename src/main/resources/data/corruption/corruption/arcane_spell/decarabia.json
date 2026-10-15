@@ -1,0 +1,41 @@
+{
+  "energy": "8KCE",
+  "cooldown": 200,
+  "min_corruption": 12,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "summon",
+      "entity": "minecraft:phantom",
+      "count": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slow_falling",
+      "target": "self",
+      "duration": 600
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 3,
+      "particles": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 40
+        }
+      ]
+    },
+    {
+      "type": "particles",
+      "shape": "sphere",
+      "radius": 1.5,
+      "particles": [
+        {
+          "particle": "minecraft:wax_on",
+          "count": 20
+        }
+      ]
+    }
+  ]
+}

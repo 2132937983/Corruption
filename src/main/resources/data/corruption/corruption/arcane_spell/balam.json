@@ -1,0 +1,47 @@
+{
+  "energy": "7KCE",
+  "cooldown": 100,
+  "min_corruption": 12,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:invisibility",
+      "target": "self",
+      "duration": 1200
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:speed",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:night_vision",
+      "target": "self",
+      "duration": 1200
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:glowing",
+      "target": "nearby",
+      "radius": 12,
+      "duration": 600
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 1,
+      "particles": [
+        {
+          "particle": "minecraft:poof",
+          "count": 30,
+          "spread": 0.4,
+          "speed": 0.03
+        }
+      ]
+    }
+  ]
+}

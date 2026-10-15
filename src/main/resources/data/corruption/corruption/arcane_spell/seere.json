@@ -1,0 +1,37 @@
+{
+  "energy": "9KCE",
+  "cooldown": 20,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 1,
+      "particles": [
+        {
+          "particle": "minecraft:reverse_portal",
+          "count": 60,
+          "spread": 0.6,
+          "speed": 0.3
+        },
+        {
+          "particle": "minecraft:end_rod",
+          "count": 20,
+          "spread": 0.5,
+          "speed": 0.05
+        }
+      ]
+    },
+    {
+      "type": "teleport",
+      "distance": 48
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:speed",
+      "target": "self",
+      "duration": 600,
+      "amplifier": 3
+    }
+  ]
+}

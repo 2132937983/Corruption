@@ -1,0 +1,49 @@
+{
+  "energy": "6KCE",
+  "cooldown": 60,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "launch_bolt",
+      "speed": 0.9,
+      "count": 7,
+      "fan": 50,
+      "trail": [
+        {
+          "particle": "minecraft:dragon_breath",
+          "count": 2,
+          "spread": 0.08
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:dragon_breath",
+          "count": 12,
+          "spread": 0.3
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "damage",
+          "amount": 4,
+          "radius": 1.5
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:poison",
+          "target": "nearby",
+          "radius": 2,
+          "duration": 100
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:nausea",
+          "target": "nearby",
+          "radius": 2,
+          "duration": 160
+        }
+      ]
+    }
+  ]
+}

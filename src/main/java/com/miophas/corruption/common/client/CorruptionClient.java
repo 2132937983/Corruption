@@ -45,6 +45,7 @@ public final class CorruptionClient {
         ModList.get().getModContainerById(Corruption.MOD_ID).orElseThrow()
                 .registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         event.enqueueWork(ArcaneTooltip::registerItemProperties);
+        com.miophas.corruption.common.client.visual.SpellVisualRenderer.registerBuiltIn();
     }
 
     @SubscribeEvent
@@ -74,6 +75,8 @@ public final class CorruptionClient {
                 com.miophas.corruption.common.client.entity.BaalModel::createBodyLayer);
         event.registerLayerDefinition(com.miophas.corruption.common.client.entity.AgaresModel.LAYER_LOCATION,
                 com.miophas.corruption.common.client.entity.AgaresModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.AndromaliusModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.AndromaliusModel::createBodyLayer);
     }
 
     @SubscribeEvent
@@ -81,7 +84,10 @@ public final class CorruptionClient {
         event.registerEntityRenderer(ModEntities.CORRUPTED_REMNANT.get(), CorruptedRemnantRenderer::new);
         event.registerEntityRenderer(ModEntities.CORRUPTED_DRAGON.get(), CorruptedRemnantRenderer::new);
         event.registerEntityRenderer(ModEntities.CORRUPTED_DRAGON_FIREBALL.get(), net.minecraft.client.renderer.entity.DragonFireballRenderer::new);
-        event.registerEntityRenderer(ModEntities.SPELL_BOLT.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
+        // A spell bolt glows by its own light, as a fireball does.
+        event.registerEntityRenderer(ModEntities.SPELL_BOLT.get(), context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 1.0F, true));
+        // A spell's effect, drawn by whatever is registered for it (see SpellVisualRenderer.registerBuiltIn).
+        event.registerEntityRenderer(ModEntities.SPELL_VISUAL.get(), com.miophas.corruption.common.client.visual.SpellVisualRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.ARCANE_PEDESTAL.get(), ArcanePedestalRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.ARCANE_CHARGER.get(), ArcaneChargerRenderer::new);
         event.registerEntityRenderer(ModEntities.CORRUPTED_DRAGON_BREATH.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
@@ -90,6 +96,7 @@ public final class CorruptionClient {
         event.registerEntityRenderer(ModEntities.GREED_PROJECTILE.get(), com.miophas.corruption.common.client.entity.GreedProjectileRenderer::new);
         event.registerEntityRenderer(ModEntities.BAAL.get(), com.miophas.corruption.common.client.entity.BaalRenderer::new);
         event.registerEntityRenderer(ModEntities.AGARES.get(), com.miophas.corruption.common.client.entity.AgaresRenderer::new);
+        event.registerEntityRenderer(ModEntities.ANDROMALIUS.get(), com.miophas.corruption.common.client.entity.AndromaliusRenderer::new);
     }
 
     @SubscribeEvent
@@ -103,6 +110,8 @@ public final class CorruptionClient {
         event.registerSpriteSet(ModParticles.CORRUPTION_SCREAM.get(), CorruptionScreamParticle.Provider::new);
         event.registerSpriteSet(ModParticles.CORRUPTION_PARTICLE.get(), com.miophas.corruption.common.client.particle.CorruptionParticle.Provider::new);
         event.registerSpriteSet(ModParticles.CORRUPTION_SPARK_PARTICLE.get(), com.miophas.corruption.common.client.particle.CorruptionSparkParticle.Provider::new);
+        // Andromalius's eye is a picture over the view, not a sprite: it needs no particles/*.json.
+        event.registerSpecial(ModParticles.ANDROMALIUS_GAZE.get(), new com.miophas.corruption.common.client.particle.GazeParticle.Provider());
     }
 
     @SubscribeEvent

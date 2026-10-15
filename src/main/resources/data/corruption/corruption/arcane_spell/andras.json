@@ -1,0 +1,53 @@
+{
+  "energy": "9KCE",
+  "cooldown": 80,
+  "min_corruption": 14,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:strength",
+      "target": "self",
+      "duration": 400,
+      "amplifier": 1
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 2.2,
+      "count": 3,
+      "fan": 18,
+      "trail": [
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.05,
+          "color": "#101010"
+        },
+        {
+          "particle": "minecraft:crit",
+          "count": 1
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:dust",
+          "count": 30,
+          "spread": 0.5,
+          "color": "#8A0303"
+        },
+        {
+          "particle": "minecraft:sweep_attack",
+          "count": 4,
+          "spread": 0.5
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "damage",
+          "amount": 12,
+          "radius": 2
+        }
+      ]
+    }
+  ]
+}

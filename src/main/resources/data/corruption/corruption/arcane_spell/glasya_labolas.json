@@ -1,0 +1,37 @@
+{
+  "energy": "5KCE",
+  "cooldown": 60,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:invisibility",
+      "target": "self",
+      "duration": 400
+    },
+    {
+      "type": "damage",
+      "amount": 9,
+      "radius": 4
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 2,
+      "particles": [
+        {
+          "particle": "minecraft:dust",
+          "count": 40,
+          "spread": 0.4,
+          "color": "#8A0303"
+        },
+        {
+          "particle": "minecraft:damage_indicator",
+          "count": 12,
+          "spread": 0.3
+        }
+      ]
+    }
+  ]
+}

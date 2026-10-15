@@ -1,0 +1,31 @@
+{
+  "energy": "4KCE",
+  "cooldown": 100,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:haste",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 1
+    },
+    {
+      "type": "give_item",
+      "item": "minecraft:amethyst_shard",
+      "count": 2
+    },
+    {
+      "type": "particles",
+      "shape": "spiral",
+      "radius": 1.5,
+      "height": 2.5,
+      "particles": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 30
+        }
+      ]
+    }
+  ]
+}

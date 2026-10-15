@@ -30,14 +30,24 @@ public interface CorruptionEnergyTool {
     }
 
     /**
-     * The store this stack offers, or null for an item that is no tool. Energy moves in and out of a stack of
-     * one; unlike a battery's, a tool's store never takes the item away once it is empty.
+     * The store this stack offers, or null for an item that is no tool. Energy goes into a stack of one, and never
+     * comes out through it: a tool's charge is drawn on only by what the tool is used for (a wand's cast spends
+     * it directly), so it is not poured into a machine, burnt as fuel, or emptied onto a charger it was set on.
      */
     static CorruptionEnergyStorage storage(ItemStack stack) {
         EnergyTool tool = of(stack);
-        return !tool.isTool() ? null : new CarriedEnergy(tool.capacity(), false, stack.getCount(),
+        if (!tool.isTool()) return null;
+        CarriedEnergy carried = new CarriedEnergy(tool.capacity(), false, stack.getCount(),
                 () -> stack.getOrDefault(CorruptionEnergyCarrier.ENERGY.get(), 0L),
                 energy -> stack.set(CorruptionEnergyCarrier.ENERGY.get(), energy), () -> {});
+        return new CorruptionEnergyStorage() {
+            @Override public long getEnergy() { return carried.getEnergy(); }
+            @Override public long getCapacity() { return carried.getCapacity(); }
+            @Override public long insert(long amount, boolean simulate) { return carried.insert(amount, simulate); }
+            @Override public long extract(long amount, boolean simulate) { return 0; }
+            @Override public boolean canInsert() { return carried.canInsert(); }
+            @Override public boolean canExtract() { return false; }
+        };
     }
 
     /** A copy of the stack with each item holding this much. */

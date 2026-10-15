@@ -1,0 +1,21 @@
+{
+  "type": "corruption:alchemy_shaped",
+  "slots": {
+    "0": {
+      "item": "corruption:malice_fiber",
+      "count": 4
+    },
+    "1": {
+      "item": "minecraft:string",
+      "count": 2
+    },
+    "2": {
+      "item": "corruption:void_ash",
+      "count": 1
+    }
+  },
+  "result": {
+    "id": "corruption:shadow_silk",
+    "count": 2
+  }
+}

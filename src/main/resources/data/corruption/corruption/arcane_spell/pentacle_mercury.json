@@ -1,0 +1,67 @@
+{
+  "energy": "28KCE",
+  "cooldown": 20,
+  "min_corruption": 12,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:vortex",
+      "radius": 2,
+      "height": 3,
+      "ticks": 20,
+      "color": "#9ADFFF",
+      "accent": "#FFFFFF",
+      "sound": "minecraft:entity.enderman.teleport"
+    },
+    {
+      "type": "particles",
+      "shape": "spiral",
+      "radius": 2,
+      "height": 3,
+      "particles": [
+        {
+          "particle": "minecraft:reverse_portal",
+          "count": 60,
+          "spread": 0.1,
+          "speed": 0.1
+        },
+        {
+          "particle": "minecraft:end_rod",
+          "count": 30
+        }
+      ]
+    },
+    {
+      "type": "teleport",
+      "distance": 64
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:speed",
+      "target": "self",
+      "duration": 2400,
+      "amplifier": 3
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:jump_boost",
+      "target": "self",
+      "duration": 2400,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:haste",
+      "target": "self",
+      "duration": 2400,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slow_falling",
+      "target": "self",
+      "duration": 200
+    }
+  ]
+}

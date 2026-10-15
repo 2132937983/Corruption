@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "type": "neoforge:components",
+      "items": "minecraft:potion",
+      "components": {
+        "minecraft:potion_contents": {
+          "potion": "minecraft:water"
+        }
+      }
+    },
+    {
+      "item": "corruption:pure_leaf"
+    },
+    {
+      "item": "corruption:pure_leaf"
+    }
+  ],
+  "result": {
+    "id": "corruption:purified_water"
+  }
+}

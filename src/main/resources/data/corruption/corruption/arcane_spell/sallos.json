@@ -1,0 +1,38 @@
+{
+  "energy": "3KCE",
+  "cooldown": 40,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "pacify",
+      "radius": 12
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:water_breathing",
+      "target": "self",
+      "duration": 1200
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:dolphins_grace",
+      "target": "self",
+      "duration": 600
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 4,
+      "particles": [
+        {
+          "particle": "minecraft:splash",
+          "count": 24
+        },
+        {
+          "particle": "minecraft:heart",
+          "count": 8
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "energy": "7KCE",
+  "cooldown": 100,
+  "min_corruption": 12,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "weather",
+      "sky": "rain",
+      "ticks": 2400
+    },
+    {
+      "type": "push",
+      "radius": 8,
+      "strength": 1.6,
+      "lift": 0.6
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slowness",
+      "target": "nearby",
+      "radius": 8,
+      "duration": 200,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 8,
+      "particles": [
+        {
+          "particle": "minecraft:splash",
+          "count": 60
+        },
+        {
+          "particle": "minecraft:cloud",
+          "count": 24,
+          "spread": 0.2,
+          "speed": 0.02
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "energy": "5KCE",
+  "cooldown": 60,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "push",
+      "radius": 7,
+      "strength": 1.4,
+      "lift": 0.5
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slowness",
+      "target": "nearby",
+      "radius": 7,
+      "duration": 200,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:weakness",
+      "target": "nearby",
+      "radius": 7,
+      "duration": 200,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 7,
+      "particles": [
+        {
+          "particle": "minecraft:note",
+          "count": 24
+        }
+      ]
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 1,
+      "particles": [
+        {
+          "particle": "minecraft:poof",
+          "count": 20,
+          "spread": 0.3,
+          "speed": 0.05
+        }
+      ]
+    }
+  ]
+}

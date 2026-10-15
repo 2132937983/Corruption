@@ -1,0 +1,40 @@
+{
+  "energy": "2KCE",
+  "cooldown": 60,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "pacify",
+      "radius": 10
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:regeneration",
+      "target": "self",
+      "duration": 200
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 3,
+      "particles": [
+        {
+          "particle": "minecraft:heart",
+          "count": 12
+        }
+      ]
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 1,
+      "particles": [
+        {
+          "particle": "minecraft:happy_villager",
+          "count": 20,
+          "spread": 0.3
+        }
+      ]
+    }
+  ]
+}

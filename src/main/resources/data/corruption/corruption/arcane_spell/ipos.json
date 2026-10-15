@@ -1,0 +1,42 @@
+{
+  "energy": "3KCE",
+  "cooldown": 40,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:strength",
+      "target": "self",
+      "duration": 400
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:speed",
+      "target": "self",
+      "duration": 400
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:jump_boost",
+      "target": "self",
+      "duration": 400
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 1,
+      "particles": [
+        {
+          "particle": "minecraft:crit",
+          "count": 16,
+          "spread": 0.3
+        },
+        {
+          "particle": "minecraft:enchanted_hit",
+          "count": 16,
+          "spread": 0.3
+        }
+      ]
+    }
+  ]
+}

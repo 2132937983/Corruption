@@ -1,0 +1,12 @@
+{
+  "type": "corruption:arcane_transmutation",
+  "ingredient": {
+    "tag": "minecraft:coals",
+    "count": 1
+  },
+  "energy": "2KCE",
+  "result": {
+    "id": "corruption:void_ash",
+    "count": 2
+  }
+}

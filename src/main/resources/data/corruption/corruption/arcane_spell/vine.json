@@ -1,0 +1,53 @@
+{
+  "energy": "8KCE",
+  "cooldown": 120,
+  "min_corruption": 12,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "launch_bolt",
+      "speed": 1.5,
+      "count": 3,
+      "fan": 15,
+      "trail": [
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.05,
+          "color": "#20202A"
+        },
+        {
+          "particle": "minecraft:smoke",
+          "count": 1,
+          "spread": 0.05
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:explosion",
+          "count": 3,
+          "spread": 0.4
+        },
+        {
+          "particle": "minecraft:large_smoke",
+          "count": 12,
+          "spread": 0.4,
+          "speed": 0.02
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "explode",
+          "power": 2.5,
+          "breaks_blocks": true
+        },
+        {
+          "type": "push",
+          "radius": 4,
+          "strength": 1.2,
+          "lift": 0.4
+        }
+      ]
+    }
+  ]
+}

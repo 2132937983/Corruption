@@ -1,0 +1,39 @@
+{
+  "energy": "3KCE",
+  "cooldown": 40,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:health_boost",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:instant_health",
+      "target": "self",
+      "duration": 1
+    },
+    {
+      "type": "particles",
+      "shape": "column",
+      "radius": 0,
+      "height": 2,
+      "particles": [
+        {
+          "particle": "minecraft:happy_villager",
+          "count": 20,
+          "spread": 0.3
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 20,
+          "spread": 0.3,
+          "color": "#202020"
+        }
+      ]
+    }
+  ]
+}

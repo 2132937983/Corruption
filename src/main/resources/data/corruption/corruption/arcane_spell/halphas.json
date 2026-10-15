@@ -1,0 +1,31 @@
+{
+  "energy": "6KCE",
+  "cooldown": 200,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "summon",
+      "entity": "minecraft:stray",
+      "count": 2
+    },
+    {
+      "type": "give_item",
+      "item": "minecraft:arrow",
+      "count": 16
+    },
+    {
+      "type": "particles",
+      "shape": "column",
+      "radius": 0,
+      "height": 3,
+      "particles": [
+        {
+          "particle": "minecraft:crit",
+          "count": 24,
+          "spread": 0.3
+        }
+      ]
+    }
+  ]
+}

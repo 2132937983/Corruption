@@ -1,0 +1,44 @@
+{
+  "energy": "6KCE",
+  "cooldown": 60,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "push",
+      "radius": 7,
+      "strength": 1.2,
+      "lift": 0.3
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slowness",
+      "target": "nearby",
+      "radius": 7,
+      "duration": 200,
+      "amplifier": 1
+    },
+    {
+      "type": "damage",
+      "amount": 5,
+      "radius": 7
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 7,
+      "particles": [
+        {
+          "particle": "minecraft:splash",
+          "count": 64
+        },
+        {
+          "particle": "minecraft:cloud",
+          "count": 20,
+          "spread": 0.2,
+          "speed": 0.02
+        }
+      ]
+    }
+  ]
+}

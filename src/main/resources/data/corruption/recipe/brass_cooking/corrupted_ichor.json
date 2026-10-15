@@ -1,0 +1,22 @@
+{
+  "type": "corruption:brass_cooking",
+  "ingredients": [
+    {
+      "item": "minecraft:glass_bottle",
+      "count": 1
+    },
+    {
+      "item": "corruption:corruption_dust",
+      "count": 4
+    }
+  ],
+  "fluid": {
+    "fluid": "corruption:flowing_corruption",
+    "amount": 250
+  },
+  "energy": "500CE",
+  "time": 120,
+  "result": {
+    "id": "corruption:corrupted_ichor"
+  }
+}

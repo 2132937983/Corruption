@@ -1,0 +1,43 @@
+{
+  "energy": "6KCE",
+  "cooldown": 100,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:resistance",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:absorption",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:wither",
+      "target": "nearby",
+      "radius": 4,
+      "duration": 160
+    },
+    {
+      "type": "particles",
+      "shape": "column",
+      "radius": 0,
+      "height": 3,
+      "particles": [
+        {
+          "particle": "minecraft:dust",
+          "count": 40,
+          "spread": 0.4,
+          "color": "#6E6E6E"
+        }
+      ]
+    }
+  ]
+}

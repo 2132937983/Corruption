@@ -1,0 +1,96 @@
+{
+  "energy": "65KCE",
+  "cooldown": 160,
+  "min_corruption": 15,
+  "corruption_gain": 2,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:vortex",
+      "radius": 8,
+      "height": 10,
+      "ticks": 60,
+      "color": "#BFE8FF",
+      "accent": "#FFFFFF",
+      "shake": 0.5,
+      "sound": "minecraft:entity.breeze.wind_burst"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:shockwave",
+      "radius": 12,
+      "height": 3,
+      "ticks": 24,
+      "color": "#BFE8FF",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "weather",
+      "sky": "thunder",
+      "ticks": 2400
+    },
+    {
+      "type": "push",
+      "radius": 12,
+      "strength": 3,
+      "lift": 1.4
+    },
+    {
+      "type": "damage",
+      "amount": 40,
+      "radius": 12
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 12,
+      "particles": [
+        {
+          "particle": "minecraft:cloud",
+          "count": 64,
+          "spread": 0.2,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:sweep_attack",
+          "count": 12,
+          "spread": 0.5
+        }
+      ]
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.4,
+      "count": 8,
+      "fan": 315,
+      "trail": [
+        {
+          "particle": "minecraft:cloud",
+          "count": 2,
+          "spread": 0.1
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:cloud",
+          "count": 20,
+          "spread": 0.5,
+          "speed": 0.1
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "push",
+          "radius": 4,
+          "strength": 2,
+          "lift": 1
+        },
+        {
+          "type": "damage",
+          "amount": 24,
+          "radius": 3
+        }
+      ]
+    }
+  ]
+}

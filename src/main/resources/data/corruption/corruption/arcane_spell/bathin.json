@@ -1,0 +1,30 @@
+{
+  "energy": "3KCE",
+  "cooldown": 40,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 1,
+      "particles": [
+        {
+          "particle": "minecraft:portal",
+          "count": 40,
+          "spread": 0.5,
+          "speed": 0.3
+        }
+      ]
+    },
+    {
+      "type": "teleport",
+      "distance": 20
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slow_falling",
+      "target": "self",
+      "duration": 100
+    }
+  ]
+}

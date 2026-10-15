@@ -1,0 +1,45 @@
+{
+  "energy": "6KCE",
+  "cooldown": 100,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:resistance",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:health_boost",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:regeneration",
+      "target": "self",
+      "duration": 200,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "sphere",
+      "radius": 2.5,
+      "particles": [
+        {
+          "particle": "minecraft:enchant",
+          "count": 40,
+          "spread": 0.1,
+          "speed": 0.2
+        },
+        {
+          "particle": "minecraft:end_rod",
+          "count": 12
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "type": "corruption:altar_shaped",
+  "pillars": {
+    "1": {
+      "item": "corruption:bloodstone"
+    },
+    "2": {
+      "item": "corruption:eldritch_membrane"
+    },
+    "3": {
+      "item": "corruption:abyssal_pearl"
+    },
+    "4": {
+      "item": "corruption:cursed_iron_ingot"
+    },
+    "5": {
+      "item": "corruption:harmonized_corruption_crystal"
+    },
+    "6": {
+      "item": "corruption:soul_resin"
+    }
+  },
+  "offering": "minecraft:pig",
+  "blocks": [
+    {
+      "at": [
+        0,
+        1
+      ],
+      "block": "#minecraft:candles"
+    },
+    {
+      "at": [
+        1,
+        1
+      ],
+      "block": "#minecraft:candles"
+    },
+    {
+      "at": [
+        1,
+        0
+      ],
+      "block": "#minecraft:candles"
+    },
+    {
+      "at": [
+        1,
+        -1
+      ],
+      "block": "#minecraft:candles"
+    },
+    {
+      "at": [
+        0,
+        -1
+      ],
+      "block": "#minecraft:candles"
+    },
+    {
+      "at": [
+        -1,
+        -1
+      ],
+      "block": "#minecraft:candles"
+    },
+    {
+      "at": [
+        -1,
+        0
+      ],
+      "block": "#minecraft:candles"
+    },
+    {
+      "at": [
+        -1,
+        1
+      ],
+      "block": "#minecraft:candles"
+    }
+  ],
+  "corruption": 8,
+  "time": 120,
+  "result": {
+    "id": "corruption:corrupted_heartstone"
+  }
+}

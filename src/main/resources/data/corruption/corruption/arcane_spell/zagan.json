@@ -1,0 +1,38 @@
+{
+  "energy": "8KCE",
+  "cooldown": 200,
+  "min_corruption": 12,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "give_item",
+      "item": "minecraft:emerald",
+      "count": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:instant_health",
+      "target": "self",
+      "duration": 1,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 1,
+      "particles": [
+        {
+          "particle": "minecraft:dust",
+          "count": 40,
+          "spread": 0.4,
+          "color": "#8E1B40"
+        },
+        {
+          "particle": "minecraft:splash",
+          "count": 20,
+          "spread": 0.4
+        }
+      ]
+    }
+  ]
+}

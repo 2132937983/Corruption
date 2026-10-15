@@ -1,0 +1,36 @@
+{
+  "type": "corruption:altar_shaped",
+  "pillars": {
+    "1": {
+      "item": "corruption:intermediate_corruption_arcane_stick"
+    },
+    "2": {
+      "item": "corruption:harmonized_corruption_crystal"
+    },
+    "3": {
+      "item": "corruption:ancient_corruption_crystal"
+    },
+    "4": {
+      "item": "corruption:corrupted_brass_block"
+    },
+    "5": {
+      "item": "corruption:ancient_corruption_crystal"
+    },
+    "6": {
+      "item": "corruption:harmonized_corruption_crystal"
+    }
+  },
+  "blocks": [
+    { "at": [0, 1], "block": "#minecraft:candles" },
+    { "at": [1, 1], "block": "#minecraft:candles" },
+    { "at": [1, 0], "block": "#minecraft:candles" },
+    { "at": [1, -1], "block": "#minecraft:candles" },
+    { "at": [0, -1], "block": "#minecraft:candles" },
+    { "at": [-1, -1], "block": "#minecraft:candles" },
+    { "at": [-1, 0], "block": "#minecraft:candles" },
+    { "at": [-1, 1], "block": "#minecraft:candles" }
+  ],
+  "result": {
+    "id": "corruption:advanced_corruption_arcane_stick"
+  }
+}

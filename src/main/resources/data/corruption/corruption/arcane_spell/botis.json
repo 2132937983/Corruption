@@ -1,0 +1,45 @@
+{
+  "energy": "3KCE",
+  "cooldown": 40,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "launch_bolt",
+      "speed": 1.6,
+      "trail": [
+        {
+          "particle": "minecraft:item_slime",
+          "count": 1
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.05,
+          "color": "#3E8E3A"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:item_slime",
+          "count": 16,
+          "spread": 0.4
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "damage",
+          "amount": 7,
+          "radius": 2
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:poison",
+          "target": "nearby",
+          "radius": 2.5,
+          "duration": 200,
+          "amplifier": 1
+        }
+      ]
+    }
+  ]
+}

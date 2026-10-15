@@ -52,7 +52,7 @@ import net.neoforged.neoforge.entity.PartEntity;
  * own box is a small stand-in nothing can hit, and its hitboxes are parts that follow its body and its
  * walking legs. What it looks like, how it is built and what it does to its prey is each creature's own.
  */
-public abstract class Colossus extends Mob implements Enemy {
+public abstract class Colossus extends Mob implements Enemy, DemonBoss {
     /** How far it has walked, in walk cycles; the legs on both sides are worked out from this. */
     private static final EntityDataAccessor<Float> CYCLE = SynchedEntityData.defineId(Colossus.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Byte> ATTACK = SynchedEntityData.defineId(Colossus.class, EntityDataSerializers.BYTE);
@@ -120,7 +120,8 @@ public abstract class Colossus extends Mob implements Enemy {
     public float walk(float partial) { return Mth.lerp(partial, walkO, walk); }
     /** 0 alive to 1 fully sunk, through its death. */
     public float collapse(float partial) { return deathTime <= 0 ? 0 : Math.min(1, (deathTime + partial) / deathTicks()); }
-    public Optional<UUID> bossBar() { return entityData.get(BOSS_BAR); }
+    @Override public Optional<UUID> bossBar() { return entityData.get(BOSS_BAR); }
+    @Override public int emblem() { return this instanceof Agares ? 1 : 0; }
     protected double blocks(double pixels) { return pixels * pixel; }
     protected ColossusGait gait() { return gait(cycle, walk, attackId(), attackTicks, collapse(0)); }
     protected float walking() { return walk; }

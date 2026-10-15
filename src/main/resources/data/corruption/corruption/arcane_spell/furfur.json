@@ -1,0 +1,45 @@
+{
+  "energy": "7KCE",
+  "cooldown": 100,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "weather",
+      "sky": "thunder",
+      "ticks": 2400
+    },
+    {
+      "type": "push",
+      "radius": 5,
+      "strength": 0.8,
+      "lift": 0.3
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 2,
+      "trail": [
+        {
+          "particle": "minecraft:electric_spark",
+          "count": 2,
+          "spread": 0.1
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:electric_spark",
+          "count": 30,
+          "spread": 0.6,
+          "speed": 0.2
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "lightning",
+          "radius": 4,
+          "count": 3
+        }
+      ]
+    }
+  ]
+}

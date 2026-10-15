@@ -38,7 +38,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
  */
 @ExtendWith(EphemeralTestServerProvider.class)
 class ArcaneLecternServerTest {
-    private static final List<String> CLAVICULA = List.of("corruption:baal", "corruption:agares", "corruption:corruption", "corruption:transmutation");
+    /** What the Prologue reveals: the corruption's own arts. */
+    private static final List<String> CLAVICULA = List.of("corruption:corruption", "corruption:transmutation", "corruption:corruption_barrage",
+            "corruption:corruption_nova", "corruption:corruption_vortex", "corruption:corruption_tempest", "corruption:corruption_rain");
 
     private static ArcaneLecternBlockEntity place(ServerLevel level, int x) {
         BlockPos pos = new BlockPos(x, -50, 3000);
@@ -74,7 +76,7 @@ class ArcaneLecternServerTest {
             var strings = level.registryAccess().registryOrThrow(ArcaneString.REGISTRY);
             for (String id : CLAVICULA) assertNotNull(strings.get(ArcaneApi.key(id)), id + " is loaded");
             assertEquals(new Codex(CLAVICULA), ArcaneApi.codex(level.registryAccess(), clavicula()), "in the tag's order");
-            assertEquals("solve et coagula", ArcaneApi.strings(level.registryAccess(), clavicula()).get(3).value().text());
+            assertEquals("solve et coagula", ArcaneApi.strings(level.registryAccess(), clavicula()).get(CLAVICULA.indexOf("corruption:transmutation")).value().text());
             assertEquals(Codex.EMPTY, ArcaneApi.codex(level.registryAccess(), new ItemStack(Items.BOOK)), "a book that is no key reveals nothing");
             assertTrue(ArcaneApi.isBlankParchment(new ItemStack(ModItems.PARCHMENT.get())));
             assertTrue(ArcaneApi.isInk(new ItemStack(ModItems.INK.get())));
@@ -96,11 +98,11 @@ class ArcaneLecternServerTest {
             ItemStack ink = new ItemStack(ModItems.INK.get());
             ink.setDamageValue(ModItems.INK_USES - 2);
             lectern.setItem(ArcaneLecternBlockEntity.INK, ink);
-            assertEquals(Transcription.Check.NOT_IN_KEY, menu.check(9), "no such place in the list");
+            assertEquals(Transcription.Check.NOT_IN_KEY, menu.check(CLAVICULA.size()), "no such place in the list");
             assertTrue(menu.clickMenuButton(player, 1));
             ItemStack copy = lectern.getItem(ArcaneLecternBlockEntity.OUTPUT);
             assertTrue(copy.is(ModItems.PARCHMENT.get()));
-            assertEquals(ArcaneApi.key("corruption:agares"), ArcaneApi.inscription(copy));
+            assertEquals(ArcaneApi.key(CLAVICULA.get(1)), ArcaneApi.inscription(copy));
             assertEquals(2, lectern.getItem(ArcaneLecternBlockEntity.PARCHMENT).getCount());
             assertEquals(1, ArcaneApi.inkIn(lectern.getItem(ArcaneLecternBlockEntity.INK)), "the bottle has one copy's worth left");
             assertEquals(1, lectern.getItem(ArcaneLecternBlockEntity.KEY).getCount(), "the key is not used up");
@@ -164,15 +166,16 @@ class ArcaneLecternServerTest {
         });
     }
 
-    @Test void aParchmentIsUnderstoodOnlyByWhoeverCarriesTheKey(MinecraftServer server) {
+    @Test void aKeyRevealsTheMeaningOfItsOwnStringsOnly(MinecraftServer server) {
         TestWorld.onServer(server, level -> {
             var baal = ArcaneApi.key("corruption:baal");
             assertEquals(ArcaneReading.Sight.GLYPHS, ArcaneApi.sight(level.registryAccess(), baal, List.of(new ItemStack(Items.BOOK))));
-            assertEquals(ArcaneReading.Sight.MEANING, ArcaneApi.sight(level.registryAccess(), baal, List.of(new ItemStack(Items.BOOK), clavicula())));
+            assertEquals(ArcaneReading.Sight.GLYPHS, ArcaneApi.sight(level.registryAccess(), baal, List.of(clavicula())), "Baal is in the first book, not the Prologue");
+            assertEquals(ArcaneReading.Sight.MEANING, ArcaneApi.sight(level.registryAccess(), baal, List.of(new ItemStack(Items.BOOK), new ItemStack(ModItems.CLAVICULA_SALOMONIS_I.get()))));
             ArcaneString string = ArcaneApi.string(level.registryAccess(), baal);
             assertNotNull(string);
             assertEquals("bael rex primus orientis", string.text());
-            assertNull(ArcaneApi.string(level.registryAccess(), ArcaneApi.key("corruption:paimon")), "a string the data does not hold");
+            assertNull(ArcaneApi.string(level.registryAccess(), ArcaneApi.key("corruption:no_such_string")), "a string the data does not hold");
             ItemStack written = ArcaneApi.inscribed(new ItemStack(ModItems.PARCHMENT.get()), baal);
             ItemStack loaded = ItemStack.parseOptional(level.registryAccess(), (CompoundTag) written.save(level.registryAccess()));
             assertEquals(baal, ArcaneApi.inscription(loaded), "what a parchment bears is saved with it");

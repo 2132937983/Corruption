@@ -1,0 +1,66 @@
+{
+  "energy": "10KCE",
+  "cooldown": 50,
+  "min_corruption": 8,
+  "corruption_gain": 2,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:shockwave",
+      "radius": 7,
+      "height": 2,
+      "ticks": 22,
+      "shake": 0.35,
+      "sound": "minecraft:entity.generic.explode"
+    },
+    {
+      "type": "particles",
+      "shape": "sphere",
+      "radius": 3,
+      "particles": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 64,
+          "spread": 0.05,
+          "speed": 0.02
+        },
+        {
+          "particle": "minecraft:witch",
+          "count": 30,
+          "spread": 0.1
+        }
+      ]
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 6,
+      "particles": [
+        {
+          "particle": "minecraft:dust",
+          "count": 60,
+          "spread": 0.1,
+          "color": "#71334C"
+        },
+        {
+          "particle": "minecraft:reverse_portal",
+          "count": 30,
+          "spread": 0.1,
+          "speed": 0.05
+        }
+      ]
+    },
+    {
+      "type": "push",
+      "radius": 7,
+      "strength": 2,
+      "lift": 0.6
+    },
+    {
+      "type": "damage",
+      "amount": 20,
+      "radius": 7,
+      "damage_type": "corruption:corruption"
+    }
+  ]
+}

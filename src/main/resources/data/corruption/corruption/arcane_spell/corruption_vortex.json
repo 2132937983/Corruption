@@ -1,0 +1,63 @@
+{
+  "energy": "12KCE",
+  "cooldown": 60,
+  "min_corruption": 10,
+  "corruption_gain": 2,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:vortex",
+      "radius": 6,
+      "height": 5,
+      "ticks": 50,
+      "shake": 0.2,
+      "sound": "minecraft:entity.evoker.prepare_attack"
+    },
+    {
+      "type": "particles",
+      "shape": "spiral",
+      "radius": 5,
+      "height": 3,
+      "particles": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 64,
+          "spread": 0.05
+        },
+        {
+          "particle": "minecraft:portal",
+          "count": 40,
+          "spread": 0.1,
+          "speed": 0.3
+        }
+      ]
+    },
+    {
+      "type": "push",
+      "radius": 10,
+      "strength": -1.6,
+      "lift": 0.2
+    },
+    {
+      "type": "damage",
+      "amount": 16,
+      "radius": 10,
+      "damage_type": "corruption:corruption"
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slowness",
+      "target": "nearby",
+      "radius": 10,
+      "duration": 160,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "corruption:corruption_curse",
+      "target": "nearby",
+      "radius": 10,
+      "duration": 120
+    }
+  ]
+}

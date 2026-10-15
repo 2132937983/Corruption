@@ -9,6 +9,8 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 
@@ -24,7 +26,21 @@ import net.minecraft.util.StringRepresentable;
  *       "on_hit": [ { "type": "damage", "amount": 6, "radius": 2 } ] } ] }
  * }</pre>
  * A bolt's "on_hit" holds more actions, so the action codec is recursive: a bolt may carry any action,
- * including another bolt. Every field but the ones naming an effect, a creature or an item may be left out; what
+ * including another bolt. How the mod's own bolt shows itself is written beside it: "look", the item it is
+ * drawn as; "trail", the {@link #PARTICLES particles} it gives off in flight (the corruption's motes if left
+ * out, none for an empty list); "burst", those that burst from where it strikes:
+ * <pre>{@code
+ * { "type": "launch_bolt", "look": "minecraft:fire_charge",
+ *   "trail": [ { "particle": "minecraft:flame", "count": 2, "spread": 0.08 }, { "particle": "minecraft:smoke" } ],
+ *   "burst": [ { "particle": "minecraft:flame", "count": 24, "spread": 0.5, "speed": 0.05 } ],
+ *   "on_hit": [ { "type": "ignite_area", "radius": 3, "seconds": 5 } ] }
+ * }</pre>
+ * A volley is "count" bolts, fanned across "fan" degrees; "from": "sky" drops them from "height" blocks over the
+ * origin instead, scattered "fan" blocks round it. "lightning" may be "corrupt" (the corruption's violet bolt) and
+ * hurt where it falls ("damage", "damage_type"); "push" thrusts away or draws in; "particles" only shows, drawing
+ * particles in a "shape" about the origin; "visual" only shows too, an effect drawn on the client under the origin:
+ * <pre>{"type": "visual", "effect": "corruption:magic_circle", "radius": 5, "ticks": 60, "color": "#9B4562",
+ *  "accent": "#FFD24A", "shake": 0.3, "sound": "minecraft:entity.evoker.prepare_summon"}</pre> Every field but the ones naming an effect, a creature or an item may be left out; what
  * it falls back to is written beside each kind below.
  */
 public final class SpellCodecs {
@@ -48,6 +64,41 @@ public final class SpellCodecs {
         case THUNDER -> "thunder";
     });
 
+    /** Where a bolt sets off from: "caster" or "sky". */
+    private static final Codec<SpellAction.Source> SOURCE = Codec.STRING.comapFlatMap(text -> switch (text) {
+        case "caster" -> DataResult.success(SpellAction.Source.CASTER);
+        case "sky" -> DataResult.success(SpellAction.Source.SKY);
+        default -> DataResult.error(() -> "A bolt sets off from the caster or the sky, not " + text);
+    }, source -> source == SpellAction.Source.SKY ? "sky" : "caster");
+    /** The shape particles are drawn in: "burst", "ring", "sphere", "column" or "spiral". */
+    private static final Codec<SpellAction.Shape> SHAPE = Codec.STRING.comapFlatMap(text -> {
+        for (SpellAction.Shape shape : SpellAction.Shape.values())
+            if (shape.name().toLowerCase(Locale.ROOT).equals(text)) return DataResult.success(shape);
+        return DataResult.error(() -> "Particles are drawn in a burst, ring, sphere, column or spiral, not " + text);
+    }, shape -> shape.name().toLowerCase(Locale.ROOT));
+
+    /** A colour as data writes it: "#RRGGBB". */
+    private static final Codec<Integer> COLOUR = Codec.STRING.comapFlatMap(text -> {
+        String hex = text.startsWith("#") ? text.substring(1) : text;
+        if (hex.length() != 6) return DataResult.error(() -> "A colour is written #RRGGBB, not " + text);
+        try { return DataResult.success(Integer.parseInt(hex, 16)); }
+        catch (NumberFormatException notHex) { return DataResult.error(() -> "A colour is written #RRGGBB, not " + text); }
+    }, colour -> String.format(Locale.ROOT, "#%06X", colour));
+
+    /**
+     * Particles a bolt gives off: {@code {"particle": "minecraft:flame", "count": 2, "spread": 0.1, "speed": 0.01}},
+     * and for a particle that takes a colour, "minecraft:dust" say, {@code "color": "#B05AA8"}. All but the
+     * particle may be left out: one at a time, all at the one spot, standing still, of no colour of its own.
+     */
+    public static final Codec<SpellAction.Particles> PARTICLES = RecordCodecBuilder.create(instance -> instance.group(
+            ID.fieldOf("particle").forGetter(SpellAction.Particles::particle),
+            Codec.intRange(0, 64).optionalFieldOf("count", 1).forGetter(SpellAction.Particles::count),
+            Codec.doubleRange(0, 4).optionalFieldOf("spread", 0.0).forGetter(SpellAction.Particles::spread),
+            Codec.doubleRange(0, 2).optionalFieldOf("speed", 0.0).forGetter(SpellAction.Particles::speed),
+            COLOUR.optionalFieldOf("color").forGetter(particles -> particles.colour() < 0 ? Optional.empty() : Optional.of(particles.colour())))
+            .apply(instance, (particle, count, spread, speed, colour) -> new SpellAction.Particles(particle, count, spread, speed, colour.orElse(-1))));
+    public static final Codec<List<SpellAction.Particles>> PARTICLE_LIST = PARTICLES.listOf();
+
     /** One action, named by its "type"; a bolt's payload may hold more of them. */
     public static final Codec<SpellAction> ACTION = Codec.recursive("SpellAction", SpellCodecs::actions);
     public static final Codec<List<SpellAction>> ACTIONS = ACTION.listOf();
@@ -64,7 +115,8 @@ public final class SpellCodecs {
     private enum Kind implements StringRepresentable {
         APPLY_EFFECT("apply_effect"), DAMAGE("damage"), IGNITE_AREA("ignite_area"), FREEZE_AREA("freeze_area"),
         CORRUPT_AREA("corrupt_area"), SUMMON("summon"), LIGHTNING("lightning"), EXPLODE("explode"),
-        TELEPORT("teleport"), WEATHER("weather"), PACIFY("pacify"), GIVE_ITEM("give_item"), LAUNCH_BOLT("launch_bolt");
+        TELEPORT("teleport"), WEATHER("weather"), PACIFY("pacify"), GIVE_ITEM("give_item"), PUSH("push"), PARTICLES("particles"),
+        VISUAL("visual"), LAUNCH_BOLT("launch_bolt");
 
         static final Codec<Kind> CODEC = StringRepresentable.fromEnum(Kind::values);
 
@@ -103,7 +155,10 @@ public final class SpellCodecs {
             .apply(instance, SpellAction.Summon::new));
     private static final MapCodec<SpellAction.Lightning> LIGHTNING = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.DOUBLE.optionalFieldOf("radius", 4.0).forGetter(SpellAction.Lightning::radius),
-            Codec.intRange(1, 16).optionalFieldOf("count", 1).forGetter(SpellAction.Lightning::count))
+            Codec.intRange(1, 32).optionalFieldOf("count", 1).forGetter(SpellAction.Lightning::count),
+            Codec.BOOL.optionalFieldOf("corrupt", false).forGetter(SpellAction.Lightning::corrupt),
+            Codec.doubleRange(0, 1000).optionalFieldOf("damage", 0.0).forGetter(SpellAction.Lightning::damage),
+            ID.optionalFieldOf("damage_type", "").forGetter(SpellAction.Lightning::damageType))
             .apply(instance, SpellAction.Lightning::new));
     private static final MapCodec<SpellAction.Explode> EXPLODE = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.DOUBLE.optionalFieldOf("power", 2.0).forGetter(SpellAction.Explode::power),
@@ -124,6 +179,29 @@ public final class SpellCodecs {
             Codec.intRange(1, 64).optionalFieldOf("count", 1).forGetter(SpellAction.GiveItem::count))
             .apply(instance, SpellAction.GiveItem::new));
 
+    private static final MapCodec<SpellAction.Push> PUSH = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            Codec.doubleRange(0, 16).optionalFieldOf("radius", 5.0).forGetter(SpellAction.Push::radius),
+            Codec.doubleRange(-4, 4).optionalFieldOf("strength", 1.0).forGetter(SpellAction.Push::strength),
+            Codec.doubleRange(0, 2).optionalFieldOf("lift", 0.2).forGetter(SpellAction.Push::lift))
+            .apply(instance, SpellAction.Push::new));
+    private static final MapCodec<SpellAction.Spectacle> SPECTACLE = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            SHAPE.optionalFieldOf("shape", SpellAction.Shape.BURST).forGetter(SpellAction.Spectacle::shape),
+            Codec.doubleRange(0, 16).optionalFieldOf("radius", 2.0).forGetter(SpellAction.Spectacle::radius),
+            Codec.doubleRange(0, 32).optionalFieldOf("height", 2.0).forGetter(SpellAction.Spectacle::height),
+            PARTICLE_LIST.fieldOf("particles").forGetter(SpellAction.Spectacle::particles))
+            .apply(instance, SpellAction.Spectacle::new));
+
+    private static final MapCodec<SpellAction.Visual> VISUAL = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            ID.fieldOf("effect").forGetter(SpellAction.Visual::effect),
+            Codec.doubleRange(0, 32).optionalFieldOf("radius", 3.0).forGetter(SpellAction.Visual::radius),
+            Codec.doubleRange(0, 64).optionalFieldOf("height", 3.0).forGetter(SpellAction.Visual::height),
+            Codec.intRange(1, 400).optionalFieldOf("ticks", 40).forGetter(SpellAction.Visual::ticks),
+            COLOUR.optionalFieldOf("color", SpellAction.Visual.ROSE).forGetter(SpellAction.Visual::colour),
+            COLOUR.optionalFieldOf("accent", SpellAction.Visual.GOLD).forGetter(SpellAction.Visual::accent),
+            Codec.doubleRange(0, 1).optionalFieldOf("shake", 0.0).forGetter(SpellAction.Visual::shake),
+            ID.optionalFieldOf("sound", "").forGetter(SpellAction.Visual::sound))
+            .apply(instance, SpellAction.Visual::new));
+
     /** A bolt's payload is a list of actions, so its codec is built from the recursive one it is made of. */
     private static Codec<SpellAction> actions(Codec<SpellAction> self) {
         return Kind.CODEC.dispatch("type", SpellCodecs::kindOf, kind -> codecFor(kind, self));
@@ -143,6 +221,9 @@ public final class SpellCodecs {
         if (action instanceof SpellAction.Weather) return Kind.WEATHER;
         if (action instanceof SpellAction.Pacify) return Kind.PACIFY;
         if (action instanceof SpellAction.GiveItem) return Kind.GIVE_ITEM;
+        if (action instanceof SpellAction.Push) return Kind.PUSH;
+        if (action instanceof SpellAction.Spectacle) return Kind.PARTICLES;
+        if (action instanceof SpellAction.Visual) return Kind.VISUAL;
         return Kind.LAUNCH_BOLT;
     }
 
@@ -161,12 +242,21 @@ public final class SpellCodecs {
             case WEATHER -> WEATHER;
             case PACIFY -> PACIFY;
             case GIVE_ITEM -> GIVE_ITEM;
+            case PUSH -> PUSH;
+            case PARTICLES -> SPECTACLE;
+            case VISUAL -> VISUAL;
             case LAUNCH_BOLT -> RecordCodecBuilder.<SpellAction.LaunchBolt>mapCodec(instance -> instance.group(
                     ID.optionalFieldOf("entity", "corruption:spell_bolt").forGetter(SpellAction.LaunchBolt::entity),
                     Codec.DOUBLE.optionalFieldOf("speed", 1.0).forGetter(SpellAction.LaunchBolt::speed),
                     Codec.FLOAT.optionalFieldOf("inaccuracy", 0.0F).forGetter(SpellAction.LaunchBolt::inaccuracy),
                     action.listOf().optionalFieldOf("on_hit", List.<SpellAction>of()).forGetter(SpellAction.LaunchBolt::onHit),
-                    ID.optionalFieldOf("look", "").forGetter(SpellAction.LaunchBolt::look))
+                    ID.optionalFieldOf("look", "").forGetter(SpellAction.LaunchBolt::look),
+                    PARTICLE_LIST.optionalFieldOf("trail", SpellAction.LaunchBolt.CORRUPTION_TRAIL).forGetter(SpellAction.LaunchBolt::trail),
+                    PARTICLE_LIST.optionalFieldOf("burst", List.of()).forGetter(SpellAction.LaunchBolt::burst),
+                    Codec.intRange(1, 16).optionalFieldOf("count", 1).forGetter(SpellAction.LaunchBolt::count),
+                    Codec.doubleRange(0, 360).optionalFieldOf("fan", 0.0).forGetter(SpellAction.LaunchBolt::fan),
+                    SOURCE.optionalFieldOf("from", SpellAction.Source.CASTER).forGetter(SpellAction.LaunchBolt::from),
+                    Codec.doubleRange(0, 64).optionalFieldOf("height", SpellAction.LaunchBolt.SKY_HEIGHT).forGetter(SpellAction.LaunchBolt::height))
                     .apply(instance, SpellAction.LaunchBolt::new));
         };
     }

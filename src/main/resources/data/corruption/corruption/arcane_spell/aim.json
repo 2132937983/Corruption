@@ -1,0 +1,53 @@
+{
+  "energy": "5KCE",
+  "cooldown": 60,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "launch_bolt",
+      "speed": 1.4,
+      "count": 3,
+      "fan": 20,
+      "look": "minecraft:fire_charge",
+      "trail": [
+        {
+          "particle": "minecraft:flame",
+          "count": 2,
+          "spread": 0.1,
+          "speed": 0.01
+        },
+        {
+          "particle": "minecraft:smoke",
+          "count": 1,
+          "spread": 0.1
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:flame",
+          "count": 30,
+          "spread": 0.5,
+          "speed": 0.06
+        },
+        {
+          "particle": "minecraft:lava",
+          "count": 6,
+          "spread": 0.3
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "ignite_area",
+          "radius": 3,
+          "seconds": 6
+        },
+        {
+          "type": "damage",
+          "amount": 6,
+          "radius": 2.5
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "type": "corruption:brass_cooking",
+  "ingredients": [
+    {
+      "item": "minecraft:bread",
+      "count": 1
+    },
+    {
+      "item": "corruption:corruption_dust",
+      "count": 1
+    }
+  ],
+  "fluid": {
+    "fluid": "corruption:flowing_corruption",
+    "amount": 50
+  },
+  "energy": "100CE",
+  "time": 100,
+  "result": {
+    "id": "corruption:corrupted_bread"
+  }
+}

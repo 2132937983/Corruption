@@ -1,0 +1,50 @@
+{
+  "energy": "6KCE",
+  "cooldown": 60,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:water_breathing",
+      "target": "self",
+      "duration": 2400
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:dolphins_grace",
+      "target": "self",
+      "duration": 1200
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:wither",
+      "target": "nearby",
+      "radius": 6,
+      "duration": 160
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:poison",
+      "target": "nearby",
+      "radius": 6,
+      "duration": 200,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 6,
+      "particles": [
+        {
+          "particle": "minecraft:splash",
+          "count": 40
+        },
+        {
+          "particle": "minecraft:item_slime",
+          "count": 16
+        }
+      ]
+    }
+  ]
+}

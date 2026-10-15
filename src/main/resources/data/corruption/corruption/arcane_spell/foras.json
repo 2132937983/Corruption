@@ -1,0 +1,43 @@
+{
+  "energy": "4KCE",
+  "cooldown": 40,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:regeneration",
+      "target": "self",
+      "duration": 600,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:health_boost",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:invisibility",
+      "target": "self",
+      "duration": 200
+    },
+    {
+      "type": "particles",
+      "shape": "spiral",
+      "radius": 1,
+      "height": 2,
+      "particles": [
+        {
+          "particle": "minecraft:happy_villager",
+          "count": 24
+        },
+        {
+          "particle": "minecraft:composter",
+          "count": 16
+        }
+      ]
+    }
+  ]
+}

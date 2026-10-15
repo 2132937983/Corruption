@@ -1,0 +1,39 @@
+{
+  "energy": "6KCE",
+  "cooldown": 60,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:strength",
+      "target": "self",
+      "duration": 600,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:resistance",
+      "target": "self",
+      "duration": 600
+    },
+    {
+      "type": "ignite_area",
+      "radius": 4,
+      "seconds": 5
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 4,
+      "particles": [
+        {
+          "particle": "minecraft:flame",
+          "count": 40,
+          "spread": 0.05,
+          "speed": 0.02
+        }
+      ]
+    }
+  ]
+}
