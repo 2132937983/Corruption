@@ -19,11 +19,13 @@ import net.minecraft.util.StringRepresentable;
  * { "energy": "2KCE", "cooldown": 40, "min_corruption": 5, "corruption_gain": 2,
  *   "actions": [
  *     { "type": "corrupt_area", "radius": 3, "chance": 0.25 },
+ *     { "type": "ignite_area", "radius": 4, "seconds": 8 },
  *     { "type": "launch_bolt", "speed": 1.5,
  *       "on_hit": [ { "type": "damage", "amount": 6, "radius": 2 } ] } ] }
  * }</pre>
  * A bolt's "on_hit" holds more actions, so the action codec is recursive: a bolt may carry any action,
- * including another bolt.
+ * including another bolt. Every field but the ones naming an effect, a creature or an item may be left out; what
+ * it falls back to is written beside each kind below.
  */
 public final class SpellCodecs {
     /** An id as data writes it, "corruption:spell_bolt", kept as the plain string the rules speak in. */
@@ -34,6 +36,17 @@ public final class SpellCodecs {
         case "nearby" -> DataResult.success(SpellAction.Target.NEARBY);
         default -> DataResult.error(() -> "A spell's target is self or nearby, not " + text);
     }, target -> target == SpellAction.Target.SELF ? "self" : "nearby");
+    /** What the sky is told to do: "clear", "rain" or "thunder". */
+    private static final Codec<SpellAction.Sky> SKY = Codec.STRING.comapFlatMap(text -> switch (text) {
+        case "clear" -> DataResult.success(SpellAction.Sky.CLEAR);
+        case "rain" -> DataResult.success(SpellAction.Sky.RAIN);
+        case "thunder" -> DataResult.success(SpellAction.Sky.THUNDER);
+        default -> DataResult.error(() -> "A spell's sky is clear, rain or thunder, not " + text);
+    }, sky -> switch (sky) {
+        case CLEAR -> "clear";
+        case RAIN -> "rain";
+        case THUNDER -> "thunder";
+    });
 
     /** One action, named by its "type"; a bolt's payload may hold more of them. */
     public static final Codec<SpellAction> ACTION = Codec.recursive("SpellAction", SpellCodecs::actions);
@@ -49,10 +62,12 @@ public final class SpellCodecs {
 
     /** What an action of each kind is called in data. */
     private enum Kind implements StringRepresentable {
-        APPLY_EFFECT("apply_effect"), DAMAGE("damage"), CORRUPT_AREA("corrupt_area"),
-        FREEZE_AREA("freeze_area"), SUMMON("summon"), LAUNCH_BOLT("launch_bolt");
+        APPLY_EFFECT("apply_effect"), DAMAGE("damage"), IGNITE_AREA("ignite_area"), FREEZE_AREA("freeze_area"),
+        CORRUPT_AREA("corrupt_area"), SUMMON("summon"), LIGHTNING("lightning"), EXPLODE("explode"),
+        TELEPORT("teleport"), WEATHER("weather"), PACIFY("pacify"), GIVE_ITEM("give_item"), LAUNCH_BOLT("launch_bolt");
 
         static final Codec<Kind> CODEC = StringRepresentable.fromEnum(Kind::values);
+
         private final String name;
         Kind(String name) { this.name = name; }
         @Override public String getSerializedName() { return name; }
@@ -67,20 +82,47 @@ public final class SpellCodecs {
             .apply(instance, SpellAction.ApplyEffect::new));
     private static final MapCodec<SpellAction.Damage> DAMAGE = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.DOUBLE.optionalFieldOf("amount", 4.0).forGetter(SpellAction.Damage::amount),
-            Codec.DOUBLE.optionalFieldOf("radius", 3.0).forGetter(SpellAction.Damage::radius))
+            Codec.DOUBLE.optionalFieldOf("radius", 3.0).forGetter(SpellAction.Damage::radius),
+            ID.optionalFieldOf("damage_type", "").forGetter(SpellAction.Damage::type))
             .apply(instance, SpellAction.Damage::new));
-    private static final MapCodec<SpellAction.Corrupt> CORRUPT_AREA = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.DOUBLE.optionalFieldOf("radius", 3.0).forGetter(SpellAction.Corrupt::radius),
-            Codec.DOUBLE.optionalFieldOf("chance", 0.25).forGetter(SpellAction.Corrupt::chance))
-            .apply(instance, SpellAction.Corrupt::new));
+    private static final MapCodec<SpellAction.Ignite> IGNITE_AREA = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            Codec.DOUBLE.optionalFieldOf("radius", 3.0).forGetter(SpellAction.Ignite::radius),
+            Codec.intRange(1, 20 * 60 * 5).optionalFieldOf("seconds", 8).forGetter(SpellAction.Ignite::seconds))
+            .apply(instance, SpellAction.Ignite::new));
     private static final MapCodec<SpellAction.Freeze> FREEZE_AREA = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.DOUBLE.optionalFieldOf("radius", 3.0).forGetter(SpellAction.Freeze::radius),
             Codec.intRange(1, 20 * 60).optionalFieldOf("ticks", 200).forGetter(SpellAction.Freeze::ticks))
             .apply(instance, SpellAction.Freeze::new));
+    private static final MapCodec<SpellAction.Corrupt> CORRUPT_AREA = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            Codec.DOUBLE.optionalFieldOf("radius", 3.0).forGetter(SpellAction.Corrupt::radius),
+            Codec.DOUBLE.optionalFieldOf("chance", 0.25).forGetter(SpellAction.Corrupt::chance))
+            .apply(instance, SpellAction.Corrupt::new));
     private static final MapCodec<SpellAction.Summon> SUMMON = RecordCodecBuilder.mapCodec(instance -> instance.group(
             ID.fieldOf("entity").forGetter(SpellAction.Summon::entity),
             Codec.intRange(1, 16).optionalFieldOf("count", 1).forGetter(SpellAction.Summon::count))
             .apply(instance, SpellAction.Summon::new));
+    private static final MapCodec<SpellAction.Lightning> LIGHTNING = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            Codec.DOUBLE.optionalFieldOf("radius", 4.0).forGetter(SpellAction.Lightning::radius),
+            Codec.intRange(1, 16).optionalFieldOf("count", 1).forGetter(SpellAction.Lightning::count))
+            .apply(instance, SpellAction.Lightning::new));
+    private static final MapCodec<SpellAction.Explode> EXPLODE = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            Codec.DOUBLE.optionalFieldOf("power", 2.0).forGetter(SpellAction.Explode::power),
+            Codec.BOOL.optionalFieldOf("breaks_blocks", false).forGetter(SpellAction.Explode::breaksBlocks))
+            .apply(instance, SpellAction.Explode::new));
+    private static final MapCodec<SpellAction.Teleport> TELEPORT = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            Codec.DOUBLE.optionalFieldOf("distance", 8.0).forGetter(SpellAction.Teleport::distance))
+            .apply(instance, SpellAction.Teleport::new));
+    private static final MapCodec<SpellAction.Weather> WEATHER = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            SKY.optionalFieldOf("sky", SpellAction.Sky.CLEAR).forGetter(SpellAction.Weather::sky),
+            Codec.intRange(1, 20 * 60 * 60).optionalFieldOf("ticks", 6000).forGetter(SpellAction.Weather::ticks))
+            .apply(instance, SpellAction.Weather::new));
+    private static final MapCodec<SpellAction.Pacify> PACIFY = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            Codec.DOUBLE.optionalFieldOf("radius", 8.0).forGetter(SpellAction.Pacify::radius))
+            .apply(instance, SpellAction.Pacify::new));
+    private static final MapCodec<SpellAction.GiveItem> GIVE_ITEM = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            ID.fieldOf("item").forGetter(SpellAction.GiveItem::item),
+            Codec.intRange(1, 64).optionalFieldOf("count", 1).forGetter(SpellAction.GiveItem::count))
+            .apply(instance, SpellAction.GiveItem::new));
 
     /** A bolt's payload is a list of actions, so its codec is built from the recursive one it is made of. */
     private static Codec<SpellAction> actions(Codec<SpellAction> self) {
@@ -91,9 +133,16 @@ public final class SpellCodecs {
     private static Kind kindOf(SpellAction action) {
         if (action instanceof SpellAction.ApplyEffect) return Kind.APPLY_EFFECT;
         if (action instanceof SpellAction.Damage) return Kind.DAMAGE;
-        if (action instanceof SpellAction.Corrupt) return Kind.CORRUPT_AREA;
+        if (action instanceof SpellAction.Ignite) return Kind.IGNITE_AREA;
         if (action instanceof SpellAction.Freeze) return Kind.FREEZE_AREA;
+        if (action instanceof SpellAction.Corrupt) return Kind.CORRUPT_AREA;
         if (action instanceof SpellAction.Summon) return Kind.SUMMON;
+        if (action instanceof SpellAction.Lightning) return Kind.LIGHTNING;
+        if (action instanceof SpellAction.Explode) return Kind.EXPLODE;
+        if (action instanceof SpellAction.Teleport) return Kind.TELEPORT;
+        if (action instanceof SpellAction.Weather) return Kind.WEATHER;
+        if (action instanceof SpellAction.Pacify) return Kind.PACIFY;
+        if (action instanceof SpellAction.GiveItem) return Kind.GIVE_ITEM;
         return Kind.LAUNCH_BOLT;
     }
 
@@ -102,14 +151,22 @@ public final class SpellCodecs {
         return switch (kind) {
             case APPLY_EFFECT -> APPLY_EFFECT;
             case DAMAGE -> DAMAGE;
-            case CORRUPT_AREA -> CORRUPT_AREA;
+            case IGNITE_AREA -> IGNITE_AREA;
             case FREEZE_AREA -> FREEZE_AREA;
+            case CORRUPT_AREA -> CORRUPT_AREA;
             case SUMMON -> SUMMON;
+            case LIGHTNING -> LIGHTNING;
+            case EXPLODE -> EXPLODE;
+            case TELEPORT -> TELEPORT;
+            case WEATHER -> WEATHER;
+            case PACIFY -> PACIFY;
+            case GIVE_ITEM -> GIVE_ITEM;
             case LAUNCH_BOLT -> RecordCodecBuilder.<SpellAction.LaunchBolt>mapCodec(instance -> instance.group(
                     ID.optionalFieldOf("entity", "corruption:spell_bolt").forGetter(SpellAction.LaunchBolt::entity),
                     Codec.DOUBLE.optionalFieldOf("speed", 1.0).forGetter(SpellAction.LaunchBolt::speed),
                     Codec.FLOAT.optionalFieldOf("inaccuracy", 0.0F).forGetter(SpellAction.LaunchBolt::inaccuracy),
-                    action.listOf().optionalFieldOf("on_hit", List.<SpellAction>of()).forGetter(SpellAction.LaunchBolt::onHit))
+                    action.listOf().optionalFieldOf("on_hit", List.<SpellAction>of()).forGetter(SpellAction.LaunchBolt::onHit),
+                    ID.optionalFieldOf("look", "").forGetter(SpellAction.LaunchBolt::look))
                     .apply(instance, SpellAction.LaunchBolt::new));
         };
     }

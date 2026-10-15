@@ -1,18 +1,25 @@
 {
   "energy": "4KCE",
-  "cooldown": 200,
+  "cooldown": 40,
   "min_corruption": 10,
-  "corruption_gain": 3,
+  "corruption_gain": 1,
   "actions": [
     {
       "type": "launch_bolt",
-      "entity": "minecraft:small_fireball",
-      "speed": 1.5
-    },
-    {
-      "type": "summon",
-      "entity": "corruption:corrupted_remnant",
-      "count": 1
+      "speed": 1.5,
+      "look": "minecraft:fire_charge",
+      "on_hit": [
+        {
+          "type": "damage",
+          "amount": 120,
+          "radius": 3
+        },
+        {
+          "type": "ignite_area",
+          "radius": 3,
+          "seconds": 5
+        }
+      ]
     }
   ]
 }

@@ -78,6 +78,8 @@ public final class ModItems {
             ITEMS.registerSimpleBlockItem("corruption_arcane_lectern", ModBlocks.CORRUPTION_ARCANE_LECTERN);
     public static final DeferredItem<BlockItem> CORRUPTION_ARCANE_PEDESTAL =
             ITEMS.registerSimpleBlockItem("corruption_arcane_pedestal", ModBlocks.CORRUPTION_ARCANE_PEDESTAL);
+    public static final DeferredItem<BlockItem> CORRUPTION_ARCANE_CHARGER =
+            ITEMS.registerSimpleBlockItem("corruption_arcane_charger", ModBlocks.CORRUPTION_ARCANE_CHARGER);
     public static final DeferredItem<BlockItem> CORRUPTION_ARCANE_TRANSMUTER =
             ITEMS.registerSimpleBlockItem("corruption_arcane_transmuter", ModBlocks.CORRUPTION_ARCANE_TRANSMUTER);
     public static final DeferredItem<BlockItem> CORRUPTION_TEETH = ITEMS.registerSimpleBlockItem("corruption_teeth", ModBlocks.CORRUPTION_TEETH);

@@ -3,7 +3,9 @@ package com.miophas.corruption.common.client;
 import com.miophas.corruption.Corruption;
 import com.miophas.corruption.api.arcane.ArcaneApi;
 import com.miophas.corruption.api.arcane.ArcaneCastingItem;
+import com.miophas.corruption.api.arcane.ArcaneSpellApi;
 import com.miophas.corruption.api.arcane.ArcaneString;
+import com.miophas.corruption.api.arcane.SpellText;
 import com.miophas.corruption.api.arcane.WandSpells;
 import com.miophas.corruption.common.registry.ModItems;
 import com.miophas.corruption.core.arcane.ArcaneReading;
@@ -47,7 +49,11 @@ public final class ArcaneTooltip {
             lines.add(under, Component.translatable("tooltip.corruption.key_strings", ArcaneApi.strings(registries, stack).size()).withStyle(ChatFormatting.LIGHT_PURPLE));
             lines.add(under + 1, Component.translatable("tooltip.corruption.key_hint").withStyle(ChatFormatting.GRAY));
         }
-        if (stack.getItem() instanceof ArcaneCastingItem) lines.addAll(under, wand(stack, registries));
+        if (stack.getItem() instanceof ArcaneCastingItem casting) {
+            // The slots first, then what the chosen spell does, and the hint on how to choose another last.
+            lines.addAll(under, wand(stack, registries));
+            lines.addAll(under + casting.capacity(), chosen(stack, registries));
+        }
     }
 
     /** What a wand has been taught, slot by slot, the chosen one marked, and how another is chosen. */
@@ -63,6 +69,19 @@ public final class ArcaneTooltip {
                     .withStyle(chosen ? ChatFormatting.LIGHT_PURPLE : ChatFormatting.GRAY));
         }
         lines.add(Component.translatable("tooltip.corruption.wand_key", SpellWheel.OPEN.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+        return lines;
+    }
+
+    /** What the chosen spell does, read out under the wand's slots, so a wand says what it is worth. */
+    private static List<Component> chosen(ItemStack stack, HolderLookup.Provider registries) {
+        Grimoire grimoire = WandSpells.of(stack);
+        String spell = grimoire.at(grimoire.selected());
+        if (spell == null) return List.of();
+        List<Component> effects = SpellText.lines(ArcaneSpellApi.rule(registries, ArcaneApi.key(spell)));
+        if (effects.isEmpty()) return List.of();
+        List<Component> lines = new ArrayList<>();
+        lines.add(Component.translatable("tooltip.corruption.wand_effects").withStyle(ChatFormatting.LIGHT_PURPLE));
+        lines.addAll(effects);
         return lines;
     }
 

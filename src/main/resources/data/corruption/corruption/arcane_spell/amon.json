@@ -1,0 +1,19 @@
+{
+  "energy": "3KCE",
+  "cooldown": 40,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "damage",
+      "amount": 8.0,
+      "radius": 5.0
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:glowing",
+      "target": "nearby",
+      "radius": 12,
+      "duration": 600
+    }
+  ]
+}

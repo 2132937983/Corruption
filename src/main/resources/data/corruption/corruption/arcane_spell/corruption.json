@@ -1,6 +1,6 @@
 {
   "energy": "1KCE",
-  "cooldown": 20,
+  "cooldown": 40,
   "min_corruption": 5,
   "corruption_gain": 1,
   "actions": [
@@ -11,12 +11,8 @@
         {
           "type": "damage",
           "amount": 6,
-          "radius": 2.5
-        },
-        {
-          "type": "corrupt_area",
-          "radius": 2,
-          "chance": 0.5
+          "radius": 2.5,
+          "damage_type": "corruption:corruption"
         }
       ]
     }

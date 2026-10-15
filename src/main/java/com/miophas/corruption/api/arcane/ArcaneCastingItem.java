@@ -1,14 +1,15 @@
 package com.miophas.corruption.api.arcane;
 
 import com.miophas.corruption.api.corruption.PlayerCorruptionApi;
+import com.miophas.corruption.api.energy.CorruptionEnergyApi;
 import com.miophas.corruption.api.energy.CorruptionEnergyCarrier;
-import com.miophas.corruption.api.energy.CorruptionEnergyItem;
+import com.miophas.corruption.api.energy.CorruptionEnergyTool;
 import com.miophas.corruption.core.arcane.CastingUnit;
 import com.miophas.corruption.core.arcane.Grimoire;
-import com.miophas.corruption.core.energy.CarriedEnergy;
 import com.miophas.corruption.core.arcane.SpellAction;
 import com.miophas.corruption.core.arcane.SpellCasting;
 import com.miophas.corruption.core.arcane.SpellRule;
+import com.miophas.corruption.core.energy.EnergyTool;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,37 +23,48 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 /**
- * A casting tool: an item that carries Corruption Energy and the {@link WandSpells spells it has been taught},
+ * A casting tool: an item that holds Corruption Energy and the {@link WandSpells spells it has been taught},
  * and casts the chosen one when used. A cast costs the wand its energy, costs the caster one parchment bearing
  * the spell, may leave them more corrupted (never wholly), and wears off over a cooldown; what it does then is
  * {@link ArcaneCasting.World}, at the caster. In creative play a cast costs nothing and needs nothing but the
  * cooldown to have worn off.
  *
  * <p>The rules are {@link CastingUnit}, {@link SpellCasting} and the spell's {@link SpellRule}, all in
- * core.arcane; this is where they meet the game, and it is what a wand of the mod's own or of an add-on is:
- * extend it and register the item as one that carries energy (corruption_energy_carrier).
+ * core.arcane. The charge it casts with is a {@link CorruptionEnergyTool}'s, not a battery's: how much it holds
+ * and how much goes in at a time is this item's own, given here in code, and what it holds is drawn on by its
+ * casts and filled again at a charger (see {@link EnergyCharger}) rather than being poured out and consumed as
+ * a Corruption Candle's is. A wand of an add-on's is made by extending this class.
  */
-public class ArcaneCastingItem extends CorruptionEnergyItem {
-    private final int capacity;
+public class ArcaneCastingItem extends Item implements CorruptionEnergyTool {
+    /** What the mod's own wand is: a tool of twenty KCE, filled a KCE a time. */
+    public static final EnergyTool DEFAULT_TOOL = new EnergyTool(CorruptionEnergyApi.kilo(20), CorruptionEnergyApi.kilo(1));
+    private static final int BAR_COLOUR = 0xC6728C;
 
-    /** A casting tool with room for the mod's wand's number of spells, {@link Grimoire#CAPACITY}, giving a KCE a step. */
-    public ArcaneCastingItem(Item.Properties properties) { this(properties, CarriedEnergy.DEFAULT_STEP, Grimoire.CAPACITY); }
-    /** @param step how much it gives away at a time when its energy is poured out, in CE */
-    public ArcaneCastingItem(Item.Properties properties, long step) { this(properties, step, Grimoire.CAPACITY); }
+    private final EnergyTool tool;
+    private final int spellCapacity;
+
+    /** A casting tool that is the mod's own wand, with room for {@link Grimoire#CAPACITY} spells. */
+    public ArcaneCastingItem(Item.Properties properties) { this(properties, DEFAULT_TOOL); }
+    /** @param tool how much charge it holds, and how much goes in at a time */
+    public ArcaneCastingItem(Item.Properties properties, EnergyTool tool) { this(properties, tool, Grimoire.CAPACITY); }
     /**
-     * @param step how much it gives away at a time when its energy is poured out, in CE
-     * @param capacity how many spells it has room for; its wheel shows that many places
+     * @param tool how much charge it holds, and how much goes in at a time
+     * @param spellCapacity how many spells it has room for; its wheel shows that many places
      */
-    public ArcaneCastingItem(Item.Properties properties, long step, int capacity) {
-        super(properties, step);
-        this.capacity = Math.max(1, capacity);
+    public ArcaneCastingItem(Item.Properties properties, EnergyTool tool, int spellCapacity) {
+        super(properties);
+        this.tool = tool;
+        this.spellCapacity = Math.max(1, spellCapacity);
     }
 
+    @Override public EnergyTool tool() { return tool; }
     /** How many spells this tool has room for. */
-    public int capacity() { return capacity; }
+    public int capacity() { return spellCapacity; }
+    /** What one of these holds now, in CE. */
+    public long getEnergy(ItemStack wand) { return CorruptionEnergyTool.held(wand); }
 
     /** What this wand, as it is held, has been taught and holds. */
-    public CastingUnit unit(ItemStack wand) { return new CastingUnit(WandSpells.of(wand), getEnergy(wand), capacity); }
+    public CastingUnit unit(ItemStack wand) { return new CastingUnit(WandSpells.of(wand), getEnergy(wand), spellCapacity); }
 
     /** Writes a unit back onto the wand itself: the spells it has been taught, and the energy it holds. */
     public void store(ItemStack wand, CastingUnit unit) {
@@ -135,6 +147,11 @@ public class ArcaneCastingItem extends CorruptionEnergyItem {
             case READY -> "message.corruption.spell_none";
         };
     }
+
+    /** A bar under it shows what charge it holds, as a tool's bar shows its wear. */
+    @Override public boolean isBarVisible(ItemStack wand) { return tool.capacity() > 0 && getEnergy(wand) < tool.capacity(); }
+    @Override public int getBarWidth(ItemStack wand) { return Math.round(13 * CorruptionEnergyApi.fraction(getEnergy(wand), tool.capacity())); }
+    @Override public int getBarColor(ItemStack wand) { return BAR_COLOUR; }
 
     private static void notice(Player player, String key) {
         player.displayClientMessage(Component.translatable(key), true);

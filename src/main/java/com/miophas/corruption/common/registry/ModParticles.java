@@ -14,6 +14,9 @@ public final class ModParticles {
     /** The motes that drift out of a working arcane transmuter. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CORRUPTION_PARTICLE =
             TYPES.register("corruption_particle", () -> new SimpleParticleType(false));
+    /** The sparks of stored Corruption Energy an arcane charger holds over itself. */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CORRUPTION_SPARK_PARTICLE =
+            TYPES.register("corruption_spark_particle", () -> new SimpleParticleType(false));
 
     private ModParticles() {}
 }

@@ -42,6 +42,7 @@ public final class ModCreativeModeTabs {
                         output.accept(CorruptionEnergyCarrier.charged(candle, carrier == null ? CorruptionEnergyApi.kilo(10) : carrier.capacity()));
                         output.accept(ModItems.CORRUPTION_ARCANE_LECTERN.get());
                         output.accept(ModItems.CORRUPTION_ARCANE_PEDESTAL.get());
+                        output.accept(ModItems.CORRUPTION_ARCANE_CHARGER.get());
                         output.accept(ModItems.ALTAR_OFFERING.get());
                         output.accept(ModItems.ALTAR_PILLAR.get());
                         output.accept(ModItems.CORRUPTED_BRASS.get());
@@ -59,8 +60,8 @@ public final class ModCreativeModeTabs {
                                 .forEach(spell -> {
                                     net.minecraft.world.item.ItemStack wand = new net.minecraft.world.item.ItemStack(ModItems.CORRUPTION_ARCANE_STICK.get());
                                     com.miophas.corruption.api.arcane.WandSpells.set(wand, com.miophas.corruption.core.arcane.Grimoire.EMPTY.inscribed(spell.location().toString()));
-                                    CorruptionEnergyCarrier wandCarrier = CorruptionEnergyCarrier.of(wand);
-                                    if (wandCarrier != null) wand.set(CorruptionEnergyCarrier.ENERGY.get(), wandCarrier.capacity());
+                                    com.miophas.corruption.core.energy.EnergyTool wandTool = com.miophas.corruption.api.energy.CorruptionEnergyTool.of(wand);
+                                    if (wandTool.isTool()) wand.set(CorruptionEnergyCarrier.ENERGY.get(), wandTool.capacity());
                                     output.accept(wand);
                                 }));
                         output.accept(ModItems.CORRUPTION_TEETH.get());

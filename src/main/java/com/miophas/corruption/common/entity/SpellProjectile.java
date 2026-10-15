@@ -7,8 +7,10 @@ import com.miophas.corruption.common.registry.ModParticles;
 import com.miophas.corruption.core.arcane.SpellAction;
 import com.miophas.corruption.core.arcane.SpellBolt;
 import java.util.List;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,20 +36,39 @@ import net.neoforged.neoforge.event.EventHooks;
  * <p>Its owner must be a player for the payload to tell who cast it; a bolt with any other owner hits nothing.
  */
 public final class SpellProjectile extends Projectile implements ItemSupplier {
-    /** What it looks like in flight, until it has a look of its own. */
-    private static final ItemStack LOOK = new ItemStack(ModItems.CORRUPTION_CRYSTAL.get());
-    private static final String ON_HIT = "OnHit";
+    /** What it looks like in flight, unless the spell it flies for names another look. */
+    private static final ItemStack DEFAULT_LOOK = new ItemStack(ModItems.CORRUPTION_CRYSTAL.get());
+    private static final String ON_HIT = "OnHit", LOOK_TAG = "Look";
     /** What it keeps of its speed a tick in water, as thrown things do. */
     private static final float WATER_DRAG = 0.8F;
 
     private List<SpellAction> onHit = List.of();
+    private ItemStack look = DEFAULT_LOOK;
 
     public SpellProjectile(EntityType<? extends SpellProjectile> type, Level level) { super(type, level); }
 
-    /** What this bolt does where it strikes. */
-    public SpellProjectile carrying(List<SpellAction> actions) { onHit = List.copyOf(actions); return this; }
+    /** What this bolt does where it strikes, under the corruption's own look. */
+    public SpellProjectile carrying(List<SpellAction> actions) { return carrying(actions, ""); }
 
-    @Override public ItemStack getItem() { return LOOK; }
+    /**
+     * What this bolt does where it strikes, and what it is drawn as in flight: an item whose model stands for
+     * it, a fire charge for a fireball say, or "" for the corruption's crystal.
+     */
+    public SpellProjectile carrying(List<SpellAction> actions, String look) {
+        onHit = List.copyOf(actions);
+        this.look = lookOf(look);
+        return this;
+    }
+
+    /** The model of an item by its id, or the corruption's crystal for none or for an id the game does not know. */
+    private static ItemStack lookOf(String id) {
+        if (id == null || id.isEmpty()) return DEFAULT_LOOK;
+        ResourceLocation name = ResourceLocation.tryParse(id);
+        return name == null ? DEFAULT_LOOK
+                : BuiltInRegistries.ITEM.getOptional(name).map(item -> new ItemStack(item, 1)).orElse(DEFAULT_LOOK);
+    }
+
+    @Override public ItemStack getItem() { return look; }
     @Override protected void defineSynchedData(SynchedEntityData.Builder builder) {}
     @Override protected double getDefaultGravity() { return SpellBolt.DEFAULT.gravity(); }
 
@@ -97,11 +118,13 @@ public final class SpellProjectile extends Projectile implements ItemSupplier {
     }
 
     @Override protected void readAdditionalSaveData(CompoundTag tag) {
+        if (tag.contains(LOOK_TAG)) look = lookOf(tag.getString(LOOK_TAG));
         if (!tag.contains(ON_HIT)) return;
         SpellCodecs.ACTIONS.parse(NbtOps.INSTANCE, tag.get(ON_HIT)).result().ifPresent(actions -> onHit = List.copyOf(actions));
     }
 
     @Override protected void addAdditionalSaveData(CompoundTag tag) {
         SpellCodecs.ACTIONS.encodeStart(NbtOps.INSTANCE, onHit).result().ifPresent(encoded -> tag.put(ON_HIT, encoded));
+        tag.putString(LOOK_TAG, BuiltInRegistries.ITEM.getKey(look.getItem()).toString());
     }
 }

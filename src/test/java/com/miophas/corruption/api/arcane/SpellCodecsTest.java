@@ -39,10 +39,12 @@ class SpellCodecsTest {
         assertEquals(5, corruption.minCorruption());
         SpellAction.LaunchBolt bolt = (SpellAction.LaunchBolt) corruption.actions().get(0);
         assertEquals("corruption:spell_bolt", bolt.entity(), "left out, a bolt is the mod's own");
-        assertEquals(List.of(new SpellAction.Damage(6, 2.5), new SpellAction.Corrupt(2, 0.5)), bolt.onHit(), "what it does where it strikes");
+        assertEquals(List.of(new SpellAction.Damage(6, 2.5, "corruption:corruption")), bolt.onHit(), "what it does where it strikes");
         SpellAction.ApplyEffect resistance = (SpellAction.ApplyEffect) spell("agares").actions().get(0);
         assertEquals(new SpellAction.ApplyEffect("minecraft:resistance", SpellAction.Target.SELF, 0, 400, 1), resistance);
-        assertEquals(new SpellAction.Summon("corruption:corrupted_remnant", 1), spell("baal").actions().get(1));
+        SpellAction.LaunchBolt fireball = (SpellAction.LaunchBolt) spell("baal").actions().get(0);
+        assertEquals("minecraft:fire_charge", fireball.look(), "a bolt may be drawn as an item of the game's own");
+        assertEquals(new SpellAction.Damage(120, 3), fireball.onHit().get(0), "and does as much as the spell says where it strikes");
     }
 
     @Test void aBoltMayCarryABoltAndBadDataIsRefused() {

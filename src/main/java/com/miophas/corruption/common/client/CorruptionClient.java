@@ -83,6 +83,7 @@ public final class CorruptionClient {
         event.registerEntityRenderer(ModEntities.CORRUPTED_DRAGON_FIREBALL.get(), net.minecraft.client.renderer.entity.DragonFireballRenderer::new);
         event.registerEntityRenderer(ModEntities.SPELL_BOLT.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.ARCANE_PEDESTAL.get(), ArcanePedestalRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.ARCANE_CHARGER.get(), ArcaneChargerRenderer::new);
         event.registerEntityRenderer(ModEntities.CORRUPTED_DRAGON_BREATH.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
         event.registerEntityRenderer(ModEntities.MALICE_VINE.get(), com.miophas.corruption.common.client.entity.MaliceVineRenderer::new);
         event.registerEntityRenderer(ModEntities.GREED.get(), com.miophas.corruption.common.client.entity.GreedRenderer::new);
@@ -101,6 +102,7 @@ public final class CorruptionClient {
     public static void particles(RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(ModParticles.CORRUPTION_SCREAM.get(), CorruptionScreamParticle.Provider::new);
         event.registerSpriteSet(ModParticles.CORRUPTION_PARTICLE.get(), com.miophas.corruption.common.client.particle.CorruptionParticle.Provider::new);
+        event.registerSpriteSet(ModParticles.CORRUPTION_SPARK_PARTICLE.get(), com.miophas.corruption.common.client.particle.CorruptionSparkParticle.Provider::new);
     }
 
     @SubscribeEvent

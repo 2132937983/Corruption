@@ -1,6 +1,7 @@
 package com.miophas.corruption.common.arcane;
 
 import com.miophas.corruption.api.arcane.ArcaneCasting;
+import com.miophas.corruption.api.arcane.ArcaneDamage;
 import com.miophas.corruption.api.corruption.PlayerCorruptionApi;
 import com.miophas.corruption.common.entity.PlayerCorruption;
 import com.miophas.corruption.common.entity.SpellProjectile;
@@ -14,11 +15,21 @@ import java.util.List;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -60,6 +71,13 @@ public final class SpellEffects implements ArcaneCasting.World {
             case SpellAction.Corrupt corrupt -> corrupt(caster, origin, corrupt);
             case SpellAction.Freeze freeze -> freeze(caster, origin, freeze);
             case SpellAction.Summon summon -> summon(caster, origin, summon);
+            case SpellAction.Ignite ignite -> ignite(caster, origin, ignite);
+            case SpellAction.Lightning lightning -> lightning(caster, origin, lightning);
+            case SpellAction.Explode explode -> explode(caster, origin, explode);
+            case SpellAction.Teleport teleport -> teleport(caster, origin, teleport);
+            case SpellAction.Weather weather -> weather(caster, origin, weather);
+            case SpellAction.Pacify pacify -> pacify(caster, origin, pacify);
+            case SpellAction.GiveItem give -> give(caster, origin, give);
             case SpellAction.LaunchBolt bolt -> launch(caster, origin, bolt);
         }
     }
@@ -81,10 +99,14 @@ public final class SpellEffects implements ArcaneCasting.World {
         for (LivingEntity target : nearby(caster, origin, action.radius())) target.addEffect(new MobEffectInstance(effect, action.duration(), action.amplifier()));
     }
 
-    /** Hurts everything near the origin. */
+    /**
+     * Hurts everything near the origin, with the mark of a spell on it: what falls to the arcane alone can tell
+     * this hurt from any other (see {@link ArcaneDamage}).
+     */
     private void damage(ServerPlayer caster, ArcaneCasting.Origin origin, SpellAction.Damage action) {
+        DamageSource hurt = ArcaneDamage.source(caster.serverLevel(), caster, action.type());
         for (LivingEntity target : nearby(caster, origin, action.radius()))
-            target.hurt(caster.damageSources().indirectMagic(caster, caster), (float) action.amount());
+            target.hurt(hurt, (float) action.amount());
     }
 
     /**
@@ -163,7 +185,7 @@ public final class SpellEffects implements ArcaneCasting.World {
         if (type == null || !type.is(ModTags.SPELL_BOLTS)) return;
         ServerLevel level = caster.serverLevel();
         if (!(type.create(level) instanceof Projectile bolt)) return;
-        if (bolt instanceof SpellProjectile spell) spell.carrying(action.onHit());
+        if (bolt instanceof SpellProjectile spell) spell.carrying(action.onHit(), action.look());
         bolt.setOwner(caster);
         bolt.setPos(origin.launch());
         Vec3 way = origin.direction();
@@ -177,6 +199,74 @@ public final class SpellEffects implements ArcaneCasting.World {
         Vec3 at = origin.at();
         return caster.level().getEntitiesOfClass(LivingEntity.class, new AABB(at, at).inflate(reach),
                 target -> target != caster && target.isAlive() && target.getBoundingBox().distanceToSqr(at) <= reach * reach);
+    }
+
+    /** Sets everything near the origin alight. */
+    private void ignite(ServerPlayer caster, ArcaneCasting.Origin origin, SpellAction.Ignite action) {
+        for (LivingEntity target : nearby(caster, origin, action.radius())) target.setRemainingFireTicks(action.seconds() * 20);
+    }
+
+    /** Strikes lightning about the origin, each bolt falling on whatever stands highest where it lands. */
+    private void lightning(ServerPlayer caster, ArcaneCasting.Origin origin, SpellAction.Lightning action) {
+        ServerLevel level = caster.serverLevel();
+        Vec3 at = origin.at();
+        double reach = Math.max(0, action.radius());
+        for (int strike = 0; strike < action.count(); strike++) {
+            double angle = level.random.nextDouble() * Math.PI * 2, out = level.random.nextDouble() * reach;
+            BlockPos under = BlockPos.containing(at.x + Math.cos(angle) * out, at.y, at.z + Math.sin(angle) * out);
+            Entity bolt = EntityType.LIGHTNING_BOLT.create(level);
+            if (bolt == null) continue;
+            bolt.moveTo(Vec3.atBottomCenterOf(level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, under)));
+            level.addFreshEntity(bolt);
+        }
+    }
+
+    /** Bursts about the origin, breaking the ground only if the spell says so. */
+    private void explode(ServerPlayer caster, ArcaneCasting.Origin origin, SpellAction.Explode action) {
+        ServerLevel level = caster.serverLevel();
+        Vec3 at = origin.at();
+        level.explode(caster, at.x, at.y, at.z, (float) Math.max(0, action.power()),
+                action.breaksBlocks() ? Level.ExplosionInteraction.BLOCK : Level.ExplosionInteraction.NONE);
+    }
+
+    /** Carries the caster where they are looking, stopping short of whatever is in the way. */
+    private void teleport(ServerPlayer caster, ArcaneCasting.Origin origin, SpellAction.Teleport action) {
+        ServerLevel level = caster.serverLevel();
+        Vec3 way = origin.direction(), from = caster.getEyePosition();
+        Vec3 reach = from.add(way.scale(Math.max(0, action.distance())));
+        BlockHitResult hit = level.clip(new ClipContext(from, reach, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, caster));
+        Vec3 to = hit.getType() == HitResult.Type.MISS ? reach : hit.getLocation().subtract(way.scale(.5));
+        if (!level.noCollision(caster, caster.getBoundingBox().move(to.subtract(caster.position())))) return;
+        caster.teleportTo(to.x, to.y, to.z);
+        level.playSound(null, to.x, to.y, to.z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.2F);
+    }
+
+    /** Tells the sky over the caster what to do, for as long as the spell asks. */
+    private void weather(ServerPlayer caster, ArcaneCasting.Origin origin, SpellAction.Weather action) {
+        ServerLevel level = caster.serverLevel();
+        int ticks = Math.max(1, action.ticks());
+        switch (action.sky()) {
+            case CLEAR -> level.setWeatherParameters(ticks, 0, false, false);
+            case RAIN -> level.setWeatherParameters(0, ticks, true, false);
+            case THUNDER -> level.setWeatherParameters(0, ticks, true, true);
+        }
+    }
+
+    /** Quiets everything near the origin, so that it stops fighting and forgets its grudges. */
+    private void pacify(ServerPlayer caster, ArcaneCasting.Origin origin, SpellAction.Pacify action) {
+        for (LivingEntity target : nearby(caster, origin, action.radius())) {
+            target.setLastHurtByMob(null);
+            target.setLastHurtMob(null);
+            if (target instanceof Mob mob) { mob.setTarget(null); mob.getNavigation().stop(); }
+        }
+    }
+
+    /** Puts what the spell gives into the caster's hands, or at their feet if they have no room. */
+    private void give(ServerPlayer caster, ArcaneCasting.Origin origin, SpellAction.GiveItem action) {
+        Item item = BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(action.item())).orElse(null);
+        if (item == null) return;
+        ItemStack given = new ItemStack(item, Math.max(1, action.count()));
+        if (!caster.getInventory().add(given)) caster.drop(given, false);
     }
 
     private SpellEffects() {}

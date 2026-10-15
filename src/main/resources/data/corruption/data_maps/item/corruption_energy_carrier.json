@@ -3,10 +3,6 @@
     "corruption:corruption_candle": {
       "capacity": "10KCE",
       "consumed": true
-    },
-    "corruption:corruption_arcane_stick": {
-      "capacity": "20KCE",
-      "consumed": false
     }
   }
 }

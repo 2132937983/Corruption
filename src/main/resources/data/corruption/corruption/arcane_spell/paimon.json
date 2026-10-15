@@ -1,0 +1,14 @@
+{
+  "energy": "4KCE",
+  "cooldown": 40,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:hero_of_the_village",
+      "target": "self",
+      "duration": 1200
+    }
+  ]
+}

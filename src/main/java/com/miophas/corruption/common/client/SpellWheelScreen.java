@@ -2,7 +2,9 @@ package com.miophas.corruption.common.client;
 
 import com.miophas.corruption.Corruption;
 import com.miophas.corruption.api.arcane.ArcaneApi;
+import com.miophas.corruption.api.arcane.ArcaneSpellApi;
 import com.miophas.corruption.api.arcane.ArcaneString;
+import com.miophas.corruption.api.arcane.SpellText;
 import com.miophas.corruption.common.network.SelectSpellPayload;
 import com.miophas.corruption.core.arcane.Grimoire;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -41,11 +43,15 @@ public final class SpellWheelScreen extends Screen {
     public static final double INNER = 0.31, OUTER = 0.86, MEDALLION = 0.30;
     private static final int WRITTEN = 0xB0201828, WRITTEN_ALTERNATE = 0xB0281E32, EMPTY = 0x70101014, CHOSEN_FILL = 0xD05E2F52,
             DIVIDER = 0xE0563A5E, RIM = 0xFFD08AC8, GOLD = 0xFFD8A936;
-    private static final int NAME = 0xFFE3D3EA, CHOSEN_NAME = 0xFFFFE070, EMPTY_NAME = 0xFF6E6278, NUMBER = 0xFF9C8FA6, TITLE = 0xFFFFFFFF;
+    private static final int NAME = 0xFFE3D3EA, CHOSEN_NAME = 0xFFFFE070, EMPTY_NAME = 0xFF6E6278, NUMBER = 0xFF9C8FA6, TITLE = 0xFFFFFFFF,
+            EFFECT = 0xFFB9A8C8;
+    /** How many lines of what the chosen spell does are shown under the wheel, so it cannot run off a short screen. */
+    private static final int EFFECT_LINES = 4;
 
     private final Grimoire grimoire;
     private final WheelSectors sectors;
     private final List<Component> names;
+    private final List<List<Component>> effects;
     private int chosen;
 
     /** @param capacity how many slots the casting unit in hand has: one sector each */
@@ -54,7 +60,15 @@ public final class SpellWheelScreen extends Screen {
         this.grimoire = grimoire;
         this.sectors = new WheelSectors(Math.max(capacity, grimoire.size()));
         this.names = grimoire.spells().stream().map(SpellWheelScreen::read).toList();
+        this.effects = grimoire.spells().stream().map(SpellWheelScreen::effects).toList();
         this.chosen = grimoire.selected();
+    }
+
+    /** What a spell does, read out: one line an action, shown under the wheel while it is the chosen one. */
+    private static List<Component> effects(String spell) {
+        Minecraft minecraft = Minecraft.getInstance();
+        return minecraft.level == null ? List.of()
+                : SpellText.lines(ArcaneSpellApi.rule(minecraft.level.registryAccess(), ArcaneApi.key(spell)));
     }
 
     /** What a spell reads as: its meaning, if the arcane data gives one, else its id. */
@@ -127,7 +141,12 @@ public final class SpellWheelScreen extends Screen {
                 graphics.drawString(font, lines.get(line), -font.width(lines.get(line)) / 2, top + 10 + line * 10, colour, true);
             graphics.pose().popPose();
         }
-        if (chosen >= 0 && chosen < names.size()) graphics.drawCenteredString(font, names.get(chosen), middleX, middleY + size / 2 + 4, CHOSEN_NAME);
+        if (chosen < 0 || chosen >= names.size()) return;
+        int under = middleY + size / 2 + 4;
+        graphics.drawCenteredString(font, names.get(chosen), middleX, under, CHOSEN_NAME);
+        List<Component> readout = effects.get(chosen);
+        for (int line = 0; line < readout.size() && line < EFFECT_LINES; line++)
+            graphics.drawCenteredString(font, readout.get(line), middleX, under + 11 + line * 10, EFFECT);
     }
 
     /** A name in at most two lines of this width, cut short with dots if it is longer still. */

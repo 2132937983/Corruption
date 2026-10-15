@@ -66,6 +66,10 @@ public final class ModBlocks {
             com.miophas.corruption.common.block.AltarOfferingBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(1.5F, 6.0F)
                     .sound(SoundType.STONE).requiresCorrectToolForDrops().noOcclusion()
                     .lightLevel(state -> state.getValue(com.miophas.corruption.common.block.AltarOfferingBlock.ALTAR) == com.miophas.corruption.common.altar.AltarMode.BINDING ? 7 : 0));
+    /** Pours its store into the item left on it, until that is full; see ArcaneChargerBlockEntity. */
+    public static final DeferredBlock<com.miophas.corruption.common.block.ArcaneChargerBlock> CORRUPTION_ARCANE_CHARGER = BLOCKS.registerBlock("corruption_arcane_charger",
+            com.miophas.corruption.common.block.ArcaneChargerBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(3.0F)
+                    .sound(SoundType.STONE).requiresCorrectToolForDrops().lightLevel(state -> 4));
     /** Teaches a wand the spells of the parchment lying on it; see ArcanePedestalBlockEntity. */
     public static final DeferredBlock<com.miophas.corruption.common.block.ArcanePedestalBlock> CORRUPTION_ARCANE_PEDESTAL = BLOCKS.registerBlock("corruption_arcane_pedestal",
             com.miophas.corruption.common.block.ArcanePedestalBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.5F)

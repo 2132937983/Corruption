@@ -1,6 +1,6 @@
 {
   "energy": "2KCE",
-  "cooldown": 80,
+  "cooldown": 40,
   "corruption_gain": 1,
   "actions": [
     {

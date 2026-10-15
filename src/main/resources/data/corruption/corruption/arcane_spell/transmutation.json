@@ -1,6 +1,7 @@
 {
   "energy": "2KCE",
   "cooldown": 40,
+  "corruption_gain": 1,
   "actions": [
     {
       "type": "corrupt_area",
