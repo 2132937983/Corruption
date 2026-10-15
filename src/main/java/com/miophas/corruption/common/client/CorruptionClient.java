@@ -7,6 +7,7 @@ import com.miophas.corruption.common.client.model.SourceRenderView;
 import com.miophas.corruption.common.client.particle.CorruptionScreamParticle;
 import com.miophas.corruption.common.item.InfectedBlockItem;
 import com.miophas.corruption.common.registry.ModBlocks;
+import com.miophas.corruption.common.registry.ModBlockEntities;
 import com.miophas.corruption.common.registry.ModItems;
 import com.miophas.corruption.common.registry.ModParticles;
 import com.miophas.corruption.common.registry.ModEntities;
@@ -80,6 +81,8 @@ public final class CorruptionClient {
         event.registerEntityRenderer(ModEntities.CORRUPTED_REMNANT.get(), CorruptedRemnantRenderer::new);
         event.registerEntityRenderer(ModEntities.CORRUPTED_DRAGON.get(), CorruptedRemnantRenderer::new);
         event.registerEntityRenderer(ModEntities.CORRUPTED_DRAGON_FIREBALL.get(), net.minecraft.client.renderer.entity.DragonFireballRenderer::new);
+        event.registerEntityRenderer(ModEntities.SPELL_BOLT.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.ARCANE_PEDESTAL.get(), ArcanePedestalRenderer::new);
         event.registerEntityRenderer(ModEntities.CORRUPTED_DRAGON_BREATH.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
         event.registerEntityRenderer(ModEntities.MALICE_VINE.get(), com.miophas.corruption.common.client.entity.MaliceVineRenderer::new);
         event.registerEntityRenderer(ModEntities.GREED.get(), com.miophas.corruption.common.client.entity.GreedRenderer::new);

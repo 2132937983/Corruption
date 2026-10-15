@@ -1,0 +1,10 @@
+{
+  "type": "corruption:arcane_transmutation",
+  "ingredient": {
+    "item": "minecraft:stick"
+  },
+  "energy": "1KCE",
+  "result": {
+    "id": "corruption:corruption_stick"
+  }
+}

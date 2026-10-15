@@ -1,0 +1,19 @@
+{
+  "energy": "2KCE",
+  "cooldown": 80,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:resistance",
+      "target": "self",
+      "duration": 400,
+      "amplifier": 1
+    },
+    {
+      "type": "freeze_area",
+      "radius": 4,
+      "ticks": 200
+    }
+  ]
+}

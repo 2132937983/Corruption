@@ -16,6 +16,13 @@ public final class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Corruption.MOD_ID);
     public static final DeferredItem<Item> CORRUPTION_DUST =
             ITEMS.register("corruption_dust", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> CORRUPTION_STICK =
+            ITEMS.register("corruption_stick", () -> new Item(new Item.Properties()));
+    /** The wand: a casting tool, carrying Corruption Energy and the spells it has been taught. */
+    public static final DeferredItem<com.miophas.corruption.common.item.CorruptionArcaneStickItem> CORRUPTION_ARCANE_STICK =
+            ITEMS.register("corruption_arcane_stick", () -> new com.miophas.corruption.common.item.CorruptionArcaneStickItem(new Item.Properties()));
+    public static final DeferredItem<Item> CORRUPTION_MIXTURE_LEV0 =
+            ITEMS.register("corruption_mixture_lev0", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> CORRUPTION_CRYSTAL =
             ITEMS.register("corruption_crystal", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> ANCIENT_CORRUPTION_CRYSTAL =
@@ -69,6 +76,8 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> ALTAR_OFFERING = ITEMS.registerSimpleBlockItem("altar_offering", ModBlocks.ALTAR_OFFERING);
     public static final DeferredItem<BlockItem> CORRUPTION_ARCANE_LECTERN =
             ITEMS.registerSimpleBlockItem("corruption_arcane_lectern", ModBlocks.CORRUPTION_ARCANE_LECTERN);
+    public static final DeferredItem<BlockItem> CORRUPTION_ARCANE_PEDESTAL =
+            ITEMS.registerSimpleBlockItem("corruption_arcane_pedestal", ModBlocks.CORRUPTION_ARCANE_PEDESTAL);
     public static final DeferredItem<BlockItem> CORRUPTION_ARCANE_TRANSMUTER =
             ITEMS.registerSimpleBlockItem("corruption_arcane_transmuter", ModBlocks.CORRUPTION_ARCANE_TRANSMUTER);
     public static final DeferredItem<BlockItem> CORRUPTION_TEETH = ITEMS.registerSimpleBlockItem("corruption_teeth", ModBlocks.CORRUPTION_TEETH);

@@ -66,6 +66,10 @@ public final class ModBlocks {
             com.miophas.corruption.common.block.AltarOfferingBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(1.5F, 6.0F)
                     .sound(SoundType.STONE).requiresCorrectToolForDrops().noOcclusion()
                     .lightLevel(state -> state.getValue(com.miophas.corruption.common.block.AltarOfferingBlock.ALTAR) == com.miophas.corruption.common.altar.AltarMode.BINDING ? 7 : 0));
+    /** Teaches a wand the spells of the parchment lying on it; see ArcanePedestalBlockEntity. */
+    public static final DeferredBlock<com.miophas.corruption.common.block.ArcanePedestalBlock> CORRUPTION_ARCANE_PEDESTAL = BLOCKS.registerBlock("corruption_arcane_pedestal",
+            com.miophas.corruption.common.block.ArcanePedestalBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.5F)
+                    .sound(SoundType.STONE).requiresCorrectToolForDrops().lightLevel(state -> 5).noOcclusion());
     /** Shows a key to the arcane, and copies its strings onto parchment; see ArcaneLecternBlockEntity. */
     public static final DeferredBlock<com.miophas.corruption.common.block.ArcaneLecternBlock> CORRUPTION_ARCANE_LECTERN = BLOCKS.registerBlock("corruption_arcane_lectern",
             com.miophas.corruption.common.block.ArcaneLecternBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.5F)

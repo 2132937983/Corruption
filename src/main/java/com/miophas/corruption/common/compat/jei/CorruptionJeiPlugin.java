@@ -8,6 +8,7 @@ import com.miophas.corruption.common.client.BrassCauldronScreen;
 import com.miophas.corruption.common.cooking.BrassCauldronBlockEntity;
 import com.miophas.corruption.common.cooking.BrassCauldronMenu;
 import com.miophas.corruption.common.registry.ModBlocks;
+import com.miophas.corruption.common.registry.ModItems;
 import com.miophas.corruption.common.registry.ModMenus;
 import com.miophas.corruption.common.registry.ModRecipes;
 import com.miophas.corruption.common.transmutation.ArcaneTransmuterBlockEntity;
@@ -34,7 +35,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 /**
- * Shows alchemy, Corrupted Arcane Transmutation, brass cauldron cooking, altar rites and the fuels that power them in JEI. JEI finds this class by
+ * Shows alchemy, Corrupted Arcane Transmutation, brass cauldron cooking, altar rites, the corruption's spells and the fuels that power them in JEI. JEI finds this class by
  * its annotation and nothing else refers to it, so the mod still loads when JEI is not installed.
  */
 @JeiPlugin
@@ -45,7 +46,8 @@ public final class CorruptionJeiPlugin implements IModPlugin {
 
     @Override public void registerCategories(IRecipeCategoryRegistration registration) {
         IGuiHelper gui = registration.getJeiHelpers().getGuiHelper();
-        registration.addRecipeCategories(new AlchemyCategory(gui), new ArcaneTransmutationCategory(gui), new BrassCookingCategory(gui), new AltarRiteCategory(gui), new CorruptionFuelCategory(gui));
+        registration.addRecipeCategories(new AlchemyCategory(gui), new ArcaneTransmutationCategory(gui), new BrassCookingCategory(gui), new AltarRiteCategory(gui),
+                new ArcaneSpellsCategory(gui), new CorruptionFuelCategory(gui));
     }
 
     @Override public void registerRecipes(IRecipeRegistration registration) {
@@ -56,6 +58,7 @@ public final class CorruptionJeiPlugin implements IModPlugin {
             registration.addRecipes(BrassCookingCategory.TYPE, level.getRecipeManager().getAllRecipesFor(ModRecipes.BRASS_COOKING.get()));
             registration.addRecipes(AltarRiteCategory.TYPE, level.getRecipeManager().getAllRecipesFor(ModRecipes.ALTAR.get()));
         }
+        registration.addRecipes(ArcaneSpellsCategory.TYPE, ArcaneSpellsCategory.entries());
         registration.addRecipes(CorruptionFuelCategory.TYPE, CorruptionFuelCategory.entries());
     }
 
@@ -65,6 +68,7 @@ public final class CorruptionJeiPlugin implements IModPlugin {
         registration.addRecipeCatalysts(ArcaneTransmutationCategory.TYPE, ModBlocks.CORRUPTION_ARCANE_TRANSMUTER.get());
         registration.addRecipeCatalysts(BrassCookingCategory.TYPE, ModBlocks.BRASS_CAULDRON.get());
         registration.addRecipeCatalysts(AltarRiteCategory.TYPE, ModBlocks.ALTAR_OFFERING.get(), ModBlocks.ALTAR_PILLAR.get());
+        registration.addRecipeCatalysts(ArcaneSpellsCategory.TYPE, ModBlocks.CORRUPTION_ARCANE_PEDESTAL.get(), ModItems.CORRUPTION_ARCANE_STICK.get());
         registration.addRecipeCatalysts(CorruptionFuelCategory.TYPE, ModBlocks.CORRUPTION_ARCANE_TRANSMUTER.get(), ModBlocks.BRASS_CAULDRON.get());
     }
 

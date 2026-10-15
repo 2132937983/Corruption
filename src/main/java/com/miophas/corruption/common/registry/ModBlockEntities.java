@@ -15,6 +15,8 @@ public final class ModBlockEntities {
             "corruption_arcane_transmuter", () -> BlockEntityType.Builder.of(com.miophas.corruption.common.transmutation.ArcaneTransmuterBlockEntity::new, ModBlocks.CORRUPTION_ARCANE_TRANSMUTER.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.miophas.corruption.common.arcane.ArcaneLecternBlockEntity>> ARCANE_LECTERN = TYPES.register(
             "corruption_arcane_lectern", () -> BlockEntityType.Builder.of(com.miophas.corruption.common.arcane.ArcaneLecternBlockEntity::new, ModBlocks.CORRUPTION_ARCANE_LECTERN.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.miophas.corruption.common.arcane.ArcanePedestalBlockEntity>> ARCANE_PEDESTAL = TYPES.register(
+            "corruption_arcane_pedestal", () -> BlockEntityType.Builder.of(com.miophas.corruption.common.arcane.ArcanePedestalBlockEntity::new, ModBlocks.CORRUPTION_ARCANE_PEDESTAL.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.miophas.corruption.common.cooking.BrassCauldronBlockEntity>> BRASS_CAULDRON = TYPES.register(
             "brass_cauldron", () -> BlockEntityType.Builder.of(com.miophas.corruption.common.cooking.BrassCauldronBlockEntity::new, ModBlocks.BRASS_CAULDRON.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.miophas.corruption.common.altar.AltarPillarBlockEntity>> ALTAR_PILLAR = TYPES.register(

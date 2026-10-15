@@ -1,0 +1,16 @@
+{
+  "energy": "2KCE",
+  "cooldown": 40,
+  "actions": [
+    {
+      "type": "corrupt_area",
+      "radius": 3,
+      "chance": 0.25
+    },
+    {
+      "type": "damage",
+      "amount": 4,
+      "radius": 3
+    }
+  ]
+}

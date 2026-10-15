@@ -28,6 +28,10 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.CorruptedDragonBreath>> CORRUPTED_DRAGON_BREATH = TYPES.register("corrupted_dragon_breath",
             () -> EntityType.Builder.of(com.miophas.corruption.common.entity.CorruptedDragonBreath::new, MobCategory.MISC)
                     .sized(6,.5F).fireImmune().clientTrackingRange(10).updateInterval(10).build("corruption:corrupted_dragon_breath"));
+    /** The bolt a spell's LaunchBolt flies, carrying the effects it does where it strikes. */
+    public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.SpellProjectile>> SPELL_BOLT = TYPES.register("spell_bolt",
+            () -> EntityType.Builder.<com.miophas.corruption.common.entity.SpellProjectile>of(com.miophas.corruption.common.entity.SpellProjectile::new, MobCategory.MISC)
+                    .sized(.5F, .5F).clientTrackingRange(10).updateInterval(1).build("corruption:spell_bolt"));
     public static CorruptedRemnant createRemnant(net.minecraft.world.level.Level level, net.minecraft.nbt.CompoundTag appearance) {
         return appearance.getString("Type").equals("minecraft:ender_dragon") ? CORRUPTED_DRAGON.get().create(level) : CORRUPTED_REMNANT.get().create(level);
     }

@@ -3,6 +3,14 @@
     "corruption:corruption_dust": {
       "energy": "0.1KCE",
       "ticks": 10
+    },
+    "corruption:corruption_remain": {
+      "energy": "0.2KCE",
+      "ticks": 20
+    },
+    "corruption:corruption_mixture_lev0": {
+      "energy": "0.48KCE",
+      "ticks": 48
     }
   }
 }

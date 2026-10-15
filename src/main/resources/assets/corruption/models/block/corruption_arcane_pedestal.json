@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "corruption:block/block_corruption_arcane_pedestal"
+  }
+}

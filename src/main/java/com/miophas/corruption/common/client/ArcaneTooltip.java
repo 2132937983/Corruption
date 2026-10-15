@@ -2,9 +2,12 @@ package com.miophas.corruption.common.client;
 
 import com.miophas.corruption.Corruption;
 import com.miophas.corruption.api.arcane.ArcaneApi;
+import com.miophas.corruption.api.arcane.ArcaneCastingItem;
 import com.miophas.corruption.api.arcane.ArcaneString;
+import com.miophas.corruption.api.arcane.WandSpells;
 import com.miophas.corruption.common.registry.ModItems;
 import com.miophas.corruption.core.arcane.ArcaneReading;
+import com.miophas.corruption.core.arcane.Grimoire;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.ChatFormatting;
@@ -44,6 +47,28 @@ public final class ArcaneTooltip {
             lines.add(under, Component.translatable("tooltip.corruption.key_strings", ArcaneApi.strings(registries, stack).size()).withStyle(ChatFormatting.LIGHT_PURPLE));
             lines.add(under + 1, Component.translatable("tooltip.corruption.key_hint").withStyle(ChatFormatting.GRAY));
         }
+        if (stack.getItem() instanceof ArcaneCastingItem) lines.addAll(under, wand(stack, registries));
+    }
+
+    /** What a wand has been taught, slot by slot, the chosen one marked, and how another is chosen. */
+    private static List<Component> wand(ItemStack stack, HolderLookup.Provider registries) {
+        Grimoire grimoire = WandSpells.of(stack);
+        List<Component> lines = new ArrayList<>();
+        for (int slot = 0; slot < Grimoire.CAPACITY; slot++) {
+            String spell = grimoire.at(slot);
+            boolean chosen = slot == grimoire.selected();
+            if (spell == null) lines.add(Component.translatable("tooltip.corruption.wand_slot_empty", slot + 1).withStyle(ChatFormatting.DARK_GRAY));
+            else lines.add(Component.translatable(chosen ? "tooltip.corruption.wand_slot_chosen" : "tooltip.corruption.wand_slot", slot + 1, name(spell, registries))
+                    .withStyle(chosen ? ChatFormatting.LIGHT_PURPLE : ChatFormatting.GRAY));
+        }
+        lines.add(Component.translatable("tooltip.corruption.wand_key", SpellWheel.OPEN.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+        return lines;
+    }
+
+    /** What a spell reads as: its meaning, if the arcane data gives one, else its id. */
+    private static Component name(String spell, HolderLookup.Provider registries) {
+        ArcaneString string = ArcaneApi.string(registries, ArcaneApi.key(spell));
+        return string == null ? Component.literal(spell) : string.meaning();
     }
 
     private static List<Component> parchment(ItemStack stack, Player reader, HolderLookup.Provider registries) {

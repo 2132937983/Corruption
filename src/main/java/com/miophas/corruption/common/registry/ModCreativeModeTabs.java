@@ -22,6 +22,9 @@ public final class ModCreativeModeTabs {
                     .icon(() -> ModItems.CORRUPTION.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.CORRUPTION_DUST.get());
+                        output.accept(ModItems.CORRUPTION_STICK.get());
+                        output.accept(ModItems.CORRUPTION_ARCANE_STICK.get());
+                        output.accept(ModItems.CORRUPTION_MIXTURE_LEV0.get());
                         output.accept(ModItems.CORRUPTION_CRYSTAL.get());
                         output.accept(ModItems.ANCIENT_CORRUPTION_CRYSTAL.get());
                         output.accept(ModItems.HARMONIZED_CORRUPTION_CRYSTAL.get());
@@ -38,6 +41,7 @@ public final class ModCreativeModeTabs {
                         CorruptionEnergyCarrier carrier = CorruptionEnergyCarrier.of(candle);
                         output.accept(CorruptionEnergyCarrier.charged(candle, carrier == null ? CorruptionEnergyApi.kilo(10) : carrier.capacity()));
                         output.accept(ModItems.CORRUPTION_ARCANE_LECTERN.get());
+                        output.accept(ModItems.CORRUPTION_ARCANE_PEDESTAL.get());
                         output.accept(ModItems.ALTAR_OFFERING.get());
                         output.accept(ModItems.ALTAR_PILLAR.get());
                         output.accept(ModItems.CORRUPTED_BRASS.get());
@@ -50,6 +54,15 @@ public final class ModCreativeModeTabs {
                         net.minecraft.world.item.ItemStack parchment = new net.minecraft.world.item.ItemStack(ModItems.PARCHMENT.get());
                         parameters.holders().lookup(com.miophas.corruption.api.arcane.ArcaneString.REGISTRY).ifPresent(strings -> strings.listElementIds()
                                 .forEach(string -> output.accept(com.miophas.corruption.api.arcane.ArcaneApi.inscribed(parchment, string))));
+                        // A wand taught each spell the data holds, for trying them without the pedestal.
+                        parameters.holders().lookup(com.miophas.corruption.api.arcane.ArcaneSpell.REGISTRY).ifPresent(spells -> spells.listElementIds()
+                                .forEach(spell -> {
+                                    net.minecraft.world.item.ItemStack wand = new net.minecraft.world.item.ItemStack(ModItems.CORRUPTION_ARCANE_STICK.get());
+                                    com.miophas.corruption.api.arcane.WandSpells.set(wand, com.miophas.corruption.core.arcane.Grimoire.EMPTY.inscribed(spell.location().toString()));
+                                    CorruptionEnergyCarrier wandCarrier = CorruptionEnergyCarrier.of(wand);
+                                    if (wandCarrier != null) wand.set(CorruptionEnergyCarrier.ENERGY.get(), wandCarrier.capacity());
+                                    output.accept(wand);
+                                }));
                         output.accept(ModItems.CORRUPTION_TEETH.get());
                         output.accept(ModItems.MALICE_GRASS.get());
                         output.accept(ModItems.WHISPER_BLOOM.get());

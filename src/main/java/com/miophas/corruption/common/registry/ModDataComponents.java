@@ -3,7 +3,9 @@ package com.miophas.corruption.common.registry;
 import com.miophas.corruption.Corruption;
 import com.miophas.corruption.api.arcane.ArcaneApi;
 import com.miophas.corruption.api.arcane.ArcaneString;
+import com.miophas.corruption.api.arcane.WandSpells;
 import com.miophas.corruption.api.energy.CorruptionEnergyCarrier;
+import com.miophas.corruption.core.arcane.Grimoire;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -21,6 +23,10 @@ public final class ModDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ResourceKey<ArcaneString>>> INSCRIPTION = TYPES.registerComponentType(
             ArcaneApi.INSCRIPTION.getId().getPath(),
             builder -> builder.persistent(ArcaneApi.INSCRIPTION_CODEC).networkSynchronized(ArcaneApi.INSCRIPTION_STREAM_CODEC));
+    /** The spells a wand has been taught; the API's {@link WandSpells#TYPE} names this same entry. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Grimoire>> WAND_SPELLS = TYPES.registerComponentType(
+            WandSpells.TYPE.getId().getPath(),
+            builder -> builder.persistent(WandSpells.CODEC).networkSynchronized(WandSpells.STREAM_CODEC));
 
     private ModDataComponents() {}
 }

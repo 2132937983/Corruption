@@ -53,5 +53,6 @@ public final class Corruption {
     private void commonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> Regions.register(new CorruptionRegion()));
         event.enqueueWork(com.miophas.corruption.common.registry.ModFluids::interactions);
+        event.enqueueWork(com.miophas.corruption.common.arcane.SpellEffects::install);
     }
 }
