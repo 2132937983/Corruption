@@ -89,9 +89,12 @@ class ArcaneTransmuterTest {
 
     @Test void corruptionPowderIsWorthATenthOfAKceAndTakesTenTicks() throws Exception {
         JsonObject values = json("/data/corruption/data_maps/item/corruption_fuel.json").getAsJsonObject("values");
-        assertEquals(1, values.size());
         CorruptionFuel powder = CorruptionFuel.CODEC.parse(JsonOps.INSTANCE, values.get("corruption:corruption_dust")).getOrThrow();
         assertEquals(new CorruptionFuel(100, 10), powder);
+        assertEquals(new CorruptionFuel(200, 20), CorruptionFuel.CODEC.parse(JsonOps.INSTANCE, values.get("corruption:corruption_remain")).getOrThrow(),
+                "corrupted residue, twice the powder");
+        assertEquals(new CorruptionFuel(480, 48), CorruptionFuel.CODEC.parse(JsonOps.INSTANCE, values.get("corruption:corruption_mixture_lev0")).getOrThrow(),
+                "the primitive mixture, a fifth more than what it is made of: (2 x 0.1 + 0.2) x 1.2 KCE");
         assertEquals(new CorruptionFuel(2500, 40), CorruptionFuel.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString("{\"energy\": 2500, \"ticks\": 40}")).getOrThrow(), "plain CE works too");
         assertTrue(CorruptionFuel.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString("{\"energy\": \"lots\", \"ticks\": 40}")).isError());
         assertTrue(CorruptionFuel.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString("{\"energy\": 100, \"ticks\": 0}")).isError(), "it takes some time");

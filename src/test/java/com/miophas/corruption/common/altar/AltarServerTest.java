@@ -306,7 +306,9 @@ class AltarServerTest {
 
     @Test void theAltarsRitesAreLoadedAndSentToPlayersWhole(MinecraftServer server) {
         TestWorld.onServer(server, level -> {
-            assertEquals(6, level.getRecipeManager().getAllRecipesFor(ModRecipes.ALTAR.get()).size());
+            var loaded = level.getRecipeManager().getAllRecipesFor(ModRecipes.ALTAR.get()).stream().map(holder -> holder.id().getPath()).toList();
+            for (String name : new String[]{"ancient_corruption_crystal", "corruption_remain", "zombified_piglin", "harmonized_corruption_crystal", "malice", "vex"})
+                assertTrue(loaded.contains("altar/" + name), name + " is loaded, among " + loaded);
             for (String name : new String[]{"harmonized_corruption_crystal", "malice", "vex"}) {
                 RecipeHolder<?> holder = level.getRecipeManager().byKey(ResourceLocation.fromNamespaceAndPath("corruption", "altar/" + name)).orElseThrow();
                 AltarRecipe rite = (AltarRecipe) holder.value();

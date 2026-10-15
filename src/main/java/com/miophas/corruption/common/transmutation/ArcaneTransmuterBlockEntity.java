@@ -109,8 +109,14 @@ public final class ArcaneTransmuterBlockEntity extends BaseContainerBlockEntity 
         if (working != null && (found == null || !found.id().equals(working))) cancel();
         if (found == null) { cost = 0; return false; }
         ArcaneTransmutationRecipe recipe = found.value();
-        working = found.id(); cost = recipe.energy();
         ItemStack result = recipe.assemble(new SingleRecipeInput(input), level.registryAccess());
+        // A transmutation that would change nothing, such as charging a wand already full, is not worth its energy.
+        if (ItemStack.isSameItemSameComponents(result, input)) {
+            if (working != null) cancel();
+            cost = 0;
+            return false;
+        }
+        working = found.id(); cost = recipe.energy();
         if (!fits(result)) return false;
         long due = CorruptionEnergyApi.share(recipe.energy(), progress, CorruptionEnergyApi.transmuteTicks());
         if (energy.getEnergy() < due) return false;

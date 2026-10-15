@@ -18,6 +18,8 @@ public final class ModMenus {
             () -> new MenuType<>(com.miophas.corruption.common.arcane.ArcaneLecternMenu::new, FeatureFlags.DEFAULT_FLAGS));
     public static final DeferredHolder<MenuType<?>, MenuType<com.miophas.corruption.common.cooking.BrassCauldronMenu>> BRASS_CAULDRON = MENUS.register("brass_cauldron",
             () -> new MenuType<>(com.miophas.corruption.common.cooking.BrassCauldronMenu::new, FeatureFlags.DEFAULT_FLAGS));
+    public static final DeferredHolder<MenuType<?>, MenuType<com.miophas.corruption.common.arcane.ArcanePedestalMenu>> ARCANE_PEDESTAL = MENUS.register("corruption_arcane_pedestal",
+            () -> new MenuType<>(com.miophas.corruption.common.arcane.ArcanePedestalMenu::new, FeatureFlags.DEFAULT_FLAGS));
 
     private ModMenus() {}
 }

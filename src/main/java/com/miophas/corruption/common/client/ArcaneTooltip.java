@@ -54,7 +54,8 @@ public final class ArcaneTooltip {
     private static List<Component> wand(ItemStack stack, HolderLookup.Provider registries) {
         Grimoire grimoire = WandSpells.of(stack);
         List<Component> lines = new ArrayList<>();
-        for (int slot = 0; slot < Grimoire.CAPACITY; slot++) {
+        int capacity = stack.getItem() instanceof ArcaneCastingItem casting ? casting.capacity() : Grimoire.CAPACITY;
+        for (int slot = 0; slot < capacity; slot++) {
             String spell = grimoire.at(slot);
             boolean chosen = slot == grimoire.selected();
             if (spell == null) lines.add(Component.translatable("tooltip.corruption.wand_slot_empty", slot + 1).withStyle(ChatFormatting.DARK_GRAY));

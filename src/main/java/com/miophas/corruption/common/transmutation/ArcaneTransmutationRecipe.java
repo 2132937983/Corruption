@@ -26,6 +26,8 @@ import net.neoforged.neoforge.common.crafting.SizedIngredient;
  * comes out:
  * <pre>{"type": "corruption:arcane_transmutation", "ingredient": {"item": "minecraft:water_bucket"},
  *  "energy": "20KCE", "result": {"id": "corruption:flowing_corruption_bucket"}}</pre>
+ * An item transmuted into more of itself keeps what it carried, with the result's components laid over it: a
+ * wand charged in the transmuter keeps the spells it was taught.
  *
  * @param energy in CE
  */
@@ -40,7 +42,14 @@ public record ArcaneTransmutationRecipe(SizedIngredient ingredient, long energy,
 
     /** The ingredient is there in at least the amount asked for. */
     @Override public boolean matches(SingleRecipeInput input, Level level) { return ingredient.test(input.item()); }
-    @Override public ItemStack assemble(SingleRecipeInput input, HolderLookup.Provider registries) { return result.copy(); }
+    /** What comes out: the result; or, if it is the same item as went in, that item with the result's components laid over it. */
+    @Override public ItemStack assemble(SingleRecipeInput input, HolderLookup.Provider registries) {
+        ItemStack from = input.item();
+        if (from.isEmpty() || !from.is(result.getItem())) return result.copy();
+        ItemStack kept = from.copyWithCount(result.getCount());
+        kept.applyComponents(result.getComponentsPatch());
+        return kept;
+    }
     @Override public boolean canCraftInDimensions(int width, int height) { return true; }
     @Override public ItemStack getResultItem(HolderLookup.Provider registries) { return result; }
     @Override public NonNullList<Ingredient> getIngredients() { return NonNullList.of(Ingredient.EMPTY, ingredient.ingredient()); }

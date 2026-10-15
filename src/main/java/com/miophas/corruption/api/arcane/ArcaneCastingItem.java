@@ -1,8 +1,11 @@
 package com.miophas.corruption.api.arcane;
 
+import com.miophas.corruption.api.corruption.PlayerCorruptionApi;
 import com.miophas.corruption.api.energy.CorruptionEnergyCarrier;
 import com.miophas.corruption.api.energy.CorruptionEnergyItem;
 import com.miophas.corruption.core.arcane.CastingUnit;
+import com.miophas.corruption.core.arcane.Grimoire;
+import com.miophas.corruption.core.energy.CarriedEnergy;
 import com.miophas.corruption.core.arcane.SpellAction;
 import com.miophas.corruption.core.arcane.SpellCasting;
 import com.miophas.corruption.core.arcane.SpellRule;
@@ -21,20 +24,35 @@ import net.minecraft.world.level.Level;
 /**
  * A casting tool: an item that carries Corruption Energy and the {@link WandSpells spells it has been taught},
  * and casts the chosen one when used. A cast costs the wand its energy, costs the caster one parchment bearing
- * the spell, may leave them more corrupted, and wears off over a cooldown; what it does then is
- * {@link ArcaneCasting.World}.
+ * the spell, may leave them more corrupted (never wholly), and wears off over a cooldown; what it does then is
+ * {@link ArcaneCasting.World}, at the caster. In creative play a cast costs nothing and needs nothing but the
+ * cooldown to have worn off.
  *
  * <p>The rules are {@link CastingUnit}, {@link SpellCasting} and the spell's {@link SpellRule}, all in
  * core.arcane; this is where they meet the game, and it is what a wand of the mod's own or of an add-on is:
  * extend it and register the item as one that carries energy (corruption_energy_carrier).
  */
 public class ArcaneCastingItem extends CorruptionEnergyItem {
-    public ArcaneCastingItem(Item.Properties properties) { super(properties); }
+    private final int capacity;
+
+    /** A casting tool with room for the mod's wand's number of spells, {@link Grimoire#CAPACITY}, giving a KCE a step. */
+    public ArcaneCastingItem(Item.Properties properties) { this(properties, CarriedEnergy.DEFAULT_STEP, Grimoire.CAPACITY); }
     /** @param step how much it gives away at a time when its energy is poured out, in CE */
-    public ArcaneCastingItem(Item.Properties properties, long step) { super(properties, step); }
+    public ArcaneCastingItem(Item.Properties properties, long step) { this(properties, step, Grimoire.CAPACITY); }
+    /**
+     * @param step how much it gives away at a time when its energy is poured out, in CE
+     * @param capacity how many spells it has room for; its wheel shows that many places
+     */
+    public ArcaneCastingItem(Item.Properties properties, long step, int capacity) {
+        super(properties, step);
+        this.capacity = Math.max(1, capacity);
+    }
+
+    /** How many spells this tool has room for. */
+    public int capacity() { return capacity; }
 
     /** What this wand, as it is held, has been taught and holds. */
-    public CastingUnit unit(ItemStack wand) { return new CastingUnit(WandSpells.of(wand), getEnergy(wand)); }
+    public CastingUnit unit(ItemStack wand) { return new CastingUnit(WandSpells.of(wand), getEnergy(wand), capacity); }
 
     /** Writes a unit back onto the wand itself: the spells it has been taught, and the energy it holds. */
     public void store(ItemStack wand, CastingUnit unit) {
@@ -44,7 +62,8 @@ public class ArcaneCastingItem extends CorruptionEnergyItem {
 
     @Override public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack wand = player.getItemInHand(hand);
-        if (!(player instanceof ServerPlayer caster)) return InteractionResultHolder.success(wand);
+        // The server decides whether the cast happens; it swings the caster's arm if it does.
+        if (!(player instanceof ServerPlayer caster)) return InteractionResultHolder.consume(wand);
 
         CastingUnit unit = unit(wand);
         String spell = unit.current();
@@ -56,19 +75,21 @@ public class ArcaneCastingItem extends CorruptionEnergyItem {
 
         SpellRule rule = known.rule();
         ArcaneCasting.World world = ArcaneCasting.world();
-        SpellCasting.Check check = SpellCasting.cast(rule, unit.caster(world.corruption(caster), parchments(player, spell),
-                player.getCooldowns().isOnCooldown(wand.getItem()), (energy, usedUp, corruptionGain) -> {
-                    store(wand, unit.spending(energy));
-                    useParchments(player, spell, usedUp);
-                    world.corrupt(caster, corruptionGain);
-                }));
+        CastingUnit.Situation situation = new CastingUnit.Situation(world.corruption(caster), PlayerCorruptionApi.max(), parchments(player, spell),
+                player.getCooldowns().isOnCooldown(wand.getItem()), player.getAbilities().instabuild);
+        SpellCasting.Check check = SpellCasting.cast(rule, unit.caster(situation, (energy, usedUp, corruptionGain) -> {
+            store(wand, unit.spending(energy));
+            useParchments(player, spell, usedUp);
+            world.corrupt(caster, corruptionGain);
+        }));
         if (check != SpellCasting.Check.READY) {
             notice(player, messageFor(check));
             caster.level().playSound(null, caster.getX(), caster.getY(), caster.getZ(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, .6F, 1.6F);
             return InteractionResultHolder.fail(wand);
         }
 
-        for (SpellAction action : rule.actions()) world.perform(caster, action);
+        ArcaneCasting.Origin origin = ArcaneCasting.Origin.of(caster);
+        for (SpellAction action : rule.actions()) world.perform(caster, origin, action);
         if (rule.cooldown() > 0) player.getCooldowns().addCooldown(wand.getItem(), rule.cooldown());
         caster.level().playSound(null, caster.getX(), caster.getY(), caster.getZ(), SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS, 1.0F, 1.0F);
         player.swing(hand, true);
@@ -108,6 +129,7 @@ public class ArcaneCastingItem extends CorruptionEnergyItem {
         return switch (check) {
             case COOLING -> "message.corruption.spell_cooling";
             case NOT_CORRUPTED_ENOUGH -> "message.corruption.spell_not_corrupted";
+            case TOO_CORRUPTED -> "message.corruption.spell_too_corrupted";
             case NO_ENERGY -> "message.corruption.spell_no_energy";
             case NO_PARCHMENT -> "message.corruption.spell_no_parchment";
             case READY -> "message.corruption.spell_none";

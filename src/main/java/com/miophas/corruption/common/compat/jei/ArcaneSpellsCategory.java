@@ -3,8 +3,10 @@ package com.miophas.corruption.common.compat.jei;
 import com.miophas.corruption.Corruption;
 import com.miophas.corruption.api.arcane.ArcaneApi;
 import com.miophas.corruption.api.arcane.ArcaneSpell;
+import com.miophas.corruption.api.arcane.WandSpells;
 import com.miophas.corruption.api.energy.CorruptionEnergyApi;
 import com.miophas.corruption.common.registry.ModItems;
+import com.miophas.corruption.core.arcane.Grimoire;
 import com.miophas.corruption.core.arcane.SpellRule;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,11 +57,14 @@ public final class ArcaneSpellsCategory implements IRecipeCategory<ArcaneSpellsC
     @Override public int getWidth() { return WIDTH; }
     @Override public int getHeight() { return HEIGHT; }
 
-    /** Parchment bearing the string going in; a wand comes out of the pedestal, taught. */
+    /** Parchment bearing the string going in; a wand comes out of the pedestal, taught the spell. */
     @Override public void setRecipe(IRecipeLayoutBuilder builder, Entry entry, IFocusGroup focuses) {
+        String spell = entry.id().location().toString();
         builder.addSlot(RecipeIngredientRole.INPUT, INPUT_X, SLOT_Y)
-                .addItemStack(ArcaneApi.inscribed(new ItemStack(ModItems.PARCHMENT.get()), ArcaneApi.key(entry.id().location().toString())));
-        builder.addSlot(RecipeIngredientRole.OUTPUT, OUTPUT_X, SLOT_Y).addItemStack(new ItemStack(ModItems.CORRUPTION_ARCANE_STICK.get()));
+                .addItemStack(ArcaneApi.inscribed(new ItemStack(ModItems.PARCHMENT.get()), ArcaneApi.key(spell)));
+        ItemStack taught = new ItemStack(ModItems.CORRUPTION_ARCANE_STICK.get());
+        WandSpells.set(taught, Grimoire.EMPTY.inscribed(spell));
+        builder.addSlot(RecipeIngredientRole.OUTPUT, OUTPUT_X, SLOT_Y).addItemStack(taught);
     }
 
     /** What casting the spell costs, and what it asks of the caster, as far as the data says. */

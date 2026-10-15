@@ -2,16 +2,21 @@ package com.miophas.corruption.common.transmutation;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.miophas.corruption.api.arcane.WandSpells;
 import com.miophas.corruption.api.energy.CorruptionEnergyApi;
+import com.miophas.corruption.api.energy.CorruptionEnergyCarrier;
 import com.miophas.corruption.api.energy.CorruptionEnergyStorage;
 import com.miophas.corruption.api.energy.CorruptionFuel;
 import com.miophas.corruption.common.block.ArcaneTransmuterBlock;
 import com.miophas.corruption.common.entity.TestWorld;
 import com.miophas.corruption.common.registry.ModBlocks;
 import com.miophas.corruption.common.registry.ModItems;
+import com.miophas.corruption.core.arcane.Grimoire;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -154,6 +159,42 @@ class ArcaneTransmuterServerTest {
             machine.setItem(ArcaneTransmuterBlockEntity.INPUT, new ItemStack(Items.WATER_BUCKET));
             level.removeBlock(machine.getBlockPos(), false);
             assertFalse(level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(machine.getBlockPos()).inflate(2)).isEmpty(), "broken, it spills what it held");
+        });
+    }
+
+    /** A wand taught this spell, holding this much energy. */
+    private static ItemStack wand(long energy) {
+        ItemStack wand = new ItemStack(ModItems.CORRUPTION_ARCANE_STICK.get());
+        WandSpells.set(wand, Grimoire.EMPTY.inscribed("corruption:agares"));
+        if (energy > 0) wand.set(CorruptionEnergyCarrier.ENERGY.get(), energy);
+        return wand;
+    }
+
+    @Test void aWandChargedKeepsTheSpellsItWasTaught(MinecraftServer server) {
+        TestWorld.onServer(server, level -> {
+            ArcaneTransmuterBlockEntity machine = place(level, 40_400, 25_000);
+            ItemStack spent = wand(3_000);
+            spent.set(DataComponents.CUSTOM_NAME, Component.literal("Ashen Rod"));
+            machine.setItem(ArcaneTransmuterBlockEntity.INPUT, spent);
+            tick(level, machine, CorruptionEnergyApi.transmuteTicks());
+            ItemStack charged = machine.getItem(ArcaneTransmuterBlockEntity.OUTPUT);
+            assertTrue(charged.is(ModItems.CORRUPTION_ARCANE_STICK.get()));
+            assertEquals(20_000L, charged.get(CorruptionEnergyCarrier.ENERGY.get()), "charged full");
+            assertTrue(WandSpells.of(charged).knows("corruption:agares"), "and still knows what it was taught");
+            assertEquals("Ashen Rod", charged.getHoverName().getString(), "and keeps its name");
+            level.removeBlock(machine.getBlockPos(), false);
+        });
+    }
+
+    @Test void aWandAlreadyFullIsNotChargedAgain(MinecraftServer server) {
+        TestWorld.onServer(server, level -> {
+            ArcaneTransmuterBlockEntity machine = place(level, 40_416, 25_000);
+            machine.setItem(ArcaneTransmuterBlockEntity.INPUT, wand(20_000));
+            tick(level, machine, 20);
+            assertEquals(25_000, machine.energy(), "no energy is spent on a transmutation that changes nothing");
+            assertEquals(0, machine.progress());
+            assertFalse(lit(level, machine));
+            level.removeBlock(machine.getBlockPos(), false);
         });
     }
 }

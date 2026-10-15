@@ -9,7 +9,8 @@ package com.miophas.corruption.core.arcane;
  * @param gravity blocks a tick it falls by, 0 for a bolt that keeps to its line
  * @param drag the share of its speed it keeps each tick, 1 for none lost
  * @param lifetime how many ticks it flies before it is spent
- * @param hitRadius how near it must come to a block or creature to strike it
+ * @param hitRadius how near its line of flight must pass a creature to strike it; blocks it strikes only by
+ *                  flying into them
  */
 public record SpellBolt(double gravity, double drag, int lifetime, double hitRadius) {
     public static final SpellBolt DEFAULT = new SpellBolt(0.0, 0.99, 100, 0.6);

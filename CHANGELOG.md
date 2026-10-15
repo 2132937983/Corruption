@@ -1,63 +1,63 @@
-# CHANGELOG — 腐化奥术（Corruption Arcane）魔法系统
+# CHANGELOG — Corruption Arcane magic system
 
-> 环境：Minecraft 1.21.1 / NeoForge，mod id `corruption`，主包 `com.miophas.corruption`。
-> 本文档记录**本会话全部改动**，供代码审查使用。**所有改动只经过 IDE 诊断（lint），从未运行 `gradlew build` / `runClient`，也没有进游戏验证运行时行为。** 请重点看第 6 节「未验证风险点」。
-
----
-
-## 0. 会话范围概览
-
-按时间顺序，本会话共完成 4 件事：
-
-1. **A. 早期小改动**：新增「腐化木棍」物品 + 转化配方；新增「腐化奥术魔棒」「初级腐化混合物」+ 炼金台配方；把「腐化遗质」设为能量燃料、按公式设定「初级腐化混合物」燃料值。
-2. **B. 清理旧版残留**：删除 15 个上一版转化系统的残留文件（它们引用已移除的注册项，会导致编译失败）。
-3. **C. 魔法系统主体**：从零实现「咒文 → 法术」体系：core 机制层、api 桥接层、common 落地层；魔棒施法、咒文载台刻录、法术轮盘、施法实体（子弹）、数据驱动的术式与效果。
-4. **D. 收尾 1-6**：魔棒 tooltip、JEI「腐化咒文」类别、`SpellBolt` 字段落地、召唤/弹射物实体白名单、载台悬浮羊皮纸渲染、音效 + 创造模式豁免 + 区域腐化开销上限。
-
-期间发生过一次**用户把本地代码回滚到 git 版本**，导致 A 阶段对「已被 git 跟踪的文件」的修改丢失（新增的未跟踪文件保留）。A 阶段的改动已在新代码基础上**重做**，并适配了新版 API（配方类型 `corruption:transmutation` → `corruption:arcane_transmutation`，能量写法 `20000` → `"20KCE"`）。
+> Environment: Minecraft 1.21.1 / NeoForge, mod id `corruption`, root package `com.miophas.corruption`.
+> This document records **all changes made in this session**, for code review. **Every change was only checked with IDE diagnostics (lint); `gradlew build` / `runClient` were never run, and no runtime behaviour was verified in-game.** Pay special attention to section 6, "Unverified risks".
 
 ---
 
-## 1. 变更清单
+## 0. Session overview
 
-### 1.1 A 阶段：物品与配方
+In chronological order, this session completed 4 things:
 
-**新增 Java 注册**（`common/registry/ModItems.java`）
+1. **A. Early small changes**: added the "Corruption Stick" item + its transmutation recipe; added the "Corruption Arcane Stick" and "Primitive Corruption Mixture" + alchemy recipes; made "Corruption Remain" an energy fuel and set the fuel value of "Primitive Corruption Mixture" by formula.
+2. **B. Cleanup of old-version leftovers**: deleted 15 leftover files from the previous transmutation system (they referenced removed registrations and would have broken compilation).
+3. **C. The magic system proper**: implemented the "inscription → spell" system from scratch: the `core` mechanics layer, the `api` bridging layer, and the `common` implementation layer; wand casting, inscription on the pedestal, the spell wheel, the casting projectile, and data-driven spells and effects.
+4. **D. Wrap-up 1-6**: wand tooltip, the JEI "Corruption Spells" category, landing the `SpellBolt` fields, the summon/projectile entity whitelists, the pedestal's floating parchment rendering, and sound effects + creative-mode exemption + an area-corruption block cap.
 
-| 常量 | 物品 id | 类型 |
+During this session the **user rolled the local code back to the git version once**, which lost phase A's changes to **files already tracked by git** (newly added untracked files were kept). Phase A was **redone** on top of the new code, adapted to the new API (recipe type `corruption:transmutation` → `corruption:arcane_transmutation`, energy notation `20000` → `"20KCE"`).
+
+---
+
+## 1. Change list
+
+### 1.1 Phase A: items and recipes
+
+**New Java registrations** (`common/registry/ModItems.java`)
+
+| Constant | Item id | Type |
 |---|---|---|
 | `CORRUPTION_STICK` | `corruption:corruption_stick` | `Item` |
-| `CORRUPTION_ARCANE_STICK` | `corruption:corruption_arcane_stick` | `CorruptionArcaneStickItem`（D 阶段改为施法器） |
+| `CORRUPTION_ARCANE_STICK` | `corruption:corruption_arcane_stick` | `CorruptionArcaneStickItem` (made a casting tool in phase D) |
 | `CORRUPTION_MIXTURE_LEV0` | `corruption:corruption_mixture_lev0` | `Item` |
-| `CORRUPTION_ARCANE_PEDESTAL` | `corruption:corruption_arcane_pedestal` | `BlockItem`（C 阶段） |
+| `CORRUPTION_ARCANE_PEDESTAL` | `corruption:corruption_arcane_pedestal` | `BlockItem` (phase C) |
 
-**新增资源**
-- `assets/corruption/models/item/{corruption_stick,corruption_arcane_stick,corruption_mixture_lev0}.json`（`item/generated`；魔棒 `layer0 = corruption:item/tool/corruption_arcane_stick`）
-- `lang/zh_cn.json` / `lang/en_us.json`：`item.corruption.corruption_stick`（腐化木棍 / Corruption Stick）、`item.corruption.corruption_arcane_stick`（腐化奥术魔棒 / Corruption Arcane Stick）、`item.corruption.corruption_mixture_lev0`（初级腐化混合物 / Primitive Corruption Mixture）
+**New resources**
+- `assets/corruption/models/item/{corruption_stick,corruption_arcane_stick,corruption_mixture_lev0}.json` (`item/generated`; the wand uses `layer0 = corruption:item/tool/corruption_arcane_stick`)
+- `lang/zh_cn.json` / `lang/en_us.json`: `item.corruption.corruption_stick` (腐化木棍 / Corruption Stick), `item.corruption.corruption_arcane_stick` (腐化奥术魔棒 / Corruption Arcane Stick), `item.corruption.corruption_mixture_lev0` (初级腐化混合物 / Primitive Corruption Mixture)
 
-**新增配方**
+**New recipes**
 
-| 文件 | 类型 | 内容 |
+| File | Type | Content |
 |---|---|---|
-| `data/corruption/recipe/arcane_transmutation/stick_to_corruption_stick.json` | `corruption:arcane_transmutation` | 木棍 + `1KCE` → 腐化木棍 |
-| `data/corruption/recipe/alchemy/corruption_arcane_stick.json` | `corruption:alchemy_shaped` | 槽 0=腐化木棍×1、槽 1=金锭×2、槽 2=腐化粉末×64 → 魔棒；**其余槽位必须为空** |
-| `data/corruption/recipe/alchemy/corruption_mixture_lev0.json` | `corruption:alchemy_shapeless` | 腐化粉末×2 + 腐化遗质×1 → 初级腐化混合物 |
+| `data/corruption/recipe/arcane_transmutation/stick_to_corruption_stick.json` | `corruption:arcane_transmutation` | Stick + `1KCE` → Corruption Stick |
+| `data/corruption/recipe/alchemy/corruption_arcane_stick.json` | `corruption:alchemy_shaped` | Slot 0 = Corruption Stick ×1, slot 1 = Gold Ingot ×2, slot 2 = Corruption Dust ×64 → wand; **all other slots must be empty** |
+| `data/corruption/recipe/alchemy/corruption_mixture_lev0.json` | `corruption:alchemy_shapeless` | Corruption Dust ×2 + Corruption Remain ×1 → Primitive Corruption Mixture |
 
-> 炼金台槽位是五芒星的 5 个独立点（`0` 左上 / `1` 右上 / `2` 左 / `3` 右 / `4` 底），**不支持镜像或偏移**；`SizedIngredient` 支持配比数量，所以「64 个腐化粉末」放在同一个槽里。
+> The alchemy table slots are the five separate points of a pentagram (`0` top-left / `1` top-right / `2` left / `3` right / `4` bottom) and **do not support mirroring or offsetting**; `SizedIngredient` supports a quantity ratio, so "64 Corruption Dust" goes in a single slot.
 
-**燃料数据**（`data/corruption/data_maps/item/corruption_fuel.json`）
+**Fuel data** (`data/corruption/data_maps/item/corruption_fuel.json`)
 
-| 物品 | energy | ticks |
+| Item | energy | ticks |
 |---|---|---|
-| `corruption:corruption_dust` | `0.1KCE`（原有） | 10 |
-| `corruption:corruption_remain`（新增） | `0.2KCE` | 20 |
-| `corruption:corruption_mixture_lev0`（新增） | `0.48KCE` | 48 |
+| `corruption:corruption_dust` | `0.1KCE` (pre-existing) | 10 |
+| `corruption:corruption_remain` (new) | `0.2KCE` | 20 |
+| `corruption:corruption_mixture_lev0` (new) | `0.48KCE` | 48 |
 
-设计规则：腐化遗质「比腐化粉末高一些」（取 2 倍）；初级腐化混合物 = 其合成材料能量总和的 **1.2 倍** → `(0.1×2 + 0.2) × 1.2 = 0.48 KCE`。`ticks` 统一沿用腐化粉末 10 CE/tick 的速率。
+Design rule: Corruption Remain is "a bit higher than Corruption Dust" (taken as 2×); Primitive Corruption Mixture = **1.2×** the sum of its ingredients' energy → `(0.1×2 + 0.2) × 1.2 = 0.48 KCE`. `ticks` uniformly follows Corruption Dust's rate of 10 CE/tick.
 
-### 1.2 B 阶段：删除的旧版残留（编译阻塞）
+### 1.2 Phase B: deleted old-version leftovers (compilation blockers)
 
-删除前全项目搜索确认**无任何引用**。共 15 个文件：
+A project-wide search confirmed **no references** before deletion. 15 files in total:
 
 ```
 src/main/java/.../api/transmutation/CorruptionEnergyApi.java
@@ -77,93 +77,93 @@ src/main/resources/data/corruption/recipe/bucket_to_flowing_corruption.json
 src/main/resources/data/corruption/transmuter_fuel/corruption_dust.json
 ```
 
-> 会阻塞编译的具体原因举例：`TransmutationRecipe.java` 引用已不存在的 `ModRecipes.TRANSMUTATION_SERIALIZER` / `ModRecipes.TRANSMUTATION`；`CorruptionArcaneTransmuterMenu.java` 引用已不存在的 `ModMenus.CORRUPTION_ARCANE_TRANSMUTER`。
-> 新版代码使用 `api/energy/*`、`core/energy/*`、`common/transmutation/ArcaneTransmuter*`，与这批旧文件互不依赖（已逐项核对）。
+> Example of a concrete compilation blocker: `TransmutationRecipe.java` referenced the no-longer-existing `ModRecipes.TRANSMUTATION_SERIALIZER` / `ModRecipes.TRANSMUTATION`; `CorruptionArcaneTransmuterMenu.java` referenced the no-longer-existing `ModMenus.CORRUPTION_ARCANE_TRANSMUTER`.
+> The new code uses `api/energy/*`, `core/energy/*`, and `common/transmutation/ArcaneTransmuter*`, which do not depend on these old files (checked item by item).
 
-另删除：`data/corruption/recipe/stick_to_corruption_stick.json`（旧配方类型，已被 1.1 的新文件取代）。
+Also deleted: `data/corruption/recipe/stick_to_corruption_stick.json` (old recipe type, superseded by the new file in 1.1).
 
-### 1.3 C + D 阶段：魔法系统
+### 1.3 Phases C + D: the magic system
 
-#### core 层（`com.miophas.corruption.core.arcane`，**纯 Java，无 `net.minecraft` 依赖**）
+#### core layer (`com.miophas.corruption.core.arcane`, **pure Java, no `net.minecraft` dependency**)
 
-| 文件 | 职责 |
+| File | Responsibility |
 |---|---|
-| `SpellAction.java` | 法术动作词汇表（`sealed interface`）：`ApplyEffect` / `Damage` / `Corrupt` / `Freeze` / `Summon` / `LaunchBolt`。`LaunchBolt` 自带 `List<SpellAction> onHit`，使施法实体可携带任意效果 |
-| `SpellRule.java` | 术式规则：`energy` / `cooldown` / **`minCorruption`**（腐化门槛）/ **`corruptionGain`**（施法增加的腐化，默认 0）/ `actions`；含 `SpellRule.NONE` |
-| `Grimoire.java` | 魔棒咒文槽：`CAPACITY = 3`、`Inscribe{READY, ALREADY_KNOWN, FULL}`、`at/current/selected/knows/indexOf/check/inscribed/selecting/cycled` |
-| `SpellCasting.java` | 施法判定 `Check{READY, COOLING, NOT_CORRUPTED_ENOUGH, NO_ENERGY, NO_PARCHMENT}` + **`Caster` 接口**（照 `Transcription` + `Desk` 范式：core 定规则与接口）+ `PARCHMENT_PER_CAST = 1` |
-| `CastingUnit.java` | **施法单元机制本体**（可被附属 mod 复用）：持有 `Grimoire` + 能量，提供 `inscribing/selecting/cycling/withEnergy/spending`，并用 `caster(...)` + `Payment` 回调产出 `SpellCasting.Caster` |
-| `SpellBolt.java` | 施法实体飞行规则：`gravity` / `drag` / `lifetime` / `hitRadius`，含 `DEFAULT = (0.0, 0.99, 100, 0.6)` |
+| `SpellAction.java` | Spell action vocabulary (`sealed interface`): `ApplyEffect` / `Damage` / `Corrupt` / `Freeze` / `Summon` / `LaunchBolt`. `LaunchBolt` carries its own `List<SpellAction> onHit`, so the casting projectile can carry arbitrary effects |
+| `SpellRule.java` | Spell rule: `energy` / `cooldown` / **`minCorruption`** (corruption threshold) / **`corruptionGain`** (corruption added on cast, default 0) / `actions`; includes `SpellRule.NONE` |
+| `Grimoire.java` | Wand inscription slots: `CAPACITY = 3`, `Inscribe{READY, ALREADY_KNOWN, FULL}`, `at/current/selected/knows/indexOf/check/inscribed/selecting/cycled` |
+| `SpellCasting.java` | Cast check `Check{READY, COOLING, NOT_CORRUPTED_ENOUGH, NO_ENERGY, NO_PARCHMENT}` + the **`Caster` interface** (following the `Transcription` + `Desk` pattern: core defines the rules and interface) + `PARCHMENT_PER_CAST = 1` |
+| `CastingUnit.java` | **The casting-unit mechanic itself** (reusable by add-on mods): holds a `Grimoire` + energy, provides `inscribing/selecting/cycling/withEnergy/spending`, and produces a `SpellCasting.Caster` via `caster(...)` + a `Payment` callback |
+| `SpellBolt.java` | Casting-projectile flight rule: `gravity` / `drag` / `lifetime` / `hitRadius`, including `DEFAULT = (0.0, 0.99, 100, 0.6)` |
 
-#### api 层（`com.miophas.corruption.api.arcane`，注册表 / Codec / 组件 / 可复用物品基类）
+#### api layer (`com.miophas.corruption.api.arcane`, registries / Codecs / components / reusable item base classes)
 
-| 文件 | 职责 |
+| File | Responsibility |
 |---|---|
-| `ArcaneSpell.java` | 术式注册表条目 `record ArcaneSpell(SpellRule rule)` + `CODEC` + `REGISTRY`（`corruption:arcane_spell`，datapack registry）。**术式 id 与 `ArcaneString` id 同名**，羊皮纸的 `inscription` 直接当术式 id 用，无需额外字段 |
-| `SpellCodecs.java` | 数据驱动 Codec：action 按 `"type"` 派发（`Kind` 枚举 + `Codec.dispatch`），`on_hit` 用 `Codec.recursive` 支持嵌套；`RULE` 用 `RecordCodecBuilder.create`，各 action 用 `mapCodec`（dispatch 要求子 codec 为 `MapCodec`） |
-| `WandSpells.java` | DataComponent `corruption:wand_spells`，存 `Grimoire`；`of(ItemStack)` 读取（无则 `Grimoire.EMPTY`）、`set(ItemStack, Grimoire)` **就地写入** |
-| `ArcaneSpellApi.java` | 桥接：`spell(registries, string)` 按同名 id 查术式、`rule(...)`（查不到返回 `SpellRule.NONE`）、`castable(...)` |
-| `ArcaneCasting.java` | **施法的「世界侧」接口 + 装配点**：`World{perform(ServerPlayer, SpellAction), corruption(ServerPlayer), corrupt(ServerPlayer, int)}`；`install(World)` / `world()`。默认实现为空（法术会被扣费但无效果） |
-| `ArcaneCastingItem.java` | **可复用施法器物品基类**（`extends CorruptionEnergyItem`）：右键施放、查术式、统计/扣除背包中「同咒文羊皮纸」、扣能量、置冷却、（D 阶段）施法成功/失败音效 |
+| `ArcaneSpell.java` | Spell registry entry `record ArcaneSpell(SpellRule rule)` + `CODEC` + `REGISTRY` (`corruption:arcane_spell`, a datapack registry). **The spell id is the same as the `ArcaneString` id**, so the parchment's `inscription` is used directly as the spell id, with no extra field needed |
+| `SpellCodecs.java` | Data-driven Codecs: actions dispatched by `"type"` (a `Kind` enum + `Codec.dispatch`), with `on_hit` using `Codec.recursive` to support nesting; `RULE` uses `RecordCodecBuilder.create`, and each action uses `mapCodec` (dispatch requires the child codec to be a `MapCodec`) |
+| `WandSpells.java` | DataComponent `corruption:wand_spells`, storing a `Grimoire`; `of(ItemStack)` reads it (falling back to `Grimoire.EMPTY` if absent), `set(ItemStack, Grimoire)` **writes it in place** |
+| `ArcaneSpellApi.java` | Bridging: `spell(registries, string)` looks up the spell by same-named id, `rule(...)` (returns `SpellRule.NONE` if not found), `castable(...)` |
+| `ArcaneCasting.java` | **The casting "world side" interface + assembly point**: `World{perform(ServerPlayer, SpellAction), corruption(ServerPlayer), corrupt(ServerPlayer, int)}`; `install(World)` / `world()`. The default implementation is empty (spells will be charged for but have no effect) |
+| `ArcaneCastingItem.java` | **Reusable casting-tool item base class** (`extends CorruptionEnergyItem`): right-click to cast, look up the spell, count/consume "same-inscription parchment" from the inventory, spend energy, set the cooldown, and (phase D) play the cast success/failure sounds |
 
-#### common 层
+#### common layer
 
-| 文件 | 职责 |
+| File | Responsibility |
 |---|---|
-| `common/arcane/SpellEffects.java` | **`ArcaneCasting.World` 的落地实现**：6 种 action → 世界效果；读写玩家腐化值；启动时 `install()` |
-| `common/arcane/ArcanePedestalBlockEntity.java` | 载台方块实体：存 1 张铭文羊皮纸，含 `getUpdateTag` / `getUpdatePacket` 客户端同步 |
-| `common/item/CorruptionArcaneStickItem.java` | 魔棒（薄壳，`step = 1 KCE`） |
-| `common/block/ArcanePedestalBlock.java` | 载台方块：魔棒右键→刻录；铭文羊皮纸右键→放上；空手→取回；破坏掉落 |
-| `common/entity/SpellProjectile.java` | 施法实体（子弹）：携带 `on_hit` 载荷（NBT + `SpellCodecs.ACTIONS`），命中后交给 `ArcaneCasting.World` 执行再自毁 |
-| `common/network/SelectSpellPayload.java` | C→S 网络包 `corruption:select_spell`（选择法术） |
-| `common/network/ModNetwork.java` | `RegisterPayloadHandlersEvent` 注册（`playToServer`，版本 `"1"`） |
-| `common/client/SpellWheel.java` | 按键 `key.corruption.spell_wheel`（默认 **V**，分类 `key.categories.corruption`）+ 长按开轮盘 / 松开发送选择 |
-| `common/client/SpellWheelScreen.java` | 咒文轮盘：`blit` 贴图 `textures/gui/spell_wheel.png`，法术名沿半径排布，指针最近的为选中，不暂停游戏 |
-| `common/client/ArcanePedestalRenderer.java` | 载台 BER：把羊皮纸 **物品模型** 悬浮慢转 + 上下浮动 |
-| `common/compat/jei/ArcaneSpellsCategory.java` | JEI「腐化咒文」类别 |
+| `common/arcane/SpellEffects.java` | **The concrete implementation of `ArcaneCasting.World`**: the 6 actions → world effects; reads/writes the player's corruption; calls `install()` on startup |
+| `common/arcane/ArcanePedestalBlockEntity.java` | Pedestal block entity: stores 1 inscribed parchment, with `getUpdateTag` / `getUpdatePacket` client sync |
+| `common/item/CorruptionArcaneStickItem.java` | The wand (thin shell, `step = 1 KCE`) |
+| `common/block/ArcanePedestalBlock.java` | Pedestal block: right-click with a wand → inscribe; right-click with an inscribed parchment → place it; empty hand → take it back; drops when broken |
+| `common/entity/SpellProjectile.java` | Casting projectile: carries the `on_hit` payload (NBT + `SpellCodecs.ACTIONS`); on hit, hands it to `ArcaneCasting.World` to execute, then self-destructs |
+| `common/network/SelectSpellPayload.java` | C→S network packet `corruption:select_spell` (select spell) |
+| `common/network/ModNetwork.java` | `RegisterPayloadHandlersEvent` registration (`playToServer`, version `"1"`) |
+| `common/client/SpellWheel.java` | Keybind `key.corruption.spell_wheel` (default **V**, category `key.categories.corruption`) + hold to open the wheel / release to send the selection |
+| `common/client/SpellWheelScreen.java` | Spell wheel: `blit`s the texture `textures/gui/spell_wheel.png`, lays spell names out radially, selects the one nearest the pointer, does not pause the game |
+| `common/client/ArcanePedestalRenderer.java` | Pedestal BER: floats the parchment's **item model**, slowly rotating and bobbing |
+| `common/compat/jei/ArcaneSpellsCategory.java` | The JEI "Corruption Spells" category |
 
-#### 注册接线（修改的既有文件）
+#### Registration wiring (existing files modified)
 
-| 文件 | 改动 |
+| File | Change |
 |---|---|
-| `Corruption.java` | `commonSetup` 增加 `event.enqueueWork(SpellEffects::install)` |
-| `common/registry/ModRegistries.java` | 新增 `event.dataPackRegistry(ArcaneSpell.REGISTRY, ArcaneSpell.CODEC, ArcaneSpell.CODEC)` |
-| `common/registry/ModDataComponents.java` | 新增 `WAND_SPELLS`（persistent + networkSynchronized） |
-| `common/registry/ModBlocks.java` | 新增 `CORRUPTION_ARCANE_PEDESTAL`（`BaseEntityBlock`，`lightLevel 5`，`noOcclusion`） |
-| `common/registry/ModBlockEntities.java` | 新增 `ARCANE_PEDESTAL`（id `corruption_arcane_pedestal`） |
-| `common/registry/ModItems.java` | 魔棒改为 `CorruptionArcaneStickItem`；新增载台方块物品 |
-| `common/registry/ModEntities.java` | 新增 `SPELL_BOLT`（`corruption:spell_bolt`，`MobCategory.MISC`，`.5×.5`，tracking 10，update 1） |
-| `common/registry/ModTags.java` | 新增 `SPELL_SUMMONS` / `SPELL_BOLTS`（`Registries.ENTITY_TYPE`） |
-| `common/registry/ModCreativeModeTabs.java` | 依次加入 腐化木棍 / 腐化奥术魔棒 / 初级腐化混合物 / 载台；并**按注册表生成"每个术式一根已刻录满电魔棒"**用于试玩 |
-| `common/client/CorruptionClient.java` | 注册 `SPELL_BOLT` 渲染器（`ThrownItemRenderer`）与 `ARCANE_PEDESTAL` 渲染器 |
-| `common/client/ArcaneTooltip.java` | 新增魔棒 tooltip（见 D-1） |
-| `common/compat/jei/CorruptionJeiPlugin.java` | 注册咒文类别 + 数据 + 催化剂；更新类注释 |
+| `Corruption.java` | Added `event.enqueueWork(SpellEffects::install)` to `commonSetup` |
+| `common/registry/ModRegistries.java` | Added `event.dataPackRegistry(ArcaneSpell.REGISTRY, ArcaneSpell.CODEC, ArcaneSpell.CODEC)` |
+| `common/registry/ModDataComponents.java` | Added `WAND_SPELLS` (persistent + networkSynchronized) |
+| `common/registry/ModBlocks.java` | Added `CORRUPTION_ARCANE_PEDESTAL` (`BaseEntityBlock`, `lightLevel 5`, `noOcclusion`) |
+| `common/registry/ModBlockEntities.java` | Added `ARCANE_PEDESTAL` (id `corruption_arcane_pedestal`) |
+| `common/registry/ModItems.java` | Changed the wand to `CorruptionArcaneStickItem`; added the pedestal block item |
+| `common/registry/ModEntities.java` | Added `SPELL_BOLT` (`corruption:spell_bolt`, `MobCategory.MISC`, `.5×.5`, tracking 10, update 1) |
+| `common/registry/ModTags.java` | Added `SPELL_SUMMONS` / `SPELL_BOLTS` (`Registries.ENTITY_TYPE`) |
+| `common/registry/ModCreativeModeTabs.java` | Added, in order: Corruption Stick / Corruption Arcane Stick / Primitive Corruption Mixture / pedestal; and **generates "one fully-charged, inscribed wand per spell" from the registry** for playtesting |
+| `common/client/CorruptionClient.java` | Registered the `SPELL_BOLT` renderer (`ThrownItemRenderer`) and the `ARCANE_PEDESTAL` renderer |
+| `common/client/ArcaneTooltip.java` | Added the wand tooltip (see D-1) |
+| `common/compat/jei/CorruptionJeiPlugin.java` | Registered the spell category + data + catalysts; updated the class comment |
 
-#### 新增数据文件
+#### New data files
 
-| 文件 | 内容 |
+| File | Content |
 |---|---|
-| `data/corruption/corruption/arcane_spell/transmutation.json` | `2KCE`，cd 40：`corrupt_area(3, 0.25)` + `damage(4, 3)` |
-| `data/corruption/corruption/arcane_spell/corruption.json` | `1KCE`，cd 20，`min_corruption 5`，`corruption_gain 1`：`launch_bolt(speed 1.2, on_hit: damage(6, 2.5) + corrupt_area(2, 0.5))` |
-| `data/corruption/corruption/arcane_spell/baal.json` | `4KCE`，cd 200，`min_corruption 10`，`corruption_gain 3`：`launch_bolt(minecraft:small_fireball, 1.5)` + `summon(corruption:corrupted_remnant, 1)`（火球术） |
-| `data/corruption/corruption/arcane_spell/agares.json` | `2KCE`，cd 80，`corruption_gain 1`：`apply_effect(minecraft:resistance, self, 400, amp 1)` + `freeze_area(4, 200)`（冰冻术） |
-| `data/corruption/recipe/arcane_transmutation/wand_charge.json` | 嬗变器：任意魔棒 + `20KCE` → 满电魔棒（`result.components` 写入 `corruption:corruption_energy`），**零新代码的充能手段** |
-| `data/corruption/tags/entity_type/spell_summons.json` | 召唤白名单：腐化残躯/贪婪/缠念藤 + 若干原版亡灵 |
-| `data/corruption/tags/entity_type/spell_bolts.json` | 弹射物白名单：`corruption:spell_bolt`、`corruption:corrupted_dragon_fireball`、小火球、箭、雪球、蛋 |
+| `data/corruption/corruption/arcane_spell/transmutation.json` | `2KCE`, cd 40: `corrupt_area(3, 0.25)` + `damage(4, 3)` |
+| `data/corruption/corruption/arcane_spell/corruption.json` | `1KCE`, cd 20, `min_corruption 5`, `corruption_gain 1`: `launch_bolt(speed 1.2, on_hit: damage(6, 2.5) + corrupt_area(2, 0.5))` |
+| `data/corruption/corruption/arcane_spell/baal.json` | `4KCE`, cd 200, `min_corruption 10`, `corruption_gain 3`: `launch_bolt(minecraft:small_fireball, 1.5)` + `summon(corruption:corrupted_remnant, 1)` (fireball spell) |
+| `data/corruption/corruption/arcane_spell/agares.json` | `2KCE`, cd 80, `corruption_gain 1`: `apply_effect(minecraft:resistance, self, 400, amp 1)` + `freeze_area(4, 200)` (frost spell) |
+| `data/corruption/recipe/arcane_transmutation/wand_charge.json` | Transmuter: any wand + `20KCE` → a fully-charged wand (`result.components` writes `corruption:corruption_energy`) — **a charging method with zero new code** |
+| `data/corruption/tags/entity_type/spell_summons.json` | Summon whitelist: Corrupted Remnant / Greed / Clinging Ivy + several vanilla undead |
+| `data/corruption/tags/entity_type/spell_bolts.json` | Projectile whitelist: `corruption:spell_bolt`, `corruption:corrupted_dragon_fireball`, Small Fireball, Arrow, Snowball, Egg |
 
-**修改的数据文件**：`data_maps/item/corruption_fuel.json`（见 1.1）、`data_maps/item/corruption_energy_carrier.json`（新增 `corruption:corruption_arcane_stick` → `capacity 20KCE`、`consumed false`，即**不消耗、可反复充能**）。
+**Modified data files**: `data_maps/item/corruption_fuel.json` (see 1.1), `data_maps/item/corruption_energy_carrier.json` (added `corruption:corruption_arcane_stick` → `capacity 20KCE`, `consumed false`, i.e. **not consumed, rechargeable repeatedly**).
 
-#### 新增资源
+#### New resources
 
 ```
 assets/corruption/blockstates/corruption_arcane_pedestal.json
-assets/corruption/models/block/corruption_arcane_pedestal.json     （cube_all 占位，纹理 block_corruption_arcane_pedestal）
+assets/corruption/models/block/corruption_arcane_pedestal.json     (cube_all placeholder, texture block_corruption_arcane_pedestal)
 assets/corruption/models/item/corruption_arcane_pedestal.json
-assets/corruption/textures/block/block_corruption_arcane_pedestal.png  （AI 生成草稿，1024×1024）
-assets/corruption/textures/gui/spell_wheel.png                          （AI 生成草稿，1024×1024，透明底）
+assets/corruption/textures/block/block_corruption_arcane_pedestal.png  (AI-generated draft, 1024×1024)
+assets/corruption/textures/gui/spell_wheel.png                          (AI-generated draft, 1024×1024, transparent background)
 ```
 
-**新增语言键**（zh_cn / en_us 各一份）
+**New language keys** (one copy each in zh_cn / en_us)
 ```
 message.corruption.spell_none / spell_cooling / spell_not_corrupted / spell_no_energy / spell_no_parchment
 block.corruption.corruption_arcane_pedestal
@@ -175,20 +175,20 @@ corruption.jei.arcane_spell / spell_energy / spell_cooldown / spell_corruption /
 
 ---
 
-## 2. 玩法流程（设计定稿）
+## 2. Gameplay flow (final design)
 
-1. **誊写**（已有系统）：腐化奥术讲台 + 所罗门之钥 + 墨水 → 铭文羊皮纸（一张纸一个咒文）。
-2. **刻录**（新方块=腐化奥术载台）：载台上放铭文羊皮纸，手持魔棒右键 → 把该咒文写进魔棒的咒文槽（**上限 3**）。**刻录不消耗任何东西**（既不吃羊皮纸也不吃能量）。
-3. **充能**：腐化奥术嬗变器里放入魔棒 → 消耗 `20KCE` 换一根满电魔棒。
-4. **选法**：长按 **V** 唤出轮盘 → 指针指向哪个咒文就是哪个 → 松开即把选择发给服务端写入魔棒。
-5. **施法**：手持魔棒**右键**。依次校验：冷却 → 腐化门槛 → 能量 → 羊皮纸；通过则执行全部 `actions`，并**扣 CE + 扣 1 张同咒文羊皮纸 + 按 `corruption_gain` 增加腐化 + 置冷却**。
-6. **失败反馈**：actionbar 提示（冷却中 / 腐化不足 / 能量不足 / 缺羊皮纸）+ 熄灭音效。
+1. **Transcription** (existing system): Corruption Arcane Lectern + Key of Solomon + Ink → an inscribed parchment (one spell per sheet).
+2. **Inscription** (new block = Corruption Arcane Pedestal): place an inscribed parchment on the pedestal, hold a wand and right-click → the spell is written into the wand's inscription slots (**max 3**). **Inscribing consumes nothing** (neither the parchment nor energy).
+3. **Charging**: put a wand into the Corruption Arcane Transmuter → spend `20KCE` for a fully-charged wand.
+4. **Selection**: hold **V** to bring up the wheel → whichever spell the pointer points at is the selected one → release to send the selection to the server, which writes it into the wand.
+5. **Casting**: hold the wand and **right-click**. Checks in order: cooldown → corruption threshold → energy → parchment; if all pass, all `actions` execute, and it **spends CE + consumes 1 same-inscription parchment + adds corruption per `corruption_gain` + sets the cooldown**.
+6. **Failure feedback**: an actionbar message (cooling down / not corrupted enough / not enough energy / missing parchment) + an extinguish sound.
 
 ---
 
-## 3. 数据格式参考
+## 3. Data format reference
 
-### 术式（`data/<ns>/corruption/arcane_spell/<name>.json`）
+### Spell (`data/<ns>/corruption/arcane_spell/<name>.json`)
 
 ```json
 {
@@ -204,101 +204,101 @@ corruption.jei.arcane_spell / spell_energy / spell_cooldown / spell_corruption /
 }
 ```
 
-| 字段 | 类型 / 默认 |
+| Field | Type / default |
 |---|---|
-| `energy` | CE 数量，可为数字 `2000` 或文本 `"2KCE"`（复用 `CorruptionEnergyCodec.AMOUNT`）；默认 0 |
-| `cooldown` | tick，0..32767；默认 0 |
-| `min_corruption` | 0..`PlayerCorruptionApi.max()`；默认 0 |
-| `corruption_gain` | 同上；默认 0 |
-| `actions` | **必填**，可组合有序列表 |
+| `energy` | CE amount, either a number `2000` or text `"2KCE"` (reuses `CorruptionEnergyCodec.AMOUNT`); default 0 |
+| `cooldown` | ticks, 0..32767; default 0 |
+| `min_corruption` | 0..`PlayerCorruptionApi.max()`; default 0 |
+| `corruption_gain` | same as above; default 0 |
+| `actions` | **required**, an ordered list that can be combined |
 
-### 六种 action
+### The six actions
 
-| `type` | 字段（默认值） | 说明 |
+| `type` | Fields (defaults) | Description |
 |---|---|---|
-| `apply_effect` | `effect`（必填 id）、`target`（`"self"` \| `"nearby"`，默认 self）、`radius`（0.0）、`duration`（200，1..12000）、`amplifier`（0，0..255） | 加状态效果 |
-| `damage` | `amount`（4.0）、`radius`（3.0） | 范围伤害（`indirectMagic`） |
-| `corrupt_area` | `radius`（3.0）、`chance`（0.25） | 复用 `ServerInfectionWorld.tryInfect` |
-| `freeze_area` | `radius`（3.0）、`ticks`（200，1..1200） | 冻结 tick 累加 + 冰冻伤害 |
-| `summon` | `entity`（必填 id）、`count`（1，1..16） | 受 `corruption:spell_summons` 白名单约束 |
-| `launch_bolt` | `entity`（默认 `corruption:spell_bolt`）、`speed`（1.0）、`inaccuracy`（0.0）、`on_hit`（`[]`） | 受 `corruption:spell_bolts` 白名单约束；`on_hit` 可嵌套任意 action（递归 codec） |
+| `apply_effect` | `effect` (required id), `target` (`"self"` \| `"nearby"`, default self), `radius` (0.0), `duration` (200, 1..12000), `amplifier` (0, 0..255) | Add a status effect |
+| `damage` | `amount` (4.0), `radius` (3.0) | Area damage (`indirectMagic`) |
+| `corrupt_area` | `radius` (3.0), `chance` (0.25) | Reuses `ServerInfectionWorld.tryInfect` |
+| `freeze_area` | `radius` (3.0), `ticks` (200, 1..1200) | Freeze-tick accumulation + freeze damage |
+| `summon` | `entity` (required id), `count` (1, 1..16) | Constrained by the `corruption:spell_summons` whitelist |
+| `launch_bolt` | `entity` (default `corruption:spell_bolt`), `speed` (1.0), `inaccuracy` (0.0), `on_hit` (`[]`) | Constrained by the `corruption:spell_bolts` whitelist; `on_hit` can nest any action (recursive codec) |
 
-### 魔棒组件
+### Wand component
 
-`corruption:wand_spells` = `{"spells": ["corruption:baal", ...], "selected": 0}`，最多 3 个。
-
----
-
-## 4. 关键设计决策与理由
-
-1. **分层**：
-   - `core/*` = 纯机制与规则（**无 `net.minecraft` 依赖**；项目里 `core/` 仅有 2 个特例文件 import 了 MC，`core/arcane` 的 `package-info` 明确写「no game code」，本实现遵守）。
-   - `api/*` = 注册表、Codec、DataComponent、数据表、以及**给附属 mod 复用的基类**。
-   - `common/*` = 本 mod 的具体落地（方块/物品/实体/界面/效果）。
-2. **为什么`ArcaneCastingItem`（魔棒属性壳）放在 api 而不是 core**：`Item` 子类必须 `extends net.minecraft.world.item.Item`，放进 `core/arcane` 会破坏该包「无游戏代码」的约定；而 api 本就是给附属用的。**魔棒的机制本体（`CastingUnit`）在 core**，common 里的 `CorruptionArcaneStickItem` 只有一行。
-3. **术式 id 与咒文 id 同名**：羊皮纸存的是 `ResourceKey<ArcaneString>`，按相同 location 直接查 `ArcaneSpell`，因此不需要在羊皮纸上多存一个术式字段。
-4. **`ArcaneCasting` 是静态装配点**：core 不能碰 MC，api 的 `perform` 又需要 `ServerPlayer`，所以 api 暴露 `World` 接口，common 在 `FMLCommonSetupEvent` 里 `install` 一份实现（`SpellEffects`）。附属可以装自己的实现。
-5. **羊皮纸消耗时机**：按用户决定——**只施法时消耗**，刻录只是「登记」。
-6. **效果全部数据驱动**：新增效果类型 = 在 `SpellAction` 加一个 record + `SpellCodecs.Kind` 加一项 + `SpellEffects` 加一个 case；**不需要碰注册表**。
-7. **施法实体（子弹）携带 `on_hit`**：让「子弹按类型带不同效果」成为纯数据，`SpellProjectile` 只负责飞行与命中，效果交给 `ArcaneCasting.World`。
-8. **实体白名单**：`summon` / `launch_bolt` 只能使用标签内的实体，避免数据包/附属放飞末影龙之类的意外。
+`corruption:wand_spells` = `{"spells": ["corruption:baal", ...], "selected": 0}`, at most 3.
 
 ---
 
-## 5. D 阶段收尾明细（1-6）
+## 4. Key design decisions and rationale
 
-1. **魔棒 tooltip**（`ArcaneTooltip`）：列出 3 个咒文槽，选中项 `▶` + `LIGHT_PURPLE`，空槽灰字，末行「长按 %s 选择咒文」（键名取 `SpellWheel.OPEN.getTranslatedKeyMessage()`）。咒文名走 `ArcaneString.meaning`，取不到则退回 id。
-2. **JEI「腐化咒文」类别**（`ArcaneSpellsCategory`）：输入槽 = 写着该咒文的羊皮纸，输出槽 = 魔棒；右侧文字为 能量 / 冷却 / 腐化门槛 / 施法后腐化。数据来自 `level.registryAccess().lookup(ArcaneSpell.REGISTRY)`（非配方管理器）。催化剂 = 载台 + 魔棒。
-3. **`SpellBolt` 字段落地**（选了「实现」而非「删字段」）：`SpellProjectile` 从 `ThrowableProjectile` 改为**直接继承 `Projectile` 并自写 `tick()`**，按 `drag` 保留速度（水中 0.8）、按 `gravity` 下落、按 `lifetime` 报废；命中范围通过 `getDimensions` 把包围盒设为 `2×hitRadius`（默认 1.2×1.2）。
-4. **实体白名单**：`ModTags.SPELL_SUMMONS` / `SPELL_BOLTS` + 两个 tag 数据文件；`SpellEffects.summon/launch` 拒绝白名单外实体。
-5. **载台悬浮羊皮纸**（`ArcanePedestalRenderer`）：用 `ItemRenderer.renderStatic` 渲染 `parchment()` 物品栈，绕 Y 轴慢转 + 上下浮动（`y≈1.15`，振幅 `0.06`）。因为渲染的是物品栈，**铭文羊皮纸会自动使用"铭文"模型**（由 `corruption:inscribed` 物品属性驱动）。
-6. **小收尾**：
-   - 音效：成功 `SoundEvents.EVOKER_CAST_SPELL`，失败 `SoundEvents.FIRE_EXTINGUISH`。
-   - 腐化代价豁免：`SpellEffects.corrupt` 对**创造/旁观模式**直接返回（与 `PlayerCorruption.cursePulse` 一致）。
-   - 区域腐化开销：改为可变坐标三层循环（先判球内、再摇 `chance`），并**限制单次最多腐化 64 个方块**（`MAX_CORRUPTED_BLOCKS`）。
-
----
-
-## 6. ⚠️ 未验证风险点（**请重点审查**）
-
-> 本会话**只运行了 IDE 诊断**（编辑后全项目 `severity=error` 为 0；被改动文件 `error+warning` 为 0）。**以下全部未在世界中验证**。
-
-1. **`@EventBusSubscriber` 的 bus 假设（风险最高）**
-   项目既有代码用**裸注解** `@EventBusSubscriber(modid = ...)` 同时处理 mod bus 与 game bus 事件（如 `EnergyPouring` 处理 game bus 的 `PlayerInteractEvent`，`ModDataMaps` 处理 mod bus 的 `RegisterDataMapTypesEvent`），因此我沿用了该写法。这意味着：
-   - `ModNetwork` 的 `RegisterPayloadHandlersEvent`（**mod bus**）与
-   - `SpellWheel` 的 `RegisterKeyMappingsEvent`（**mod bus**）+ `ClientTickEvent.Post`（**game bus**）
-   都依赖这个假设。**若假设不成立，网络包不会注册、轮盘按键不会生效**（表现为按 V 无反应、选法不保存）。建议进游戏后先看日志有没有 payload 注册失败/按键未注册的报错。
-2. **`SpellProjectile` 自写 `tick()`**：移动逻辑是从 `ThrowableProjectile#tick` 拷来再换成自己的 `drag`。需要确认：命中判定、`checkInsideBlocks`、与地形碰撞、与发射者自身不误伤（靠 `canHitEntity`）、以及 1.2 的包围盒是否让子弹"提前命中"。
-3. **轮盘交互**：`SpellWheelScreen` 不暂停游戏，按键释放靠 `ClientTickEvent` 检测 `OPEN.isDown()`；若玩家用 Esc 关闭、或切出窗口，`showing` 状态与 `minecraft.screen` 可能不同步（当前逻辑会在下一 tick 自愈，但需实测）。轮盘中心死区为 `size() × 0.1`。
-4. **`dataPackRegistry(ArcaneSpell.REGISTRY, CODEC, CODEC)`**：第二个参数是网络 codec，这里与持久化 codec 同一份（`ArcaneString` 也是这么用的）。
-5. **JEI 类别**：`ArcaneSpellsCategory` 的槽位坐标与文字行距是估着写的，需实测排版；`entries()` 依赖客户端注册表已同步。
-6. **载台 BER**：`y≈1.15`、`ItemDisplayContext.FIXED`、自转速度 1.5°/tick 都是估的，需实测观感。
-7. **tooltip 顺序**：`CarriedEnergyTooltip`（能量行）与 `ArcaneTooltip`（咒文行）都往 `under` 索引插入，**两者的先后由订阅者注册顺序决定**，可能出现「能量行在咒文行上面或下面」的随机表现。
-8. **创造模式标签页**：预刻录魔棒在标签页构建时读 `ArcaneSpell` 注册表 + `corruption_energy_carrier` 数据表，需确认加载时序没问题。
-9. **`ItemInteractionResult` 交互**：`ArcanePedestalBlock.useItemOn` 在客户端直接返回 `SUCCESS`、服务端做实事；`useWithoutItem` 处理空手取回。逻辑上没问题但未实测。
-10. **`corrupt_area` 性能**：半径上限 8（17³ 次循环）、单次上限 64 个方块；`tryInfect` 内部还会做 canInfect/白名单检查，实测时留意是否有卡顿。
-11. **`SpellBolt` 数值**：`drag = 0.99`、无重力、寿命 100 tick —— 手感是否合适需要你判断。
-
-### 已知的"故意留白"
-- **载台方块模型是 `cube_all` 占位**（六面同一张纹理）。若要柱形/凹槽造型，替换 `models/block/corruption_arcane_pedestal.json` 即可。
-- **两张 AI 生成的纹理是草稿**：1024×1024、右下角有淡淡水印「AI生成 WORKBUDDY」；方块贴图常规应为 16×16。`spell_wheel.png` 画的是 **6 个扇区**，而 `Grimoire.CAPACITY = 3`，我按"法术个数"均匀排布文字，所以**文字位置不会落在图上那 6 个扇区里**。
-- 未做：载台放入/取出之外的额外音效粒子、施法前摇动画、魔棒耐久、咒文"遗忘"功能。
+1. **Layering**:
+   - `core/*` = pure mechanics and rules (**no `net.minecraft` dependency**; in this project `core/` has only 2 exceptional files that import MC, and `core/arcane`'s `package-info` explicitly states "no game code", which this implementation honours).
+   - `api/*` = registries, Codecs, DataComponents, data tables, and **base classes for add-on mods to reuse**.
+   - `common/*` = this mod's concrete implementation (blocks/items/entities/screens/effects).
+2. **Why `ArcaneCastingItem` (the wand's attribute shell) lives in api rather than core**: an `Item` subclass must `extends net.minecraft.world.item.Item`, and putting it in `core/arcane` would break that package's "no game code" convention; api, by contrast, is meant for add-ons. **The wand's actual mechanic (`CastingUnit`) is in core**, and `CorruptionArcaneStickItem` in common is a single line.
+3. **The spell id is the same as the inscription id**: the parchment stores a `ResourceKey<ArcaneString>`, and an `ArcaneSpell` is looked up directly by the same location, so no extra spell field needs to be stored on the parchment.
+4. **`ArcaneCasting` is a static assembly point**: core cannot touch MC, while api's `perform` needs a `ServerPlayer`, so api exposes a `World` interface and common `install`s an implementation (`SpellEffects`) in `FMLCommonSetupEvent`. Add-ons can install their own implementation.
+5. **When parchment is consumed**: as the user decided — **consumed only on cast**; inscribing merely "registers" it.
+6. **All effects are data-driven**: adding an effect type = adding a record to `SpellAction` + an entry to `SpellCodecs.Kind` + a case to `SpellEffects`; **the registry does not need to be touched**.
+7. **The casting projectile carries `on_hit`**: this makes "a projectile carrying different effects by type" pure data; `SpellProjectile` only handles flight and hits, handing effects to `ArcaneCasting.World`.
+8. **Entity whitelists**: `summon` / `launch_bolt` can only use entities within the tags, preventing datapacks/add-ons from letting loose something like an ender dragon by accident.
 
 ---
 
-## 7. 会话期间发现但未处理的既有问题
+## 5. Phase D wrap-up details (1-6)
 
-1. `common/block/EerieBlock.java`、`common/infection/InfectionEvents.java` 等使用已弃用的 `LevelReader#hasChunkAt(BlockPos)`。
-2. `common/registry/ModBlocks.java` 使用了已弃用的 `SoundType(float, float, SoundEvent...)` 构造器。
-3. 大量 `common/client/entity/*Geometry.java` / `*Model.java` 存在未使用的局部变量（blockbench 导出的产物）。
-4. `git status` 显示 `assets/corruption/textures/item/corrupted_brass.png` 处于已修改状态——**不是本次会话改的**。
-5. 仓库中 `.gitignore`、`.github/`、`gradle/`、`source/` 均为未跟踪状态；`source/merged_data` 内含反编译 MC 源码（本次被用作 API 参考）。
+1. **Wand tooltip** (`ArcaneTooltip`): lists the 3 inscription slots, the selected one with `▶` + `LIGHT_PURPLE`, empty slots in grey, and a last line "hold %s to select a spell" (the key name comes from `SpellWheel.OPEN.getTranslatedKeyMessage()`). Spell names go through `ArcaneString.meaning`, falling back to the id if unavailable.
+2. **The JEI "Corruption Spells" category** (`ArcaneSpellsCategory`): the input slot = the parchment inscribed with that spell, the output slot = the wand; the text on the right is energy / cooldown / corruption threshold / post-cast corruption. The data comes from `level.registryAccess().lookup(ArcaneSpell.REGISTRY)` (not the recipe manager). Catalysts = pedestal + wand.
+3. **Landing the `SpellBolt` fields** ("implement" rather than "delete the fields" was chosen): `SpellProjectile` changed from `ThrowableProjectile` to **directly extending `Projectile` with a hand-written `tick()`**, retaining velocity per `drag` (0.8 in water), falling per `gravity`, and expiring per `lifetime`; the hit range is set via `getDimensions`, making the bounding box `2×hitRadius` (default 1.2×1.2).
+4. **Entity whitelists**: `ModTags.SPELL_SUMMONS` / `SPELL_BOLTS` + two tag data files; `SpellEffects.summon/launch` reject entities outside the whitelist.
+5. **Pedestal's floating parchment** (`ArcanePedestalRenderer`): renders the `parchment()` item stack with `ItemRenderer.renderStatic`, slowly rotating around the Y axis and bobbing (`y≈1.15`, amplitude `0.06`). Because it renders the item stack, **the inscribed parchment automatically uses the "inscribed" model** (driven by the `corruption:inscribed` item property).
+6. **Small wrap-ups**:
+   - Sounds: success `SoundEvents.EVOKER_CAST_SPELL`, failure `SoundEvents.FIRE_EXTINGUISH`.
+   - Corruption-cost exemption: `SpellEffects.corrupt` returns immediately for **creative/spectator mode** (consistent with `PlayerCorruption.cursePulse`).
+   - Area-corruption cost: changed to a triple nested loop over variable coordinates (first test inside the sphere, then roll `chance`), and **capped at 64 blocks corrupted per cast** (`MAX_CORRUPTED_BLOCKS`).
 
 ---
 
-## 8. 文件清单汇总
+## 6. ⚠️ Unverified risks (**review these closely**)
 
-### 新增 Java（23）
+> This session **only ran IDE diagnostics** (project-wide `severity=error` is 0 after editing; modified files have `error+warning` of 0). **None of the following was verified in a world.**
+
+1. **The bus assumption for `@EventBusSubscriber` (highest risk)**
+   Existing project code uses the **bare annotation** `@EventBusSubscriber(modid = ...)` to handle both mod bus and game bus events (e.g. `EnergyPouring` handles the game bus's `PlayerInteractEvent`, `ModDataMaps` handles the mod bus's `RegisterDataMapTypesEvent`), so I followed that style. This means:
+   - `ModNetwork`'s `RegisterPayloadHandlersEvent` (**mod bus**) and
+   - `SpellWheel`'s `RegisterKeyMappingsEvent` (**mod bus**) + `ClientTickEvent.Post` (**game bus**)
+   all depend on this assumption. **If the assumption does not hold, the network packets will not be registered and the wheel keybind will not take effect** (manifesting as nothing happening on V, and the selection not being saved). After entering the game, first check the log for payload-registration failures / unregistered keybind errors.
+2. **`SpellProjectile`'s hand-written `tick()`**: the movement logic was copied from `ThrowableProjectile#tick` and then switched to its own `drag`. Needs confirmation: hit detection, `checkInsideBlocks`, collision with terrain, not accidentally damaging the shooter itself (via `canHitEntity`), and whether the 1.2 bounding box makes the projectile "hit early".
+3. **Wheel interaction**: `SpellWheelScreen` does not pause the game, and key release is detected via `ClientTickEvent` checking `OPEN.isDown()`; if the player closes with Esc or switches away from the window, the `showing` state and `minecraft.screen` may fall out of sync (the current logic self-heals on the next tick, but this needs testing). The wheel's central dead zone is `size() × 0.1`.
+4. **`dataPackRegistry(ArcaneSpell.REGISTRY, CODEC, CODEC)`**: the second argument is the network codec, and here it is the same as the persistent codec (that is also how `ArcaneString` uses it).
+5. **JEI category**: `ArcaneSpellsCategory`'s slot coordinates and text line spacing were estimated and need layout testing; `entries()` depends on the client registry already being synced.
+6. **Pedestal BER**: `y≈1.15`, `ItemDisplayContext.FIXED`, and the spin speed of 1.5°/tick were all estimated and need visual testing.
+7. **Tooltip order**: `CarriedEnergyTooltip` (the energy line) and `ArcaneTooltip` (the spell lines) both insert at the `under` index, **and their order is determined by subscriber registration order**, so the energy line may appear above or below the spell lines unpredictably.
+8. **Creative mode tab**: the pre-inscribed wands read the `ArcaneSpell` registry + the `corruption_energy_carrier` data table when the tab is built, so the load ordering needs confirmation.
+9. **`ItemInteractionResult` interaction**: `ArcanePedestalBlock.useItemOn` returns `SUCCESS` directly on the client while the server does the real work; `useWithoutItem` handles taking it back with an empty hand. Logically fine, but untested.
+10. **`corrupt_area` performance**: radius cap of 8 (17³ iterations), a cap of 64 blocks per cast; `tryInfect` also does canInfect/whitelist checks internally, so watch for lag during testing.
+11. **`SpellBolt` numbers**: `drag = 0.99`, no gravity, lifetime 100 ticks — whether the feel is right is for you to judge.
+
+### Known "intentional gaps"
+- **The pedestal block model is a `cube_all` placeholder** (the same texture on all six faces). If you want a pillar/groove shape, just replace `models/block/corruption_arcane_pedestal.json`.
+- **The two AI-generated textures are drafts**: 1024×1024, with a faint "AI生成 WORKBUDDY" watermark in the bottom-right corner; block textures should normally be 16×16. `spell_wheel.png` is drawn with **6 sectors**, while `Grimoire.CAPACITY = 3`, and I lay the text out evenly by "number of spells", so **the text positions will not fall within those 6 sectors in the image**.
+- Not done: extra sounds/particles for inserting/removing on the pedestal, a casting wind-up animation, wand durability, and a spell "forget" function.
+
+---
+
+## 7. Pre-existing issues noticed during the session but not addressed
+
+1. `common/block/EerieBlock.java`, `common/infection/InfectionEvents.java`, etc. use the deprecated `LevelReader#hasChunkAt(BlockPos)`.
+2. `common/registry/ModBlocks.java` uses the deprecated `SoundType(float, float, SoundEvent...)` constructor.
+3. Many `common/client/entity/*Geometry.java` / `*Model.java` files have unused local variables (Blockbench export artifacts).
+4. `git status` shows `assets/corruption/textures/item/corrupted_brass.png` as modified — **not changed in this session**.
+5. In the repository, `.gitignore`, `.github/`, `gradle/`, and `source/` are all untracked; `source/merged_data` contains decompiled MC source (used as an API reference this session).
+
+---
+
+## 8. File manifest summary
+
+### New Java (23)
 ```
 core/arcane/SpellAction.java
 core/arcane/SpellRule.java
@@ -324,9 +324,9 @@ common/client/SpellWheelScreen.java
 common/client/ArcanePedestalRenderer.java
 common/compat/jei/ArcaneSpellsCategory.java
 ```
-（23 个，上表按层列出）
+(23 in total; the table above lists them by layer.)
 
-### 修改 Java（12）
+### Modified Java (12)
 ```
 Corruption.java
 common/registry/ModItems.java
@@ -342,7 +342,7 @@ common/client/ArcaneTooltip.java
 common/compat/jei/CorruptionJeiPlugin.java
 ```
 
-### 新增数据 / 资源（18）
+### New data / resources (18)
 ```
 data/corruption/corruption/arcane_spell/{transmutation,corruption,baal,agares}.json
 data/corruption/recipe/arcane_transmutation/{stick_to_corruption_stick,wand_charge}.json
@@ -355,7 +355,7 @@ assets/corruption/textures/block/block_corruption_arcane_pedestal.png
 assets/corruption/textures/gui/spell_wheel.png
 ```
 
-### 修改数据 / 资源（4）
+### Modified data / resources (4)
 ```
 data/corruption/data_maps/item/corruption_fuel.json
 data/corruption/data_maps/item/corruption_energy_carrier.json
@@ -363,19 +363,98 @@ assets/corruption/lang/zh_cn.json
 assets/corruption/lang/en_us.json
 ```
 
-### 删除（16）
+### Deleted (16)
 ```
-（见 1.2 的 15 个旧版残留文件 + 本会话创建后又废弃的旧配方 stick_to_corruption_stick.json）
+(see the 15 old-version leftover files in 1.2 + the old recipe stick_to_corruption_stick.json created then abandoned this session)
 ```
 
 ---
 
-## 9. 建议的审查顺序
+## 9. Suggested review order
 
-1. **core/arcane/** 6 个文件 —— 规则是否合理、`CastingUnit` 的复用性是否达标。
-2. **api/arcane/SpellCodecs.java** —— 递归 codec 与 dispatch 的正确性、字段命名。
-3. **api/arcane/ArcaneCastingItem.java** —— 施法结算顺序（校验→扣费→执行→冷却）、客户端/服务端分支。
-4. **common/arcane/SpellEffects.java** —— 6 种效果的副作用、创造模式豁免、64 方块上限。
-5. **common/entity/SpellProjectile.java** —— 自写 `tick()` 的物理与命中。
-6. **common/registry/ModRegistries.java + ModDataComponents.java** —— 注册时序。
-7. **第 6 节的 11 条风险点** —— 尤其第 1 条（bus 假设）。
+1. **core/arcane/** — the 6 files: whether the rules are reasonable and whether `CastingUnit`'s reusability is adequate.
+2. **api/arcane/SpellCodecs.java** — the correctness of the recursive codec and dispatch, and field naming.
+3. **api/arcane/ArcaneCastingItem.java** — the cast resolution order (check → charge → execute → cooldown) and the client/server branches.
+4. **common/arcane/SpellEffects.java** — the side effects of the 6 effects, the creative-mode exemption, and the 64-block cap.
+5. **common/entity/SpellProjectile.java** — the physics and hits of its hand-written `tick()`.
+6. **common/registry/ModRegistries.java + ModDataComponents.java** — registration ordering.
+7. **The 11 risk points in section 6** — especially point 1 (the bus assumption).
+
+---
+
+## 10. Review fixes (follow-up session)
+
+A review of this session's code found the issues below; all are fixed, and the build now **compiles and passes the full test suite** (previously never built). Items marked *supersedes* change a statement made earlier in this document.
+
+### Bugs fixed
+
+| # | Problem | Fix |
+|---|---|---|
+| 1 | A spell bolt's `on_hit` actions ran **around the caster**, not where the bolt struck (`ArcaneCasting.World.perform` had no position), so the `corruption` spell's bolt never hurt its target and hurt whatever stood next to the caster. | **API change** (*supersedes* §1.3 `ArcaneCasting`): `World.perform(ServerPlayer caster, Origin origin, SpellAction action)`. `ArcaneCasting.Origin(at, launch, direction)`: `Origin.of(caster)` for hand casts (centre of the caster; bolts leave from just under the eyes along the gaze), `Origin.impact(point, flying)` for a bolt's strike. Every action now works round its origin; the caster is never caught in their own spell's harm. |
+| 2 | The spell wheel closed **one tick after opening**: `Minecraft.setScreen` releases every key mapping, and an `IN_GAME` key reads as up while any screen is open. Only the first spell taught was ever usable. | `SpellWheel` opens on a fresh press (`consumeClick`), and `SpellWheelScreen` closes itself when the key is physically let go (polled from GLFW, plus `keyReleased` / `mouseReleased`). Escape closes it without choosing; a key held through Escape does not reopen it until let go. |
+| 3 | Charging a wand in the transmuter **wiped its taught spells** (and name, enchantments): `assemble` returned a fresh copy of the result. | `ArcaneTransmutationRecipe.assemble`: when the result is the same item as the input, the input is kept with the result's components laid over it. `ArcaneTransmuterBlockEntity` no longer runs a transmutation that would change nothing, so a full wand is not charged (and billed) again. |
+| 4 | The pedestal **dropped nothing**: `requiresCorrectToolForDrops()`, but no loot table and not in `mineable/pickaxe`. | Added `loot_table/blocks/corruption_arcane_pedestal.json` and the pickaxe tag entry. |
+| 5 | The pedestal kept **showing the parchment after it was taken**: an empty update tag is ignored by NeoForge, so the client never cleared. | `getUpdateTag` always writes the `Parchment` key, empty or not. |
+
+### Smaller fixes
+
+- **Summons** (*supersedes* §3 `summon`): creatures are finalized as the game spawns any mob (`MOB_SUMMONED`; skeletons get bows, etc.), set down where they fit, and remember their summoner (`common/arcane/SpellSummons`): they never target the summoner or the summoner's other summons.
+- **Pedestal clicks**: an empty pedestal now passes on items it has no use for, so blocks can be placed against it (it used to swallow every right-click).
+- **`corrupt_area`** tries blocks nearest-first (ties in random order), so the 64-block cap no longer favours one corner.
+- **Hit reach** (*supersedes* §5-3): the bolt's `getDimensions` override was removed; it now does its own hit test with `SpellBolt.hitRadius` as the margin round targets' hit boxes (vanilla uses 0.3). Blocks are still struck only by flying into them.
+- **Casting** (*supersedes* §2 step 5 and `SpellCasting.Check`):
+  - New check `TOO_CORRUPTED`: a cast that would bring the caster to the corruption maximum (20, conversion death) is refused (`message.corruption.spell_too_corrupted`). Since `core/arcane` must stay `java.*`-only, the limit reaches the rules through `Caster.corruptionLimit()`.
+  - **Creative play** casts for free: no energy, parchment or corruption requirement or cost; the cooldown still applies (`Caster.free()`).
+  - `CastingUnit.caster(Situation, Payment)` with `CastingUnit.Situation(corruption, corruptionLimit, parchments, cooling, free)`; the old four-argument `caster(...)` is kept.
+  - Corruption gain goes through `PlayerCorruptionApi.increase`.
+  - The client no longer swings the arm before the server has decided; the server swings it on a successful cast.
+- **JEI**: the "Corruption Spells" output shows the wand taught that spell.
+
+### Risk points in §6, resolved
+
+1. **Event bus**: not a risk. In FML 4.0.4x the `bus` attribute of `@EventBusSubscriber` is ignored and each event goes to the bus it belongs to.
+3. **Wheel**: was broken; fixed (bug 2 above).
+9. **Pedestal interaction**: fixed (pedestal clicks above).
+2, 4, 5, 8, 10: checked by reading and by the tests; 6, 7, 11 still need an in-game look.
+
+### Tests added
+
+- `core/arcane/SpellCastingTest`: grimoire rules, check order, payment, free casting, the corruption limit, `CastingUnit`.
+- `api/arcane/SpellCodecsTest`: the four spell files parse and round-trip; nested `on_hit`; bad data is refused.
+- `common/arcane/SpellServerTest`: a survival cast's costs and cooldown, the corruption limit, creative casting, summons (armed, loyal, tag-limited), nearest-first corruption, and the pedestal (clicks, teaching, client sync, pickaxe, drop).
+- `common/entity/SpellProjectileServerTest`: a bolt's payload is carried out where it struck.
+- `common/transmutation/ArcaneTransmuterServerTest`: a charged wand keeps its spells and name; a full wand is not charged again.
+- Two stale tests were updated for data added since they were written (the `altar/emerald` rite; the two new fuel entries, whose values are now checked).
+
+---
+
+## 11. Pedestal model and GUI, dynamic spell wheel, per-tool capacity
+
+### Casting units differ in capacity
+- `CastingUnit(grimoire, energy, capacity)` and `ArcaneCastingItem(properties, step, capacity)`: how many spells a casting tool has room for is the tool's, not a global constant. The mod's wand keeps `Grimoire.CAPACITY = 3`; an add-on tool may have 6, 8 or more. The wand tooltip, the pedestal GUI and the spell wheel all follow the held tool's capacity.
+- `Grimoire.checkAt(slot, spell, capacity)` / `writtenAt(...)`, `CastingUnit.checkAt(slot, spell)` / `writingAt(slot, spell)`: a spell is written into the next free slot, or over an already written one (the chosen spell stays chosen); never twice in one grimoire, never leaving gaps.
+
+### Arcane pedestal: real model and textures
+- Built in Blockbench by `gamemodels/arcane_pedestal/build_pedestal.py` (project `arcane_pedestal.bbmodel`, exported to `models/block/corruption_arcane_pedestal.json`, parent `minecraft:block/block`): foot, plinth, brass band, rune-lit arcane-brick shaft, brass neck and a capital whose plate (top at 14 px) bears a violet seal. Where two parts meet only the wider face is kept, so no faces are coplanar.
+- 16x16 textures from `draw_pedestal.py`: `block_corruption_arcane_pedestal_{side,top,stone,trim}.png`; the side texture's rows match the parts' heights. The 1024x1024 AI draft `block_corruption_arcane_pedestal.png` is deleted.
+- `ArcanePedestalBlock`'s outline/collision shape is now the six parts (a test checks it equals the model).
+
+### Arcane pedestal: GUI instead of instant use
+- Right-click (anything in hand) opens `ArcanePedestalMenu` / `ArcanePedestalScreen` (`gui_corruption_arcane_pedestal.png`, drawn by `draw_pedestal_gui.py` in the lectern's style). The block entity is a two-slot container: inscribed parchment and casting tool (one each; no hopper access); both are synced to nearby clients (update tag always written) and dropped when broken.
+- The frame shows the tool's slots, as many as its capacity (six to a row, shrinking beyond three rows). Click a slot to choose where to write (default: first free; a written slot is written over); Inscribe sends `clickMenuButton(slot)`, which the server re-checks. A status line explains what will happen or why not (`NO_PARCHMENT`, `NO_WAND`, `NO_SPELL`, `ALREADY_KNOWN`, `NO_ROOM`). Teaching still costs nothing.
+- The renderer floats the parchment (scaled 0.6) above the plate and lays the wand flat just over it.
+- Lang: new `container.corruption.corruption_arcane_pedestal`, `gui.corruption.pedestal.*`; the instant-use `message.corruption.pedestal_*` keys are removed.
+
+### Spell wheel: dynamic sectors
+- One sector per slot of the held tool (`SpellWheelScreen(grimoire, capacity)`), slot 1 straight up, clockwise; drawn at runtime as translucent quads (`RenderType.gui()`): written sectors alternate shades, empty ones are dim and cannot be chosen, the chosen one is violet with a bright rim, the wand's current spell has a gold mark on the rim; the chosen name is shown under the wheel. Labels wrap/shorten and scale down for many sectors. The central medallion is the dead zone.
+- Geometry in `common/client/WheelSectors` (no Minecraft imports, tested).
+- `textures/gui/spell_wheel.png` (the 1024x1024 AI draft with 6 baked sectors) is replaced by a 256x256 ornament from `gamemodels/spell_wheel/draw_wheel.py`: an outer rune ring and a central medallion, nothing baked between them; the script also renders previews for 3 and 8 slots.
+- New lang key `gui.corruption.spell_wheel.empty`.
+
+### Tests
+- `core/arcane/SpellCastingTest`: writing into a chosen slot, per-unit capacity.
+- `common/arcane/ArcanePedestalAssetsTest`: no fighting faces, whole pixels, 16x16 textures, outline equals model, old draft gone.
+- `common/arcane/ArcanePedestalMenuServerTest`: slot rules, opening the screen, writing into the next free slot and over a written one, refusals and invalid ids, shift-click routing, client sync, spilling when broken, the layout for 1-30 slots, and the GUI texture agreeing with the code.
+- `common/client/WheelSectorsTest`: sector geometry for 1-12 slots, dead zone, empty slots not choosable.
+- `SpellServerTest`'s pedestal test now checks only what still applies (pickaxe, drops itself).
+

@@ -12,14 +12,14 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.projectile.ItemSupplier;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
@@ -27,8 +27,9 @@ import net.neoforged.neoforge.event.EventHooks;
 /**
  * A spell bolt: the casting entity a spell's {@link SpellAction.LaunchBolt} flies. It carries the actions of
  * its "on_hit" — written out in the spell's own data — and carries them out where it strikes, so what a bolt
- * does is data. How it flies is {@link SpellBolt}: it keeps that share of its speed each tick, is pulled down
- * as it goes, is spent once it has flown long enough, and strikes what comes within that reach of it.
+ * does is data, and it does it where it strikes, round that point. How it flies is {@link SpellBolt}: it keeps
+ * that share of its speed each tick, is pulled down as it goes, is spent once it has flown long enough, and
+ * strikes a creature its line of flight passes within that reach of, or a block it flies into.
  *
  * <p>Its owner must be a player for the payload to tell who cast it; a bolt with any other owner hits nothing.
  */
@@ -38,9 +39,6 @@ public final class SpellProjectile extends Projectile implements ItemSupplier {
     private static final String ON_HIT = "OnHit";
     /** What it keeps of its speed a tick in water, as thrown things do. */
     private static final float WATER_DRAG = 0.8F;
-    /** How near it comes to strike: the box it is tested for hits with, as wide as the bolt's own reach. */
-    private static final EntityDimensions DIMENSIONS = EntityDimensions.scalable(
-            (float) (SpellBolt.DEFAULT.hitRadius() * 2.0), (float) (SpellBolt.DEFAULT.hitRadius() * 2.0));
 
     private List<SpellAction> onHit = List.of();
 
@@ -50,7 +48,6 @@ public final class SpellProjectile extends Projectile implements ItemSupplier {
     public SpellProjectile carrying(List<SpellAction> actions) { onHit = List.copyOf(actions); return this; }
 
     @Override public ItemStack getItem() { return LOOK; }
-    @Override public EntityDimensions getDimensions(Pose pose) { return DIMENSIONS; }
     @Override protected void defineSynchedData(SynchedEntityData.Builder builder) {}
     @Override protected double getDefaultGravity() { return SpellBolt.DEFAULT.gravity(); }
 
@@ -60,7 +57,7 @@ public final class SpellProjectile extends Projectile implements ItemSupplier {
      */
     @Override public void tick() {
         super.tick();
-        HitResult hit = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
+        HitResult hit = strike();
         if (hit.getType() != HitResult.Type.MISS && !EventHooks.onProjectileImpact(this, hit)) hitTargetOrDeflectSelf(hit);
         checkInsideBlocks();
         Vec3 move = getDeltaMovement();
@@ -74,12 +71,28 @@ public final class SpellProjectile extends Projectile implements ItemSupplier {
         } else if (tickCount > SpellBolt.DEFAULT.lifetime()) discard();
     }
 
-    /** Where it strikes, what it carried is carried out, and the bolt is spent. */
+    /**
+     * What it strikes this tick, if anything: the first block on its way, or a creature it passes within its
+     * reach of before that, whichever comes first.
+     */
+    private HitResult strike() {
+        Vec3 from = position(), move = getDeltaMovement(), to = from.add(move);
+        HitResult block = level().clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+        if (block.getType() != HitResult.Type.MISS) to = block.getLocation();
+        double reach = SpellBolt.DEFAULT.hitRadius();
+        EntityHitResult creature = ProjectileUtil.getEntityHitResult(level(), this, from, to, getBoundingBox().expandTowards(move).inflate(1.0 + reach),
+                this::canHitEntity, (float) reach);
+        return creature != null ? creature : block;
+    }
+
+    /** Where it strikes, what it carried is carried out round that point, and the bolt is spent. */
     @Override protected void onHit(HitResult result) {
         super.onHit(result);
         if (!(level() instanceof ServerLevel)) return;
-        if (getOwner() instanceof ServerPlayer caster)
-            for (SpellAction action : onHit) ArcaneCasting.world().perform(caster, action);
+        if (getOwner() instanceof ServerPlayer caster) {
+            ArcaneCasting.Origin struck = ArcaneCasting.Origin.impact(result.getLocation(), getDeltaMovement());
+            for (SpellAction action : onHit) ArcaneCasting.world().perform(caster, struck, action);
+        }
         discard();
     }
 
