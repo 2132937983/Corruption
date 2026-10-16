@@ -11,5 +11,18 @@ public final class ModAttachments {
     public static final DeferredRegister<AttachmentType<?>> TYPES=DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES,Corruption.MOD_ID);
     public static final DeferredHolder<AttachmentType<?>,AttachmentType<Integer>> PLAYER_CORRUPTION=TYPES.register("player_corruption",
         ()->AttachmentType.builder(()->0).serialize(Codec.intRange(0,PlayerCorruptionApi.max())).copyOnDeath().sync(ByteBufCodecs.VAR_INT).build());
+    /**
+     * A player's corruption as it was before a corrupted robe took hold of it, given back when the robe comes off
+     * (CorruptedRobeRules.step); -1 while no robe holds it. Saved, so the robe's hold outlasts leaving the game; not kept
+     * through death, which takes all of a player's corruption (PlayerCorruption.clone), so there is nothing to give back.
+     */
+    public static final DeferredHolder<AttachmentType<?>,AttachmentType<Integer>> CORRUPTION_KEPT=TYPES.register("corruption_kept",
+        ()->AttachmentType.builder(()->com.miophas.corruption.core.corruption.CorruptedRobeRules.NOTHING_KEPT).serialize(Codec.intRange(-1,PlayerCorruptionApi.max())).build());
+    /**
+     * What a corrupted robe holds a player's corruption at: what it was, or the grade's threshold if that is higher
+     * (CorruptedRobeRules.step); -1 while no robe holds it. Saved, and not kept through death, as CORRUPTION_KEPT.
+     */
+    public static final DeferredHolder<AttachmentType<?>,AttachmentType<Integer>> CORRUPTION_HELD=TYPES.register("corruption_held",
+        ()->AttachmentType.builder(()->com.miophas.corruption.core.corruption.CorruptedRobeRules.NOTHING_KEPT).serialize(Codec.intRange(-1,PlayerCorruptionApi.max())).build());
     private ModAttachments(){}
 }

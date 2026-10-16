@@ -1,40 +1,100 @@
 {
-  "energy": "7KCE",
-  "cooldown": 100,
-  "min_corruption": 12,
+  "energy": "2KCE",
+  "cooldown": 40,
+  "min_corruption": 5,
   "corruption_gain": 1,
   "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:wings",
+      "radius": 6,
+      "height": 1.5,
+      "ticks": 40,
+      "color": "#3A6AB0",
+      "accent": "#E0F4FF"
+    },
     {
       "type": "weather",
       "sky": "rain",
       "ticks": 2400
     },
     {
-      "type": "push",
-      "radius": 8,
-      "strength": 1.6,
-      "lift": 0.6
-    },
-    {
-      "type": "apply_effect",
-      "effect": "minecraft:slowness",
-      "target": "nearby",
-      "radius": 8,
-      "duration": 200,
-      "amplifier": 1
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#2A5AA0",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#2A5AA0"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#2A5AA0"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:tidal_wave",
+          "radius": 20,
+          "height": 3,
+          "ticks": 50,
+          "color": "#2A5AA0",
+          "accent": "#C0F0FF",
+          "shake": 0.3,
+          "sound": "minecraft:entity.player.splash.high_speed"
+        },
+        {
+          "type": "damage",
+          "amount": 52,
+          "radius": 20
+        },
+        {
+          "type": "push",
+          "radius": 20,
+          "strength": 2,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 20,
+          "duration": 80,
+          "amplifier": 1
+        }
+      ]
     },
     {
       "type": "particles",
       "shape": "ring",
-      "radius": 8,
+      "radius": 6,
       "particles": [
         {
           "particle": "minecraft:splash",
-          "count": 60
+          "count": 40
         },
         {
           "particle": "minecraft:cloud",
-          "count": 24,
+          "count": 16,
           "spread": 0.2,
           "speed": 0.02
         }

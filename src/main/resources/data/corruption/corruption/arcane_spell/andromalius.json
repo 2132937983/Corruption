@@ -1,9 +1,19 @@
 {
-  "energy": "10KCE",
-  "cooldown": 100,
-  "min_corruption": 14,
+  "energy": "3KCE",
+  "cooldown": 40,
+  "min_corruption": 10,
   "corruption_gain": 1,
   "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:eye",
+      "radius": 4.4,
+      "height": 5,
+      "ticks": 50,
+      "color": "#C01010",
+      "accent": "#FF6060",
+      "sound": "minecraft:entity.elder_guardian.curse"
+    },
     {
       "type": "launch_bolt",
       "speed": 1.8,
@@ -28,29 +38,47 @@
       ],
       "on_hit": [
         {
+          "type": "visual",
+          "effect": "corruption:chains",
+          "radius": 8,
+          "height": 1,
+          "ticks": 50,
+          "color": "#2E7D32",
+          "accent": "#B0FF90",
+          "sound": "minecraft:block.chain.place"
+        },
+        {
           "type": "push",
-          "radius": 6,
+          "radius": 12,
           "strength": -1.2,
           "lift": 0.3
         },
         {
           "type": "damage",
-          "amount": 12,
-          "radius": 4
+          "amount": 60,
+          "radius": 10
         },
         {
           "type": "apply_effect",
           "effect": "minecraft:poison",
           "target": "nearby",
-          "radius": 4,
+          "radius": 10,
           "duration": 200,
+          "amplifier": 2
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 10,
+          "duration": 100,
           "amplifier": 2
         },
         {
           "type": "apply_effect",
           "effect": "minecraft:glowing",
           "target": "nearby",
-          "radius": 4,
+          "radius": 10,
           "duration": 600
         }
       ]

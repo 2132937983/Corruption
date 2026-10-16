@@ -63,6 +63,7 @@ public final class Greed extends AnchoredLivingPlant {
         return target != null && target != this && target.isAlive() && !target.isSpectator()
                 && !CorruptionFactionApi.isRemnant(target)
                 && (!(target instanceof Player player) || !player.isCreative())
+                && !com.miophas.corruption.api.corruption.CorruptionVeilApi.hiddenFrom(target, this)
                 && getBoundingBox().distanceToSqr(target.getBoundingBox().getCenter()) <= detectionRange() * detectionRange();
     }
     private boolean visible(LivingEntity target, int head) {

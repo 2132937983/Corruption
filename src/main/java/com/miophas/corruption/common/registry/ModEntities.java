@@ -44,6 +44,14 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.SpellVisualEntity>> SPELL_VISUAL = TYPES.register("spell_visual",
             () -> EntityType.Builder.<com.miophas.corruption.common.entity.SpellVisualEntity>of(com.miophas.corruption.common.entity.SpellVisualEntity::new, MobCategory.MISC)
                     .noSave().fireImmune().sized(.1F, .1F).clientTrackingRange(12).updateInterval(Integer.MAX_VALUE).build("corruption:spell_visual"));
+    /** A spell's beam as it fires: kept at its caster's hand and turned as they look; drawn from them on the client; never saved. */
+    public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.SpellBeamEntity>> SPELL_BEAM = TYPES.register("spell_beam",
+            () -> EntityType.Builder.<com.miophas.corruption.common.entity.SpellBeamEntity>of(com.miophas.corruption.common.entity.SpellBeamEntity::new, MobCategory.MISC)
+                    .noSave().fireImmune().sized(.1F, .1F).clientTrackingRange(16).updateInterval(1).build("corruption:spell_beam"));
+    /** A boss's beam (the beam skill): stood where it leaves the boss and turned every tick by the skill; never saved. */
+    public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.DemonBeamEntity>> DEMON_BEAM = TYPES.register("demon_beam",
+            () -> EntityType.Builder.<com.miophas.corruption.common.entity.DemonBeamEntity>of(com.miophas.corruption.common.entity.DemonBeamEntity::new, MobCategory.MISC)
+                    .noSave().fireImmune().sized(.1F, .1F).clientTrackingRange(16).updateInterval(1).build("corruption:demon_beam"));
     public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.CorruptLightning>> CORRUPT_LIGHTNING = TYPES.register("corrupt_lightning",
             () -> EntityType.Builder.<com.miophas.corruption.common.entity.CorruptLightning>of(com.miophas.corruption.common.entity.CorruptLightning::new, MobCategory.MISC)
                     .noSave().sized(0, 0).clientTrackingRange(16).updateInterval(Integer.MAX_VALUE).build("corruption:corrupt_lightning"));
@@ -72,6 +80,16 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.Andromalius>> ANDROMALIUS = TYPES.register("andromalius",
             () -> EntityType.Builder.of(com.miophas.corruption.common.entity.Andromalius::new, MobCategory.MONSTER)
                     .sized(2F, 4F).eyeHeight(3.7F).fireImmune().clientTrackingRange(10).build("corruption:andromalius"));
+    /** Dantalion, the seventy-first spirit: a great flying book, then a mirror standing taller (his own box changes as he does). */
+    public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.Dantalion>> DANTALION = TYPES.register("dantalion",
+            () -> EntityType.Builder.of(com.miophas.corruption.common.entity.Dantalion::new, MobCategory.MONSTER)
+                    .sized(com.miophas.corruption.core.demon.DantalionRules.BOOK_WIDTH, com.miophas.corruption.core.demon.DantalionRules.BOOK_HEIGHT)
+                    .fireImmune().clientTrackingRange(10).build("corruption:dantalion"));
+    /** Seere, the seventieth spirit: a winged horse, fast on the ground and in the sky (sent to clients the oftener for it). */
+    public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.Seere>> SEERE = TYPES.register("seere",
+            () -> EntityType.Builder.of(com.miophas.corruption.common.entity.Seere::new, MobCategory.MONSTER)
+                    .sized(com.miophas.corruption.core.demon.SeereRules.WIDTH, com.miophas.corruption.core.demon.SeereRules.HEIGHT).eyeHeight(2.6F)
+                    .fireImmune().clientTrackingRange(12).updateInterval(2).build("corruption:seere"));
 
     @SubscribeEvent
     public static void attributes(EntityAttributeCreationEvent event) {
@@ -82,6 +100,8 @@ public final class ModEntities {
         event.put(BAAL.get(), com.miophas.corruption.common.entity.Baal.attributes().build());
         event.put(AGARES.get(), com.miophas.corruption.common.entity.Agares.attributes().build());
         event.put(ANDROMALIUS.get(), com.miophas.corruption.common.entity.Andromalius.attributes().build());
+        event.put(DANTALION.get(), com.miophas.corruption.common.entity.Dantalion.attributes().build());
+        event.put(SEERE.get(), com.miophas.corruption.common.entity.Seere.attributes().build());
     }
 
     private ModEntities() {}

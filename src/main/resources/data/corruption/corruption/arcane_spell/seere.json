@@ -1,12 +1,60 @@
 {
-  "energy": "9KCE",
+  "energy": "2KCE",
   "cooldown": 20,
   "corruption_gain": 1,
   "actions": [
     {
+      "type": "visual",
+      "effect": "corruption:shockwave",
+      "radius": 18,
+      "height": 1.5,
+      "ticks": 18,
+      "color": "#C0E8FF",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:rift",
+      "radius": 3.6,
+      "height": 2,
+      "ticks": 35,
+      "color": "#FFFFFF",
+      "accent": "#9AE0FF",
+      "sound": "minecraft:entity.enderman.teleport"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:wings",
+      "radius": 6,
+      "height": 1.5,
+      "ticks": 35,
+      "color": "#C0E8FF",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "damage",
+      "amount": 44,
+      "radius": 18
+    },
+    {
+      "type": "push",
+      "radius": 18,
+      "strength": 1.6,
+      "lift": 0.4,
+      "from": "caster"
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slowness",
+      "target": "nearby",
+      "radius": 18,
+      "duration": 80,
+      "amplifier": 1
+    },
+    {
       "type": "particles",
       "shape": "burst",
-      "radius": 1,
+      "radius": 2,
       "particles": [
         {
           "particle": "minecraft:reverse_portal",
@@ -24,13 +72,13 @@
     },
     {
       "type": "teleport",
-      "distance": 48
+      "distance": 64
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:speed",
       "target": "self",
-      "duration": 600,
+      "duration": 1200,
       "amplifier": 3
     }
   ]

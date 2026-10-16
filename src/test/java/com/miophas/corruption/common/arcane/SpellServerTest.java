@@ -98,7 +98,7 @@ class SpellServerTest {
             player.getInventory().setItem(5, parchment(AGARES, 2));
             try {
                 assertEquals(InteractionResult.SUCCESS, cast(level, player));
-                assertEquals(18_000, energy(wand), "agares costs 2 KCE");
+                assertEquals(19_000, energy(wand), "agares costs 1 KCE");
                 assertEquals(1, player.getInventory().getItem(5).getCount(), "and one parchment");
                 assertEquals(1, PlayerCorruption.value(player), "and leaves its caster a little more corrupted");
                 assertTrue(player.hasEffect(MobEffects.DAMAGE_RESISTANCE), "what it does: resistance for its caster");
@@ -106,7 +106,7 @@ class SpellServerTest {
                 player.getCooldowns().removeCooldown(wand.getItem());
                 player.setData(ModAttachments.PLAYER_CORRUPTION, 19);
                 assertEquals(InteractionResult.FAIL, cast(level, player), "one more would leave its caster wholly corrupted");
-                assertEquals(18_000, energy(wand), "and a spell not cast costs nothing");
+                assertEquals(19_000, energy(wand), "and a spell not cast costs nothing");
                 assertEquals(19, PlayerCorruption.value(player));
                 player.setData(ModAttachments.PLAYER_CORRUPTION, 0);
                 player.getInventory().setItem(5, ItemStack.EMPTY);

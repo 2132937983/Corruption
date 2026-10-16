@@ -1,18 +1,63 @@
 {
-  "energy": "6KCE",
-  "cooldown": 200,
-  "min_corruption": 10,
+  "energy": "2KCE",
+  "cooldown": 60,
+  "min_corruption": 3,
   "corruption_gain": 1,
   "actions": [
     {
-      "type": "summon",
-      "entity": "minecraft:stray",
-      "count": 2
+      "type": "visual",
+      "effect": "corruption:blades",
+      "radius": 8,
+      "height": 6,
+      "ticks": 60,
+      "color": "#C8D0E0",
+      "accent": "#FFFFFF",
+      "sound": "minecraft:entity.player.attack.sweep"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:feathers",
+      "radius": 5,
+      "ticks": 40,
+      "color": "#E8E8F0",
+      "accent": "#FFFFFF"
     },
     {
       "type": "give_item",
       "item": "minecraft:arrow",
-      "count": 16
+      "count": 32
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 2.6,
+      "count": 7,
+      "fan": 30,
+      "look": "minecraft:arrow",
+      "trail": [
+        {
+          "particle": "minecraft:crit",
+          "count": 1
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:crit",
+          "count": 8,
+          "spread": 0.2
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "damage",
+          "amount": 24,
+          "radius": 4
+        }
+      ]
+    },
+    {
+      "type": "summon",
+      "entity": "minecraft:stray",
+      "count": 3
     },
     {
       "type": "particles",

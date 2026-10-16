@@ -245,6 +245,8 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
 
     /** What the rite took is gone, what it brought forth appears, and the offering stops binding. */
     private void complete(Level level, AltarRecipe recipe, AltarInput input) {
+        // What it brings forth is made before what it takes is gone: it may keep what was set on one of those things.
+        ItemStack made = recipe.assemble(input, level.registryAccess());
         int[] used = recipe.pillarsUsed(input);
         List<AltarPillarBlockEntity> pillars = pillars(level);
         for (int slot : used == null ? new int[0] : used) {
@@ -257,11 +259,11 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
             bound.discard();
         }
         Vec3 top = top();
-        recipe.result().item().ifPresent(item -> {
-            ItemEntity drop = new ItemEntity(level, top.x, top.y + .1, top.z, item.copy(), 0, .15, 0);
+        if (!made.isEmpty()) {
+            ItemEntity drop = new ItemEntity(level, top.x, top.y + .1, top.z, made, 0, .15, 0);
             drop.setDefaultPickUpDelay();
             level.addFreshEntity(drop);
-        });
+        }
         recipe.result().creature().ifPresent(type -> summon(level, type, top));
         level.playSound(null, worldPosition, SoundEvents.EVOKER_CAST_SPELL, SoundSource.BLOCKS, 1, .8F);
         stop();

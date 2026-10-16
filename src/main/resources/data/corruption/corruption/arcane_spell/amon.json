@@ -1,19 +1,107 @@
 {
-  "energy": "3KCE",
-  "cooldown": 40,
+  "energy": "2KCE",
+  "cooldown": 30,
+  "min_corruption": 3,
   "corruption_gain": 1,
   "actions": [
     {
-      "type": "damage",
-      "amount": 8.0,
-      "radius": 5.0
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#FF4020",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#FF4020"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#FF4020"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:hellfire",
+          "radius": 18,
+          "height": 3,
+          "ticks": 50,
+          "color": "#FF4020",
+          "accent": "#FFC060",
+          "shake": 0.25,
+          "sound": "minecraft:entity.blaze.shoot"
+        },
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 18,
+          "height": 1.5,
+          "ticks": 18,
+          "color": "#FF4020",
+          "accent": "#FFC060"
+        },
+        {
+          "type": "damage",
+          "amount": 48,
+          "radius": 18
+        },
+        {
+          "type": "push",
+          "radius": 18,
+          "strength": 1.4,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 18,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "ignite_area",
+          "radius": 18,
+          "seconds": 8
+        }
+      ]
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:glowing",
       "target": "nearby",
-      "radius": 12,
+      "radius": 24,
       "duration": 600
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 6,
+      "particles": [
+        {
+          "particle": "minecraft:flame",
+          "count": 40,
+          "spread": 0.05,
+          "speed": 0.02
+        }
+      ]
     }
   ]
 }

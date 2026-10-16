@@ -1,19 +1,51 @@
 {
-  "energy": "6KCE",
-  "cooldown": 200,
-  "min_corruption": 10,
+  "energy": "2KCE",
+  "cooldown": 60,
+  "min_corruption": 5,
   "corruption_gain": 1,
   "actions": [
     {
-      "type": "give_item",
-      "item": "minecraft:gold_nugget",
-      "count": 6
+      "type": "visual",
+      "effect": "corruption:alchemy",
+      "radius": 6,
+      "height": 3,
+      "ticks": 60,
+      "color": "#FF4030",
+      "accent": "#FFD24A",
+      "sound": "minecraft:block.smithing_table.use"
     },
     {
-      "type": "particles",
-      "shape": "burst",
-      "radius": 1,
-      "particles": [
+      "type": "visual",
+      "effect": "corruption:crown",
+      "radius": 4,
+      "height": 2.6,
+      "ticks": 50,
+      "color": "#FF4030",
+      "accent": "#FFD24A"
+    },
+    {
+      "type": "give_item",
+      "item": "minecraft:gold_ingot",
+      "count": 2
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.6,
+      "look": "minecraft:gold_nugget",
+      "trail": [
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.05,
+          "color": "#FFD24A"
+        },
+        {
+          "particle": "minecraft:flame",
+          "count": 1,
+          "spread": 0.05
+        }
+      ],
+      "burst": [
         {
           "particle": "minecraft:dust",
           "count": 30,
@@ -24,6 +56,27 @@
           "particle": "minecraft:wax_on",
           "count": 12,
           "spread": 0.4
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 5,
+          "height": 1,
+          "ticks": 14,
+          "color": "#FF4030",
+          "accent": "#FFD24A"
+        },
+        {
+          "type": "damage",
+          "amount": 44,
+          "radius": 7
+        },
+        {
+          "type": "ignite_area",
+          "radius": 7,
+          "seconds": 6
         }
       ]
     }

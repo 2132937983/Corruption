@@ -1,0 +1,34 @@
+{
+  "type": "corruption:brass_cooking",
+  "ingredients": [
+    {
+      "item": "corruption:malice_grass",
+      "count": 4
+    },
+    {
+      "item": "corruption:blood_filaments",
+      "count": 4
+    },
+    {
+      "item": "corruption:whisper_bloom",
+      "count": 4
+    },
+    {
+      "item": "corruption:eerie",
+      "count": 4
+    },
+    {
+      "item": "corruption:eldritch",
+      "count": 4
+    }
+  ],
+  "fluid": {
+    "fluid": "corruption:flowing_corruption",
+    "amount": 1000
+  },
+  "energy": "5KCE",
+  "time": 300,
+  "result": {
+    "id": "corruption:resentment"
+  }
+}

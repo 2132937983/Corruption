@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "corruption:novice_corrupted_robe_hood",
+    "corruption:intermediate_corrupted_robe_hood",
+    "corruption:advanced_corrupted_robe_hood",
+    "corruption:robe_hood"
+  ]
+}

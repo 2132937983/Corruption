@@ -31,7 +31,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 /**
  * The corruption's raw materials: each is drawn, named and described in both languages, and made by exactly one
  * recipe of the mod's own systems (the transmuter, the cauldron, the bench or the altar), never the game's own
- * crafting, smelting or brewing; and on a server, every one of those recipes loads.
+ * crafting, smelting or brewing, but for the few that only the corruption's living plants leave when cut down, which
+ * no recipe makes; and on a server, every one of those recipes loads.
  */
 @ExtendWith(EphemeralTestServerProvider.class)
 class CorruptionMaterialsServerTest {
@@ -41,6 +42,9 @@ class CorruptionMaterialsServerTest {
             "brass_cooking", Set.of("corruption:brass_cooking"),
             "alchemy", Set.of("corruption:alchemy_shaped", "corruption:alchemy_shapeless"),
             "altar", Set.of("corruption:altar_shaped", "corruption:altar_shapeless"));
+    /** What only the living plants leave, by the loot table that leaves it. */
+    private static final Map<String, String> DROPS = Map.of("corruption:malice_tendril", "/data/corruption/loot_table/entities/malice_vine.json",
+            "corruption:greed_heartwood", "/data/corruption/loot_table/entities/greed.json");
 
     private static JsonElement json(String path) throws Exception {
         try (InputStream in = CorruptionMaterialsServerTest.class.getResourceAsStream(path)) {
@@ -98,6 +102,11 @@ class CorruptionMaterialsServerTest {
             String id = material.getId().toString();
             List<String> making = new ArrayList<>();
             for (var recipe : recipes.entrySet()) if (made(recipe.getValue()).equals(id)) making.add(recipe.getKey());
+            if (DROPS.containsKey(id)) {
+                assertEquals(List.of(), making, id + " is left by a living plant, and made by nothing");
+                assertTrue(json(DROPS.get(id)).toString().contains("\"" + id + "\""), id + " is in " + DROPS.get(id));
+                continue;
+            }
             assertEquals(1, making.size(), id + " is made by one recipe: " + making);
             String folder = making.get(0).substring(0, making.get(0).indexOf('/'));
             assertTrue(SYSTEMS.containsKey(folder), id + " is made at the transmuter, the cauldron, the bench or the altar, not by " + making.get(0));
@@ -112,6 +121,7 @@ class CorruptionMaterialsServerTest {
             Map<String, JsonObject> recipes;
             try { recipes = recipes(); } catch (Exception failure) { throw new AssertionError(failure); }
             for (DeferredItem<CorruptionMaterialItem> material : ModItems.MATERIALS) {
+                if (DROPS.containsKey(material.getId().toString())) continue;
                 String path = recipes.entrySet().stream().filter(recipe -> made(recipe.getValue()).equals(material.getId().toString()))
                         .map(Map.Entry::getKey).findFirst().orElseThrow();
                 RecipeHolder<?> loaded = level.getRecipeManager().byKey(ResourceLocation.fromNamespaceAndPath("corruption", path)).orElse(null);

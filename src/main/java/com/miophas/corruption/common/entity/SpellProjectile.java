@@ -33,6 +33,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.Pose;
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
 import net.neoforged.neoforge.event.EventHooks;
 
@@ -43,17 +46,19 @@ import net.neoforged.neoforge.event.EventHooks;
  * that share of its speed each tick, is pulled down as it goes, is spent once it has flown long enough, and
  * strikes a creature its line of flight passes within that reach of, or a block it flies into.
  *
- * <p>How it shows itself is its spell's data too (see {@link SpellAction.LaunchBolt}): the item it is drawn as,
- * the particles it trails in flight, scattered along the stretch it has just flown so that a fast bolt leaves an
- * unbroken trail, and those that burst from where it strikes. Its look and its trail are sent to the clients
- * when it first appears to them; the burst is sent from the server where it strikes.
+ * <p>How it shows itself is its spell's data too (see {@link SpellAction.LaunchBolt}): drawn as its own (a crystal
+ * in a shell of shards, ringed with runes, trailing light, shining in its spell's colour; see SpellBoltRenderer) or as
+ * an item its spell names; the particles it trails in flight, scattered along the stretch it has just flown so that a
+ * fast bolt leaves an unbroken trail, and those that burst from where it strikes. How big it is is its spell's too:
+ * its box, its look and how far off its line of flight it strikes a creature all grow with it. Its look, colour, size
+ * and trail are sent to the clients when it first appears to them; the burst is sent from the server where it strikes.
  *
  * <p>Its owner must be a player for the payload to tell who cast it; a bolt with any other owner hits nothing.
  */
 public final class SpellProjectile extends Projectile implements ItemSupplier, IEntityWithComplexSpawn {
     /** What it looks like in flight, unless the spell it flies for names another look. */
     private static final ItemStack DEFAULT_LOOK = new ItemStack(ModItems.CORRUPTION_CRYSTAL.get());
-    private static final String ON_HIT = "OnHit", LOOK_TAG = "Look", TRAIL = "Trail", BURST = "Burst";
+    private static final String ON_HIT = "OnHit", LOOK_TAG = "Look", TRAIL = "Trail", BURST = "Burst", OWN = "Own", COLOUR = "Color", SIZE = "Size";
     /** A particle list, as it goes over the wire with a bolt. */
     private static final StreamCodec<ByteBuf, List<SpellAction.Particles>> PARTICLES_STREAM = ByteBufCodecs.fromCodec(SpellCodecs.PARTICLE_LIST);
     /** What a colour is drawn as when a particle that takes one is given none: the corruption's violet. */
@@ -63,6 +68,10 @@ public final class SpellProjectile extends Projectile implements ItemSupplier, I
 
     private List<SpellAction> onHit = List.of();
     private ItemStack look = DEFAULT_LOOK;
+    /** Whether it is drawn as its own, not as an item; its light's colour (0xRRGGBB, -1 for the corruption's rose); how big it is, in blocks. */
+    private boolean own = true;
+    private int colour = -1;
+    private double size = SpellAction.LaunchBolt.DEFAULT_SIZE;
     private List<SpellAction.Particles> trail = SpellAction.LaunchBolt.CORRUPTION_TRAIL, burst = List.of();
 
     public SpellProjectile(EntityType<? extends SpellProjectile> type, Level level) { super(type, level); }
@@ -72,6 +81,15 @@ public final class SpellProjectile extends Projectile implements ItemSupplier, I
         carrying(bolt.onHit(), bolt.look());
         trail = bolt.trail();
         burst = bolt.burst();
+        colour = bolt.colour();
+        sized(bolt.size());
+        return this;
+    }
+
+    /** Makes it this big, its box and its look, in blocks. */
+    public SpellProjectile sized(double blocks) {
+        size = Math.max(SpellAction.LaunchBolt.MIN_SIZE, Math.min(SpellAction.LaunchBolt.MAX_SIZE, blocks));
+        refreshDimensions();
         return this;
     }
 
@@ -85,6 +103,7 @@ public final class SpellProjectile extends Projectile implements ItemSupplier, I
     public SpellProjectile carrying(List<SpellAction> actions, String look) {
         onHit = List.copyOf(actions);
         this.look = lookOf(look);
+        own = look == null || look.isEmpty();
         return this;
     }
 
@@ -97,6 +116,15 @@ public final class SpellProjectile extends Projectile implements ItemSupplier, I
     }
 
     @Override public ItemStack getItem() { return look; }
+    /** Whether it is drawn as its own, rather than as the item its spell names. */
+    public boolean drawnAsOwn() { return own; }
+    /** Its light's colour, 0xRRGGBB; -1 for the corruption's rose. */
+    public int colour() { return colour; }
+    /** How big it is, in blocks. */
+    public double size() { return size; }
+
+    /** Its box: as big as it is, every way. */
+    @Override public EntityDimensions getDimensions(Pose pose) { return EntityDimensions.scalable((float) size, (float) size); }
     /** What it trails in flight, and what bursts from where it strikes. */
     public List<SpellAction.Particles> trail() { return trail; }
     public List<SpellAction.Particles> burst() { return burst; }
@@ -165,7 +193,8 @@ public final class SpellProjectile extends Projectile implements ItemSupplier, I
         Vec3 from = position(), move = getDeltaMovement(), to = from.add(move);
         HitResult block = level().clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
         if (block.getType() != HitResult.Type.MISS) to = block.getLocation();
-        double reach = SpellBolt.DEFAULT.hitRadius();
+        // A bigger bolt strikes what its line of flight passes the further off, in proportion.
+        double reach = SpellBolt.DEFAULT.hitRadius() * size / SpellAction.LaunchBolt.DEFAULT_SIZE;
         EntityHitResult creature = ProjectileUtil.getEntityHitResult(level(), this, from, to, getBoundingBox().expandTowards(move).inflate(1.0 + reach),
                 this::canHitEntity, (float) reach);
         return creature != null ? creature : block;
@@ -176,7 +205,8 @@ public final class SpellProjectile extends Projectile implements ItemSupplier, I
         super.onHit(result);
         if (!(level() instanceof ServerLevel)) return;
         if (getOwner() instanceof ServerPlayer caster) {
-            ArcaneCasting.Origin struck = ArcaneCasting.Origin.impact(result.getLocation(), getDeltaMovement());
+            ArcaneCasting.Origin struck = ArcaneCasting.Origin.impact(result.getLocation(), getDeltaMovement(),
+                    result instanceof EntityHitResult creature ? creature.getEntity() : null);
             for (SpellAction action : onHit) ArcaneCasting.world().perform(caster, struck, action);
         }
         if (level() instanceof ServerLevel server) {
@@ -194,15 +224,25 @@ public final class SpellProjectile extends Projectile implements ItemSupplier, I
     @Override public void writeSpawnData(RegistryFriendlyByteBuf buffer) {
         buffer.writeUtf(BuiltInRegistries.ITEM.getKey(look.getItem()).toString());
         PARTICLES_STREAM.encode(buffer, trail);
+        buffer.writeBoolean(own);
+        buffer.writeInt(colour);
+        buffer.writeDouble(size);
     }
 
     @Override public void readSpawnData(RegistryFriendlyByteBuf buffer) {
         look = lookOf(buffer.readUtf());
         trail = List.copyOf(PARTICLES_STREAM.decode(buffer));
+        own = buffer.readBoolean();
+        colour = buffer.readInt();
+        sized(buffer.readDouble());
     }
 
     @Override protected void readAdditionalSaveData(CompoundTag tag) {
         if (tag.contains(LOOK_TAG)) look = lookOf(tag.getString(LOOK_TAG));
+        // A bolt saved before bolts were drawn as their own wore the corruption's crystal for none.
+        own = tag.contains(OWN) ? tag.getBoolean(OWN) : look.getItem() == DEFAULT_LOOK.getItem();
+        colour = tag.contains(COLOUR) ? tag.getInt(COLOUR) : -1;
+        sized(tag.contains(SIZE) ? tag.getDouble(SIZE) : SpellAction.LaunchBolt.DEFAULT_SIZE);
         if (tag.contains(TRAIL)) SpellCodecs.PARTICLE_LIST.parse(NbtOps.INSTANCE, tag.get(TRAIL)).result().ifPresent(read -> trail = List.copyOf(read));
         if (tag.contains(BURST)) SpellCodecs.PARTICLE_LIST.parse(NbtOps.INSTANCE, tag.get(BURST)).result().ifPresent(read -> burst = List.copyOf(read));
         if (!tag.contains(ON_HIT)) return;
@@ -212,6 +252,9 @@ public final class SpellProjectile extends Projectile implements ItemSupplier, I
     @Override protected void addAdditionalSaveData(CompoundTag tag) {
         SpellCodecs.ACTIONS.encodeStart(NbtOps.INSTANCE, onHit).result().ifPresent(encoded -> tag.put(ON_HIT, encoded));
         tag.putString(LOOK_TAG, BuiltInRegistries.ITEM.getKey(look.getItem()).toString());
+        tag.putBoolean(OWN, own);
+        tag.putInt(COLOUR, colour);
+        tag.putDouble(SIZE, size);
         SpellCodecs.PARTICLE_LIST.encodeStart(NbtOps.INSTANCE, trail).result().ifPresent(encoded -> tag.put(TRAIL, encoded));
         SpellCodecs.PARTICLE_LIST.encodeStart(NbtOps.INSTANCE, burst).result().ifPresent(encoded -> tag.put(BURST, encoded));
     }

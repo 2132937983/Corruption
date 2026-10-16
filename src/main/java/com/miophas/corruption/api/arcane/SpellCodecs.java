@@ -40,12 +40,29 @@ import net.minecraft.util.StringRepresentable;
  * hurt where it falls ("damage", "damage_type"); "push" thrusts away or draws in; "particles" only shows, drawing
  * particles in a "shape" about the origin; "visual" only shows too, an effect drawn on the client under the origin:
  * <pre>{"type": "visual", "effect": "corruption:magic_circle", "radius": 5, "ticks": 60, "color": "#9B4562",
- *  "accent": "#FFD24A", "shake": 0.3, "sound": "minecraft:entity.evoker.prepare_summon"}</pre> Every field but the ones naming an effect, a creature or an item may be left out; what
- * it falls back to is written beside each kind below.
+ *  "accent": "#FFD24A", "shake": 0.3, "sound": "minecraft:entity.evoker.prepare_summon"}</pre> A "beam" fires from
+ * the caster's hands along their gaze and follows it, for "ticks", "length" blocks or to the first block in its way;
+ * every "interval" ticks it does its "on_hit" at each creature within "width" blocks of it, and it is drawn, in
+ * "color" and "accent", for exactly as long as it fires:
+ * <pre>{"type": "beam", "length": 64, "width": 2, "ticks": 60, "interval": 5, "color": "#FFD24A", "accent": "#FFFFFF",
+ *  "on_hit": [{"type": "damage", "amount": 24, "radius": 3}]}</pre> The mod's own bolt, drawn as its own (no
+ * "look"), shines in its "color" and is as big as its "size", its box and its look, in blocks (0.5 unless written).
+ * "corrupt_area" may be "inert", leaving only the dormant corruption that spreads no further; "quell_corruption"
+ * stills the corruption already there; "raise_remnants" calls up remnants to serve the caster; "mark_prey" sends the
+ * corruption's creatures, its bosses among them, after the creature a bolt struck; "truce" has them spare the caster:
+ * <pre>{"type": "mark_prey", "radius": 24, "ticks": 600}</pre> Every field but the ones naming an effect, a
+ * creature or an item may be left out; what it falls back to is written beside each kind below.
  */
 public final class SpellCodecs {
     /** An id as data writes it, "corruption:spell_bolt", kept as the plain string the rules speak in. */
     private static final Codec<String> ID = ResourceLocation.CODEC.xmap(ResourceLocation::toString, ResourceLocation::parse);
+    /**
+     * How far round its origin an action reaches: refused past {@link SpellAction#MAX_RADIUS} as the data loads,
+     * since the spell reaches no further than that, so that no radius is ever quietly cut short.
+     */
+    private static final Codec<Double> RADIUS = Codec.doubleRange(0, SpellAction.MAX_RADIUS);
+    /** How far round its origin corrupting reaches: refused past {@link SpellAction#MAX_CORRUPTION_RADIUS}. */
+    private static final Codec<Double> CORRUPTION_RADIUS = Codec.doubleRange(0, SpellAction.MAX_CORRUPTION_RADIUS);
     /** Who an effect falls on: "self" or "nearby". */
     private static final Codec<SpellAction.Target> TARGET = Codec.STRING.comapFlatMap(text -> switch (text) {
         case "self" -> DataResult.success(SpellAction.Target.SELF);
@@ -114,9 +131,10 @@ public final class SpellCodecs {
     /** What an action of each kind is called in data. */
     private enum Kind implements StringRepresentable {
         APPLY_EFFECT("apply_effect"), DAMAGE("damage"), IGNITE_AREA("ignite_area"), FREEZE_AREA("freeze_area"),
-        CORRUPT_AREA("corrupt_area"), SUMMON("summon"), LIGHTNING("lightning"), EXPLODE("explode"),
+        CORRUPT_AREA("corrupt_area"), CORRUPT_CREATURES("corrupt_creatures"), SUMMON("summon"), LIGHTNING("lightning"), EXPLODE("explode"),
         TELEPORT("teleport"), WEATHER("weather"), PACIFY("pacify"), GIVE_ITEM("give_item"), PUSH("push"), PARTICLES("particles"),
-        VISUAL("visual"), LAUNCH_BOLT("launch_bolt");
+        VISUAL("visual"), LAUNCH_BOLT("launch_bolt"), BEAM("beam"), QUELL_CORRUPTION("quell_corruption"), RAISE_REMNANTS("raise_remnants"),
+        MARK_PREY("mark_prey"), TRUCE("truce");
 
         static final Codec<Kind> CODEC = StringRepresentable.fromEnum(Kind::values);
 
@@ -128,42 +146,71 @@ public final class SpellCodecs {
     private static final MapCodec<SpellAction.ApplyEffect> APPLY_EFFECT = RecordCodecBuilder.mapCodec(instance -> instance.group(
             ID.fieldOf("effect").forGetter(SpellAction.ApplyEffect::effect),
             TARGET.optionalFieldOf("target", SpellAction.Target.SELF).forGetter(SpellAction.ApplyEffect::target),
-            Codec.DOUBLE.optionalFieldOf("radius", 0.0).forGetter(SpellAction.ApplyEffect::radius),
+            RADIUS.optionalFieldOf("radius", 0.0).forGetter(SpellAction.ApplyEffect::radius),
             Codec.intRange(1, 20 * 60 * 10).optionalFieldOf("duration", 200).forGetter(SpellAction.ApplyEffect::duration),
             Codec.intRange(0, 255).optionalFieldOf("amplifier", 0).forGetter(SpellAction.ApplyEffect::amplifier))
             .apply(instance, SpellAction.ApplyEffect::new));
     private static final MapCodec<SpellAction.Damage> DAMAGE = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.DOUBLE.optionalFieldOf("amount", 4.0).forGetter(SpellAction.Damage::amount),
-            Codec.DOUBLE.optionalFieldOf("radius", 3.0).forGetter(SpellAction.Damage::radius),
+            RADIUS.optionalFieldOf("radius", 3.0).forGetter(SpellAction.Damage::radius),
             ID.optionalFieldOf("damage_type", "").forGetter(SpellAction.Damage::type))
             .apply(instance, SpellAction.Damage::new));
     private static final MapCodec<SpellAction.Ignite> IGNITE_AREA = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.DOUBLE.optionalFieldOf("radius", 3.0).forGetter(SpellAction.Ignite::radius),
+            RADIUS.optionalFieldOf("radius", 3.0).forGetter(SpellAction.Ignite::radius),
             Codec.intRange(1, 20 * 60 * 5).optionalFieldOf("seconds", 8).forGetter(SpellAction.Ignite::seconds))
             .apply(instance, SpellAction.Ignite::new));
     private static final MapCodec<SpellAction.Freeze> FREEZE_AREA = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.DOUBLE.optionalFieldOf("radius", 3.0).forGetter(SpellAction.Freeze::radius),
+            RADIUS.optionalFieldOf("radius", 3.0).forGetter(SpellAction.Freeze::radius),
             Codec.intRange(1, 20 * 60).optionalFieldOf("ticks", 200).forGetter(SpellAction.Freeze::ticks))
             .apply(instance, SpellAction.Freeze::new));
     private static final MapCodec<SpellAction.Corrupt> CORRUPT_AREA = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.DOUBLE.optionalFieldOf("radius", 3.0).forGetter(SpellAction.Corrupt::radius),
-            Codec.DOUBLE.optionalFieldOf("chance", 0.25).forGetter(SpellAction.Corrupt::chance))
+            CORRUPTION_RADIUS.optionalFieldOf("radius", 3.0).forGetter(SpellAction.Corrupt::radius),
+            Codec.DOUBLE.optionalFieldOf("chance", 0.25).forGetter(SpellAction.Corrupt::chance),
+            Codec.BOOL.optionalFieldOf("inert", false).forGetter(SpellAction.Corrupt::inert))
             .apply(instance, SpellAction.Corrupt::new));
+    private static final MapCodec<SpellAction.Quell> QUELL_CORRUPTION = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            CORRUPTION_RADIUS.optionalFieldOf("radius", 6.0).forGetter(SpellAction.Quell::radius))
+            .apply(instance, SpellAction.Quell::new));
+    private static final MapCodec<SpellAction.RaiseRemnants> RAISE_REMNANTS = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            Codec.intRange(1, 16).optionalFieldOf("count", 4).forGetter(SpellAction.RaiseRemnants::count),
+            Codec.doubleRange(0, 16).optionalFieldOf("radius", 3.0).forGetter(SpellAction.RaiseRemnants::radius),
+            ID.listOf().optionalFieldOf("likenesses", SpellAction.RaiseRemnants.LIKENESSES).forGetter(SpellAction.RaiseRemnants::likenesses),
+            Codec.intRange(0, 20 * 60 * 10).optionalFieldOf("lifetime", 1200).forGetter(SpellAction.RaiseRemnants::lifetime))
+            .apply(instance, SpellAction.RaiseRemnants::new));
+    private static final MapCodec<SpellAction.MarkPrey> MARK_PREY = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            RADIUS.optionalFieldOf("radius", 24.0).forGetter(SpellAction.MarkPrey::radius),
+            Codec.intRange(1, 20 * 60 * 5).optionalFieldOf("ticks", 600).forGetter(SpellAction.MarkPrey::ticks))
+            .apply(instance, SpellAction.MarkPrey::new));
+    private static final MapCodec<SpellAction.Truce> TRUCE = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            RADIUS.optionalFieldOf("radius", 16.0).forGetter(SpellAction.Truce::radius),
+            Codec.intRange(1, 20 * 60 * 10).optionalFieldOf("ticks", 1200).forGetter(SpellAction.Truce::ticks))
+            .apply(instance, SpellAction.Truce::new));
+    private static final MapCodec<SpellAction.CorruptCreatures> CORRUPT_CREATURES = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            RADIUS.optionalFieldOf("radius", 4.0).forGetter(SpellAction.CorruptCreatures::radius),
+            Codec.doubleRange(0, 1).optionalFieldOf("chance", 1.0).forGetter(SpellAction.CorruptCreatures::chance))
+            .apply(instance, SpellAction.CorruptCreatures::new));
     private static final MapCodec<SpellAction.Summon> SUMMON = RecordCodecBuilder.mapCodec(instance -> instance.group(
             ID.fieldOf("entity").forGetter(SpellAction.Summon::entity),
             Codec.intRange(1, 16).optionalFieldOf("count", 1).forGetter(SpellAction.Summon::count))
             .apply(instance, SpellAction.Summon::new));
     private static final MapCodec<SpellAction.Lightning> LIGHTNING = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.DOUBLE.optionalFieldOf("radius", 4.0).forGetter(SpellAction.Lightning::radius),
-            Codec.intRange(1, 32).optionalFieldOf("count", 1).forGetter(SpellAction.Lightning::count),
+            RADIUS.optionalFieldOf("radius", 4.0).forGetter(SpellAction.Lightning::radius),
+            Codec.intRange(1, 128).optionalFieldOf("count", 1).forGetter(SpellAction.Lightning::count),
             Codec.BOOL.optionalFieldOf("corrupt", false).forGetter(SpellAction.Lightning::corrupt),
             Codec.doubleRange(0, 1000).optionalFieldOf("damage", 0.0).forGetter(SpellAction.Lightning::damage),
             ID.optionalFieldOf("damage_type", "").forGetter(SpellAction.Lightning::damageType))
             .apply(instance, SpellAction.Lightning::new));
     private static final MapCodec<SpellAction.Explode> EXPLODE = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.DOUBLE.optionalFieldOf("power", 2.0).forGetter(SpellAction.Explode::power),
-            Codec.BOOL.optionalFieldOf("breaks_blocks", false).forGetter(SpellAction.Explode::breaksBlocks))
-            .apply(instance, SpellAction.Explode::new));
+            Codec.BOOL.optionalFieldOf("breaks_blocks", false).forGetter(SpellAction.Explode::breaksBlocks),
+            RADIUS.optionalFieldOf("break_radius", SpellAction.Explode.ANY_REACH).forGetter(SpellAction.Explode::breakRadius),
+            Codec.intRange(0, SpellAction.Explode.ANY_COUNT).optionalFieldOf("max_blocks", SpellAction.Explode.ANY_COUNT).forGetter(SpellAction.Explode::maxBlocks),
+            Codec.doubleRange(0, SpellAction.Explode.ANY_RESISTANCE).optionalFieldOf("max_resistance", SpellAction.Explode.ANY_RESISTANCE)
+                    .forGetter(SpellAction.Explode::maxResistance),
+            Codec.doubleRange(0, 1000).optionalFieldOf("crush_hardness")
+                    .forGetter(explode -> explode.crushHardness() < 0 ? Optional.empty() : Optional.of(explode.crushHardness())))
+            .apply(instance, (power, breaks, radius, most, resistance, crush) -> new SpellAction.Explode(power, breaks, radius, most, resistance,
+                    crush.orElse(SpellAction.Explode.NO_CRUSH))));
     private static final MapCodec<SpellAction.Teleport> TELEPORT = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.DOUBLE.optionalFieldOf("distance", 8.0).forGetter(SpellAction.Teleport::distance))
             .apply(instance, SpellAction.Teleport::new));
@@ -172,28 +219,36 @@ public final class SpellCodecs {
             Codec.intRange(1, 20 * 60 * 60).optionalFieldOf("ticks", 6000).forGetter(SpellAction.Weather::ticks))
             .apply(instance, SpellAction.Weather::new));
     private static final MapCodec<SpellAction.Pacify> PACIFY = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.DOUBLE.optionalFieldOf("radius", 8.0).forGetter(SpellAction.Pacify::radius))
+            RADIUS.optionalFieldOf("radius", 8.0).forGetter(SpellAction.Pacify::radius))
             .apply(instance, SpellAction.Pacify::new));
     private static final MapCodec<SpellAction.GiveItem> GIVE_ITEM = RecordCodecBuilder.mapCodec(instance -> instance.group(
             ID.fieldOf("item").forGetter(SpellAction.GiveItem::item),
             Codec.intRange(1, 64).optionalFieldOf("count", 1).forGetter(SpellAction.GiveItem::count))
             .apply(instance, SpellAction.GiveItem::new));
 
+    /** What a push thrusts away from: "origin" or "caster". */
+    private static final Codec<SpellAction.Push.From> PUSH_FROM = Codec.STRING.comapFlatMap(text -> switch (text) {
+        case "origin" -> DataResult.success(SpellAction.Push.From.ORIGIN);
+        case "caster" -> DataResult.success(SpellAction.Push.From.CASTER);
+        default -> DataResult.error(() -> "A push is from the origin or the caster, not " + text);
+    }, from -> from == SpellAction.Push.From.ORIGIN ? "origin" : "caster");
+
     private static final MapCodec<SpellAction.Push> PUSH = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.doubleRange(0, 16).optionalFieldOf("radius", 5.0).forGetter(SpellAction.Push::radius),
+            RADIUS.optionalFieldOf("radius", 5.0).forGetter(SpellAction.Push::radius),
             Codec.doubleRange(-4, 4).optionalFieldOf("strength", 1.0).forGetter(SpellAction.Push::strength),
-            Codec.doubleRange(0, 2).optionalFieldOf("lift", 0.2).forGetter(SpellAction.Push::lift))
+            Codec.doubleRange(0, 2).optionalFieldOf("lift", 0.2).forGetter(SpellAction.Push::lift),
+            PUSH_FROM.optionalFieldOf("from", SpellAction.Push.From.ORIGIN).forGetter(SpellAction.Push::from))
             .apply(instance, SpellAction.Push::new));
     private static final MapCodec<SpellAction.Spectacle> SPECTACLE = RecordCodecBuilder.mapCodec(instance -> instance.group(
             SHAPE.optionalFieldOf("shape", SpellAction.Shape.BURST).forGetter(SpellAction.Spectacle::shape),
-            Codec.doubleRange(0, 16).optionalFieldOf("radius", 2.0).forGetter(SpellAction.Spectacle::radius),
-            Codec.doubleRange(0, 32).optionalFieldOf("height", 2.0).forGetter(SpellAction.Spectacle::height),
+            RADIUS.optionalFieldOf("radius", 2.0).forGetter(SpellAction.Spectacle::radius),
+            Codec.doubleRange(0, 128).optionalFieldOf("height", 2.0).forGetter(SpellAction.Spectacle::height),
             PARTICLE_LIST.fieldOf("particles").forGetter(SpellAction.Spectacle::particles))
             .apply(instance, SpellAction.Spectacle::new));
 
     private static final MapCodec<SpellAction.Visual> VISUAL = RecordCodecBuilder.mapCodec(instance -> instance.group(
             ID.fieldOf("effect").forGetter(SpellAction.Visual::effect),
-            Codec.doubleRange(0, 32).optionalFieldOf("radius", 3.0).forGetter(SpellAction.Visual::radius),
+            RADIUS.optionalFieldOf("radius", 3.0).forGetter(SpellAction.Visual::radius),
             Codec.doubleRange(0, 64).optionalFieldOf("height", 3.0).forGetter(SpellAction.Visual::height),
             Codec.intRange(1, 400).optionalFieldOf("ticks", 40).forGetter(SpellAction.Visual::ticks),
             COLOUR.optionalFieldOf("color", SpellAction.Visual.ROSE).forGetter(SpellAction.Visual::colour),
@@ -214,6 +269,7 @@ public final class SpellCodecs {
         if (action instanceof SpellAction.Ignite) return Kind.IGNITE_AREA;
         if (action instanceof SpellAction.Freeze) return Kind.FREEZE_AREA;
         if (action instanceof SpellAction.Corrupt) return Kind.CORRUPT_AREA;
+        if (action instanceof SpellAction.CorruptCreatures) return Kind.CORRUPT_CREATURES;
         if (action instanceof SpellAction.Summon) return Kind.SUMMON;
         if (action instanceof SpellAction.Lightning) return Kind.LIGHTNING;
         if (action instanceof SpellAction.Explode) return Kind.EXPLODE;
@@ -224,6 +280,11 @@ public final class SpellCodecs {
         if (action instanceof SpellAction.Push) return Kind.PUSH;
         if (action instanceof SpellAction.Spectacle) return Kind.PARTICLES;
         if (action instanceof SpellAction.Visual) return Kind.VISUAL;
+        if (action instanceof SpellAction.Beam) return Kind.BEAM;
+        if (action instanceof SpellAction.Quell) return Kind.QUELL_CORRUPTION;
+        if (action instanceof SpellAction.RaiseRemnants) return Kind.RAISE_REMNANTS;
+        if (action instanceof SpellAction.MarkPrey) return Kind.MARK_PREY;
+        if (action instanceof SpellAction.Truce) return Kind.TRUCE;
         return Kind.LAUNCH_BOLT;
     }
 
@@ -235,6 +296,7 @@ public final class SpellCodecs {
             case IGNITE_AREA -> IGNITE_AREA;
             case FREEZE_AREA -> FREEZE_AREA;
             case CORRUPT_AREA -> CORRUPT_AREA;
+            case CORRUPT_CREATURES -> CORRUPT_CREATURES;
             case SUMMON -> SUMMON;
             case LIGHTNING -> LIGHTNING;
             case EXPLODE -> EXPLODE;
@@ -245,6 +307,10 @@ public final class SpellCodecs {
             case PUSH -> PUSH;
             case PARTICLES -> SPECTACLE;
             case VISUAL -> VISUAL;
+            case QUELL_CORRUPTION -> QUELL_CORRUPTION;
+            case RAISE_REMNANTS -> RAISE_REMNANTS;
+            case MARK_PREY -> MARK_PREY;
+            case TRUCE -> TRUCE;
             case LAUNCH_BOLT -> RecordCodecBuilder.<SpellAction.LaunchBolt>mapCodec(instance -> instance.group(
                     ID.optionalFieldOf("entity", "corruption:spell_bolt").forGetter(SpellAction.LaunchBolt::entity),
                     Codec.DOUBLE.optionalFieldOf("speed", 1.0).forGetter(SpellAction.LaunchBolt::speed),
@@ -253,11 +319,26 @@ public final class SpellCodecs {
                     ID.optionalFieldOf("look", "").forGetter(SpellAction.LaunchBolt::look),
                     PARTICLE_LIST.optionalFieldOf("trail", SpellAction.LaunchBolt.CORRUPTION_TRAIL).forGetter(SpellAction.LaunchBolt::trail),
                     PARTICLE_LIST.optionalFieldOf("burst", List.of()).forGetter(SpellAction.LaunchBolt::burst),
-                    Codec.intRange(1, 16).optionalFieldOf("count", 1).forGetter(SpellAction.LaunchBolt::count),
+                    Codec.intRange(1, SpellAction.LaunchBolt.MAX_COUNT).optionalFieldOf("count", 1).forGetter(SpellAction.LaunchBolt::count),
                     Codec.doubleRange(0, 360).optionalFieldOf("fan", 0.0).forGetter(SpellAction.LaunchBolt::fan),
                     SOURCE.optionalFieldOf("from", SpellAction.Source.CASTER).forGetter(SpellAction.LaunchBolt::from),
-                    Codec.doubleRange(0, 64).optionalFieldOf("height", SpellAction.LaunchBolt.SKY_HEIGHT).forGetter(SpellAction.LaunchBolt::height))
-                    .apply(instance, SpellAction.LaunchBolt::new));
+                    Codec.doubleRange(0, 64).optionalFieldOf("height", SpellAction.LaunchBolt.SKY_HEIGHT).forGetter(SpellAction.LaunchBolt::height),
+                    COLOUR.optionalFieldOf("color").forGetter(bolt -> bolt.colour() < 0 ? Optional.empty() : Optional.of(bolt.colour())),
+                    Codec.doubleRange(SpellAction.LaunchBolt.MIN_SIZE, SpellAction.LaunchBolt.MAX_SIZE).optionalFieldOf("size", SpellAction.LaunchBolt.DEFAULT_SIZE)
+                            .forGetter(SpellAction.LaunchBolt::size))
+                    .apply(instance, (entity, speed, inaccuracy, onHit, look, trail, burst, count, fan, from, height, colour, size) -> new SpellAction.LaunchBolt(
+                            entity, speed, inaccuracy, onHit, look, trail, burst, count, fan, from, height, colour.orElse(-1), size)));
+            case BEAM -> RecordCodecBuilder.<SpellAction.Beam>mapCodec(instance -> instance.group(
+                    Codec.doubleRange(1, SpellAction.MAX_RADIUS).optionalFieldOf("length", 32.0).forGetter(SpellAction.Beam::length),
+                    Codec.doubleRange(.1, 16).optionalFieldOf("width", 1.0).forGetter(SpellAction.Beam::width),
+                    Codec.intRange(1, 400).optionalFieldOf("ticks", 60).forGetter(SpellAction.Beam::ticks),
+                    Codec.intRange(1, 100).optionalFieldOf("interval", 5).forGetter(SpellAction.Beam::interval),
+                    action.listOf().optionalFieldOf("on_hit", List.<SpellAction>of()).forGetter(SpellAction.Beam::onHit),
+                    COLOUR.optionalFieldOf("color", SpellAction.Visual.ROSE).forGetter(SpellAction.Beam::colour),
+                    COLOUR.optionalFieldOf("accent", SpellAction.Visual.GOLD).forGetter(SpellAction.Beam::accent),
+                    Codec.doubleRange(0, 1).optionalFieldOf("shake", 0.0).forGetter(SpellAction.Beam::shake),
+                    ID.optionalFieldOf("sound", "").forGetter(SpellAction.Beam::sound))
+                    .apply(instance, SpellAction.Beam::new));
         };
     }
 

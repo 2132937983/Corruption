@@ -1,10 +1,16 @@
 package com.miophas.corruption.common.client.visual;
 
 import com.miophas.corruption.Corruption;
+import com.miophas.corruption.common.entity.BossDeath;
+import com.miophas.corruption.common.entity.DemonBoss;
+import com.miophas.corruption.common.entity.SpellBeamEntity;
 import com.miophas.corruption.common.entity.SpellVisualEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -35,7 +41,44 @@ public final class CameraShake {
 
     public static void add(float amount) { trauma = Mth.clamp(trauma + amount, 0, 1); }
 
-    @SubscribeEvent public static void settle(ClientTickEvent.Post event) { trauma = Math.max(0, trauma - SETTLING); }
+    /**
+     * A beam firing near the player: the view held at least this shaken by it, the more the nearer, none past its
+     * length (or sixteen blocks), every tick it fires; so it rumbles steadily while the beam fires, and settles as
+     * soon as it stops.
+     */
+    public static void rumble(SpellBeamEntity beam) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (beam.shake() <= 0 || player == null) return;
+        double reach = Math.max(16, beam.length()), distance = player.position().distanceTo(beam.position());
+        if (distance < reach) trauma = Math.max(trauma, Mth.clamp((float) (beam.shake() * (1 - distance / reach)), 0, 1));
+    }
+
+    /**
+     * The bosses dying about the player: the ground trembles under the viewer all through a death, by its rumble, the
+     * more the nearer, none past three times the length of its rays; and each moment of a death that shakes shakes the
+     * view as it comes, as an effect appearing does, by its size times the death's scale.
+     */
+    static void dying(LocalPlayer player, Iterable<Entity> entities) {
+        for (Entity entity : entities) {
+            if (!(entity instanceof LivingEntity boss) || !(entity instanceof DemonBoss demon) || boss.deathTime <= 0) continue;
+            BossDeath death = demon.death();
+            if (boss.deathTime >= death.lasts()) continue;
+            double reach = Math.max(16, death.rays().length() * death.scale() * 3), distance = player.position().distanceTo(boss.position());
+            if (boss.deathTime < death.ticks() && distance < reach) trauma = Math.max(trauma, (float) (death.rumble() * (1 - distance / reach)));
+            for (BossDeath.Beat beat : death.beats()) {
+                if (beat.tick() != boss.deathTime || beat.visual().shake() <= 0) continue;
+                Vec3 at = beat.at() == BossDeath.Anchor.HEART ? demon.heart(1) : boss.position();
+                double near = Math.max(10, beat.visual().radius() * death.scale() * 4), off = player.position().distanceTo(at);
+                if (off < near) add((float) (beat.visual().shake() * (1 - off / near)));
+            }
+        }
+    }
+
+    @SubscribeEvent public static void settle(ClientTickEvent.Post event) {
+        trauma = Math.max(0, trauma - SETTLING);
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.player != null && minecraft.level != null) dying(minecraft.player, minecraft.level.entitiesForRendering());
+    }
 
     @SubscribeEvent public static void swing(ViewportEvent.ComputeCameraAngles event) {
         Minecraft minecraft = Minecraft.getInstance();

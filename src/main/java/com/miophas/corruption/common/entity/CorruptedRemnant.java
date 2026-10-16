@@ -61,6 +61,23 @@ public class CorruptedRemnant extends Monster implements net.minecraft.world.ent
 
     public CorruptedRemnant(EntityType<? extends CorruptedRemnant> type, Level level) { super(type, level); }
 
+    /**
+     * A remnant called up out of nothing, in the likeness of a creature of this kind as the game would bring one forth
+     * (armed and dressed as it would be), at full health, standing at this place facing this way; not yet in the world.
+     * Null if the creature cannot be made.
+     */
+    public static CorruptedRemnant raised(net.minecraft.server.level.ServerLevel level, EntityType<?> likeness, net.minecraft.world.phys.Vec3 at, float yaw) {
+        if (!(likeness.create(level) instanceof Mob source)) return null;
+        CorruptedRemnant remnant = com.miophas.corruption.common.registry.ModEntities.CORRUPTED_REMNANT.get().create(level);
+        if (remnant == null) return null;
+        source.moveTo(at.x, at.y, at.z, yaw, 0);
+        source.finalizeSpawn(level, level.getCurrentDifficultyAt(source.blockPosition()), net.minecraft.world.entity.MobSpawnType.MOB_SUMMONED, null);
+        remnant.initialize(RemnantAppearance.capture(source, true), source.getMaxHealth());
+        remnant.moveTo(at.x, at.y, at.z, yaw, 0);
+        source.discard();
+        return remnant;
+    }
+
     public static AttributeSupplier.Builder attributes() {
         var definition = RemnantCombatApi.definition();
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, definition.health())
@@ -266,7 +283,25 @@ public class CorruptedRemnant extends Monster implements net.minecraft.world.ent
     public float abilityCastTicks(float partialTick) {
         long start = entityData.get(CAST_START); return start < 0 ? -1 : Math.max(0, level().getGameTime() - start + partialTick);
     }
+    /** Game time at which a remnant a spell raised for a while crumbles away; 0 for one that stays. */
+    private long crumblesAt;
+
+    /** A remnant raised for a while: it crumbles away at this game time. */
+    public void crumbleAt(long gameTime) { crumblesAt = Math.max(0, gameTime); }
+
+    /** When it crumbles away, as game time; 0 if it stays. */
+    public long crumblesAt() { return crumblesAt; }
+
     @Override public void tick() {
+        if (!level().isClientSide && crumblesAt > 0 && level().getGameTime() >= crumblesAt && level() instanceof net.minecraft.server.level.ServerLevel server) {
+            // Its time up, it falls to dust and souls: no death, and nothing dropped.
+            server.sendParticles(net.minecraft.core.particles.ParticleTypes.SOUL, getX(), getY() + getBbHeight() / 2, getZ(), 12, getBbWidth() / 2, getBbHeight() / 3, getBbWidth() / 2, .02);
+            server.sendParticles(com.miophas.corruption.common.registry.ModParticles.CORRUPTION_PARTICLE.get(), getX(), getY() + getBbHeight() / 2, getZ(), 20,
+                    getBbWidth() / 2, getBbHeight() / 3, getBbWidth() / 2, .03);
+            playSound(net.minecraft.sounds.SoundEvents.SOUL_ESCAPE.value(), 1, .7F);
+            discard();
+            return;
+        }
         if (!level().isClientSide) abilities();
         boolean phase = hasAbility(RemnantAbility.PHASE_WALLS) || hasAbility(RemnantAbility.DRAGON_COMBAT);
         if (phase) noPhysics = true;
@@ -428,14 +463,21 @@ public class CorruptedRemnant extends Monster implements net.minecraft.world.ent
         return hit;
     }
 
-    @Override public boolean isAlliedTo(Entity entity) { return com.miophas.corruption.api.corruption.CorruptionFactionApi.isRemnant(entity); }
-    @Override public boolean canAttack(LivingEntity target) { return !isAlliedTo(target) && super.canAttack(target); }
+    /** Its own side is its allies, but for one marked as its prey, or hunting it (see PreyMarks). */
+    @Override public boolean isAlliedTo(Entity entity) {
+        return com.miophas.corruption.api.corruption.CorruptionFactionApi.isRemnant(entity) && !com.miophas.corruption.common.arcane.PreyMarks.feuding(this, entity);
+    }
+    /** Nothing of its own side, nor anything a corrupted robe veils from it (CorruptionVeilApi), whether it would take it for prey or turn on it. */
+    @Override public boolean canAttack(LivingEntity target) {
+        return !isAlliedTo(target) && !com.miophas.corruption.api.corruption.CorruptionVeilApi.hiddenFrom(target, this) && super.canAttack(target);
+    }
     @Override public boolean canAttackType(EntityType<?> type) { return type != getType() && !type.is(com.miophas.corruption.api.corruption.CorruptionFactionApi.REMNANTS); }
 
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.put("SourceAppearance", appearance());
+        if (crumblesAt > 0) tag.putLong("CrumblesAt", crumblesAt);
         abilities().save(tag);
         if (hasAbility(RemnantAbility.DRAGON_COMBAT)) dragon().save(tag);
         if (hasAbility(RemnantAbility.SHULKER_COMBAT)) shulker().save(tag);
@@ -445,6 +487,7 @@ public class CorruptedRemnant extends Monster implements net.minecraft.world.ent
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         entityData.set(APPEARANCE, tag.getCompound("SourceAppearance").copy());
+        crumblesAt = tag.getLong("CrumblesAt");
         abilities().load(tag);
         if (hasAbility(RemnantAbility.SHULKER_COMBAT)) { shulker = new RemnantShulkerBehavior(this); shulker.load(tag); getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1); setPersistenceRequired(); }
         if (hasAbility(RemnantAbility.DRAGON_COMBAT)) {

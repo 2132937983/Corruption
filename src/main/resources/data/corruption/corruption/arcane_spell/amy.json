@@ -1,43 +1,120 @@
 {
-  "energy": "8KCE",
-  "cooldown": 80,
-  "min_corruption": 12,
+  "energy": "3KCE",
+  "cooldown": 40,
+  "min_corruption": 8,
   "corruption_gain": 1,
   "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:alchemy",
+      "radius": 6,
+      "height": 2,
+      "ticks": 60,
+      "color": "#FF7A1A",
+      "accent": "#FFF0B0"
+    },
     {
       "type": "apply_effect",
       "effect": "minecraft:fire_resistance",
       "target": "self",
-      "duration": 600
+      "duration": 3600
     },
     {
       "type": "particles",
       "shape": "sphere",
-      "radius": 3,
+      "radius": 4,
       "particles": [
         {
           "particle": "minecraft:flame",
-          "count": 64,
+          "count": 40,
           "spread": 0.05,
           "speed": 0.02
         },
         {
           "particle": "minecraft:soul_fire_flame",
-          "count": 30,
+          "count": 20,
           "spread": 0.05,
           "speed": 0.02
         }
       ]
     },
     {
-      "type": "ignite_area",
-      "radius": 6,
-      "seconds": 10
-    },
-    {
-      "type": "damage",
-      "amount": 8,
-      "radius": 6
+      "type": "launch_bolt",
+      "speed": 1.6,
+      "color": "#FF7A1A",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#FF7A1A"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#FF7A1A"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:hellfire",
+          "radius": 22,
+          "height": 4,
+          "ticks": 60,
+          "color": "#FF7A1A",
+          "accent": "#FFF0B0",
+          "shake": 0.3,
+          "sound": "minecraft:entity.ghast.shoot"
+        },
+        {
+          "type": "damage",
+          "amount": 64,
+          "radius": 22
+        },
+        {
+          "type": "push",
+          "radius": 22,
+          "strength": 1.6,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 22,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "ignite_area",
+          "radius": 22,
+          "seconds": 10
+        },
+        {
+          "type": "explode",
+          "power": 4,
+          "breaks_blocks": true,
+          "break_radius": 4,
+          "max_blocks": 64,
+          "max_resistance": 6
+        }
+      ]
     }
   ]
 }

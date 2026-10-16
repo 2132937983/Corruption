@@ -17,7 +17,7 @@ public final class AgaresRenderer extends ColossusRenderer<Agares, AgaresModel> 
     public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "textures/entity/agares.png");
 
     public AgaresRenderer(EntityRendererProvider.Context context) {
-        super(context, new AgaresModel(context.bakeLayer(AgaresModel.LAYER_LOCATION)), AgaresApi.scale(), AgaresApi.heightBlocks());
+        super(context, new AgaresModel(context.bakeLayer(AgaresModel.LAYER_LOCATION)), AgaresApi.scale());
         addLayer(new Glow(this));
     }
 

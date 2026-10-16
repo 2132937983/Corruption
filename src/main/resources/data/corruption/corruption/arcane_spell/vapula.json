@@ -1,26 +1,53 @@
 {
-  "energy": "6KCE",
-  "cooldown": 100,
+  "energy": "2KCE",
+  "cooldown": 30,
+  "min_corruption": 3,
   "corruption_gain": 1,
   "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:alchemy",
+      "radius": 6,
+      "height": 3,
+      "ticks": 60,
+      "color": "#FFB040",
+      "accent": "#FFFFFF",
+      "sound": "minecraft:block.anvil.use"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:wings",
+      "radius": 5,
+      "height": 1.5,
+      "ticks": 40,
+      "color": "#D08A30",
+      "accent": "#FFF0C0"
+    },
     {
       "type": "apply_effect",
       "effect": "minecraft:haste",
       "target": "self",
-      "duration": 2400,
+      "duration": 6000,
       "amplifier": 2
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:strength",
       "target": "self",
-      "duration": 1200
+      "duration": 3600,
+      "amplifier": 1
     },
     {
-      "type": "particles",
-      "shape": "burst",
-      "radius": 1,
-      "particles": [
+      "type": "launch_bolt",
+      "speed": 2,
+      "trail": [
+        {
+          "particle": "minecraft:crit",
+          "count": 2,
+          "spread": 0.05
+        }
+      ],
+      "burst": [
         {
           "particle": "minecraft:crit",
           "count": 20,
@@ -30,6 +57,28 @@
           "particle": "minecraft:enchanted_hit",
           "count": 20,
           "spread": 0.3
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 5,
+          "height": 1,
+          "ticks": 14,
+          "color": "#FFB040",
+          "accent": "#FFFFFF"
+        },
+        {
+          "type": "damage",
+          "amount": 48,
+          "radius": 7
+        },
+        {
+          "type": "push",
+          "radius": 7,
+          "strength": 1.4,
+          "lift": 0.4
         }
       ]
     }

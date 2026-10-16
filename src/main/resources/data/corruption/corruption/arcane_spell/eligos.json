@@ -1,20 +1,83 @@
 {
-  "energy": "3KCE",
-  "cooldown": 40,
+  "energy": "2KCE",
+  "cooldown": 30,
   "corruption_gain": 1,
   "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:blades",
+      "radius": 8,
+      "height": 6,
+      "ticks": 60,
+      "color": "#C0C8D8",
+      "accent": "#FFE8A0",
+      "shake": 0.2,
+      "sound": "minecraft:entity.player.attack.sweep"
+    },
     {
       "type": "apply_effect",
       "effect": "minecraft:strength",
       "target": "self",
-      "duration": 600
+      "duration": 3600,
+      "amplifier": 1
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:glowing",
       "target": "nearby",
-      "radius": 12,
-      "duration": 400
+      "radius": 24,
+      "duration": 600
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 3,
+      "look": "minecraft:trident",
+      "trail": [
+        {
+          "particle": "minecraft:crit",
+          "count": 2,
+          "spread": 0.05
+        },
+        {
+          "particle": "minecraft:enchanted_hit",
+          "count": 1,
+          "spread": 0.05
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:crit",
+          "count": 20,
+          "spread": 0.4
+        },
+        {
+          "particle": "minecraft:sweep_attack",
+          "count": 2,
+          "spread": 0.3
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 5,
+          "height": 1,
+          "ticks": 14,
+          "color": "#C0C8D8",
+          "accent": "#FFE8A0"
+        },
+        {
+          "type": "damage",
+          "amount": 48,
+          "radius": 6
+        },
+        {
+          "type": "push",
+          "radius": 6,
+          "strength": 1.4,
+          "lift": 0.3
+        }
+      ]
     },
     {
       "type": "particles",

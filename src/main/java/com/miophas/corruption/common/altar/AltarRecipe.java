@@ -53,12 +53,22 @@ import net.minecraft.world.level.Level;
  * <pre> "blocks": [{"at": [1, 0], "block": "#minecraft:candles"}, {"at": [-1, 0], "block": "#minecraft:candles"}],
  *  "corruption": 10</pre>
  *
+ * A shaped rite that remakes one thing into another may name that thing's pillar as "keep" ("1" to "6"), and the item
+ * it brings forth keeps what had been set on it (its enchantments, its wear, its name: see KeptComponents).
+ *
  * @param pillars shaped: six, slot 1 first, {@link Ingredient#EMPTY} where a pillar must hold nothing; shapeless: one to six
  * @param blocks what must stand on the ground, and where; everywhere else on it, nothing
  * @param corruption how corrupted a player at the altar must be, or 0 for no player at all
+ * @param keep shaped only: the pillar (1 to 6) whose item the result keeps what had been set on, if any
  */
 public record AltarRecipe(boolean shaped, List<Ingredient> pillars, Optional<EntityType<?>> offering, List<GroundBlock> blocks, int corruption,
-                          AltarResult result, int time) implements Recipe<AltarInput> {
+                          AltarResult result, int time, Optional<Integer> keep) implements Recipe<AltarInput> {
+    /** A rite that keeps nothing of what it remakes. */
+    public AltarRecipe(boolean shaped, List<Ingredient> pillars, Optional<EntityType<?>> offering, List<GroundBlock> blocks, int corruption,
+                       AltarResult result, int time) {
+        this(shaped, pillars, offering, blocks, corruption, result, time, Optional.empty());
+    }
+
     /** A slot, as recipes write it: "1" to "6". */
     private static final Codec<Integer> SLOT = Codec.STRING.comapFlatMap(text -> {
         try {
@@ -86,14 +96,22 @@ public record AltarRecipe(boolean shaped, List<Ingredient> pillars, Optional<Ent
     });
     private static final Codec<Integer> CORRUPTION = Codec.intRange(0, PlayerCorruptionApi.max());
 
-    public static final MapCodec<AltarRecipe> SHAPED_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+    private static final MapCodec<AltarRecipe> SHAPED_FIELDS = RecordCodecBuilder.mapCodec(instance -> instance.group(
             SHAPED_PILLARS.fieldOf("pillars").forGetter(AltarRecipe::pillars),
             BuiltInRegistries.ENTITY_TYPE.byNameCodec().optionalFieldOf("offering").forGetter(AltarRecipe::offering),
             BLOCKS.optionalFieldOf("blocks", List.of()).forGetter(AltarRecipe::blocks),
             CORRUPTION.optionalFieldOf("corruption", 0).forGetter(AltarRecipe::corruption),
             AltarResult.CODEC.fieldOf("result").forGetter(AltarRecipe::result),
-            TIME.optionalFieldOf("time", RitualRules.DEFAULT_TICKS).forGetter(AltarRecipe::time))
-            .apply(instance, (pillars, offering, blocks, corruption, result, time) -> new AltarRecipe(true, pillars, offering, blocks, corruption, result, time)));
+            TIME.optionalFieldOf("time", RitualRules.DEFAULT_TICKS).forGetter(AltarRecipe::time),
+            SLOT.optionalFieldOf("keep").forGetter(AltarRecipe::keep))
+            .apply(instance, (pillars, offering, blocks, corruption, result, time, keep) -> new AltarRecipe(true, pillars, offering, blocks, corruption, result, time, keep)));
+    public static final MapCodec<AltarRecipe> SHAPED_CODEC = SHAPED_FIELDS.flatXmap(AltarRecipe::checked, AltarRecipe::checked);
+
+    /** A rite keeps what lies on a pillar it asks for, and only for an item it brings forth. */
+    private static DataResult<AltarRecipe> checked(AltarRecipe recipe) {
+        return recipe.keep().isEmpty() || !recipe.pillars().get(recipe.keep().get() - 1).isEmpty() && recipe.result().item().isPresent()
+                ? DataResult.success(recipe) : DataResult.error(() -> "A rite keeps what lies on a pillar it asks for, and only for an item it brings forth");
+    }
     public static final MapCodec<AltarRecipe> SHAPELESS_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Ingredient.CODEC_NONEMPTY.listOf(1, AltarLayout.SLOTS).fieldOf("pillars").forGetter(AltarRecipe::pillars),
             BuiltInRegistries.ENTITY_TYPE.byNameCodec().optionalFieldOf("offering").forGetter(AltarRecipe::offering),
@@ -104,14 +122,26 @@ public record AltarRecipe(boolean shaped, List<Ingredient> pillars, Optional<Ent
             .apply(instance, (pillars, offering, blocks, corruption, result, time) -> new AltarRecipe(false, pillars, offering, blocks, corruption, result, time)));
 
     private static StreamCodec<RegistryFriendlyByteBuf, AltarRecipe> streamCodecFor(boolean shaped) {
-        return StreamCodec.composite(
-                Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list(AltarLayout.SLOTS)), AltarRecipe::pillars,
-                ByteBufCodecs.optional(ByteBufCodecs.registry(Registries.ENTITY_TYPE)), AltarRecipe::offering,
-                GroundBlock.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::blocks,
-                ByteBufCodecs.VAR_INT, AltarRecipe::corruption,
-                AltarResult.STREAM_CODEC, AltarRecipe::result,
-                ByteBufCodecs.VAR_INT, AltarRecipe::time,
-                (pillars, offering, blocks, corruption, result, time) -> new AltarRecipe(shaped, pillars, offering, blocks, corruption, result, time));
+        StreamCodec<RegistryFriendlyByteBuf, List<Ingredient>> pillars = Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list(AltarLayout.SLOTS));
+        StreamCodec<RegistryFriendlyByteBuf, Optional<EntityType<?>>> offering = ByteBufCodecs.optional(ByteBufCodecs.registry(Registries.ENTITY_TYPE));
+        StreamCodec<RegistryFriendlyByteBuf, List<GroundBlock>> blocks = GroundBlock.STREAM_CODEC.apply(ByteBufCodecs.list());
+        return StreamCodec.of((buffer, recipe) -> {
+            pillars.encode(buffer, recipe.pillars());
+            offering.encode(buffer, recipe.offering());
+            blocks.encode(buffer, recipe.blocks());
+            buffer.writeVarInt(recipe.corruption());
+            AltarResult.STREAM_CODEC.encode(buffer, recipe.result());
+            buffer.writeVarInt(recipe.time());
+            buffer.writeVarInt(recipe.keep().orElse(0));
+        }, buffer -> {
+            List<Ingredient> read = pillars.decode(buffer);
+            Optional<EntityType<?>> creature = offering.decode(buffer);
+            List<GroundBlock> ground = blocks.decode(buffer);
+            int corruption = buffer.readVarInt();
+            AltarResult result = AltarResult.STREAM_CODEC.decode(buffer);
+            int time = buffer.readVarInt(), keep = buffer.readVarInt();
+            return new AltarRecipe(shaped, read, creature, ground, corruption, result, time, keep == 0 ? Optional.empty() : Optional.of(keep));
+        });
     }
 
     /** The pillars whose items the rite uses, or null if what lies on the altar does not make it. */
@@ -148,7 +178,11 @@ public record AltarRecipe(boolean shaped, List<Ingredient> pillars, Optional<Ent
         return RitualMatch.offering(asked, present) && RitualMatch.corruption(corruption, input.corruption()) && pillarsUsed(input) != null && groundMet(input.ground());
     }
 
-    @Override public ItemStack assemble(AltarInput input, HolderLookup.Provider registries) { return result.item().map(ItemStack::copy).orElse(ItemStack.EMPTY); }
+    /** The item the rite brings forth, keeping what had been set on the thing it remakes, if it keeps it. */
+    @Override public ItemStack assemble(AltarInput input, HolderLookup.Provider registries) {
+        return result.item().map(item -> keep.map(pillar -> com.miophas.corruption.common.alchemy.KeptComponents.onto(item.copy(), input.getItem(pillar - 1)))
+                .orElseGet(item::copy)).orElse(ItemStack.EMPTY);
+    }
     @Override public boolean canCraftInDimensions(int width, int height) { return true; }
     @Override public ItemStack getResultItem(HolderLookup.Provider registries) { return result.item().orElse(ItemStack.EMPTY); }
     @Override public NonNullList<Ingredient> getIngredients() {

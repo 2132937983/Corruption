@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.miophas.corruption.api.arcane.ArcaneApi;
 import com.miophas.corruption.api.arcane.ArcaneDamage;
+import com.miophas.corruption.api.arcane.client.SpellVisuals;
 import com.miophas.corruption.common.altar.AltarRecipe;
+import com.miophas.corruption.common.registry.ModBlocks;
 import com.miophas.corruption.common.registry.ModEntities;
 import com.miophas.corruption.core.demon.AndromaliusRules;
 import com.mojang.authlib.GameProfile;
@@ -12,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -23,6 +27,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.projectile.SmallFireball;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
@@ -201,6 +207,213 @@ class AndromaliusServerTest {
             assertEquals(speed * (1 + AndromaliusRules.ENRAGED_SPEED), serpent.getAttributeValue(Attributes.MOVEMENT_SPEED), 1e-9, "and faster");
             assertEquals(AndromaliusRules.Attack.GAZE, serpent.attack(), "his gaze ready at once");
             serpent.discard();
+        });
+    }
+
+    /**
+     * He is of the corruption's side, as its remnants are: the corruption's own are his allies and never his prey;
+     * whatever else lives is his prey, a beast as much as a player, when no player is about.
+     */
+    @Test void heHuntsWhatIsNotOfTheCorruption(MinecraftServer server) {
+        TestWorld.onServer(server, level -> {
+            Andromalius serpent = serpent(level, 47_000);
+            net.minecraft.world.entity.animal.Pig pig = EntityType.PIG.create(level);
+            pig.moveTo(serpent.getX() + 8, serpent.getY(), serpent.getZ(), 0, 0);
+            pig.setNoAi(true);
+            level.addFreshEntity(pig);
+            CorruptedRemnant remnant = ModEntities.CORRUPTED_REMNANT.get().create(level);
+            remnant.moveTo(serpent.getX() + 4, serpent.getY(), serpent.getZ(), 0, 0);
+            remnant.setNoAi(true);
+            level.addFreshEntity(remnant);
+            try {
+                assertTrue(com.miophas.corruption.api.corruption.CorruptionFactionApi.isRemnant(serpent), "of the corruption's side");
+                assertTrue(serpent.isAlliedTo(remnant), "its own are his allies");
+                assertFalse(serpent.canAttack(remnant), "and never his prey");
+                // His mind picks a target as it would, taking its chances as it does.
+                for (int tries = 0; tries < 400 && serpent.getTarget() == null; tries++)
+                    for (var goal : serpent.targetSelector.getAvailableGoals())
+                        if (goal.getGoal() instanceof net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<?> hunting && hunting.canUse()) hunting.start();
+                assertSame(pig, serpent.getTarget(), "a beast, with no player about; not the remnant nearer to him");
+            } finally {
+                pig.discard();
+                remnant.discard();
+                serpent.discard();
+            }
+        });
+    }
+
+    /** The corruption's ground hurts what treads on it, but not one of its own, as he now is. */
+    @Test void theCorruptionsGroundSparesHim(MinecraftServer server) {
+        TestWorld.onServer(server, level -> {
+            Andromalius serpent = serpent(level, 54_400);
+            net.minecraft.world.entity.animal.Pig pig = EntityType.PIG.create(level);
+            pig.moveTo(serpent.getX() + 6, serpent.getY(), serpent.getZ(), 0, 0);
+            level.addFreshEntity(pig);
+            BlockPos under = serpent.blockPosition().below(), underPig = pig.blockPosition().below();
+            var before = level.getBlockState(under);
+            try {
+                var ground = ModBlocks.CORRUPTION.get().defaultBlockState();
+                level.setBlock(under, ground, 3);
+                level.setBlock(underPig, ground, 3);
+                serpent.setOnGround(true);
+                pig.setOnGround(true);
+                ground.getBlock().stepOn(level, under, ground, serpent);
+                ground.getBlock().stepOn(level, underPig, ground, pig);
+                assertEquals(serpent.getMaxHealth(), serpent.getHealth(), 1e-4, "of the corruption, he walks its ground unhurt");
+                assertTrue(pig.getHealth() < pig.getMaxHealth(), "what is not of it is hurt");
+            } finally {
+                level.setBlock(under, before, 3);
+                level.setBlock(underPig, before, 3);
+                pig.discard();
+                serpent.discard();
+            }
+        });
+    }
+
+    /**
+     * His charge, run by hand: it bores a tunnel his own size (three blocks across, four high) through a wall of stone in
+     * its way, leaving the rest of the wall standing, and stops dead at a wall of obsidian beyond it.
+     */
+    @Test void hisChargeSmashesThroughWhatIsSofterThanObsidianAndStopsAtObsidian(MinecraftServer server) {
+        TestWorld.onServer(server, level -> {
+            Andromalius serpent = serpent(level, 55_200);
+            net.minecraft.world.entity.animal.Pig pig = EntityType.PIG.create(level);
+            pig.moveTo(serpent.getX(), -60, serpent.getZ() + 20, 0, 0);
+            pig.setNoAi(true);
+            level.addFreshEntity(pig);
+            int x = net.minecraft.util.Mth.floor(serpent.getX()), z = net.minecraft.util.Mth.floor(serpent.getZ());
+            java.util.List<net.minecraft.core.BlockPos> stone = new ArrayList<>(), tunnel = new ArrayList<>(), obsidian = new ArrayList<>();
+            for (int across = -2; across <= 2; across++) for (int up = 0; up < 5; up++) {
+                stone.add(new net.minecraft.core.BlockPos(x + across, -60 + up, z + 5));
+                if (Math.abs(across) <= 1 && up <= 3) tunnel.add(new net.minecraft.core.BlockPos(x + across, -60 + up, z + 5));
+                obsidian.add(new net.minecraft.core.BlockPos(x + across, -60 + up, z + 11));
+            }
+            try {
+                stone.forEach(at -> level.setBlock(at, Blocks.STONE.defaultBlockState(), 3));
+                obsidian.forEach(at -> level.setBlock(at, Blocks.OBSIDIAN.defaultBlockState(), 3));
+                var charging = serpent.charging();
+                assertTrue(charging.usable(serpent, pig), "twenty blocks off: in its reach");
+                charging.begin(serpent, pig);
+                for (int tick = 0; tick < charging.timing().ticks(); tick++) {
+                    charging.tick(serpent, pig, tick);
+                    serpent.move(MoverType.SELF, serpent.getDeltaMovement());
+                }
+                charging.end(serpent, false);
+                assertTrue(tunnel.stream().allMatch(at -> level.getBlockState(at).isAir()), "the stone in his way gave way");
+                assertTrue(stone.stream().filter(at -> !tunnel.contains(at)).allMatch(at -> level.getBlockState(at).is(Blocks.STONE)), "the rest of the wall stands");
+                assertTrue(obsidian.stream().allMatch(at -> level.getBlockState(at).is(Blocks.OBSIDIAN)), "the obsidian did not");
+                assertTrue(charging.stopped(), "and stopped him dead");
+                assertTrue(serpent.getZ() > z + 5 && serpent.getZ() < z + 11, "past the stone, short of the obsidian: " + serpent.getZ());
+            } finally {
+                stone.forEach(at -> level.setBlock(at, Blocks.AIR.defaultBlockState(), 3));
+                obsidian.forEach(at -> level.setBlock(at, Blocks.AIR.defaultBlockState(), 3));
+                pig.discard();
+                serpent.discard();
+            }
+        });
+    }
+
+    @Test void hisChargeRamsWhatItMeets(MinecraftServer server) {
+        TestWorld.onServer(server, level -> {
+            Andromalius serpent = serpent(level, 55_600);
+            net.minecraft.world.entity.animal.Pig pig = EntityType.PIG.create(level);
+            pig.moveTo(serpent.getX(), -60, serpent.getZ() + 10, 0, 0);
+            pig.setNoAi(true);
+            level.addFreshEntity(pig);
+            try {
+                var charging = serpent.charging();
+                charging.begin(serpent, pig);
+                for (int tick = 0; tick < charging.timing().ticks(); tick++) {
+                    charging.tick(serpent, pig, tick);
+                    serpent.move(MoverType.SELF, serpent.getDeltaMovement());
+                }
+                assertTrue(pig.getHealth() < pig.getMaxHealth() || !pig.isAlive(), "rammed");
+                assertTrue(pig.getDeltaMovement().y > 0 || pig.getZ() > serpent.getZ() - 1, "and thrown off along the charge");
+            } finally {
+                pig.discard();
+                serpent.discard();
+            }
+        });
+    }
+
+    /** His body is made of hitboxes that follow him as he turns: blows land on those, and the arcane through them reaches him. */
+    @Test void hisBodyIsMadeOfPartsThatFollowHim(MinecraftServer server) {
+        TestWorld.onServer(server, level -> {
+            Andromalius serpent = serpent(level, 56_000);
+            FakePlayer player = player(level, 56_000.5 + 6, "andromalius_parts");
+            try {
+                serpent.tick();
+                var parts = serpent.getParts();
+                assertEquals(AndromaliusRules.BODY.size(), parts.length);
+                assertTrue(serpent.isMultipartEntity());
+                assertFalse(serpent.isPickable(), "his own box is not there to be struck at");
+                GoeticDemon.Part head = null, tip = null;
+                for (var part : parts) {
+                    GoeticDemon.Part body = (GoeticDemon.Part) part;
+                    assertTrue(body.isPickable());
+                    if (body.definition().name().equals("head")) head = body;
+                    if (body.definition().name().equals("tail_tip")) tip = body;
+                }
+                assertNotNull(head);
+                assertTrue(head.getZ() - serpent.getZ() > 1 && head.getY() - serpent.getY() > 2.5, "his head reared up ahead of him (he faces south)");
+                assertTrue(tip.getZ() - serpent.getZ() < -6, "the tip of his tail lies far behind him");
+                serpent.setYRot(90);
+                serpent.yBodyRot = 90;
+                serpent.tick();
+                assertTrue(head.getX() - serpent.getX() < -1, "turned west, his head follows");
+                float health = serpent.getHealth();
+                assertFalse(head.hurt(level.damageSources().playerAttack(player), 10), "a blade on his head passes through him as through the rest");
+                assertTrue(head.hurt(ArcaneDamage.source(level, player), 10), "the arcane does not");
+                assertTrue(serpent.getHealth() < health, "and it is his hurt");
+                assertTrue(serpent.hurt(level.damageSources().genericKill(), Float.MAX_VALUE));
+                assertFalse(head.isPickable(), "dying, he is nothing to strike at");
+            } finally {
+                serpent.discard();
+            }
+        });
+    }
+
+    @Test void heDiesInASpectacleAndIsGoneAtTheEndOfIt(MinecraftServer server) {
+        TestWorld.onServer(server, level -> {
+            Andromalius serpent = serpent(level, 53_600);
+            try {
+                assertTrue(serpent.hurt(level.damageSources().genericKill(), Float.MAX_VALUE), "commands still work on him");
+                assertTrue(serpent.isDeadOrDying());
+                BossDeath death = serpent.death();
+                assertEquals(AndromaliusRules.DEATH_TICKS, death.ticks(), "his own death, as long as his rules say");
+                assertEquals(serpent.getY() + serpent.getBbHeight() * .6, serpent.heart(1).y, 1e-6, "his light pours out of him a little over halfway up");
+                for (int tick = 0; tick < death.ticks(); tick++) serpent.tick();
+                assertFalse(serpent.isRemoved(), "his body is gone in his last burst, but he lingers while his death plays out");
+                assertTrue(serpent.getBoundingBoxForCulling().getXsize() > 20, "and he is drawn wherever any of it could be seen");
+                for (int tick = 0; tick < death.linger() - 1; tick++) serpent.tick();
+                assertFalse(serpent.isRemoved());
+                serpent.tick();
+                assertTrue(serpent.isRemoved(), "and then he is gone");
+            } finally {
+                serpent.discard();
+            }
+        });
+    }
+
+    /**
+     * Every boss's death, and the ordinary one a demon of an add-on's dies: each moment of it is an effect the mod draws,
+     * sounds as the game can, and has played out by the time the boss is taken away; its rays come and its body goes.
+     */
+    @Test void everyDeathIsMadeOfWhatTheGameHas(MinecraftServer server) {
+        TestWorld.onServer(server, level -> {
+            for (BossDeath death : List.of(Baal.DEATH, Agares.DEATH, Andromalius.DEATH, BossDeath.ordinary(4, 0xC6728C, 0xFFD24A))) {
+                assertTrue(death.rays().count() > 0 && death.rays().length() > 0, "light pours out of it");
+                assertFalse(death.beats().isEmpty());
+                for (BossDeath.Beat beat : death.beats()) {
+                    String what = beat.visual().effect() + " at " + beat.tick();
+                    assertTrue(SpellVisuals.BUILT_IN.contains(ResourceLocation.parse(beat.visual().effect())), what + " is one the mod draws");
+                    assertTrue(beat.visual().sound().isEmpty() || BuiltInRegistries.SOUND_EVENT.containsKey(ResourceLocation.parse(beat.visual().sound())),
+                            what + " sounds as the game can: " + beat.visual().sound());
+                    assertTrue(beat.tick() >= 0 && beat.tick() + beat.visual().ticks() <= death.lasts(), what + " has played out before it is taken away");
+                }
+                assertTrue(death.beats().stream().anyMatch(beat -> beat.visual().effect().equals("corruption:nova") && Math.abs(beat.tick() - death.ticks()) <= 4),
+                        "its body is gone in a burst of its light");
+            }
         });
     }
 

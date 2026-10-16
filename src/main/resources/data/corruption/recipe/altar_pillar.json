@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "B",
+    "X",
+    "B"
+  ],
+  "key": {
+    "B": {
+      "item": "corruption:cursed_brick"
+    },
+    "X": {
+      "item": "corruption:corruption"
+    }
+  },
+  "result": {
+    "id": "corruption:altar_pillar"
+  }
+}

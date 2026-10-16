@@ -40,9 +40,11 @@ import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.entity.ai.control.LookControl;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.PartEntity;
 
@@ -56,14 +58,20 @@ public abstract class Colossus extends Mob implements Enemy, DemonBoss {
     /** How far it has walked, in walk cycles; the legs on both sides are worked out from this. */
     private static final EntityDataAccessor<Float> CYCLE = SynchedEntityData.defineId(Colossus.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Byte> ATTACK = SynchedEntityData.defineId(Colossus.class, EntityDataSerializers.BYTE);
+    /** How near something other than a player must be for a colossus to go after it unprovoked, in blocks. */
+    private static final double HUNT_BLOCKS = 48;
     /** Which boss bar on the client is this creature's, so it can be drawn in the mod's own style. */
     private static final EntityDataAccessor<Optional<UUID>> BOSS_BAR = SynchedEntityData.defineId(Colossus.class, EntityDataSerializers.OPTIONAL_UUID);
     /** What {@link #chooseAttack} answers when there is nothing to start: walk closer, or stand and keep turning. */
     protected static final int WALK = 0, HOLD = -1;
     /** Stepping onto ground this much higher or lower takes it a tick per block, so it rises and sinks instead of jumping. */
     private static final double CLIMB_BLOCKS_PER_TICK = 1;
+    /** Through the last part of its death it goes down into the ground by this share of its height. */
+    private static final float SINK_FROM = .6F, SINK = .2F;
 
     private final Part[] parts;
+    /** The hitbox its heart is in, where its light pours out as it dies. */
+    private final Part heart;
     private final double pixel;
     private final ServerBossEvent boss = new ServerBossEvent(getDisplayName(), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);
     private double walked;
@@ -75,6 +83,9 @@ public abstract class Colossus extends Mob implements Enemy, DemonBoss {
         super(type, level);
         pixel = blocksPerPixel;
         parts = hitboxes.stream().map(part -> new Part(this, part, blocksPerPixel)).toArray(Part[]::new);
+        Part chest = parts[0];
+        for (Part part : parts) if (part.definition.name().equals("chest")) chest = part;
+        heart = chest;
         setId(ENTITY_COUNTER.getAndAdd(parts.length + 1) + 1);
         noCulling = true; noPhysics = true; xpReward = 500;
         setNoGravity(true); setPersistenceRequired();
@@ -88,6 +99,8 @@ public abstract class Colossus extends Mob implements Enemy, DemonBoss {
     /** Its legs for this state. Which attacks lift a foot or crouch it is the creature's own business. */
     protected abstract ColossusGait gait(float cycle, float walk, int attack, float attackTicks, float collapse);
     protected abstract int deathTicks();
+    /** How tall its model stands, in blocks. */
+    protected abstract double heightBlocks();
     protected abstract double sightBlocks();
     protected abstract double walkBlocksPerTick();
     protected abstract float turnDegreesPerTick();
@@ -120,6 +133,13 @@ public abstract class Colossus extends Mob implements Enemy, DemonBoss {
     public float walk(float partial) { return Mth.lerp(partial, walkO, walk); }
     /** 0 alive to 1 fully sunk, through its death. */
     public float collapse(float partial) { return deathTime <= 0 ? 0 : Math.min(1, (deathTime + partial) / deathTicks()); }
+    /** How far it has gone down into the ground as it dies, in blocks, over and above its kneeling. */
+    public double sunkBlocks(float partial) { return Math.max(0, (collapse(partial) - SINK_FROM) / (1 - SINK_FROM)) * SINK * heightBlocks(); }
+    /** The middle of its chest, as it kneels and sinks. */
+    @Override public Vec3 heart(float partial) {
+        return new Vec3(Mth.lerp(partial, heart.xo, heart.getX()), Mth.lerp(partial, heart.yo, heart.getY()) + heart.getBbHeight() / 2 - sunkBlocks(partial),
+                Mth.lerp(partial, heart.zo, heart.getZ()));
+    }
     @Override public Optional<UUID> bossBar() { return entityData.get(BOSS_BAR); }
     @Override public int emblem() { return this instanceof Agares ? 1 : 0; }
     protected double blocks(double pixels) { return pixels * pixel; }
@@ -161,19 +181,50 @@ public abstract class Colossus extends Mob implements Enemy, DemonBoss {
     /** It never moves by velocity, so nothing can shove, sink, float or drop it. */
     @Override public void travel(Vec3 input) {}
 
+    /** How near something other than a player must be for it to go after it unprovoked, in blocks; players it sees from much further. */
+    protected double huntBlocks() { return Math.min(sightBlocks(), HUNT_BLOCKS); }
+
+    /** The nearest living thing not of the corruption that it can see within its hunting range, or null. */
+    protected LivingEntity nearestPrey(ServerLevel level) {
+        double reach = huntBlocks(), best = reach * reach;
+        LivingEntity nearest = null;
+        for (LivingEntity living : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(reach), this::prey)) {
+            double distance = distanceToSqr(living);
+            if (distance < best && sees(living)) {
+                best = distance;
+                nearest = living;
+            }
+        }
+        return nearest;
+    }
+
+    /**
+     * Whether nothing solid stands between its eyes and the creature's. A mob's own sight gives out 128 blocks
+     * from its eyes, and a colossus's are nearly that high above its feet, so it would see nothing on the ground.
+     */
+    protected boolean sees(LivingEntity living) {
+        return living.level() == level() && level().clip(new ClipContext(getEyePosition(), living.getEyePosition(),
+                ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this)).getType() == HitResult.Type.MISS;
+    }
+
     protected boolean prey(Entity entity) {
         return entity instanceof LivingEntity living && living != this && living.isAlive() && !living.isSpectator()
-                && !CorruptionFactionApi.isRemnant(living) && !(living instanceof Player player && player.getAbilities().invulnerable);
+                && (!CorruptionFactionApi.isRemnant(living) || com.miophas.corruption.common.arcane.PreyMarks.hunts(this, living))
+                && !(living instanceof Player player && player.getAbilities().invulnerable)
+                && !com.miophas.corruption.api.corruption.CorruptionVeilApi.hiddenFrom(living, this);
     }
 
     @Override protected void customServerAiStep() {
         ServerLevel level = (ServerLevel) level();
         boss.setProgress(getHealth() / getMaxHealth());
         if (attackCooldown > 0) attackCooldown--;
-        // Players come first; otherwise it keeps after whatever last drew its attention, such as something that hurt it.
+        // Players come first, from as far as it sees; failing them, it keeps after whatever last drew its attention,
+        // such as something that hurt it; and failing that, as the corruption's remnants do, it goes after whatever
+        // living thing not of the corruption it sees nearest.
         if (tickCount % 20 == 0) {
             Player player = level.getNearestPlayer(getX(), getY(), getZ(), sightBlocks(), this::prey);
             if (player != null && player != getTarget()) setTarget(player);
+            else if (player == null && getTarget() == null) setTarget(nearestPrey(level));
         }
         if (getTarget() != null && (!prey(getTarget()) || distanceToSqr(getTarget()) > sightBlocks() * sightBlocks())) setTarget(null);
         LivingEntity target = getTarget();
@@ -287,24 +338,36 @@ public abstract class Colossus extends Mob implements Enemy, DemonBoss {
     /** Only something attacking it can hurt it: not fire, water, walls or its own side. Commands still can. */
     private boolean hurtPart(ColossusPart part, DamageSource source, float amount) {
         if (source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) return super.hurt(source, amount);
-        if (source.getEntity() == null || CorruptionFactionApi.isRemnant(source.getEntity())) return false;
+        if (source.getEntity() == null || isAlliedTo(source.getEntity())) return false;
         if (!super.hurt(source, amount * damageTaken(part != null && part.weak()))) return false;
         if (getTarget() == null && prey(source.getEntity())) setTarget((LivingEntity) source.getEntity());
         return true;
     }
 
-    /** It sinks over several seconds instead of tipping over and vanishing in one. */
+    @Override public void die(DamageSource source) {
+        if (!level().isClientSide && !isRemoved() && !dead) DemonBoss.logDeath(this, source);
+        super.die(source);
+    }
+
+    /**
+     * It sinks over several seconds instead of tipping over and vanishing in one, bursting here and there as it goes,
+     * and its death is sounded as {@link #death()} says. Its body is gone in the last burst of its light; it lingers,
+     * unseen and with its bar put away, while what its death set going plays out, and only then is taken away.
+     */
     @Override protected void tickDeath() {
+        BossDeath death = death();
         deathTime++;
         if (!(level() instanceof ServerLevel level) || isRemoved()) return;
         if (attackId() != 0) start(0);
-        if (deathTime % 12 == 1) {
+        death.sound(level, this, heart(0), deathTime);
+        if (deathTime < death.ticks() && deathTime % 12 == 1) {
             Part part = parts[random.nextInt(parts.length)];
             Vec3 at = part.getBoundingBox().getCenter();
             level.playSound(null, at.x, at.y, at.z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.HOSTILE, 24, .5F + random.nextFloat() * .2F);
             particles(level, ParticleTypes.EXPLOSION_EMITTER, at, 3, blocks(part.definition.width()) / 4, 0);
         }
-        if (deathTime >= deathTicks()) { level.broadcastEntityEvent(this, (byte) 60); remove(RemovalReason.KILLED); }
+        if (deathTime == death.ticks()) boss.setVisible(false);
+        if (deathTime >= death.lasts()) remove(RemovalReason.KILLED);
     }
 
     @Override public void setId(int id) { super.setId(id); if (parts != null) for (int index = 0; index < parts.length; index++) parts[index].setId(id + index + 1); }
@@ -316,9 +379,14 @@ public abstract class Colossus extends Mob implements Enemy, DemonBoss {
     @Override protected void pushEntities() {}
     @Override public boolean isPushedByFluid() { return false; }
     @Override public boolean canUsePortal(boolean allowPassengers) { return false; }
+    /** It rides nothing, not even when told to. */
+    @Override public boolean startRiding(Entity vehicle, boolean force) { return false; }
     @Override public boolean canBeAffected(MobEffectInstance effect) { return false; }
     @Override public boolean removeWhenFarAway(double distance) { return false; }
-    @Override public boolean isAlliedTo(Entity entity) { return CorruptionFactionApi.isRemnant(entity); }
+    /** Its own side is its allies, but for one marked as its prey, or hunting it (see PreyMarks). */
+    @Override public boolean isAlliedTo(Entity entity) {
+        return CorruptionFactionApi.isRemnant(entity) && !com.miophas.corruption.common.arcane.PreyMarks.feuding(this, entity);
+    }
     /** Players can turn their entity distance down; this is meant to be seen from as far as it is sent. */
     @Override public boolean shouldRenderAtSqrDistance(double distance) { return true; }
     @Override protected BodyRotationControl createBodyControl() { return new BodyRotationControl(this) { @Override public void clientTick() {} }; }
@@ -355,7 +423,8 @@ public abstract class Colossus extends Mob implements Enemy, DemonBoss {
         @Override protected void readAdditionalSaveData(CompoundTag tag) {}
         @Override protected void addAdditionalSaveData(CompoundTag tag) {}
         @Override public boolean shouldBeSaved() { return false; }
-        @Override public boolean isPickable() { return true; }
+        /** Only while it lives: a dying colossus is no longer anything to strike at. */
+        @Override public boolean isPickable() { return getParent().isAlive(); }
         @Override public boolean is(Entity entity) { return this == entity || getParent() == entity; }
         @Override public EntityDimensions getDimensions(Pose pose) { return size == null ? super.getDimensions(pose) : size; }
         @Override public boolean hurt(DamageSource source, float amount) { return getParent().hurtPart(definition, source, amount); }

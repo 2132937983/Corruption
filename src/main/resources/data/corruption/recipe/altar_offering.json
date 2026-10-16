@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RGR",
+    "BXB",
+    "BMB"
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:red_wool"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "B": {
+      "item": "corruption:cursed_brick"
+    },
+    "X": {
+      "item": "corruption:corruption"
+    },
+    "M": {
+      "item": "corruption:malice"
+    }
+  },
+  "result": {
+    "id": "corruption:altar_offering"
+  }
+}

@@ -6,8 +6,17 @@
   "actions": [
     {
       "type": "visual",
+      "effect": "corruption:fissure",
+      "radius": 20,
+      "height": 2,
+      "ticks": 50,
+      "color": "#6E6E7A",
+      "accent": "#E0E0F0"
+    },
+    {
+      "type": "visual",
       "effect": "corruption:magic_circle",
-      "radius": 10,
+      "radius": 20,
       "height": 2,
       "ticks": 50,
       "color": "#6E6E7A",
@@ -16,7 +25,7 @@
     {
       "type": "visual",
       "effect": "corruption:shockwave",
-      "radius": 12,
+      "radius": 24,
       "height": 3,
       "ticks": 26,
       "color": "#6E6E7A",
@@ -27,7 +36,7 @@
     {
       "type": "particles",
       "shape": "ring",
-      "radius": 10,
+      "radius": 20,
       "particles": [
         {
           "particle": "minecraft:large_smoke",
@@ -45,20 +54,20 @@
     },
     {
       "type": "push",
-      "radius": 10,
+      "radius": 20,
       "strength": 2.4,
       "lift": 1
     },
     {
       "type": "damage",
-      "amount": 45,
-      "radius": 10
+      "amount": 90,
+      "radius": 20
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:slowness",
       "target": "nearby",
-      "radius": 10,
+      "radius": 20,
       "duration": 300,
       "amplifier": 3
     },
@@ -66,7 +75,7 @@
       "type": "apply_effect",
       "effect": "minecraft:mining_fatigue",
       "target": "nearby",
-      "radius": 10,
+      "radius": 20,
       "duration": 300,
       "amplifier": 2
     },
@@ -74,7 +83,7 @@
       "type": "apply_effect",
       "effect": "minecraft:wither",
       "target": "nearby",
-      "radius": 10,
+      "radius": 20,
       "duration": 200,
       "amplifier": 2
     }

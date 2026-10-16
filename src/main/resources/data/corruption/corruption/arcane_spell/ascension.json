@@ -6,8 +6,16 @@
   "actions": [
     {
       "type": "visual",
+      "effect": "corruption:wings",
+      "radius": 8,
+      "height": 1.6,
+      "ticks": 60,
+      "accent": "#FFD24A"
+    },
+    {
+      "type": "visual",
       "effect": "corruption:light_pillar",
-      "radius": 2.5,
+      "radius": 5,
       "height": 40,
       "ticks": 60,
       "accent": "#FFD24A",
@@ -17,7 +25,7 @@
     {
       "type": "visual",
       "effect": "corruption:magic_circle",
-      "radius": 6,
+      "radius": 12,
       "height": 3,
       "ticks": 60
     },
@@ -58,7 +66,7 @@
     {
       "type": "particles",
       "shape": "spiral",
-      "radius": 2,
+      "radius": 4,
       "height": 6,
       "particles": [
         {
@@ -108,14 +116,14 @@
         {
           "type": "visual",
           "effect": "corruption:shockwave",
-          "radius": 3,
+          "radius": 6,
           "height": 2,
           "ticks": 14,
           "shake": 0.15
         },
         {
           "type": "lightning",
-          "radius": 1.5,
+          "radius": 3,
           "count": 3,
           "corrupt": true,
           "damage": 60,

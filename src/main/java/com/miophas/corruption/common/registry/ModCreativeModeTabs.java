@@ -42,8 +42,10 @@ public final class ModCreativeModeTabs {
                         output.accept(ModItems.PURE_LEAF.get());
                         output.accept(ModItems.CORRUPTION_BENCH.get());
                         output.accept(ModItems.CORRUPTION.get());
+                        output.accept(ModItems.DEACTIVATED_CORRUPTION.get());
                         output.accept(ModItems.MALICE.get());
                         output.accept(ModItems.CORRUPTION_ARCANE_BRICK.get());
+                        output.accept(ModItems.CURSED_BRICK.get());
                         output.accept(ModItems.CORRUPTION_ARCANE_TRANSMUTER.get());
                         // A candle as the transmuter makes it, carrying all it can.
                         net.minecraft.world.item.ItemStack candle = new net.minecraft.world.item.ItemStack(ModItems.CORRUPTION_CANDLE.get());
@@ -64,6 +66,9 @@ public final class ModCreativeModeTabs {
                         output.accept(ModItems.CORRUPTED_BREAD.get());
                         output.accept(ModItems.PURIFIED_WATER.get());
                         for (var piece : ModItems.ROBE_SET) output.accept(piece.get());
+                        for (var piece : ModItems.CORRUPTED_ROBES) output.accept(piece.get());
+                        output.accept(ModItems.CORRUPTION_ENERGY_SWORD.get());
+                        output.accept(ModItems.CORRUPTED_ARCANE_SWORD.get());
                         output.accept(ModItems.CORRUPTION_TEETH.get());
                         output.accept(ModItems.MALICE_GRASS.get());
                         output.accept(ModItems.WHISPER_BLOOM.get());

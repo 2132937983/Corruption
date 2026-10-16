@@ -1,35 +1,108 @@
 {
-  "energy": "6KCE",
-  "cooldown": 60,
-  "min_corruption": 10,
+  "energy": "2KCE",
+  "cooldown": 30,
+  "min_corruption": 5,
   "corruption_gain": 1,
   "actions": [
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#1A8A9A",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#1A8A9A"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#1A8A9A"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:tidal_wave",
+          "radius": 18,
+          "height": 2.5,
+          "ticks": 50,
+          "color": "#1A8A9A",
+          "accent": "#A0FFF0",
+          "sound": "minecraft:entity.generic.splash"
+        },
+        {
+          "type": "visual",
+          "effect": "corruption:miasma",
+          "radius": 18,
+          "ticks": 60,
+          "color": "#5A7A2A",
+          "accent": "#C0E070"
+        },
+        {
+          "type": "damage",
+          "amount": 44,
+          "radius": 18
+        },
+        {
+          "type": "push",
+          "radius": 18,
+          "strength": 1.4,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 18,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:wither",
+          "target": "nearby",
+          "radius": 18,
+          "duration": 200,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:poison",
+          "target": "nearby",
+          "radius": 18,
+          "duration": 200,
+          "amplifier": 1
+        }
+      ]
+    },
     {
       "type": "apply_effect",
       "effect": "minecraft:water_breathing",
       "target": "self",
-      "duration": 2400
+      "duration": 9600
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:dolphins_grace",
       "target": "self",
-      "duration": 1200
-    },
-    {
-      "type": "apply_effect",
-      "effect": "minecraft:wither",
-      "target": "nearby",
-      "radius": 6,
-      "duration": 160
-    },
-    {
-      "type": "apply_effect",
-      "effect": "minecraft:poison",
-      "target": "nearby",
-      "radius": 6,
-      "duration": 200,
-      "amplifier": 1
+      "duration": 3600
     },
     {
       "type": "particles",
@@ -38,11 +111,11 @@
       "particles": [
         {
           "particle": "minecraft:splash",
-          "count": 40
+          "count": 30
         },
         {
           "particle": "minecraft:item_slime",
-          "count": 16
+          "count": 12
         }
       ]
     }

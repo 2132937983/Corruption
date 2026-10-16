@@ -1,40 +1,118 @@
 {
-  "energy": "9KCE",
-  "cooldown": 120,
-  "min_corruption": 14,
+  "energy": "3KCE",
+  "cooldown": 40,
+  "min_corruption": 8,
   "corruption_gain": 1,
   "actions": [
     {
-      "type": "pacify",
-      "radius": 12
+      "type": "visual",
+      "effect": "corruption:eye",
+      "radius": 4.8,
+      "height": 5,
+      "ticks": 70,
+      "color": "#C060FF",
+      "accent": "#FFFFFF",
+      "sound": "minecraft:entity.evoker.prepare_wololo"
     },
     {
-      "type": "apply_effect",
-      "effect": "minecraft:nausea",
-      "target": "nearby",
-      "radius": 12,
-      "duration": 300
+      "type": "visual",
+      "effect": "corruption:shards",
+      "radius": 6,
+      "height": 2.2,
+      "ticks": 60,
+      "color": "#8A40C0",
+      "accent": "#F0D0FF"
     },
     {
-      "type": "apply_effect",
-      "effect": "minecraft:weakness",
-      "target": "nearby",
-      "radius": 12,
-      "duration": 600,
-      "amplifier": 2
-    },
-    {
-      "type": "apply_effect",
-      "effect": "minecraft:mining_fatigue",
-      "target": "nearby",
-      "radius": 12,
-      "duration": 600,
-      "amplifier": 1
+      "type": "launch_bolt",
+      "speed": 1.6,
+      "color": "#C060FF",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#C060FF"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#C060FF"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 24,
+          "height": 1.5,
+          "ticks": 18,
+          "color": "#C060FF",
+          "accent": "#FFFFFF"
+        },
+        {
+          "type": "damage",
+          "amount": 60,
+          "radius": 24
+        },
+        {
+          "type": "push",
+          "radius": 24,
+          "strength": 1.4,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 24,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:nausea",
+          "target": "nearby",
+          "radius": 24,
+          "duration": 300
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:weakness",
+          "target": "nearby",
+          "radius": 24,
+          "duration": 600,
+          "amplifier": 2
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:mining_fatigue",
+          "target": "nearby",
+          "radius": 24,
+          "duration": 600,
+          "amplifier": 1
+        }
+      ]
     },
     {
       "type": "particles",
       "shape": "sphere",
-      "radius": 4,
+      "radius": 6,
       "particles": [
         {
           "particle": "minecraft:witch",

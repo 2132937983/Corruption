@@ -1,0 +1,20 @@
+{
+  "type": "corruption:alchemy_shapeless",
+  "ingredients": [
+    {
+      "item": "corruption:memory_fragment",
+      "count": 1
+    },
+    {
+      "item": "minecraft:diamond",
+      "count": 10
+    },
+    {
+      "item": "minecraft:quartz",
+      "count": 32
+    }
+  ],
+  "result": {
+    "id": "corruption:corrupted_memory_gem"
+  }
+}

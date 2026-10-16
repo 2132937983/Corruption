@@ -7,7 +7,7 @@
     {
       "type": "visual",
       "effect": "corruption:vortex",
-      "radius": 6,
+      "radius": 12,
       "height": 5,
       "ticks": 50,
       "shake": 0.2,
@@ -16,7 +16,7 @@
     {
       "type": "particles",
       "shape": "spiral",
-      "radius": 5,
+      "radius": 10,
       "height": 3,
       "particles": [
         {
@@ -33,22 +33,26 @@
       ]
     },
     {
+      "type": "corrupt_creatures",
+      "radius": 20
+    },
+    {
       "type": "push",
-      "radius": 10,
+      "radius": 20,
       "strength": -1.6,
       "lift": 0.2
     },
     {
       "type": "damage",
-      "amount": 16,
-      "radius": 10,
+      "amount": 32,
+      "radius": 20,
       "damage_type": "corruption:corruption"
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:slowness",
       "target": "nearby",
-      "radius": 10,
+      "radius": 20,
       "duration": 160,
       "amplifier": 2
     },
@@ -56,7 +60,7 @@
       "type": "apply_effect",
       "effect": "corruption:corruption_curse",
       "target": "nearby",
-      "radius": 10,
+      "radius": 20,
       "duration": 120
     }
   ]

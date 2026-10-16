@@ -104,7 +104,7 @@ public abstract class AnchoredLivingPlant extends PathfinderMob {
             if (growthTicks >= growthInterval()) grow();
         }
         if (LivingPlantApi.definition(plantKind()).causesBlindness()) for (Player player : server.getEntitiesOfClass(Player.class, getBoundingBox().inflate(InfectionConfig.blindnessRadius()),
-                p -> p.isAlive() && !p.isSpectator() && !p.isCreative())) {
+                p -> p.isAlive() && !p.isSpectator() && !p.isCreative() && !com.miophas.corruption.api.corruption.CorruptionVeilApi.hiddenFrom(p, this))) {
             player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 60, 0, false, false, true));
         }
         if (LivingPlantApi.definition(plantKind()).attractsRemnants() && (tickCount + getId()) % 40 == 0) {
@@ -128,7 +128,9 @@ public abstract class AnchoredLivingPlant extends PathfinderMob {
     @Override public boolean isPushable() { return false; }
     @Override public void push(double x, double y, double z) {}
     @Override public void travel(Vec3 input) { setDeltaMovement(Vec3.ZERO); }
-    @Override public boolean isAlliedTo(Entity entity) { return CorruptionFactionApi.isRemnant(entity); }
+    @Override public boolean isAlliedTo(Entity entity) {
+        return CorruptionFactionApi.isRemnant(entity) && !com.miophas.corruption.common.arcane.PreyMarks.feuding(this, entity);
+    }
     @Override public boolean isInvulnerableTo(DamageSource source) { return source.is(ModDamageTypes.CORRUPTION) || super.isInvulnerableTo(source); }
     @Override public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag); tag.putLong("Anchor", anchor().asLong()); tag.putBoolean("Hanging", hanging());

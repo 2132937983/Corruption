@@ -65,8 +65,11 @@ public class CorruptionPurifyingItem extends Item {
         return stack;
     }
 
-    /** Lowers a player's corruption as this purifier does. */
-    public void purify(Player player) { PlayerCorruptionHolder.set(player, purifier.purify(PlayerCorruptionHolder.of(player))); }
+    /** Lowers a player's corruption as this purifier does; not while a corrupted robe holds it fast (CorruptionVeilApi). */
+    public void purify(Player player) {
+        if (CorruptionVeilApi.holdsCorruption(player)) return;
+        PlayerCorruptionHolder.set(player, purifier.purify(PlayerCorruptionHolder.of(player)));
+    }
 
     @Override public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> lines, TooltipFlag flag) {
         lines.add(Component.translatable("tooltip.corruption.purifies", purifier.amount()).withStyle(ChatFormatting.AQUA));

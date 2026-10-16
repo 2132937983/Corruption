@@ -42,12 +42,14 @@ public final class RemnantCombatEvents {
     }
     @SubscribeEvent public static void friendlyDamage(LivingIncomingDamageEvent event) {
         var attacker = event.getSource().getEntity();
-        if (attacker instanceof CorruptedRemnant && CorruptionFactionApi.isRemnant(event.getEntity())) event.setCanceled(true);
+        if (attacker instanceof CorruptedRemnant && CorruptionFactionApi.isRemnant(event.getEntity())
+                && !com.miophas.corruption.common.arcane.PreyMarks.feuding(attacker, event.getEntity())) event.setCanceled(true);
     }
     @SubscribeEvent public static void friendlyImpact(net.neoforged.neoforge.event.entity.ProjectileImpactEvent event) {
         if (event.getProjectile().getOwner() instanceof CorruptedRemnant
                 && event.getRayTraceResult() instanceof net.minecraft.world.phys.EntityHitResult hit
-                && CorruptionFactionApi.isRemnant(hit.getEntity())) event.setCanceled(true);
+                && CorruptionFactionApi.isRemnant(hit.getEntity())
+                && !com.miophas.corruption.common.arcane.PreyMarks.feuding(event.getProjectile().getOwner(), hit.getEntity())) event.setCanceled(true);
     }
     private RemnantCombatEvents() {}
 }

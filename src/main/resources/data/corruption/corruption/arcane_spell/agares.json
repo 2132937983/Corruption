@@ -1,19 +1,85 @@
 {
-  "energy": "2KCE",
+  "energy": "1KCE",
   "cooldown": 40,
   "corruption_gain": 1,
   "actions": [
     {
+      "type": "visual",
+      "effect": "corruption:spikes",
+      "radius": 12,
+      "height": 2.2,
+      "ticks": 50,
+      "color": "#7FC8FF",
+      "accent": "#F0FCFF",
+      "shake": 0.3,
+      "sound": "minecraft:block.glass.break"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:fissure",
+      "radius": 16,
+      "height": 1.5,
+      "ticks": 50,
+      "color": "#3F8FD0",
+      "accent": "#E0F8FF",
+      "sound": "minecraft:item.mace.smash_ground"
+    },
+    {
       "type": "apply_effect",
       "effect": "minecraft:resistance",
       "target": "self",
-      "duration": 400,
+      "duration": 1200,
+      "amplifier": 1
+    },
+    {
+      "type": "damage",
+      "amount": 36,
+      "radius": 16
+    },
+    {
+      "type": "push",
+      "radius": 16,
+      "strength": 1.2,
+      "lift": 0.4,
+      "from": "caster"
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slowness",
+      "target": "nearby",
+      "radius": 16,
+      "duration": 80,
       "amplifier": 1
     },
     {
       "type": "freeze_area",
-      "radius": 4,
+      "radius": 16,
       "ticks": 200
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slowness",
+      "target": "nearby",
+      "radius": 16,
+      "duration": 100,
+      "amplifier": 2
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 14,
+      "particles": [
+        {
+          "particle": "minecraft:snowflake",
+          "count": 60,
+          "spread": 0.1
+        },
+        {
+          "particle": "minecraft:item_snowball",
+          "count": 30,
+          "spread": 0.2
+        }
+      ]
     }
   ]
 }

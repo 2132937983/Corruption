@@ -6,8 +6,17 @@
   "actions": [
     {
       "type": "visual",
+      "effect": "corruption:eye",
+      "radius": 5,
+      "height": 6,
+      "ticks": 80,
+      "color": "#B8C8FF",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "visual",
       "effect": "corruption:rune_ring",
-      "radius": 2.5,
+      "radius": 5,
       "height": 3,
       "ticks": 80,
       "color": "#B8C8FF",
@@ -17,7 +26,7 @@
     {
       "type": "visual",
       "effect": "corruption:magic_circle",
-      "radius": 3,
+      "radius": 6,
       "height": 2,
       "ticks": 80,
       "color": "#B8C8FF",
@@ -65,7 +74,7 @@
     {
       "type": "particles",
       "shape": "spiral",
-      "radius": 1.5,
+      "radius": 3,
       "height": 3,
       "particles": [
         {

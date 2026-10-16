@@ -1,10 +1,12 @@
 package com.miophas.corruption.common.entity;
 
-import com.miophas.corruption.common.registry.ModParticles;
+import com.miophas.corruption.common.entity.skill.ChargeSkill;
+import com.miophas.corruption.common.entity.skill.GazeSkill;
 import com.miophas.corruption.core.demon.AndromaliusRules;
 import com.miophas.corruption.core.demon.AndromaliusRules.Attack;
 import com.miophas.corruption.core.demon.AndromaliusRules.Intent;
 import java.util.EnumSet;
+import java.util.List;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -35,7 +37,6 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -49,11 +50,26 @@ import net.minecraft.world.phys.Vec3;
  * data/corruption/recipe/altar/andromalius.json). What he does and when is {@link AndromaliusRules}: he circles his
  * quarry at a middle distance and works on it with his gaze and his fireballs, hunts it down every so often (and
  * at once when it is blinded or slowed) to bite it, lashes with his tail at whatever is behind him, raises his ward
- * when rushed, slithers aside from what is thrown at him, and is enraged below half his health. This carries it out.
- * As every {@link GoeticDemon}, only the arcane can hurt him; while his ward stands, it hurts him only by half.
- * He burns not at all.
+ * when rushed, slithers aside from what is thrown at him, charges what he hunts or cannot see, smashing through what
+ * stands in his way, and is enraged below half his health. This carries it out; his gaze and his charge are the skill
+ * modules every boss may share (GazeSkill, ChargeSkill). As every {@link GoeticDemon}, only the arcane can hurt him;
+ * while his ward stands, it hurts him only by half. He burns not at all. His body is his hitboxes
+ * ({@link AndromaliusRules#BODY}): his head, his neck, his coil and his tail along the ground.
  */
 public final class Andromalius extends GoeticDemon {
+    /**
+     * His death: the chains of his own punishing bind him, his eye opens over him and glares its last, the souls he
+     * took rise out of him, and as the chains burst apart he is gone in a burst of his blood-red light, a ring of it
+     * racing out and a pillar of it standing where he fell.
+     */
+    public static final BossDeath DEATH = new BossDeath(AndromaliusRules.DEATH_TICKS, 45, 1, new BossDeath.Rays(14, 9, 0xC01010, 0xFF9090), .1F, List.of(
+            BossDeath.beat(0, BossDeath.Anchor.FEET, "chains", 4, 1.2, 80, 0x2E7D32, 0xB0FF90, 0, "minecraft:block.chain.place", 3, .6F),
+            BossDeath.beat(2, BossDeath.Anchor.FEET, "eye", 3.6, 7, 62, 0xC01010, 0xFF6060, .2, "minecraft:entity.elder_guardian.curse", 4, .7F),
+            BossDeath.beat(24, BossDeath.Anchor.FEET, "souls", 2.5, 7, 55, 0xC01010, 0xB0FF90, 0, "minecraft:particle.soul_escape", 3, .8F),
+            BossDeath.beat(66, BossDeath.Anchor.HEART, "nova", 12, 0, 26, 0xC01010, 0xFFFFFF, .6, "minecraft:entity.generic.explode", 4, .8F),
+            BossDeath.beat(66, BossDeath.Anchor.FEET, "shockwave", 12, 2.5, 26, 0xC01010, 0xFF9090, 0, "", 0, 1),
+            BossDeath.beat(67, BossDeath.Anchor.FEET, "light_pillar", 1.4, 36, 44, 0xC01010, 0xFFC0C0, 0, "minecraft:block.beacon.deactivate", 4, .6F)));
+
     private static final EntityDataAccessor<Byte> ATTACK = SynchedEntityData.defineId(Andromalius.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Boolean> SHIELDED = SynchedEntityData.defineId(Andromalius.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> ENRAGED = SynchedEntityData.defineId(Andromalius.class, EntityDataSerializers.BOOLEAN);
@@ -65,9 +81,11 @@ public final class Andromalius extends GoeticDemon {
     /** How hard he lunges into a bite, slithers aside from a thrown thing, and throws off what his tail lashes, in blocks a tick. */
     private static final double LUNGE = .9, DODGE = 1.1, LASH = 1.2;
 
+    private final GazeSkill gazing = new GazeSkill(AndromaliusRules.GAZE, 0xC01010, 0xFF6060);
+    private final ChargeSkill charging = new ChargeSkill(AndromaliusRules.CHARGE);
     private final AndromaliusRules.Approach approach = new AndromaliusRules.Approach();
     private final AndromaliusRules.Shield shield = new AndromaliusRules.Shield();
-    private int gazeCooldown = 30, volleyCooldown = 20, biteCooldown, tailCooldown, dodgeCooldown, huntCooldown = AndromaliusRules.HUNT_EVERY / 2;
+    private int gazeCooldown = 30, volleyCooldown = 20, biteCooldown, tailCooldown, dodgeCooldown, huntCooldown = AndromaliusRules.HUNT_EVERY / 2, chargeCooldown = 60;
     private int attackTicks, volleySize, volleyFired, huntTicks, huntBites, retreatTicks, strafeTicks, strafeSide = 1;
     private boolean hunting;
     private Intent intent = Intent.CIRCLE;
@@ -77,7 +95,7 @@ public final class Andromalius extends GoeticDemon {
     private int attackSeen, shieldSeen;
 
     public Andromalius(EntityType<? extends Andromalius> type, Level level) {
-        super(type, level, BossEvent.BossBarColor.RED);
+        super(type, level, BossEvent.BossBarColor.RED, AndromaliusRules.BODY);
         xpReward = 60;
     }
 
@@ -102,7 +120,7 @@ public final class Andromalius extends GoeticDemon {
         goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 24));
         goalSelector.addGoal(8, new RandomLookAroundGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        huntTheUncorrupted(2);
     }
 
     // ---- his mind ----
@@ -117,7 +135,7 @@ public final class Andromalius extends GoeticDemon {
         }
         gazeCooldown = Math.max(0, gazeCooldown - 1); volleyCooldown = Math.max(0, volleyCooldown - 1);
         biteCooldown = Math.max(0, biteCooldown - 1); tailCooldown = Math.max(0, tailCooldown - 1);
-        dodgeCooldown = Math.max(0, dodgeCooldown - 1); huntCooldown = Math.max(0, huntCooldown - 1);
+        dodgeCooldown = Math.max(0, dodgeCooldown - 1); huntCooldown = Math.max(0, huntCooldown - 1); chargeCooldown = Math.max(0, chargeCooldown - 1);
         retreatTicks = Math.max(0, retreatTicks - 1);
         if (--strafeTicks <= 0 || horizontalCollision) {
             strafeSide = random.nextFloat() < .7F ? -strafeSide : strafeSide;
@@ -150,7 +168,7 @@ public final class Andromalius extends GoeticDemon {
         }
         boolean sight = hasLineOfSight(target);
         AndromaliusRules.Situation now = new AndromaliusRules.Situation(distance, sight, AndromaliusRules.behind(degreesOff(target)), impaired, hunting,
-                retreatTicks > 0, gazeCooldown == 0, volleyCooldown == 0, biteCooldown == 0, tailCooldown == 0);
+                retreatTicks > 0, gazeCooldown == 0, volleyCooldown == 0, biteCooldown == 0, tailCooldown == 0, chargeCooldown == 0);
         intent = AndromaliusRules.intent(now);
 
         switch (attack()) {
@@ -160,12 +178,18 @@ public final class Andromalius extends GoeticDemon {
                     volleySize = AndromaliusRules.volleySize(getHealth() / getMaxHealth());
                     volleyFired = 0;
                 }
-                if (next != Attack.NONE) begin(next);
+                if (next != Attack.NONE) begin(next, target);
             }
             case GAZE -> {
-                if (++attackTicks < AndromaliusRules.GAZE_WINDUP) return;
-                if (hasLineOfSight(target) && AndromaliusRules.inGaze(distance)) gaze(target);
+                gazing.tick(this, target, attackTicks++);
+                if (!gazing.timing().over(attackTicks)) return;
                 gazeCooldown = AndromaliusRules.cooldown(AndromaliusRules.GAZE_COOLDOWN, enraged);
+                end();
+            }
+            case CHARGE -> {
+                charging.tick(this, target, attackTicks++);
+                if (!charging.timing().over(attackTicks)) return;
+                chargeCooldown = AndromaliusRules.cooldown(AndromaliusRules.CHARGE.timing().cooldown(), enraged);
                 end();
             }
             case VOLLEY -> {
@@ -212,14 +236,16 @@ public final class Andromalius extends GoeticDemon {
         playSound(SoundEvents.CREEPER_PRIMED, 2, .45F);
     }
 
-    private void begin(Attack attack) {
+    private void begin(Attack attack, LivingEntity target) {
         attackTicks = 0;
         entityData.set(ATTACK, (byte) attack.ordinal());
-        if (attack == Attack.GAZE) playSound(SoundEvents.ELDER_GUARDIAN_AMBIENT, 2, .5F);
+        if (attack == Attack.GAZE) gazing.begin(this, target);
+        else if (attack == Attack.CHARGE) charging.begin(this, target);
         else if (attack == Attack.VOLLEY) playSound(SoundEvents.CREEPER_PRIMED, 2, .5F);
     }
 
     private void end() {
+        if (attack() == Attack.CHARGE) charging.end(this, attackTicks < charging.timing().ticks());
         attackTicks = 0;
         entityData.set(ATTACK, (byte) 0);
     }
@@ -241,17 +267,12 @@ public final class Andromalius extends GoeticDemon {
 
     /**
      * Fixes something with the eye on his brow: a player sees it flash before their eyes, as an elder guardian's
-     * face does, and hears the guardian's curse; whatever it is, it is slowed and blinded.
+     * face does, and hears the guardian's curse; whatever it is, it is slowed and blinded (GazeSkill.stare).
      */
-    public void gaze(LivingEntity target) {
-        if (target instanceof Player player && (player.isCreative() || player.isSpectator())) return;
-        if (target instanceof ServerPlayer player && level() instanceof ServerLevel server) {
-            server.sendParticles(player, ModParticles.ANDROMALIUS_GAZE.get(), true, player.getX(), player.getEyeY(), player.getZ(), 1, 0, 0, 0, 0);
-            player.playNotifySound(SoundEvents.ELDER_GUARDIAN_CURSE, SoundSource.HOSTILE, 1, .6F);
-        }
-        target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, AndromaliusRules.SLOWNESS_TICKS, AndromaliusRules.SLOWNESS_LEVEL), this);
-        target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, AndromaliusRules.BLINDNESS_TICKS), this);
-    }
+    public void gaze(LivingEntity target) { GazeSkill.stare(this, target, AndromaliusRules.GAZE); }
+
+    /** His charge, as it stands: the way it rushes, and whether something has stopped it. */
+    public ChargeSkill charging() { return charging; }
 
     /** Where his fireballs leave from: his jaws, up on his raised forebody, a little ahead of him. */
     public Vec3 mouth() {
@@ -413,6 +434,16 @@ public final class Andromalius extends GoeticDemon {
     }
 
     @Override public int emblem() { return 2; }
+    @Override public BossDeath death() { return DEATH; }
+
+    /** Gone in his light: a flash, and his souls and smoke bursting out of where he lay. */
+    @Override protected void gone(ServerLevel level) {
+        super.gone(level);
+        Vec3 heart = heart(0);
+        level.sendParticles(ParticleTypes.FLASH, heart.x, heart.y, heart.z, 1, 0, 0, 0, 0);
+        level.sendParticles(ParticleTypes.SOUL, heart.x, heart.y, heart.z, 40, .8, .8, .8, .12);
+        level.sendParticles(ParticleTypes.LARGE_SMOKE, heart.x, heart.y, heart.z, 30, .9, .6, .9, .05);
+    }
 
     // ---- the rest of what he is ----
 
@@ -429,6 +460,7 @@ public final class Andromalius extends GoeticDemon {
         tag.putInt("GazeCooldown", gazeCooldown);
         tag.putInt("VolleyCooldown", volleyCooldown);
         tag.putInt("HuntCooldown", huntCooldown);
+        tag.putInt("ChargeCooldown", chargeCooldown);
     }
 
     @Override public void readAdditionalSaveData(CompoundTag tag) {
@@ -438,6 +470,7 @@ public final class Andromalius extends GoeticDemon {
         gazeCooldown = tag.getInt("GazeCooldown");
         volleyCooldown = tag.getInt("VolleyCooldown");
         huntCooldown = tag.getInt("HuntCooldown");
+        chargeCooldown = tag.getInt("ChargeCooldown");
         entityData.set(ENRAGED, AndromaliusRules.enraged(getHealth() / getMaxHealth()));
     }
 
@@ -462,8 +495,13 @@ public final class Andromalius extends GoeticDemon {
         @Override public void tick() {
             LivingEntity target = serpent.getTarget();
             if (target == null) return;
-            serpent.getLookControl().setLookAt(target, 30, 30);
             Attack attack = serpent.attack();
+            // His charge steers and turns him itself.
+            if (attack == Attack.CHARGE) {
+                serpent.getNavigation().stop();
+                return;
+            }
+            serpent.getLookControl().setLookAt(target, 30, 30);
             if (attack == Attack.GAZE || attack == Attack.VOLLEY || attack == Attack.TAIL) {
                 serpent.getNavigation().stop();
                 return;

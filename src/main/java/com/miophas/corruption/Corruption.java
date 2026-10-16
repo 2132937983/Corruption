@@ -55,5 +55,6 @@ public final class Corruption {
         event.enqueueWork(() -> Regions.register(new CorruptionRegion()));
         event.enqueueWork(com.miophas.corruption.common.registry.ModFluids::interactions);
         event.enqueueWork(com.miophas.corruption.common.arcane.SpellEffects::install);
+        event.enqueueWork(com.miophas.corruption.common.entity.skill.BossSkillMaker::install);
     }
 }

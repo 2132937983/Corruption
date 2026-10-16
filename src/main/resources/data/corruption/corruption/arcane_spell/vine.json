@@ -1,14 +1,24 @@
 {
-  "energy": "8KCE",
-  "cooldown": 120,
-  "min_corruption": 12,
+  "energy": "3KCE",
+  "cooldown": 40,
+  "min_corruption": 8,
   "corruption_gain": 1,
   "actions": [
     {
+      "type": "visual",
+      "effect": "corruption:crown",
+      "radius": 6,
+      "height": 2.6,
+      "ticks": 40,
+      "color": "#3A3A5A",
+      "accent": "#C0A0FF",
+      "sound": "minecraft:entity.ravager.roar"
+    },
+    {
       "type": "launch_bolt",
       "speed": 1.5,
-      "count": 3,
-      "fan": 15,
+      "count": 5,
+      "fan": 30,
       "trail": [
         {
           "particle": "minecraft:dust",
@@ -37,15 +47,33 @@
       ],
       "on_hit": [
         {
-          "type": "explode",
-          "power": 2.5,
-          "breaks_blocks": true
+          "type": "visual",
+          "effect": "corruption:fissure",
+          "radius": 6,
+          "height": 1.2,
+          "ticks": 40,
+          "color": "#5A4A7A",
+          "accent": "#FFA040",
+          "shake": 0.3
+        },
+        {
+          "type": "damage",
+          "amount": 36,
+          "radius": 7
         },
         {
           "type": "push",
-          "radius": 4,
+          "radius": 8,
           "strength": 1.2,
           "lift": 0.4
+        },
+        {
+          "type": "explode",
+          "power": 2.5,
+          "breaks_blocks": true,
+          "break_radius": 3,
+          "max_blocks": 24,
+          "max_resistance": 6
         }
       ]
     }

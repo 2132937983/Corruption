@@ -1222,3 +1222,1369 @@ Asked for: a more advanced AI, his abilities more often, more speed and a genera
 - The existing `CorruptedBreadServerTest` and `SpellServerTest` still pass through the new `raise`.
 - **Run**: the full suite, 405 tests, passes. Nothing was checked in game.
 
+---
+
+## 26. Twenty new spell effects, and an effect for every one of the seventy-two
+
+### 26.1 The effects (`common/client/visual`, ids in `api/arcane/client/SpellVisuals`)
+Twenty new kinds of the `visual` action, after the first six. All are drawn as additive light (`RenderType.eyes`), like those, and fade in and out with `strength()`.
+
+| id | What it draws |
+| --- | --- |
+| `hellfire` | A flash, then a ring of flame bursting up, its tongues at heights of their own scrolling up it (`flames` texture), a lower ring inside, a forge-glow on the ground, embers whirling up. |
+| `wings` | Two great wings behind the caster, turned with their yaw: rows of flight feathers and coverts on an arm from the shoulder, folded at first, sweeping open past their span, beating, shedding feathers. `height` is the shoulder, `radius` one wing's reach. A feather hanging down stops at the ground. |
+| `feathers` | A gust ring on the ground; feathers burst out on swirling paths, then drift down rocking. |
+| `lightning` | A storm's eye overhead with billows of cloud round it (so it is a storm from the side too); forked bolts strike round the spot one after another, the first in the middle, each flickering on, dim, on, lighting the cloud, splashing light where it lands. |
+| `fissure` | Cracks racing out and branching, molten light in them and seeping up from them, a crater glow, shards flung up; then they cool. |
+| `spikes` | Ring after ring of faceted spikes (`facet` texture) erupting outward from the middle, overshooting, leaning out, a flash at each foot; they sink at the end. |
+| `blades` | Swords of light glinting into being high up, point down, each out of a small turning circle; they plunge one after another, sparks and a flash where each strikes, and stand buried a third of their length. |
+| `souls` | A slow whirl of light on the ground; wisps and skulls spiral up out of it trailing light. |
+| `eye` | An eye high over the spot, always turned to the viewer: its lids part, the iris glances about, then fixes on the viewer; it blinks once; rays of glory and a triangle of light round it; a searching beam sweeps the ground; it closes at the end. |
+| `constellation` | Stars wink on one by one in a dome overhead (spread evenly round it), then lines join them into a figure; the sky turns, dust sifts down, shooting stars cross it; a star chart turns on the ground. |
+| `sigil` | A ring of runes standing before the caster, the way they faced; a point of light traces a spirit's seal in it stroke by stroke; it flares when done and its strokes fly apart at the end. The seal is seeded by the spell's colours and size, so a spell always traces the same one. |
+| `tidal_wave` | A wave rising in a ring and rushing out: a long back, a steep hollowed front curling into a lip, foam at the crest, spray; a smaller wave follows; the ground behind glistens (`water` texture). A wave is never taller than the ground behind its front can hold. |
+| `bloom` | A lotus of light: three rings of petals opening from a bud round a glowing heart, turning; light and pollen rise from it. |
+| `chains` | From small circles round the spot, chains of light (links alternately turned) shoot up one after another, arc over and lash together over the middle under a binding circle; they thrum when taut and burst apart link by link. |
+| `resonance` | On every beat a ring of sound pulses out, a swaying staff of music standing round it (`staff` texture), notes riding its lines and floating up; the ground flashes and ripples on the beat. |
+| `rift` | A standing ring of racing sparks spinning open before the caster, sparks dripping off it, space whirling inside; it spins shut. |
+| `miasma` | Billows of glowing cloud rolling out low and swelling; bubbles rise from the ground and burst. |
+| `crown` | A faceted crown descending and turning, a gem under each point, rays of glory round it (never long enough to reach the ground), gold dust falling, a royal circle on the ground. |
+| `alchemy` | A transmutation circle (`alchemy_circle` texture) drawn round as by a hand; once closed, arcs leap over it; the reaction flares in a column of light and motes rise. |
+| `shards` | Glassy shards fly in and circle the spot, tumbling, now and then glinting; they burst outward at the end. |
+
+- **API**: `SpellVisual.Shown` gains `facing`, the viewer's camera orientation (`Quaternionfc`), with `right()`, `up()` and `forward()`, so that sprites and lines can face the viewer. `SpellVisualRenderer` passes `entityRenderDispatcher.cameraOrientation()`.
+  - This changes the record's constructor; the mod's renderer is its only caller.
+- **Drawing helpers** (`VisualDraw`):
+  - `sprite`, a sprite facing the viewer, with roll; and `spriteAlong`, a sprite laid along a line.
+  - `segment`, `beam`, `beams` and `groundLine`, lines of light.
+  - `triangle`.
+  - `discIn`, a disc in any plane; and `roundIn`, an upright disc cut round so its corners never swing into the ground.
+  - `wipe`, a disc revealed by a sweeping hand.
+  - `lookX`/`lookZ`, `within`, and `hash`.
+- **New `VisualPaths`**, plain Java, seeded:
+  - a jagged bolt by midpoint displacement, and its forks;
+  - cracks that branch and stay inside their radius, each piece with how far along its crack it lies;
+  - a seal: a stem, bars, arcs, spokes and rings, often mirrored, kept inside its circle;
+  - a constellation's figure: each star joined to the nearest already joined.
+- `SpellVisualRenderer.builtIn()` lists how each id is drawn, and `registerBuiltIn` registers from it.
+- **Culling**: `SpellVisualEntity.reach(...)` replaces the old box, generously: about 2.6 times the radius round, 1.7 times the height plus 1.7 times the radius up, and never less than the least an effect draws (a storm's cloud is 6 up).
+- **Textures** (`gamemodels/spell_visuals/draw_visuals.py`):
+  - `sprites`: sixteen sprites, four by four, each drawn its own shape and squeezed into its cell: feather, wisp, petal, twinkle, four notes, link, blade, puff, shard, ember, gem, bubble, skull.
+  - `flames`, `beam`, `facet`, `alchemy_circle`, `staff` and `water`.
+  - `iris` and `sclera`, both clamped by `.mcmeta`. The white has a hole where the iris goes, because additive light can't draw a dark pupil.
+
+### 26.2 Every spirit shows itself
+- `write_books.py` gains `SHOWS`, a table naming, for each spell, the effects shown as it is cast and those shown where its bolt strikes (for Belial, also where each of his bolt's own bolts strikes). `shown()` sets them first among the actions; `unshown()` removes effects.
+- **All seventy-two spirits** have one or two effects each, in their own colours, most with a sound. Between them they use all twenty new effects. Some examples:
+  - Baal: a fire crown; hellfire and lightning where his fireball lands.
+  - Agares: ice spikes and a fissure.
+  - Phenex: fire wings with the totem's sound, and hellfire.
+  - Focalor: an 8-block tidal wave and griffin wings.
+  - Stolas and Orias: constellations.
+  - Gaap, Bathin and Seere: a rift where they vanish.
+  - Andromalius: a blood-red eye; chains where his bolt strikes.
+- The first ten spirits' spells are still hand-written. The script now sets only their effects into them, replacing any they had, so `SHOWS` covers all seventy-two in one place.
+- **The higher arts and the Prologue's tempest** each gain one new effect:
+  - lightning where the tempest's and Jupiter's bolts land, and for Theurgia;
+  - a fissure for Saturn, blades for Mars, a crown for the Sun, a bloom for Venus, a rift for Mercury, and constellations for the Moon and Almadel;
+  - wings for the Ascension and Paulina, a sigil and souls for Goetia, an eye for Notoria.
+- Nothing else in any spell changed: the spell data is purely additive. The script is idempotent, and its other outputs (strings, tags, the data map, lang) are unchanged.
+
+### 26.3 Checked without the game
+- A throwaway preview rasterized the dumped faces with the real textures, additively, from a slanted camera. It was not kept. It caught these, all fixed:
+  - the tidal wave drawn as a bowl;
+  - the eye's pupil showing pink, hence the sclera;
+  - lightning too sparse and its cloud a line seen from the side, hence the billows and steadier strikes;
+  - the constellation bunched on one side, hence the even spread;
+  - blades, crown, shards, notes and the alchemy arcs too small or faint.
+
+### 26.4 Tests
+- **New `common/client/visual/SpellVisualsDrawTest`** (3 tests):
+  - The renderer draws exactly `BUILT_IN`, in order (26).
+  - Every effect is drawn through its whole life, from radius 0 to 32 and height 0 to 64, from a slanted camera, into a recording buffer. Each draws whole quads at finite places with valid colours, all inside `reach`, and something halfway through its life. This caught wings, the sigil, the rift, the eye, the crown, the bloom and shards reaching below ground at large sizes; all were fixed.
+  - Every texture is there, and the iris is clamped.
+- **New `VisualPathsTest`** (4 tests): bolts end at their ends, are jagged but bounded, and fork from the bolt; cracks start from the middle, stay inside and reach the edge; seals stay in their circle and repeat by seed; a figure joins every star once, growing from the first.
+- **New `BooksAndWandsTest.everyPillarShowsItself`**: each of the seventy-two shows one of the twenty new effects, and together they use them all.
+- `SpellCodecsTest` finds Agares's and Baal's actions by kind rather than by position, since their effects now come first.
+- **Run**: the full suite, 413 tests, passes. Nothing was checked in game.
+
+---
+
+## 27. The seventy-two rebalanced: mostly offensive, stronger, cheaper
+
+**Why.** A cast spends a parchment and a point of corruption as well as its energy. For that, most spirits gave a buff of 10 to 60 seconds, or a hit of 4 to 12, at 1 to 10 KCE with corruption gates of 10 to 14 from Book III on. A potion did as much for less.
+
+### 27.1 The new rules (written at the head of the spirits in `write_books.py`)
+- **Most fight.**
+  - 65 of the 72 deal damage, up from 21: a hit of 10 to 26 about the caster or where a bolt strikes, with weakness, slowness, poison, wither, blindness, nausea, knockback or fire.
+  - Baal's fireball keeps its 120.
+  - Spells with many bolts or falling stars hit several times (Aim 5 fire bolts, Leraje 7 arrows, Asmoday 5, Flauros 6, Andras 5).
+- **Seven support**, strongly: Buer, Gusion, Sallos, Foras, Vual, Orobas and Gremory (heal, ward, pacify, riches).
+- **What a spell gives its caster lasts 2 to 8 minutes**, with higher amplifiers, where it used to last seconds.
+  - Burst healing, Baal's invisibility and Bathin's landing slow-fall last at least 30 s.
+  - Debuffs on what is hit last 5 to 30 s.
+- **Costs**:
+  - Energy: 1 KCE for the lesser spirits, 2 for most, 3 for the kings and the cruellest, 4 for Belial; it was 1 to 10. A Novice wand's 10 KCE now holds 3 to 10 casts.
+  - Cooldowns: 1 to 10 s.
+  - Corruption gates: at most 10, and only for the greater spirits (Baal, Belial and Andromalius ask 10). Many spirits asked 10 to 14 before.
+  - The corruption gain stays 1 per cast, and every cast still uses a parchment.
+- A spell that summons now hurts first and summons after, so its own summons are never caught by it (Bune, Bifrons, Murmur, Valac, Halphas, Decarabia).
+
+### 27.2 Some of the changes
+- **Agares**: draws foes in, 14 damage within 6, freezes and slows them; resistance II for a minute. 1 KCE.
+- **Vassago, Barbatos, Eligos, Berith, Vapula**: gain bolts (sight, arrows, a lance, gold, a griffin's strike).
+- **Marax, Stolas, Decarabia**: a star bolt that calls 4 or 5 more stars down where it lands.
+- **Focalor and Crocell**: waves of 20 and 22 damage that throw foes back.
+- **Orias, Andrealphus, Amdusias**: lift foes into the air and hurt them; they no longer lift the caster.
+- **Gaap, Bathin, Seere**: a blast where they vanish, then the teleport (48, 32 and 64 blocks).
+- **Furcas**: a pyromantic explosion of 26.
+- **Andromalius**: a bolt that pulls foes in, 26 damage, poison III and slowness.
+- **Belial**: 20 where his bolt lands, then eight falling fireballs of 16 each.
+- **Paimon, Beleth, Purson, Dantalion**: kings' blasts of 18 to 20 over 7 to 10 blocks.
+
+### 27.3 The script
+- The first ten spirits' spells (`FIRST_TEN`) are now written by `write_books.py` like the rest; their strings stay hand-written. Baal keeps his own particles and his 120.
+- `unshown()` is gone, now that the script writes those spells whole.
+- New bolts get an impact effect in `SHOWS`: a shockwave in the spirit's colours for Eligos, Marax, Stolas, Berith, Vapula and Decarabia.
+- Only the 72 spell files changed. Strings, tags, the data map and lang are unchanged, and the script is still idempotent.
+- The Prologue, the Ascension and the Lesser Key are unchanged. Per KCE, the Prologue's Nova and Vortex are now weaker than the strongest spirits.
+
+### 27.4 Tests
+- **New `BooksAndWandsTest.thePillarsAreWorthWhatTheyCost`**:
+  - every spirit costs at most 4 KCE, comes back within 10 s, and asks a corruption of at most 10;
+  - at least 60 of the 72 deal damage, and none hits for less than 8;
+  - every lasting self effect lasts at least 30 s;
+  - no damage comes after a summon.
+- `SpellCodecsTest` and `SpellServerTest` now expect Agares's new values: resistance II for 1200 ticks, 1 KCE.
+- **Run**: the full suite, 414 tests, passes. Nothing was checked in game.
+
+---
+
+## 28. The spirits' blasts hold off what rushes the caster
+
+**Why.** The spells that hurt about their caster reached only 3 to 5 blocks for many spirits, and hit for 10 to 24. So an enemy had to be at arm's length before it was hit at all, and it survived. Meanwhile the spell's cooldown, which is put on the wand item (`ArcaneCastingItem.use`: `getCooldowns().addCooldown(wand.getItem(), ...)`), held every spell on that wand, and every wand of the same tier, for up to 5 or 6 seconds.
+
+### 28.1 Blasts (`blast()` in `write_books.py`)
+- **New helper `blast(amount, radius, strength=1.4)`**: hurts everything within the radius, throws it back (`push`, with a lift of .4), and slows it (slowness II for 4 s), so that what was rushing the caster cannot come straight back in.
+- **42 spirits** now fight about their caster with one:
+  - 1 KCE: 16 to 18, within 8 to 9 blocks;
+  - 2 KCE: mostly 22 to 26, within 9 to 10 (Furfur's 16 within 8, beside his lightning; Orias 24 within 12);
+  - 3 KCE: 28 to 32, within 10 to 12 (Paimon, Beleth, Purson, Balam, Murmur, Amy, Zagan, Dantalion).
+- **How hard they throw**:
+  - 1.2 for those that also freeze or lift (Agares, Gamigin, Marbas, Zepar, Orias, Andrealphus, Amdusias);
+  - 1.4 for most;
+  - 1.6 for those that flee or scatter (Bathin, Gaap, Seere, Furfur, Ipos, Purson, Amy);
+  - 1.8 for Paimon, Crocell and Kimaris;
+  - 2 for Beleth and Focalor.
+- **Agares** no longer draws foes in, which pulled them onto the caster. He throws back and freezes everything within 8.
+- **Bolts** hit harder and wider where they strike: most within 2.5 to 3.5 blocks, arrows within 2, Furcas 4.5, Andromalius and Belial 5. Some examples:
+  - Vassago 16, Botis 20, Eligos 24, Berith 22, Vapula 24, Malphas 26, Furcas 30, Andromalius 30;
+  - Aim 5 × 14, Leraje and Halphas 7 × 12, Andras 5 × 20, Flauros 6 × 20;
+  - Belial 26, then 8 × 18; the star bolts' falling stars 10 each;
+  - Furfur's lightning 6 × 16.
+- **Cooldowns are 1 to 3 seconds**: 20 to 40 ticks for those that fight, 60 for heals, gifts and summons. A cast now holds the wand only briefly.
+
+### 28.2 Their effects show their reach
+- Each blast's area effect in `SHOWS` (hellfire, shockwave, fissure, resonance, miasma, spikes, tidal wave, chains, vortex, blades, magic circle) is now drawn as wide as the blast reaches. For example, Amon's hellfire went from 5 to 9, Focalor's wave from 8 to 10, and Orias's constellation from 8 to 12.
+- Where a blast had nothing drawn at its reach, it gets a shockwave there in the spirit's colours: Marbas, Valefor, Bathin, Gaap, Haagenti, Balam, Seere and Dantalion.
+
+### 28.3 The script
+- `P()` now refuses more than 64 particles, the codec's limit. Three counts of 80 slipped in, and the game would not have loaded them.
+- The note at the head of the spirits describes the new rules.
+
+### 28.4 Tests
+- `BooksAndWandsTest.thePillarsAreWorthWhatTheyCost` is stricter:
+  - every spirit comes round within 60 ticks;
+  - every blast about the caster reaches 8 blocks or more and hits for 16 or more, beside a push at least as wide that throws back;
+  - a spirit that hurts hits for 10 at least.
+- **Run**: the full suite, 414 tests, passes. Nothing was checked in game.
+
+---
+
+## 29. A radius means what it says; the spirits fight with bolts
+
+### 29.1 Why a radius of 16 did not reach 16
+- `SpellEffects.nearby()` cut every area action (damage, effects, ignite, freeze, pacify, push) to `MAX_RADIUS = 12`, whatever the data said. The codecs never mentioned it: damage's radius had no limit, push's was 16. So data asking for 16 loaded fine and silently reached 12.
+- **Now one limit governs both.** `SpellAction.MAX_RADIUS = 128` (core), and `SpellAction.MAX_CORRUPTION_RADIUS = 8` for `corrupt_area`, which changes every block it reaches.
+  - `SpellCodecs` reads every radius through `RADIUS` (0 to 128) or `CORRUPTION_RADIUS` (0 to 8): damage, apply_effect, ignite, freeze, pacify, lightning, push, particles and visual.
+  - `SpellEffects` reaches exactly that far.
+  - A radius is either honoured, or refused when the data loads; never quietly cut short.
+- The limits the user raised in `SpellCodecs` that day are kept: push, particle and effect radii and particle height to 128, lightning count to 128. The two codec tests that pinned the old limits now test 129.
+
+### 29.2 Throwing away from the caster
+- **`push` gains `"from": "caster"`** (`SpellAction.Push.From`, default `origin`): it thrusts away from the caster instead of from the origin.
+  - At a bolt's blast, a push from the blast would fling whatever stands between the caster and the blast onto the caster; a push from the caster drives it on, away.
+  - The 3-argument `Push` constructor stays, meaning "from the origin".
+- **What stands right at the point it is thrust from** (the creature a bolt struck dead on) is thrust along the origin's direction, the way the bolt flew. It used to go a random way.
+
+### 29.3 The spirits fight with the Corrupted Arcane Bolt
+- **New `arcane_bolt(on_hit, colour, speed)`**: the corruption's own spell bolt (`corruption:spell_bolt`, drawn as a corrupted crystal), trailing the corruption and the spirit's colour and bursting in both where it lands.
+- **`blast()` now thrusts from the caster**, so it serves both about the caster and where a bolt lands.
+- **38 spirits that blasted about the caster now fire the bolt**, and the blast and its debuffs happen where it lands; their self buffs, gifts and summons stay with the caster.
+  - The five of the first ten: Gamigin, Marbas, Valefor, Amon and Paimon.
+  - The rest: Sitri, Beleth, Zepar, Purson, Ipos, Naberius, Glasya-Labolas, Bune, Ronove, Forneus, Furfur (his own lightning bolt now carries the blast too), Marchosias, Phenex, Raum, Focalor, Vepar, Sabnock, Shax, Bifrons, Haagenti, Crocell, Balam, Alloces, Murmur, Ose, Amy, Orias, Zagan, Valac, Andrealphus, Kimaris, Amdusias and Dantalion.
+- **Four keep their blast about the caster**: Agares (a frost ring), and Bathin, Gaap and Seere as they vanish.
+- **61 of the 65 that fight now do so by bolt.**
+- **Their area effects** (hellfire, shockwave, resonance, tidal wave, chains, miasma, spikes, vortex, blades, feathers, magic circle) moved from the caster to where the bolt lands. The casting effects stay with the caster: wings, crowns, eyes, souls, domes and the like.
+
+### 29.4 What happened to the user's doubled spells, and the guard
+- **What happened.** At 20:20 that day, every spell's JSON was doubled by hand: every `"amount"` and every `"radius"`, nothing else. At 20:31, running `write_books.py` wrote all 90 of its spell files over that doubling.
+  - The two spells the script does not write (`corruption.json`, `transmutation.json`) kept it.
+  - The doubling showed in those two files, and in `SpellCodecsTest`, which expected Baal at 240 within 6.
+- **Restored in the script itself.** Every amount and radius argument of the spell helpers (`hurt`, `blast`, `fx`, `ignite`, `freeze`, `corrupt`, `push`, `pacify`, `lightning`, `show`, `visual`), 555 numbers, is doubled in `write_books.py`, so its output matches what was there.
+  - So the bolt blasts are 32 to 64 within 16 to 24 blocks, Agares's ring 36 within 16, and Baal 240 within 6.
+  - Effects are drawn twice as large too, as the hand edit had them.
+- **The guard.** `write_books.py` now plans everything, then writes nothing if a file or lang line it owns was changed since it last wrote it, and names them.
+  - What it wrote is recorded in `gamemodels/arcane_books/written.json`: each file's hash, and each owned lang line.
+  - `--overwrite` lets the edits go.
+  - Tried by hand: an edited `amon.json` and an edited lang line were each refused, and named.
+
+### 29.5 Tests
+- **`CorruptionMagicServerTest.aSpellReachesAsFarAsItsRadiusSays`**: a radius-16 damage and push reach a pig 15 blocks off (past the old 12) and leave one at 17.
+- **`CorruptionMagicServerTest.aBlastWhereABoltLandsThrowsAwayFromTheCaster`**: a pig between the caster and a blast is driven away from the caster by a push from the caster. A push from the blast would have flung it back.
+- **`SpellCodecsTest`**:
+  - every area kind reads radius 128 and refuses 129; `corrupt_area` reads 8 and refuses 9;
+  - `"from": "caster"` round-trips, defaults to origin, and refuses anything else;
+  - the old 32 limits are now tested at 129.
+- **`BooksAndWandsTest.thePillarsAreWorthWhatTheyCost`**:
+  - at least 55 of the spirits fight by bolt;
+  - every bolt whose blast reaches 8 or more throws what it catches away from the caster.
+- **Run**: the full suite, 416 tests, passes. Nothing was checked in game.
+
+---
+
+## 30. The archmage's beam
+
+**Why.** An effect like an archmage's giant energy beam, lasting until the spell ends, could not be a plain `visual`: spells happen in an instant, a visual's time is set apart from them, and no visual knows where its caster is aiming. So the beam is a spell action of its own, whose sight is tied to its life: it is drawn for exactly as long as it fires.
+
+### 30.1 The action (core, api)
+- **New `SpellAction.Beam(length, width, ticks, interval, onHit, colour, accent, shake, sound)`.**
+  - It fires from the caster's hand along their gaze, and follows the gaze as they turn, for `ticks`.
+  - It reaches `length` blocks, or to the first block in its way, and catches whatever comes within `width` of its line.
+  - Every `interval` ticks it does `onHit` at each creature it catches, never the caster.
+  - Each pulse lands, however close together the pulses come: the beam resets the brief immunity a hurt leaves once per pulse, so within one pulse each creature is hurt only once.
+  - It shakes nearby views by `shake` while it fires, and sounds `sound` as it starts.
+  - It always fires from the caster, even when a bolt carries it.
+- **Codec `"beam"`**, every field optional: `length` 1 to 128 (32), `width` 0.1 to 16 (1), `ticks` 1 to 400 (60), `interval` 1 to 100 (5), `on_hit` (none), `color` and `accent` (rose and gold), `shake` 0 to 1, `sound`.
+- **Tooltip text** (`SpellText`): "Fires a beam %s blocks long, %s round, for %s s", then "Every %s s, at each creature in it:" with the payload set in beneath, as a bolt's is.
+- **Lang** (both): `spell.corruption.beam`, `spell.corruption.beam_pulse`, and `entity.corruption.spell_beam`.
+
+### 30.2 The beam itself (common)
+- **`SpellBeamEntity`** (`corruption:spell_beam`): never saved, tracked to 16 chunks, updated every tick.
+  - It stands at the caster's hand (`muzzle`: 0.7 before them, 0.3 to their right, 0.3 under their eyes, so it pours from the hand rather than filling their own sight), turned the way they look.
+  - On the server it pulses, and goes when its time is up, or when its caster dies, leaves or changes level.
+  - It holds its caster directly on the server, since a fake player (as machines and tests use) is in no level's lookup by id.
+- **`SpellBeamRenderer`** draws it from the caster as this client sees them that frame (hand, gaze, part-tick), to the first block in its way, so it turns smoothly as they look about. With the caster out of this client's sight, it draws from where the server last put it.
+- **`BeamVisual`** draws:
+  - three casting circles before the hand: the outer runes, an echo, and the inner sigil, turning against each other;
+  - the beam driving out to its end in 4 ticks: glows within glows round a white-hot core and thread, light rushing along it, three strands of energy coiling round it, shock rings racing down it every 5 ticks;
+  - at its end, a flare, sparks thrown back off what it struck, and a ring burned on the face it struck;
+  - its swelling and shivering, and its thinning to a thread over its last 6 ticks.
+- **`CameraShake.rumble`**: while a beam fires within its length (or 16 blocks), the view is held at least `shake × (1 − distance / reach)` shaken: a steady rumble that settles as soon as it stops.
+- **`SpellEffects`** fires it and sounds it. The sound is shared now with visuals, through one helper.
+
+### 30.3 The Magus's Ray
+- **New Ascension art `radius_magi`** ("radius magi omnia transfigit"; "The magus's ray, which pierces all things"; 术士之光，贯穿万物).
+  - Cost: 40 KCE, cooldown 100 ticks, asks a corruption of 12, gain 1.
+  - It sets a magic circle under the caster, and fires a beam 64 long and 2 round, for 60 ticks, pulsing every 5.
+  - Each pulse: 24 to everything within 3 of each creature caught, a push of .5 from the caster, and fire for 4 s.
+  - In gold and white, with a shake of .3 and the beacon's sound.
+- The Ascension now holds nine arts: ninety-three spells in all.
+- **`write_books.py`**:
+  - a `beam()` helper;
+  - its guard now leaves a lang file's other lines to anyone and checks only the lines it owns. The beam's lines, added by hand, were at first taken for an edit to a file it owned.
+
+### 30.4 Tests
+- **`SpellCodecsTest`**: a full beam and a bare one round-trip; length 129, ticks 401 and interval 0 are refused.
+- **`CorruptionMagicServerTest.aBeamFiresAlongTheCastersGazeUntilItEnds`**:
+  - two pulses two ticks apart both land on what is in its line;
+  - nothing behind the caster, or 4 blocks to the side, is hit;
+  - it follows the caster as they turn;
+  - a wall stops it;
+  - after 12 ticks it is gone, and the caster is never hurt.
+- **`SpellVisualsDrawTest.theBeamDrawsAlongItsLineThroughItsWholeLife`**: lengths .5, 12 and 64; widths .5, 2 and 8; three directions, one straight up; stopped by a face or by nothing; lifetimes 1 and 60. It draws whole faces at real places within 5 × width + 3 of its line, and shows midway.
+- `BooksAndWandsTest`'s walk now goes into a beam's payload, as into a bolt's.
+- The beam was also rendered outside the game with the preview rasterizer, to look at it. That was not kept.
+- **Run**: the full suite, 418 tests, passes. Nothing was checked in game.
+
+## 31. Explosions that break only what their data allows; the corruption's bosses hunt the uncorrupted
+
+**Why.** A few of the heaviest spells should blow holes where they land, and how much they may break should be data, as everything else about a spell is. And the corruption's bosses should be as hostile to everything not of the corruption as its Remnants are.
+
+### 31.1 The bounded explosion (core, api, common)
+- **`SpellAction.Explode(power, breaksBlocks, breakRadius, maxBlocks, maxResistance)`.**
+  - It breaks no block further than `breakRadius`, none whose blast resistance is above `maxResistance`, and at most `maxBlocks` of them, the nearest first.
+  - Left at their widest (`ANY_REACH` 128, `ANY_COUNT` 32,768, `ANY_RESISTANCE` 3,600,000), it breaks all that an explosion of its force would. `limited()` says whether any bound is set.
+  - The old two-argument constructor keeps its meaning.
+- **Codec `"explode"`**: the optional fields are `break_radius` (0 to 128), `max_blocks` (0 to 32,768) and `max_resistance` (0 to 3,600,000).
+- **`common/arcane/SpellExplosions`**:
+  - A spell's explosion still goes off through `level.explode`, with the caster as its source, so it never hurts them. A bounded one is remembered while it goes off.
+  - On `ExplosionEvent.Detonate`, at the **lowest** priority, so after any protection mod has had its say, it strikes out of the affected list:
+    - every block beyond the radius;
+    - every block tougher than the limit;
+    - all but the nearest `max_blocks` (air is not counted).
+  - It only ever removes blocks from the list, so it can make an explosion break less, never more. Entities are hurt as the explosion's force says.
+- **Tooltip text**: `spell.corruption.explode_breaks_limited`.
+  - en: "Explosion (power %s), breaking up to %s blocks within %s, none tougher than %s", with ∞ for a field left unbounded.
+  - zh: "爆炸（威力 %1$s · 在 %3$s 格内最多破坏 %2$s 个方块 · 抗爆性不超过 %4$s）".
+- **`write_books.py`**: `explode(power, breaks, radius, most, hardest)`.
+
+### 31.2 The spells that blow holes
+Each explosion goes off where the spell's bolt lands. Stone and deepslate resist 6, end stone 9, obsidian 1200.
+
+| Spell | Power | Within | At most | No tougher than |
+| --- | --- | --- | --- | --- |
+| `baal` | 4 | 4 | 60 | 6 |
+| `amy` | 4 | 4 | 64 | 6 |
+| `malphas` | 3 | 4 | 80 | 9 |
+| `furcas` | 3 | 3.5 | 40 | 6 |
+| `vine` | 2.5 | 3 | 24 | 6 |
+| `belial` (the chariot's bolt) | 5 | 5 | 120 | 6 |
+| `ars_goetia` (the soul-fire bolt) | 6 | 6 | 200 | 9 |
+
+### 31.3 The bosses hunt what is not of the corruption
+- **`GoeticDemon`** (the base of the Goetic bosses):
+  - `huntTheUncorrupted(priority)` hunts players first, then any living thing in sight not of the corruption.
+  - `isAlliedTo` is true for every member of the corruption's faction, and `canAttack` refuses them.
+- **Andromalius**:
+  - His target goals are now: he turns on what hurt him (1), then hunts the uncorrupted (2 and 3).
+  - He is now in the faction tag `corruption:corrupted_remnants`. Remnants and the rest of the faction are his allies, and neither side attacks the other. Monsters and golems that are not corrupted now attack him.
+  - Because he is in the faction, the corruption curse effect, corruption plants and lost souls no longer hurt him.
+  - Corrupted ground and corrupted liquid still hurt him by contact: that damage has no faction check, and his arcane-only rule accepts `corruption:corruption`. Spells dealing corruption damage hurt him as before.
+- **The colossi (Baal and Agares)**:
+  - Players still come first, from anywhere in their sight (512 for Baal), and whatever hurt them is still kept as the target.
+  - With neither, once a second each looks for the nearest living thing not of the corruption within 48 blocks (`HUNT_BLOCKS`, or its sight if that is shorter) that it can see.
+  - **`Colossus.sees`**: a block clip from its eyes to the creature's eyes, without vanilla's 128-block limit. Baal's eyes are about 169 blocks above its feet, so vanilla's `hasLineOfSight` never saw anything on the ground. The first run of the new test caught this.
+- **README**: the faction members, both bosses' hunting, and Andromalius's immunities.
+
+### 31.4 Tests
+- **`CorruptionMagicServerTest.aSpellsExplosionBreaksOnlyWhatItsDataAllows`**:
+  - The bound alone, on a list: it keeps the three nearest stones within reach and the air, but not the obsidian or what lies past the radius.
+  - A real explosion of force 6 inside a 13³ block of stone, bounded to radius 3, 12 blocks and resistance 6. Nothing past the radius breaks, 1 to 12 blocks break, the obsidian stands, and the caster is unhurt.
+- **`SpellCodecsTest`**: a bounded explosion reads and round-trips; left out, it is unbounded; `max_blocks` -1 and `break_radius` 129 are refused.
+- **`AndromaliusServerTest.heHuntsWhatIsNotOfTheCorruption`**: he is of the faction, allied with a Remnant and never attacks it. His own target goals pick a pig 8 blocks off over a Remnant 4 off.
+- **`BaalServerTest.withNoPlayerAboutItHuntsWhatIsNotOfTheCorruption`**: with no player about, Baal picks a pig 24 blocks off over a Remnant 14 off.
+
+## 32. The Prologue's higher arts turn creatures into Remnants
+
+**Why.** The Prologue's more advanced corruption spells should instantly turn the mobs they reach into the matching kind of Corrupted Remnant, and still lay the Corruption Curse. On top of that:
+- the Corrupted Bolt (腐化之矢, `corruption_barrage`) should fire 48 bolts;
+- every mob where the Corrupted Lightning (腐化之雷降临, `corruption_tempest`) lands must be turned;
+- Corruption Descending from the Heavens (腐化自天而降, `corruption_rain`) should get several times its force and bolts.
+
+### 32.1 The action `corrupt_creatures` (core, api, common)
+- **New `SpellAction.CorruptCreatures(radius, chance)`.** `chance` is clamped to 0 to 1, and a one-argument constructor turns everything in reach.
+- **Codec `"corrupt_creatures"`**: `radius` 0 to 128 (default 4) and `chance` 0 to 1 (default 1).
+- **`SpellEffects.corruptCreatures`** takes the mod's existing route for an instant turning, the one a player at full corruption takes:
+  - Each mob within reach that may be turned, and that the chance picks, takes `Float.MAX_VALUE` of `corruption:corruption_conversion` damage, dealt by the caster through the new `ModDamageTypes.conversion(level, attacker)`. That damage type already passed armour, effects and invulnerability.
+  - The mob dies at once. At the end of the tick, `ReanimationEvents` raises a Remnant where it stood, in its likeness, with its maximum health.
+  - Its loot drops as on any death, and the kill is the caster's.
+- **`turnable`**: the action never turns:
+  - players (only mobs are turned; the curse takes players its own way);
+  - members of the corruption's faction;
+  - anything marked invulnerable;
+  - anything the caster owns (`OwnableEntity`) or summoned with a spell (`SpellSummons`);
+  - any type in the new entity tag **`corruption:spell_conversion_immune`**, which by default holds the optional `#c:bosses` (the ender dragon and the wither).
+- **`corruption:corruption_conversion`** joins `minecraft:no_knockback`, so a turned creature is not flung before it rises. The player conversion's source already counted as no-knockback.
+- **Tooltip text**: `spell.corruption.corrupt_creatures` and `_chance`.
+  - en: "Turns creatures into Corrupted Remnants (radius %s[, %s])".
+  - zh: "将生物转化为腐化残躯（半径 %s[ · %s]）".
+- The Remnants it makes are ordinary ones, not bound to the caster as summons are. They hunt everything not of the corruption, the caster included, and like every Remnant they are immune to corruption damage.
+
+### 32.2 Volleys of up to 64
+- `LaunchBolt.MAX_COUNT` = 64. The codec's limit on `count` was 16.
+
+### 32.3 The five higher arts
+In each, the turning comes first, then the hurt and the curse. Those are left for what cannot be turned: players, and bosses. Costs, cooldowns and corruption are unchanged, and so are the two basic arts, `corruption` and `transmutation`.
+
+| Art | Now |
+| --- | --- |
+| `corruption_barrage` (腐化之矢) | **48 bolts** (was 7) in the same 40° fan. Each turns everything within 4 of where it lands, then 24 corruption damage and 5 s of the curse in 4 |
+| `corruption_nova` | turns everything within 14, then the push and 40 damage, and **now also** the curse for 6 s in 14 |
+| `corruption_vortex` | turns everything within 20, then the pull, 32 damage, slowness and the curse it had |
+| `corruption_tempest` (腐化之雷降临) | turns **every creature within 12** of where its bolt lands, which covers all its lightning can reach (strikes fall within 10 and hurt 1.75 about each). Then the lightning, the slowness, and **now also** the curse for 6 s in 12 |
+| `corruption_rain` (腐化自天而降) | **48 bolts rain down** (was 12), each with **96 damage** (was 32) in 4. Each turns everything within 4 where it lands, and **now also** lays the curse for 5 s in 4 |
+
+- **`write_books.py`**: a `turn(radius, chance)` helper, and the five rewritten. Its guard found no hand edits to them.
+- **README**: the action, its exclusions and an example; the Prologue list (its old numbers were stale); volleys of up to 64; and that magic can now turn creatures, in the Remnant section.
+
+### 32.4 Tests
+- **`SpellCodecsTest`**:
+  - `corrupt_creatures` reads, round-trips and defaults to every creature within 4; a chance of 1.5 is refused; radius 128 is read and 129 refused.
+  - A volley of 64 is read and 65 refused. The old test refused 17.
+  - All five higher arts turn every creature they reach and lay the curse.
+  - The barrage fires 48; the tempest turns everything within 12; the rain drops 48 bolts of 96.
+- **`CorruptionMagicServerTest.aSpellTurnsTheCreaturesItReachesIntoRemnantsWhereTheyStand`**:
+  - A chance of 0 turns nothing.
+  - A pig and a zombie fall at once and rise as Remnants of their own kind, where they stood, at full health.
+  - Untouched: the caster's tamed wolf, a zombie the caster summoned, an invulnerable pig, a wither, a pig 9 blocks off (past the radius of 6), and a Remnant.
+- **Run**: the full suite, 422 tests, passes. Nothing was checked in game.
+
+## 33. The bosses' deaths
+
+**Why.** The bosses needed death effects. Before, Baal and Agares sank for 8 and 13 seconds with explosions bursting off their bodies, and Andromalius died as any mob does: twenty ticks, then a puff of smoke.
+
+### 33.1 A death is a script (common)
+- **New `BossDeath(ticks, linger, scale, rays, rumble, beats)`** describes the whole death:
+  - `ticks`: from the fall until the body is gone, in the last burst of its light.
+  - `linger`: ticks the boss stays on, unseen, while the rest plays out; only then is it removed.
+  - `scale`: every effect is drawn at its own size and then made this many times larger. So what an effect draws at a fixed size of its own (a spike's height, a crown's drop) grows with it, and a 915-block colossus's death keeps the proportions of a 4-block serpent's.
+  - `rays`: light pouring out of the heart. Up to `count` rays, each up to `length` long, come one after another over the first three quarters of the death.
+  - `rumble`: how hard the ground trembles under the viewer all through the death.
+  - `beats`: the moments. Each is a tick, an anchor (`FEET`, or `HEART`), a `SpellAction.Visual` (any effect a spell can show, its sound and its shake), and the sound's volume and pitch.
+- **`DemonBoss`** gains `death()` and `heart(partial)`:
+  - **Colossus**: the heart is the middle of its `chest` hitbox, kneeling with it, and sunk with the body as it goes into the ground. The sinking moved here from the renderer, so both sides agree.
+  - **GoeticDemon**: by default, a little over halfway up its body.
+- **Server side** (`Colossus.tickDeath`, `GoeticDemon.tickDeath`):
+  - each beat's sound plays at its tick (`BossDeath.sound`);
+  - at `ticks` the boss bar is put away;
+  - at `ticks + linger` the boss is removed.
+  - The colossi keep their bursts of explosions until the body is gone, and their hitboxes are no longer pickable once they die.
+- **`GoeticDemon`**:
+  - A demon that says nothing of its own death dies `BossDeath.ordinary`: scaled to its height, in the corruption's rose and gold; 3 s of rays, then a nova, a shockwave and a pillar of light.
+  - `gone()` gives the puff of smoke when the body goes.
+  - Its culling box grows to the death's reach while dying.
+
+### 33.2 Drawn from the boss's own death time (client)
+- **`DeathVisual`** draws a death from the synced `deathTime` and the boss's heart, in the boss's own renderer. That is the whole reason for this design:
+  - Agares fights from about 380 blocks away, beyond what spell-effect entities are ever sent (192 blocks). Drawn this way, a death is seen as far as the boss is.
+  - It follows the body as it sinks.
+  - For each part:
+    - **Rays**: `RaysVisual.burst` from the heart. Each ray is a broad blade of the colour with a white-hot one inside it, flickering, and the burst turns slowly. Rays come spread evenly (golden angle and ratio), and none goes below the ground.
+    - **Heart glow**: a glow at the heart that swells as the death goes on.
+    - **Beats**: each beat is drawn by its registered `SpellVisual`, in a pose scaled by `scale`. A `HEART` beat stands on the ground under the heart with its height raised by the heart's, so whatever an effect places by height (a nova's point, an eye, a ring of shards) is at the heart.
+- **Colossi** draw their deaths in their own long fog, through the far-view buffers.
+  - `VisualDraw.drawnAs` swaps the light every effect draws with while the death is drawn: `FarView.glow` in place of `RenderType.eyes`. So all 28 effects work at colossus distance unchanged.
+  - The body is no longer drawn once it is gone.
+- **Andromalius's renderer**: the body and the ward are drawn only until he is gone; no shadow after; he shudders (`isShaking`) through his throes.
+- **His model**: a new `agony` pose. He rears with his hood spread and jaws wide, his neck jerks, his head shakes and his tail thrashes. Then he falls over the last 18 ticks (`AndromaliusModel.FALLING`). The old 8-argument `pose` still works.
+- **`CameraShake`**: each client tick it looks for dying bosses.
+  - It holds the view shaken by `rumble × (1 − distance / reach)`, where reach is three times the rays' length, while the death lasts.
+  - It adds each beat's `shake` as the beat comes, falling off over four times the beat's scaled radius.
+
+### 33.3 Two new effects, for deaths and spells alike
+- **`corruption:rays`** (`RaysVisual`): rays bursting one after another out of a point, at its height or half its radius if higher, as long as its radius, over the first half of its life, with the glow at their heart.
+- **`corruption:nova`** (`NovaVisual`): a star bursting at its height:
+  - a blinding flash that swells and fades;
+  - a cross of light flaring through it;
+  - a level ring racing out and a tilted one;
+  - 28 sparks flung outward, trailing light and slowing.
+  - Whatever would reach under the ground is held above it.
+- Both are in `SpellVisuals.BUILT_IN` (now 28) and registered with the rest, so spells may use them too.
+
+### 33.4 The deaths
+
+| Boss | Length | Scale | Rays | Moments |
+| --- | --- | --- | --- | --- |
+| Baal (fire) | 160 + 70 ticks | 8 | 20 × 144 blocks | shockwave and the ender dragon's death cry (0); fissure (10); hellfire (30); lightning storm (55); shockwave as it kneels (96); nova at the heart and a 320-block pillar of light (156); a 272-block shockwave (158); souls (160) |
+| Agares (frost) | 260 + 90 | 30 | 24 × 540 | shockwave and the death cry (0); ice spikes up to 150 blocks (20); fissure (45); lightning (90); a storm of feathers (120); shockwave (156); nova and a 1200-block pillar (256); a 900-block shockwave (258); souls (260) |
+| Andromalius (blood and venom) | 70 + 45 | 1 | 14 × 9 | his own chains bind him (0); his eye opens and glares its last (2); his souls rise (24); nova, shockwave (66) and a pillar of light (67); a flash, souls and smoke as he goes |
+
+- Sounds are heard far: volume 40 to 64 for the colossi (640 to 1024 blocks), 3 to 4 for Andromalius.
+- `AndromaliusRules.DEATH_TICKS` = 70.
+
+### 33.5 Tests
+- **`DeathVisualDrawTest`** (new):
+  - Every boss's death and the ordinary one are drawn tick by tick from the fall to past their end. They draw whole faces at real places within reach of the boss; the light shows all through the dying; nothing is drawn once it is over.
+  - Every beat draws on its own, at its scaled size.
+- **`AndromaliusServerTest`**:
+  - `heDiesInASpectacleAndIsGoneAtTheEndOfIt`: he dies over his rules' length and lingers. His culling box reaches round his death, and he is removed at its end.
+  - `everyDeathIsMadeOfWhatTheGameHas`: every beat is a built-in effect, its sound is in the game's registry, and it plays out before the boss is removed. Rays come, and the body goes in a nova.
+- **`BaalServerTest.itDiesSlowly`** and **`AgaresServerTest.itDiesSlowly`**:
+  - the body lingers and then goes;
+  - Baal's hitboxes are no longer pickable;
+  - its heart sinks with its body.
+- **`SpellVisualsDrawTest`**: 28 built-in effects; the two new ones are drawn within their reach through their whole lives.
+- **`BooksAndWandsTest.everyPillarShowsItself`** now means the twenty spirit effects, not every effect after the first six.
+- The deaths and the new effects were also rendered outside the game with the preview rasterizer, to look at them. That led to the rays being made bolder (a bright inner blade, wider) and spread evenly. The temporary dump test was deleted.
+- **Run**: the full suite, 426 tests, passes. Nothing was checked in game.
+
+## 34. The crash as Andromalius died, and a boss that vanishes for no clear reason
+
+**Why.** Two reports: the game crashed, and "no mob can attack our boss, but the boss disappears after a while".
+
+### 34.1 The crash
+- **What it was.** The client crash report of 2026-10-15 23:48:18 says "Rendering entity in world", `IllegalStateException: Not building!`, at `NovaVisual.draw` from Andromalius's death, at its nova burst (tick 66).
+  - The nova drew its sparks with the beam light it had asked for before the rings, and the rings had asked for their own light in between.
+  - The game draws every kind of effect light into one shared buffer, and asking for another kind finishes the last. So the sparks were drawn into a finished buffer. `VisualDraw` warned of exactly this, and the nova broke the rule.
+- **Fix.** The sparks are drawn straight after the cross, in the same light, before the rings.
+- **Why the tests missed it, and what catches it now.** The draw tests drew into a buffer that never finished. Now they draw into **`SharedBuffers`** (test code), which behaves as the game's buffers do:
+  - asking for another kind of light finishes the last;
+  - asking for the same kind again goes on with it;
+  - drawing into a finished buffer fails the test.
+- `SpellVisualsDrawTest` (all 28 effects and the beam) and `DeathVisualDrawTest` use it. With the nova put back in its old order, three of these tests failed on exactly that; with the fix, all pass, the other 27 effects included.
+
+### 34.2 The boss that vanished
+- **What the logs and the save show.** A boss only vanishes like this by dying: the crash happened while his death was being drawn. He was summoned at 23:47:55 and died at about 23:48:14, about 18 s later.
+- **What cannot have done it:**
+  - **Mobs.** Their blows, arrows and fireballs never hurt a demon, by design (§23): only the arcane does.
+  - **Corrupted ground.** The ground where he died was not corrupted. Reading the save's region file, it was grass, dirt and blocks of the Spore mod.
+  - **Other mods' damage.** None of the mods in run/mods adds a damage type to `minecraft:bypasses_invulnerability` (the only way past a demon's defences) except Goety's `goety:dismissed`, for sending its own servants away.
+- **What can:** spells, and every spell's damage is arcane, the Prologue's corruption damage included. Also `/kill`, the void, and (before this change) corrupted ground and liquid.
+- **The most likely cause is not certain.** The player had killed an enderman at 23:48:07 (from the save's advancements), and the player's stats show Andromalius killed 5 times in that world. So the likeliest cause is the player's own area spells, cast at mobs near him, catching him too. It cannot be told for certain from the save.
+- **Changes:**
+  - **A boss's death is now logged**, with where it died, the death message, the damage type, and who dealt it (`DemonBoss.logDeath`, from `GoeticDemon.die` and `Colossus.die`). The game logs this only for creatures with names of their own. Next time the log says what did it.
+  - **The corruption's ground and liquid spare its own faction.** `CorruptionBlock.applyContactDamage` now skips every member of `corruption:corrupted_remnants`, as the curse, corruption plants and lost souls already did.
+    - Before, Andromalius took 15% of his health (24) from every touch of corrupted ground or liquid, so on corrupted ground he melted away in about four seconds. That is a real way for him to "disappear after a while", though not the one in this report.
+    - Remnants, the colossi, Greed and the malice vine were already immune by other means, so only Andromalius (and any member a data pack adds) changes.
+- **README**: the corruption damage paragraph, Andromalius's immunities (and that area spells catch him), and the death log.
+
+### 34.3 Tests
+- **`AndromaliusServerTest.theCorruptionsGroundSparesHim`** (new): stepping on corruption ground leaves him whole; a pig on the same ground is hurt.
+- **Run**: the full suite, 427 tests, passes. Nothing was checked in game.
+
+## 35. Bosses ride nothing; Andromalius's hitboxes and charge; Dantalion; boss skills as modules
+
+**Why.** The request: bosses must not sit in boats and get stuck; Andromalius needs a better hitbox and a fourth skill, a charge that breaks every block in its path softer than obsidian; and a new boss, Dantalion, the 71st spirit: a flying book that becomes a flying mirror at half health, with well-made animations and the listed skills. Every skill is a module: its mechanics in `core`, used through an API by `common`, so any boss can carry it. The user then added the summoning rite: eight enchanting tables, a Mending book among the offerings, and a villager.
+
+### 35.1 Vehicles
+- **`GoeticDemon.startRiding`** and **`Colossus.startRiding`** return false. Boats, minecarts and every other vehicle can no longer pick up Baal, Agares, Andromalius or Dantalion, so a boss can't get stuck in one.
+
+### 35.2 Skills as modules (core, api, common)
+- **Rules** (`core/demon/skill`, pure Java, guarded by tests):
+  - `SkillTiming(windup, ticks, cooldown)`: the shared timing of a skill.
+  - `SkillBook`: which skill runs, for how long, and each skill's cooldown, by index.
+  - One rules record per skill, holding all of its numbers and decisions: `GazeRules`, `ChargeRules`, `SummonRules`, `BlinkRules` (with `Danger`, `unsafe`, `score` and the `Wounds` health ring buffer), `StrikeRules`, `BeamRules` and `MindControlRules`.
+  - `core/demon/BodyPart`: one hitbox of a long body, placed relative to the boss.
+- **API** (`api/demon/skill`, for add-ons; never imports `common`, which a test checks):
+  - `BossSkill<E>` has `timing`, `usable`, `begin`, `tick` and `end`, plus two default hooks:
+    - `linger` runs every tick whether the skill runs or not. It keeps up whatever outlasts a skill's run, such as a held mind.
+    - `cease` runs when the boss dies or is removed, and lets go of everything.
+  - `SkillSet<E>` holds a boss's named skills:
+    - one runs at a time;
+    - it counts cooldowns down, scaled the way the boss says;
+    - it ticks the running skill and lingers all of them;
+    - it has `interrupt`, `cease`, `comeRound` and `holdOff`;
+    - it saves cooldowns by name.
+  - `BossSkillApi` makes the mod's modules from their rules. `BossSkillMaker` installs the maker at common setup.
+  - `BeamCaster` lets a boss say where its beam leaves it.
+- **Implementations** (`common/entity/skill`):
+  - `GazeSkill`: Eyes of Providence, one over the boss and the rest in a ring round the quarry. Its `stare` is the effect itself.
+  - `ChargeSkill`: wind-up, then a rush that breaks blocks and rams.
+  - `SummonSkill`: remnants raised in the given likenesses. Each is tagged `corruption:called_by` so only the boss's own count toward its limit.
+  - `BlinkSkill`: `weigh` judges danger every tick, then the skill teleports the boss to the best of 16 trial spots.
+  - `StrikeSkill`: magic-circle telegraphs, then violet corrupt lightning bolts.
+  - `BeamSkill`: a `DemonBeamEntity` that gathers, fires and follows its target.
+  - `MindControlSkill`: holds a player's view, and with the greater skill their movement too.
+  - `SkillShows`: shared visual and sound helpers.
+
+### 35.3 Andromalius
+- **Hitboxes.** His 2×4 box only moves him and can't be picked. Nine `PartEntity` hitboxes along his body (`AndromaliusRules.BODY`: head, neck, coil, five tail segments, tail tip) follow his body yaw on both sides.
+  - Hits on a part go to him and pass his usual arcane-only check.
+  - The parts can't be picked once he dies.
+  - This is general: `GoeticDemon` takes an optional `List<BodyPart>`.
+- **Charge** (`AndromaliusRules.CHARGE`, `Attack.CHARGE`):
+  - **When**: his quarry is 7–22 blocks away and he is hunting it or can't see it.
+  - **How**: he faces it and churns the ground for 0.8 s, then rushes 1.35 blocks/tick for 0.8 s along the last line he saw it on (about 21 blocks).
+  - **Blocks**: every tick he breaks, with drops, each block in his body's way whose hardness is ≥ 0 and < 50 (obsidian), as long as `mobGriefing` allows. A block he can't break stops him with a crash.
+  - **Ram**: 12 damage to each creature met, once, thrown along the charge.
+  - **Cooldown**: 10 s, 6 s enraged.
+  - Saved as `ChargeCooldown`.
+- **Gaze** now runs through `GazeSkill`; the numbers are unchanged.
+- **Model**: a charge pose. He lowers his head and horns, then rushes with his neck stretched low and his tail straight.
+
+### 35.4 Dantalion
+- **Entity** `corruption:dantalion` (`common/entity/Dantalion`, rules in `core/demon/DantalionRules`):
+  - 280 health, 6 armor, knockback resistance 1, fire immune.
+  - Flies with no gravity, keeping about 12 blocks from his quarry and hovering 3.5–6 blocks over the ground.
+  - Purple boss bar; emblem 3 drawn on `colossus_boss_bar.png`.
+  - In `corruption:corrupted_remnants`.
+- **Phases**:
+  - The book is 2.2×1.8.
+  - At half health he changes over 3 s, hurt only by what bypasses invulnerability, into the mirror (1.8×3.2).
+  - The mirror's cooldowns are ×0.8.
+- **Skills** (`DantalionRules.choose`, weighted random among the skills that are ready and would serve):
+  - **Both shapes**:
+    - gaze: Andromalius's own effect numbers, Slowness II for 8 s and Blindness for 5 s;
+    - greater gaze: 5 eyes, Slowness II for 13 s, Blindness for 8 s, Wither II for 7 s;
+    - summon: 3 remnants at a time, at most 6 alive;
+    - blink: whenever he is unsafe, without waiting for his rest;
+    - strike: 1 marked bolt, 12 damage;
+    - storm: 9 marked bolts, 10 damage each.
+  - **Mirror only**: beam (40 blocks, 5 damage every 4 ticks for 3 s), mind control (view held 3 s), greater mind control (view and movement held 3.5 s).
+  - While a mind is held, the beam and the lightning weigh twice as much.
+- **Mind control on the client** (`MindControlClient`, `MindControlPayload`):
+  - every frame the view is pulled toward his heart;
+  - under the greater hold, movement input is replaced by a weaving walk toward him, with no jumping or sneaking;
+  - a throbbing violet vignette;
+  - released on expiry, when he is gone, or on logout.
+- **Rite** (`recipe/altar/dantalion.json`):
+  - pillars, in order: his inscribed parchment, a Mending book, a chaos catalyst, a corrupted heartstone, an amethyst shard, a book and quill;
+  - a villager offered;
+  - eight enchanting tables round the offering, at distance 2;
+  - a player with corruption 6 or more;
+  - 10 s.
+  - The book is matched with `neoforge:components` on `stored_enchantments`, so it has to carry Mending alone.
+- **Death**: 4 s plus 2.5 s, scale 1.2, 16 violet rays. He sinks to the ground through shards, a last eye, souls and a rune ring, then a nova, a shockwave and a pillar of light.
+- **Loot**: 2–4 inscribed parchments, 1–2 randomly enchanted books, 2–6 amethyst shards, 1–2 abyssal pearls; 80 XP.
+- **Lang** (en_us and zh_cn): `entity.corruption.dantalion`, `entity.corruption.demon_beam`, `message.corruption.mind_held`, `message.corruption.mind_seized`.
+- **Models** (built in Blockbench by `gamemodels/dantalion/build_book.js` and `build_mirror.js`):
+  - The book: covers on one hinge, four flipping leaves, an eye on the left page, a ribbon, loose pages.
+  - The mirror: a frame of eight separate arcs, glass, a spiral, a crest, a spike, six masks, six shards.
+  - Shared: a 512×256 texture from `paint_texture.py`; `export_model.py` writes the geo files, the `.bbmodel` files and previews.
+- **Animation fixes found by previewing the poses in Blockbench, and by review:**
+  - **Spine**: when the book shut, its spine was left floating 3 px behind the covers (they hinge at the front of the spine). The spine now widens and moves forward with the swing.
+  - **Skills now settle**: the server clears the skill when its run ends, so every pose snapped back to rest, and the blink left the book shut. The client now keeps posing the last skill (`Dantalion.posedSkill`) until the next one begins, and every pose eases back to rest on its own. The blink whirl is one full turn.
+  - **No more jumping**: the leaves', shards' and spiral's speeds were multiplied into the absolute time (age plus an id offset), so every change of speed made them jump wildly. `DantalionWinding` now advances each phase frame by frame in the renderer.
+  - **Beam pose**: the shards never drifted back out after a beam, because "gathering" stayed at 1. Gathering now covers only the wind-up.
+- **Mind control rework**:
+  - **The problem**: the skill ran for its whole hold, and only one skill runs at a time, so he could never beam or strike a held player. The rule that weights those skills up during a hold was dead.
+  - **The fix**: the skill's run now ends at the taking. The hold is kept up by `linger` and released when it times out, when the player escapes (beyond 36 blocks, dead, creative or spectator, another dimension), or when the skill is broken off. `cease` releases it on his death or removal.
+  - **Synced state**: `HOLD` is synced, so the mirror's spiral and staring masks show while he holds a mind, whatever else he does, and fade out over 6 ticks after.
+
+### 35.5 Tests
+- **`SkillRulesTest`, `SkillSetTest`** (new):
+  - the rules of every module;
+  - the skill set: one skill at a time, cooldowns, `comeRound`, saving by name;
+  - every skill lingers every tick, and `cease` breaks the running skill and ceases all of them;
+  - `api/demon` imports nothing from `common`.
+- **`AndromaliusRulesTest`**: the charge's choice and the layering check, which now walks subfolders and allows `core.` imports.
+- **`AndromaliusServerTest`**, 3 new tests:
+  - the charge bores a tunnel his own size, 3 wide and 4 high, through a stone wall, leaving the rest of the wall, and stops dead at obsidian;
+  - the charge rams what it meets;
+  - his parts follow him, can be picked while he lives, forward arcane hits only, and can't be picked once he dies.
+- **`DantalionRulesTest`** (new): his choices, phases and cooldowns. His gaze equals Andromalius's; the greater gaze opens more eyes, lasts longer and withers.
+- **`DantalionServerTest`** (new, 11 tests):
+  - his faction and flight, and that he rides nothing;
+  - the change to the mirror;
+  - both gazes, strike and storm, summon, blink, beam;
+  - the hold outlasts the skill, he can fire his beam at the held player, and the hold ends after its time;
+  - dying releases the hold;
+  - the rite; his death.
+- **`DantalionModelTest`** (new, 14 tests):
+  - the bones, and that every skill poses;
+  - the book: covers, the eye, the blink shutting and reopening, the leaves' order, rearing for lightning, the change, the spine;
+  - the mirror: being made during the change, the spiral while reaching for or holding a mind, the shards for the beam and after it;
+  - deaths;
+  - every pose returns exactly to rest after its skill;
+  - the leaf and shard speeds never jump and return to their resting rates;
+  - the texture and emblem.
+- **`DeathVisualDrawTest`**: Dantalion's death added.
+- **Previews**: key poses of both shapes and Andromalius's charge were rendered in Blockbench from a temporary pose-dump test, which was then deleted.
+- **Run**: the full suite, 475 tests, passes. Nothing was checked in game.
+
+## 36. The spell bolt's model and hitbox; the Arcana of Corruption; the dormant corruption
+
+**Why.** The request:
+- redesign the spell projectile with a Blockbench model, and configure its hitbox;
+- add a new volume of the Key of Solomon for high-tier corruption spells, including:
+  - a projectile that does no damage but sends Corruption-series mobs (bosses included) within 24 blocks of the struck creature and of the caster after it;
+  - a Corruption Projectile that corrupts the environment into a new **Deactivated Corrupted Block**, never into Lingering Thought (malice) or the spreading Corruption;
+  - a spell that spawns a group of Corrupted Remains around the caster;
+- add the Deactivated Corrupted Block itself: the corrupted block in every way except that it is hard-coded not to spread;
+- "the rest, design yourself".
+
+### 36.1 The dormant corruption (`corruption:deactivated_corruption`)
+- **`DeactivatedCorruptionBlock extends CorruptionBlock`**, made with the same properties as `corruption:corruption`. The two now share one `ModBlocks.corruption()` properties method, so they can't drift apart.
+  - Same model and look, contact damage, footstep screams, ambient particles, loot (1–2 corruption dust), pickaxe tag and exposure.
+  - It counts as corrupted ground everywhere.
+- **The one difference is hard-coded**: `CorruptionBlock.spreads()` (true) is false for it.
+  - It never wakes the infection on place, remove or neighbour change.
+  - The new `CorruptionConversions.isSource(state)` (corrupted, and spreading) excludes it. `ServerInfectionWorld.isSourceState` and `ChunkFrontierScan` (both the section skip and the per-block check) now use `isSource`.
+  - Being corrupted, nothing converts it.
+- **Item** (`DescribedBlockItem`): the item shows a tooltip line saying it spreads no further, since it looks identical to the corruption block.
+- It is in the Corruption creative tab. Lang: `block.corruption.deactivated_corruption` (+ `.desc`), en_us and zh_cn.
+
+### 36.2 New actions (core, api, common)
+- **`corrupt_area` + `"inert": true`** (`SpellAction.Corrupt.inert`, `SpellEffects.blight`):
+  - turns blocks into the dormant corruption only, never malice, the spreading corruption or the generated variants, and nothing is decorated on top;
+  - only blocks the infection could convert that are whole and solid (no liquid, no block entity, a full occluding cube) and not ores;
+  - capped at 64 blocks per cast, like `corrupt_area`.
+- **`quell_corruption`** (`SpellAction.Quell`, radius up to 8): turns spreading, whole corrupted blocks into the dormant corruption, nearest first, at most 128 per cast. That means the corruption block, malice and `StaticCorruptedBlock` full cubes; non-full variants, corrupted liquids and the corrupted ores are left.
+- **`raise_remnants`** (`SpellAction.RaiseRemnants`: count up to 16, radius up to 16, likenesses, lifetime):
+  - remnants are raised in the given likenesses (defaults: zombie, skeleton, husk, stray, vindicator, drowned), evenly round the origin;
+  - each is bound to the caster through `SpellSummons`, so it never targets them or their summons;
+  - each crumbles after `lifetime` ticks (default 1200; 0 keeps it). This is the new saved `CorruptedRemnant.crumbleAt` / `CrumblesAt`: souls and corruption motes, no death, no drops;
+  - likenesses in `corruption:spell_conversion_immune` (bosses) are skipped.
+- **`mark_prey`** (`SpellAction.MarkPrey`: radius, default 24; ticks, default 600):
+  - **The prey** is the creature the bolt struck. `ArcaneCasting.Origin` gained `struck`, set by `SpellProjectile` on an entity hit; the old 3-argument constructor and `impact` remain. If nothing was struck, the nearest creature within 2 blocks is marked.
+  - It glows for the duration.
+  - **The hunters** are every faction mob (`corruption:corrupted_remnants`, bosses included) within the radius of the prey or of the caster, except the prey's own summons. They are sent after it.
+  - **`PreyMarks`** (common, event-driven, in memory only):
+    - any target change a hunter makes is redirected to the prey (`LivingChangeTargetEvent`, low priority) until the mark expires or the prey dies;
+    - expired entries are swept every second;
+    - everything is cleared when the server stops.
+  - **Marking a faction member works**: hunter and prey stop being allies (`PreyMarks.feuding`). The checks that honour this:
+    - `isAlliedTo` in `GoeticDemon`, `Colossus`, `CorruptedRemnant` and `AnchoredLivingPlant`;
+    - `Colossus.prey` and its damage gate;
+    - `RemnantCombatEvents` friendly damage and projectile impacts;
+    - the dragon remnant's fireball and breath.
+
+    Each creature's own immunities stay, so demons still take only arcane damage.
+  - The caster gets an action-bar line with how many answered.
+- **`truce`** (`SpellAction.Truce`: radius, default 16; ticks, default 1200):
+  - faction mobs within the radius drop the caster as their target and won't retarget them for the duration;
+  - bosses (`DemonBoss`, `#c:bosses`) don't swear;
+  - the caster gets an action-bar line with the count.
+- **Codecs, text and lang**:
+  - `SpellCodecs` gained the four kinds plus `inert`, and the bolt's `color` and `size`. The edits were surgical; the existing codecs are unchanged.
+  - `SpellText` gained a line for each.
+  - New lang keys `spell.corruption.corrupt_area_inert`, `quell_corruption`, `raise_remnants(_forever)`, `mark_prey`, `truce` and `message.corruption.prey_marked`, `prey_unheeded`, `truce_sworn`, in en_us and zh_cn.
+
+### 36.3 The spell bolt: a model, and a hitbox of its own size
+- **`LaunchBolt`** gained:
+  - `colour` (-1 means the corruption's rose);
+  - `size` (0.125–4 blocks, default 0.5), which is the bolt's box and its look.
+
+  The old 11-argument constructor still exists.
+- **`SpellProjectile`**:
+  - its dimensions follow `size`, overriding `getDimensions`;
+  - the creature-hit reach scales with it: `SpellBolt.hitRadius` × size / 0.5, so 0.6 by default and 1.8 at size 1.5;
+  - colour, size and whether it is drawn as its own model are sent in its spawn data and saved. Old saves wearing the crystal are treated as its own;
+  - an entity hit passes the struck creature to its payload.
+- **The model** (`gamemodels/spell_bolt/`):
+  - `paint_texture.py` paints a 128×64 swatch sheet. The shell is in the style guide's grey-violet with dark-rose cracks; the glowing parts are pale greys so the game can tint them.
+  - `build_bolt.js` builds the bolt in Blockbench, pointing toward −Z: a stepped-diamond crystal of light around a white-hot heart; four dark shards flaring back like a spearhead, each seamed with light; front and back rune rings; and a three-piece swaying tail.
+  - `export_model.py` writes `geo/spell_bolt.json`, the `.bbmodel`, the texture and previews.
+  - A first version, with fins that dominated and a detached tail, was reworked after looking at the previews.
+- **`SpellBoltModel` / `SpellBoltRenderer`** replace `ThrownItemRenderer` for `corruption:spell_bolt`.
+  - The model points along the flight (yaw + 180°, pitch) and is scaled by size × 8/11, so the default model fills its half-block box.
+  - It is drawn in three passes: the shell, lit by the world; the `_glow` bones unlit (`RenderType.eyes`) in the spell's colour; and the `_core` bones 65% of the way to white.
+  - The rings counter-rotate, the shell turns slowly, the crystal throbs and the tail sways.
+  - Bolts whose spell names a `look` item are still drawn as that item.
+- **Generator** (`write_books.py`): `bolt()` takes `color`/`size`, and `arcane_bolt()` now passes the spirit's colour. As a result, 37 of the spirits' spell files gained a `color` on their bolt and nothing else; this was checked by stripping the field and comparing against hashes taken before the run.
+
+### 36.4 The Arcana of Corruption (`corruption:clavicula_salomonis_corruption`)
+- A new key, after the Prologue in `ModItems.KEYS`: EPIC, its own data-map entry, tag and lore.
+- Its cover comes from `draw_books.py`: the corruption's grey-violet, a rose seal, and rose cracks across the cover.
+- Its six strings and spells are generated by `write_books.py` (`CORRUPTION_ARCANA`). The generator was first confirmed to reproduce the existing data byte for byte.
+
+  | Spell | Cost | What it does |
+  | --- | --- | --- |
+  | `corruption_mark` | 8 KCE, 5 s, corruption 8 | A blood-red 0.4 bolt. Where it lands, an eye opens and chains bind, and `mark_prey(24, 600)` fires. No damage. |
+  | `corruption_blight` | 4 KCE, 1 s, 4 | A bolt that blights 4 blocks round where it lands into dormant corruption (`inert`). |
+  | `corruption_host` | 16 KCE, 10 s, 10 | Raises 6 remnants for 60 s around the caster. |
+  | `corruption_quell` | 6 KCE, 6 s, 6 | Quells 8 blocks round. |
+  | `corruption_oath` | 12 KCE, 30 s, 12 | A 60 s truce within 16 blocks. |
+  | `corruption_engulf` | 36 KCE, 12 s, 14 | A slow size-1.5 bolt. Where it lands: turns creatures within 8, 60 corruption damage, Corruption Curse II for 15 s, a 5-block dormant blight, a nova and a shockwave. |
+
+- Every corruption the book lays down is dormant.
+- **Wands**: the mark, blight and quell fit a Novice wand, the host and oath a Basic one, the engulf an Intermediate one.
+- **Lang**: book name and lore, and the six meanings, in en_us and zh_cn.
+- **README**:
+  - the opening list, the infection rules' exception, the key table and counts (now 12 books, 99 strings, 99 spells);
+  - the 22 actions, with the new ones described;
+  - the bolt model and size;
+  - the new book's spells and the layering.
+
+### 36.5 Tests
+- **`SpellCodecsTest`**:
+  - the bolt's `color`/`size`, with defaults, round-trip, and bounds;
+  - `inert`, `quell_corruption` (bounded to 8), `raise_remnants` (defaults, likeness cycling, count bound), `mark_prey` and `truce`, with their defaults;
+  - every new kind reads back and says one line.
+- **`CorruptionArcanaServerTest`** (new, 8 tests):
+  - the dormant corruption is corrupted but no source, unconvertible, made and sounding the same. A chunk scan finds the corruption block next to stone but not the dormant one, and the dormant one hurts what stands on it by the same 15%;
+  - an inert blight leaves only dormant blocks: no malice, no spreading block, slabs and ores kept, nothing grown;
+  - quelling stills the corruption block, malice and a generated stone variant, and leaves a corrupted slab and an ore;
+  - raised remnants: a boss likeness skipped, bound to the caster, never targeting them, crumbling when their time is up;
+  - the mark:
+    - hunters near the prey, hunters near the caster and Andromalius all target it, and one out of reach does not;
+    - nothing turns a hunter away, not even a boss's own `setTarget(null)`;
+    - the hunt ends when the prey dies;
+  - a marked remnant and its hunter are no longer allies, and the hunter's blow lands;
+  - a real bolt carrying a mark marks what it strikes. A default bolt passes a pig about 1 block off its line, and a size-1.5 bolt strikes it; its box is its size;
+  - a truce makes a remnant drop the caster and refuse them again, while Andromalius does not swear.
+- **`BooksAndWandsTest.theArcanaOfCorruptionCommandsTheCorruption`** (new):
+  - the book's contents and order;
+  - the mark does no harm;
+  - every corruption in the book is inert;
+  - the host raises remnants for a while, quell and oath are present, and the engulf bolt is the only oversized bolt in any book;
+  - everything in the book fits an Intermediate wand.
+- **`SpellBoltModelTest`** (new, 4 tests):
+  - the three passes split the bones;
+  - the rings counter-rotate, the shell turns slower, the tail sways and the crystal throbs, all returning to rest;
+  - the model is 11 px across, drawn at 8 px, a half block;
+  - the texture is 128×64, and the white-hot tint is correct.
+- **Run**: the full suite, 489 tests, passes. Nothing was checked in game. In particular, the bolt's tinted, unlit look in flight has not been seen: the Blockbench previews show its geometry untinted. A try at swapping in a tinted texture for a preview failed to load in time, and the open project was restored to its own texture (the saved files were untouched).
+
+## 37. Dantalion rises whole; twenty strikes of Corrupted Lightning; Baal's fireball measured and made to crush obsidian
+
+**Why.** The request:
+- Dantalion should recover all his health when he enters his second phase;
+- Corrupted Lightning's value should go to 20;
+- the spells' damage should be checked, since Baal's fireball says 240 "but doesn't seem to deal that much";
+- Baal's fireball should break blocks as hard as obsidian, but never bedrock.
+
+### 37.1 Dantalion heals as he changes
+- **`DantalionRules.healthAt(from, max, through)`** gives his health that far through the change: it eases from what it was to full.
+- **In the entity**:
+  - `Dantalion.beginChange` records his health;
+  - each tick of the 3 s change sets his health along that curve, so the boss bar visibly refills;
+  - the last tick sets it to full.
+- He is still untouchable while changing, so the second phase always begins at 280/280.
+- The change's progress (`Changing`, `ChangedFrom`) is now saved, so a world saved mid-change finishes it on load.
+
+### 37.2 Corrupted Lightning: 20 strikes
+- "Corrupted Lightning" is the Prologue's `corruption_tempest` (腐化之雷). Its strikes already deal 22 each, so "to 20" was read as the number of strikes: 10 to 20, in the same 10-block radius, each still 22 corruption damage.
+- Changed in `write_books.py` and regenerated. Only `corruption_tempest.json` and `baal.json` changed, checked by file hashes before and after.
+
+### 37.3 Baal's fireball: what it really deals
+- **Measured** with the new `SpellDamageServerTest`, which flies the spell's own bolt from its data at targets with 1000 health:
+  - with no armour, it takes exactly 240;
+  - against a zombie in full diamond (armour 22, toughness 8), it takes about 198. That is exactly what `CombatRules` gives for any blow of 240.
+- **The data was right.** Spell damage (`corruption:arcane_spell`) is not armour-piercing, so like most damage it is reduced by:
+  - armour and toughness;
+  - Protection enchantments (four Protection IV pieces: about 71);
+  - Resistance (with Resistance II as well: about 43);
+  - whatever other mods impose.
+- **The likely cause of the report:** the user's dev instance has the Spore mod. In hard mode its evolved and calamity mobs cap the damage of each hit (20–100 in `run/config/spore-startup.toml`) and give themselves Resistance II. The last session's log shows spells used among those creatures.
+- **No change** was made to how spells hurt. The README now explains what reduces a spell's stated damage and gives the measured numbers.
+
+### 37.4 Explosions that crush (core, api, common)
+- **`SpellAction.Explode.crushHardness`** (data `crush_hardness`, 0–1000; omitted means none; the old constructors still work). Every block within `break_radius` (at most 8) no harder than this also breaks, whatever its blast resistance; blocks that can't be broken (negative hardness: bedrock, barriers, portal frames) never do.
+  - Crushed blocks count toward `max_blocks`, nearest first.
+  - Each must first pass a `BlockEvent.BreakEvent` for the caster and `Level.mayInteract`, so land protection can still refuse it.
+  - Air and plain liquids are skipped.
+- **Where it runs:** `SpellExplosions` adds the crushed blocks in the same lowest-priority `ExplosionEvent.Detonate` step that bounds the rest; the explosion itself breaks them, with drops.
+- **Text and lang:** `SpellText` has a new line for crushing blasts, `spell.corruption.explode_crushes`, in en_us and zh_cn.
+- **Baal's fireball** now crushes up to obsidian's hardness (50): `explode(4, True, 4, 60, crush=50)`. Its old 6-resistance cap is gone, so within 4 blocks obsidian, crying obsidian, netherite blocks, ancient debris and anything softer give way, up to 60 blocks; reinforced deepslate (55) and bedrock don't.
+
+### 37.5 Tests
+- **`SpellDamageServerTest`** (new, 2 tests): Baal's fireball deals 240 to the unarmoured and exactly the armour formula's share to the armoured; and its blast tears through an obsidian wall without touching the bedrock behind it.
+- **`SpellCodecsTest.aBlastThatCrushesIsData`**:
+  - obsidian is crushed, reinforced deepslate and unbreakable blocks are not;
+  - the reach is capped at 8;
+  - it round-trips, defaults to none, and refuses a negative value;
+  - Baal's data crushes obsidian and not bedrock.
+- **`DantalionRulesTest.heIsMadeWholeAsHeChanges`**; the server change test now checks the bar refilling halfway through and full health at the end.
+- **`BooksAndWandsTest`**: the tempest calls 20 strikes.
+- **Run**: the full suite, 493 tests, passes. Nothing was checked in game.
+
+## 38. Seere, the winged horse: a third demon, by ground, sky and earth
+
+**Why.** The request: a new boss, Seere, modelled as a winged pegasus who travels through the sky and underground, with animations to match. His skills:
+- in the sky, a dive at the target that moves the blocks where it lands (anything softer than bedrock) as if blown up by TNT;
+- on the ground, rapid multi-stage blinks, each dealing Corruption Curse damage along the path it passes;
+- on the ground, an ordinary melee strike with his front hooves;
+- in the sky, up to four beams, each fired from its own magic circle: one at full health, more as his health falls;
+- on the ground, a large field of earth spikes in front of him that damages and slows;
+- and very fast movement.
+
+### 38.1 Seere (`corruption:seere`)
+- **What he is**: the seventieth spirit of the Goetia, here the winged horse himself. He is a `GoeticDemon`, so only the arcane hurts him. His body is three hitboxes (forequarters, hindquarters, head and neck). Stats:
+  - 360 health, 8 armour, knockback resistance 1, fire immune;
+  - steps up 1.6 blocks;
+  - 100 xp;
+  - a blue boss bar.
+- **Speed**: his ground speed attribute is 0.5 (a horse's is 0.3375 at most). He flies at up to 0.75 blocks a tick and moves at 0.7 underground.
+- **Three ways of going** (`SeereRules.Mode`), and four *shifts* between them, each a short state of its own that the client poses like a skill:
+  - take-off: 1 s;
+  - landing: up to 3 s;
+  - burrowing: 0.8 s;
+  - emerging: 0.8 s.
+- **On the ground** he gallops after his quarry until his hooves can reach it.
+- **In the sky** he circles it about 14 blocks off, 7 to 12 blocks above the ground, now and then changing height, pitched as he flies.
+- **Underground**:
+  - **Moving**: he sinks 3 blocks below the surface and moves toward his quarry. He is not drawn and casts no shadow; the ground above him shakes and throws up dust.
+  - **Rising**: within 3 blocks of it, or after 6 s, he bursts out. Everything within 3.5 blocks takes 12 corruption damage and is thrown up, and up to 24 blocks around him are torn up as by his dive.
+- **When he changes** (`SeereRules.choose`):
+  - **Burrowing**: on the ground he burrows for a quarry beyond 26 blocks, or one he hasn't seen for 2.5 s.
+  - **Taking off**: he takes off at once for a quarry more than 4 blocks above him. After 8 s on the ground, taking off becomes one of his choices (weight 3).
+  - **Landing**: in the sky he lands if he has flown at least 5 s and has lost sight of his quarry. After 10 s aloft, landing becomes one of his choices (weight 3).
+  - **After a dive**: a dive always ends with him on the ground.
+
+### 38.2 His blows
+Between blows he rests 0.5 s on the ground and 0.8 s in the sky.
+1. **Hooves** (ground):
+   - **When**: first choice whenever his quarry is within 4.6 blocks and inside a 140° arc in front.
+   - **The blow**: he rears for 0.6 s, pawing, then comes down. Everything in the arc takes 16 damage (an ordinary mob attack, so armour counts) and is knocked back and lifted.
+   - **Cooldown**: 1.5 s.
+2. **Blinks** (ground, weight 4):
+   - **When**: his quarry is 3–18 blocks away.
+   - **The run**: after a 0.5 s crouch he blinks 4 times, 0.25 s apart. Each blink passes through the quarry and lands 5 blocks beyond it, turned 35° to alternating sides, so the run zigzags back and forth through it.
+   - **On each path**: everything within 1.6 blocks (plus half its own size) takes 12 corruption damage and Corruption Curse II for 6 s.
+   - **Blocked landings**: if a landing doesn't fit, he tries the other side, then half the distance, else skips that blink.
+   - **Visuals**: shards where he leaves, a rift where he arrives.
+   - **Cooldown**: 8 s.
+3. **Spikes** (ground, weight 4):
+   - **When**: his quarry is 2–16 blocks away and within 30° of his facing.
+   - **The field**: he turns to it and rears, wings up, and the field ahead of him is marked with small magic circles. It runs from 1.5 to 16 blocks out, 3 blocks wide near him and 11 at the far end, one circle about every 2.5 blocks (17 in all).
+   - **The stamp**: after 1 s he stamps. Spikes burst up at every mark, and everything standing in the field (within 3 blocks up or down) takes 14 corruption damage and Slowness III for 6 s. Nothing behind or beside him is touched.
+   - **Cooldown**: 10 s.
+4. **Dive** (sky, weight 5):
+   - **When**: his quarry is 6–48 blocks away and at least 5 blocks below him.
+   - **The dive**: he marks its position with a 4-block magic circle, climbs for 1.2 s, then folds his wings and dives there at 1.6 blocks a tick.
+   - **Impact**: when he hits the ground (or reaches the mark), everything within 4 blocks takes 24 damage (an ordinary mob attack) and is thrown away and up.
+   - **The ground is blown up**: up to 48 blocks within 3.5 blocks, nearest first, become falling blocks flung outward and upward at up to 0.9 blocks a tick, landing where they fall.
+     - **What goes**: every block that can be broken at all, obsidian included.
+     - **What stays**: bedrock, barriers, liquids, blocks with block entities, door and bed halves, and replaceable plants.
+     - It respects `mobGriefing`.
+   - **Cooldown**: 11 s.
+5. **Beams** (sky, weight 5):
+   - **When**: his quarry is 4–40 blocks away; he hangs in the air facing it.
+   - **How many**: 1 beam at full health, 2 at 75% or less, 3 at 50%, 4 at 25%.
+   - **Where from**: each beam comes from its own magic circle, a rune ring standing in the air. A single beam leaves from before his breast. More are spread evenly on a 2.6-block ring around that point, the first straight above.
+   - **Firing**: after 1.5 s each fires a 44-block beam for 3 s. It turns at most 2.4° a tick to follow, and every 4 ticks deals 5 corruption damage to everything within 1.4 blocks of it, up to the first block. Each beam hurts on its own.
+   - **Cooldown**: 16 s.
+
+### 38.3 New skill modules (core, api, common)
+Each is a rules record in `core/demon/skill` (pure Java), a `BossSkillApi` maker for add-ons, and an implementation in `common/entity/skill`:
+- **`MeleeRules` / `MeleeSkill`**: a close blow in an arc (`catches(distance, offDegrees)`).
+- **`PhaseDashRules` / `PhaseDashSkill`**: the run of blinks. `hopping` says which blink falls on which tick, `landing` where each lands, and `offLine` how far a point is from a path. Its timing is stretched to cover the last blink.
+- **`SpikeFieldRules` / `SpikeFieldSkill`**: the field ahead. `widthAt`, `covers` and `clusters` give its shape. The field is fixed the moment the skill begins.
+- **`DiveRules` / `DiveSkill`**: the dive. `serves`, `diving`, `tears(hardness)` (anything with hardness ≥ 0) and `fling`. The tearing itself is `Debris.tear`, which any boss may call; Seere uses it for his emergence too.
+- **`BeamVolleyRules` / `BeamVolleySkill`**: several beams at once. `byHealth(share)` gives the count and `circle(index, count)` places each circle. The boss supplies the count as a `ToIntFunction<Mob>`, so an add-on can count however it likes.
+- **`BossSkillApi`** gained `melee`, `phaseDash`, `spikeField`, `dive` and `beamVolley`.
+- None of these hurt the boss's allies (the corruption's side).
+
+### 38.4 Under the earth
+- **Not hittable**: `GoeticDemon.exposed()` is a new hook, and a demon's body parts are pickable only while it returns true. Seere returns false underground (except while emerging). His `hurt` refuses everything there except damage that bypasses invulnerability (`/kill`, the void).
+- **He keeps his quarry.** A creature forgets a target it hasn't seen for about 3 s; the vanilla target goal gives up. Underground he can't see anything, so on a long tunnel he would have surfaced wherever he happened to be. A server test caught this before it shipped.
+  - **The fix**: Seere now keeps the quarry he burrowed after until he is back up, then takes it as his target again.
+  - **Timing**: he burrows for an unseen quarry at 2.5 s instead of 3 s, so he goes before he would have forgotten it.
+
+### 38.5 The rite, drops, registration, lang
+- **The rite** (`recipe/altar/seere.json`):
+  - pillars 1–6: a parchment inscribed `corruption:seere` (copied from the Key of Solomon VIII at a lectern, as the other demons' are), a saddle, an eldritch membrane, a corrupted heartstone, an abyssal pearl, a feather;
+  - a horse given up on the offering table;
+  - hay bales at (2,2), (2,-2), (-2,-2), (-2,2);
+  - corruption 8; 10 s.
+- **Drops** (`loot_table/entities/seere.json`): 2–4 of his parchments, 1–3 abyssal pearls, 1–3 eldritch membranes, 4–10 feathers, and a saddle half the time.
+- **Registration**: `ModEntities.SEERE` (2.2×2.9, eyes at 2.6, fire immune), his attributes, and his place in `corruption:corrupted_remnants`.
+- **Lang**: `entity.corruption.seere` ("Seere" / "系尔").
+- **Death** (`Seere.DEATH`), indigo and silver, ×1.4, 3.5 s plus 2.5 s:
+  - feathers scattering with a wingbeat;
+  - a ring of force and a horse's death cry;
+  - souls rising;
+  - a rift opening and closing under him;
+  - up to 18 rays;
+  - an indigo nova, a last ring and a pillar of light.
+
+  Dying underground, he comes up first; dying in the sky, he falls.
+
+### 38.6 Model, texture and animation
+- **Model** (`gamemodels/seere/build_seere.js`, `export_model.py`, texture from `paint_texture.py`, 512×256):
+  - body; a two-part neck, each part with a mane; a jaw that opens; a three-part tail;
+  - legs of thigh, shank and hoof;
+  - wings of arm, forearm and hand, built spread straight out, with coverts, secondaries and six primaries;
+  - glowing markings, mane and feather tips in `_glow` bones, drawn again unlit by the renderer's glow layer.
+- **The folded wing** took some finding. A bird's fold, zig-zagging the three pieces in the wing's own plane, reverses every other piece, so the forearm's feathers stood up over his back like sails. Two preview probes in Blockbench showed this. Instead (`SeereModel.FOLD_*`):
+  - **The arm** swings back along his back and turns about its own length, so its feathers hang down his flank, leaning slightly outward;
+  - **The forearm** shuts forward over the outside of the arm the way a book closes: a half turn about the line of its feathers, so they still hang down;
+  - **The hand** shuts back over the forearm the same way;
+  - each piece lies a few pixels outside the last, and the forearm's feathers close up by 30% (as a fan closes), so nothing hangs below his belly.
+  - **Half open**, the whole wing sweeps back first; the forearm and hand only shut at the end, so a half-open wing never looks broken.
+- **Poses** (`SeereModel.pose`):
+  - a rotary gallop, and flight with legs tucked, neck out and tail streaming;
+  - every blow and shift has its own pose: rearing for hooves and spikes; crouching and lunging between blinks; climbing on hard beats, then falling with wings swept back flat like a stooping falcon; hovering on slow beats for the beams; taking off and landing; diving nose-first into the ground and rearing out of it;
+  - death on his side, wings fallen open.
+  - Every pose, take-off included, eases back to rest by itself after its skill.
+- **`SeereWinding`** winds the wingbeat and the amount of flight frame by frame, so a change of pace never jumps them.
+- **`SeereRenderer`**:
+  - pitches him about his middle in flight and in the dive;
+  - draws nothing (and no shadow) while he is underground;
+  - draws his death with `DeathVisual`.
+- **Boss bar**: his emblem, a knight's horse head with a raised wing tipped in his indigo, is drawn into `colossus_boss_bar.png` at (128,72) by `draw_boss_bar.py`.
+
+### 38.7 Tests
+- **`SkillRulesTest`** (5 new tests):
+  - the arc and reach of a blow;
+  - the blinks' timing, zigzag landings and distance to a path;
+  - the spike field's shape and clusters;
+  - what a dive tears up (obsidian yes, bedrock no) and how it flings;
+  - the beam count by health (1 to 4) and the circles' places.
+- **`SeereRulesTest`** (7): choices on the ground, in the sky and underground; burrowing for distant or unseen quarries; beams by health; when he rises; shift lengths; faster than any horse.
+- **`SeereModelTest`** (8), measuring where the bones actually end up:
+  - folded, the hand lies back along him outside his flank, nothing rises above his back, and the feathers hang down but no lower than his belly;
+  - spread and beating in the air; swept back whole when half open;
+  - the gallop, the rears and the dive;
+  - lying on his side in death;
+  - every pose settling to rest;
+  - the texture and the emblem.
+- **`SeereServerTest`** (10, on a real server):
+  - what he is;
+  - take-off, staying aloft and landing;
+  - going underground out of reach, then rising beside his quarry, hurting and throwing it and tearing up the ground;
+  - hooves that hit what's in front and spare what's behind;
+  - blinks that hurt and curse the quarry and what stands on a path, and nothing off it;
+  - spikes that hurt and slow only what's in the field;
+  - a dive that hurts, tears up obsidian but leaves bedrock, flings every block upward, and ends with him on the ground;
+  - one beam at full health and three, each with its own circle, at 30%;
+  - the rite;
+  - dying underground and surfacing to die.
+- **`DeathVisualDrawTest`** now draws Seere's death too.
+- **Run**: the full suite, 523 tests, passes. Nothing was checked in game. His poses were checked only as Blockbench previews of the posed bones, from three views; the animations in motion, his flight and burrowing paths, and how hard he is to fight have not been seen.
+
+## 39. Seere remodelled: a plain shape, the detail painted
+
+**Why.** The request: Seere's model was too simple and ugly, and detail should be a precise texture, not modelled.
+
+### 39.1 What was wrong
+- **The texture**: Seere was built like the earlier demons. Every box showed a random crop of a material swatch, so the texture carried no detail at all.
+- **The geometry**: all the detail was boxes:
+  - ribs, glow strips and horn stacks;
+  - a neck built as a staircase;
+  - a box muzzle on a box head;
+  - feathers as separate slabs.
+
+### 39.2 The model as data (`gamemodels/seere/seere_model.py`)
+- **One Python file** holds the whole model: bones, boxes, and the skin that paints each box. It packs every box's box UV onto a 256×128 texture and writes the Blockbench build script. `build_seere.js` and the swatch files are gone.
+- **The shape, 55 boxes on 28 bones**:
+  - a horse's barrel with a breast, withers, croup and quarters;
+  - a neck of two pieces leaning forward 36° and arching back 14°;
+  - a long head bowed a further 32°, with a jowl, a jaw that opens, ears and a forelock;
+  - legs of upper, lower and hoof, each hoof wrapped in long hair;
+  - a three-piece tail falling nearly to the ground.
+- **Each wing** is three pieces (arm, forearm, hand), each one leading edge plus one plane of feathers 0.08 px thick, as the style guide asks for thin wings. Spread, a wing reaches 50 px from the shoulder.
+- **Mirroring**: right-side boxes are mirrors of the left and share its texture.
+- **Bone names are unchanged**, so the animation keeps working. The neck, head and tail now carry rest rotations; the animation only ever adds to those.
+
+### 39.3 The texture (`paint_texture.py`)
+- **How it paints**: every texel of every face is painted from where it is on the model and which way its face looks in the world, rest rotations included. So:
+  - shading runs on across neighbouring boxes;
+  - an eye, a nostril or a crease is painted at its place in space, not at a texture coordinate.
+- **The coat**: a blue-black ramp of nine steps, lighter where a face looks up and along the top line, with a blue sheen at the brightest. Also:
+  - shoulder and hip muscles;
+  - the shoulder blade's and the flank's creases;
+  - a parted chest and a spine down the back;
+  - no noise or dither: both turned large areas into checkerboards in the previews.
+- **The head**:
+  - glowing indigo eyes with lids and a catchlight;
+  - a narrow silver blaze ending in a snip, and the nostrils;
+  - a mouth line, with teeth inside the mouth;
+  - pointed ears, their tips cut out with transparent texels.
+- **Hair**: the mane (a crest along the neck and a fall of hair down one side), forelock, tail and fetlock hair are silver strands of varying length with ragged, transparent ends.
+- **Feathers**, each painted with its shaft, a lighter leading edge and a darker trailing one, so the feathers lie one over the next; everything outside the feathers is transparent:
+  - rows of coverts on the arm;
+  - five secondaries with staggered round tips on the forearm;
+  - six primaries fanning from straight out to straight back on the hand, giving the wing a rounded tip and separated "fingers".
+- **The underside** of the wing is paler.
+- **His sigil**: Seere's sigil (a ring, a staff and spread wings) is branded on each hip in indigo.
+- **Glow**: what glows (his eyes, the sigils, the feather tips, some hair tips) is also painted on `seere_glow.png`. `SeereRenderer` now draws that texture over him unlit with `RenderType.eyes`, so the model has no `_glow` bones and `SeereModel.glowOnly` is gone.
+
+### 39.4 The folded wing on thin feathers
+- **Thinner fold**: with planes instead of 1–2 px slabs, the folded layers need far less room. `FOLD_OUT` (the arm out from the flank) is 1.2 px, and `FOLD_FOREARM_OUT` and `FOLD_HAND_OUT` (each layer out from the last) are 0.9 px each. The folded wing now lies about 3 px off the flank, where it was 7–8 before.
+- **Leading edges**: the forearm's and hand's leading edges were thinned to 1.5 and 1 px. Seen from the front they no longer stand out from the shoulders like epaulettes.
+- **The fold itself is unchanged**: the book fold, the 30% tuck and the staged closing.
+
+### 39.5 Pipeline notes
+- **Box UV orientation** was confirmed with a test cube seen from all six sides before painting:
+  - every side face reads unmirrored from outside;
+  - the top and bottom faces run from back to front, with +X on the texture's left.
+- **Texture caching**: Blockbench keeps an image it has loaded from a path, so `export_model.py` loads a freshly named copy each build. Without that, a rebuilt texture silently didn't show.
+
+### 39.6 Tests
+- **`SeereModelTest`** is updated for the new shape:
+  - the probe points (the outermost primary's tip, the outer secondary's foot);
+  - his flank at 6 px, his back and belly 7 px from the body's pivot.
+- **New checks**:
+  - the model has no `_glow` bones;
+  - the texture is 256×128;
+  - the glow texture is the same size and has more than 50 lit texels, each over a painted texel of the texture.
+- **The fold checks pass unchanged** in meaning on the new geometry. The hand lies back along him, outside his flank and within 9 px of it; nothing rises above his back; the feathers hang down but no lower than his belly. Spread, the wing reaches past 30 px out and beats over 20 px up and down.
+- **Run**: the full suite, 523 tests, passes. Nothing was checked in game. The new model and textures were judged only in Blockbench previews (rest, gallop, rearing, flight, dive, beams, landing, burrowing, emerging, death; close-ups of the head and of the wing from above and below). Blockbench draws no glow, and its lighting is not the game's.
+
+## 40. Seere's blinks nerfed
+
+**Why.** The report: Seere's blink attack dealt far too much damage; even a Warden could not survive it.
+
+### 40.1 Where the damage came from
+The blinks' stated damage (12 a blink) was not the problem. The Corruption Curse was:
+- **How the curse hurts**: every second it deals 15% of the victim's *maximum* health per level (`CorruptionBlock.CONTACT_DAMAGE_FRACTION × CorruptionCurseRules.damageScale`). Its damage type, `corruption:corruption`, ignores armour, Resistance and invulnerability frames. *(Wrong, corrected in §42: armour, Protection, Resistance and invulnerability frames all apply to it.)*
+- **What the blinks laid on**: Curse II (30% a second) for 6 s, which alone is 180% of anything's health.
+- **Re-applied every blink**: every blink of a run passes through the quarry, so all four hurt it (48 armour-piercing damage) and re-applied the curse. A re-applied curse starts its count again at a whole second, so it bites again at once.
+- **Total**: about ten pulses, roughly 300% of maximum health. A Warden (500 health) lost 120% of its health in the first second.
+
+### 40.2 The fix
+- **`PhaseDashRules.hitsEach`** (new): how many blinks of one run may hurt the same creature, at least 1. `PhaseDashSkill` counts each creature it has hurt during a use, so a creature is hurt and cursed no more often than that. Its doc now warns how the curse scales.
+- **Seere's blinks** (`SeereRules.BLINKS`):
+  - each creature is hurt once a run;
+  - 6 corruption damage (was 12 a blink);
+  - Curse I for 1.5 s (was Curse II for 6 s), which bites exactly once.
+- **The worst a run now does** to anything is 6 damage plus 15% of its maximum health. For a player that is about 9 of 20 health; for a Warden, about 81 of 500.
+- **Unchanged**: the range, timing, zigzag, path width and cooldown.
+
+### 40.3 Tests
+- **`SeereServerTest.aWardenOutlastsAWholeRunOfHisBlinks`** (new): a Warden is blinked through and lives its own ticks during the run and until its curse ends. It must live with more than 75% of its health. With the old numbers put back, this test fails: the Warden dies.
+- **The blinks test** now also checks that the quarry was hurt exactly once (its health down by exactly the blink damage), though all four blinks passed through it, and that the curse is level I.
+- **`SkillRulesTest`**: `hitsEach` is kept, and held to at least 1.
+- **Run**: the skill rules, Seere rules and Seere server tests pass (32).
+
+### 40.4 Run
+- The full suite, 524 tests, passes. Nothing was checked in game.
+- The new damage was measured only in the test world, against a still Warden ticked by hand.
+
+## 41. Memory, the corruption's blades and robes, and its working blocks made
+
+**Why.** The request: a Memory Fragment and the chain built on it (a gem, an energy brick, two swords), two boss-drop materials, Resentment, three grades of corrupted robes, recipes for every functional block, Silk Touch and shears for the corruption's plants, and the original robe's place as the future Great Sage's attire. Everything is split into core / api / common.
+
+**Names used.** Alchemy Table = Corruption Bench (`corruption:alchemy_shaped/shapeless`). Brass Pot = brass cauldron (`corruption:brass_cooking`). Corruption = the block `corruption:corruption`. Lingering Thought = `corruption:malice` (缠念). Lingering Vine = the malice vine. Resentment Grass, Wraith, Whispering Flower, Eerie, Grotesque = `malice_grass`, `blood_filaments`, `whisper_bloom`, `eerie`, `eldritch`. Corrupted Remains = the corruption faction (`corruption:corrupted_remnants`) without its bosses.
+
+### 41.1 Six new materials (`ModItems.MATERIALS`, 14 → 20)
+| Material | Made by |
+|---|---|
+| Malice Tendril (`malice_tendril`) | Dropped by the malice vine, 1-2 (+0-1 per Looting level), only when killed by a player |
+| Greed Heartwood (`greed_heartwood`) | Dropped by Greed, the same way |
+| Resentment (`resentment`) | Brass cauldron: 4 each of the five plants + 1000 mB flowing corruption, 5 KCE, 300 ticks |
+| Memory Fragment (`memory_fragment`) | Bench, shapeless: 64 corruption crystal, 32 ancient corruption crystal, 16 Corruption blocks, 8 malice |
+| Corrupted Memory Gem (`corrupted_memory_gem`) | Bench, shapeless: Memory Fragment, 10 diamonds, 32 quartz |
+| Corruption Energy Brick (`corruption_energy_brick`) | Altar, shaped: the gem on pillar 1, a Corruption Arcane Brick block on each of pillars 2-6, 160 ticks |
+
+- Generated by `gamemodels/corruption_materials/write_materials.py`; sprites by `draw_materials.py` (six new ones).
+- The materials test now lets dropped materials have no recipe (see 41.9).
+
+### 41.2 The blades
+- **Corruption Energy Sword** (`corruption:corruption_energy_sword`):
+  - 16 attack damage, speed 1.6, 2500 durability, enchantability 15. Fire-resistant. Repaired with the energy brick.
+  - Bench, shaped: 2 energy bricks, 4 cursed iron ingots, a chaos catalyst, a corruption stick, 2 harmonized corruption crystals.
+  - In the item tag `corruption:arcane_weapons` (the attack tag), so a hand blow with it reaches the Goetic demons.
+  - No curse.
+- **Corrupted Arcane Sword** (`corruption:corrupted_arcane_sword`):
+  - 32 attack damage, speed 1.6, 3000 durability, enchantability 15. Fire-resistant. Repaired with Resentment.
+  - Bench, shaped: the energy sword on slot 0 + 3 Resentment. It keeps the energy sword's components (see 41.5).
+  - In `corruption:arcane_weapons` and `corruption:cursed_weapons`:
+    - On anything not of the corruption, it lays Corruption Curse I for 30 ticks (one bite, 15% of maximum health).
+    - Remnants take the blow but not the curse.
+    - The corruption's bosses (`corruption:bosses`) refuse the blow: no damage, an anvil sound, and a message to the attacker.
+  - Given up on altar pillar 1 (100 ticks), it turns back into the energy sword, keeping its components.
+- Both swords are in `minecraft:swords`, so sword enchantments apply.
+- **Hooks**: `GoeticDemon.accepts` now also accepts `ArcaneWeapons.isArcaneBlow`. The `CorruptionBlades` events refuse cursed blows on bosses (HIGH priority, `LivingIncomingDamageEvent`) and lay the curse (`LivingDamageEvent.Post`).
+- **Already hittable**: remnants take any weapon (they are immune only to corruption damage), and so do Baal and Agares (Colossus: any damage with an attacker). The mark only matters for Andromalius, Dantalion and Seere.
+
+### 41.3 The corrupted robes
+- Three grades (novice, intermediate, advanced), each a hood, robe, leggings and boots. They only work as a full set of four; a mixed set counts as its lowest grade.
+  - **Novice**: the corruption's non-boss creatures do not target the wearer or retaliate against them, and the plants' blindness skips them. Corruption is held at 5.
+  - **Intermediate**: as Novice, held at 12, and corruption damage halved.
+  - **Advanced**: as Intermediate, held at 19, corruption damage fully negated, and the bosses do not target or retaliate either.
+- **Corruption damage** means the damage type tag `corruption:corruption_damage`, which holds `corruption:corruption` and `corruption:corruption_conversion`.
+- **The hold**:
+  - Putting a set on remembers the current corruption (attachment `CORRUPTION_KEPT`) and sets it to the grade's value.
+  - While held, `PlayerCorruption.raise` and purification do nothing.
+  - Once the set is incomplete, the remembered value is given back. Neither wearing nor dying in the robes can launder corruption away or pump it up.
+  - `CORRUPTION_KEPT` is saved and kept through death, as the corruption itself is. *(Wrong, corrected in §43.2: death resets corruption to 0, and keeping this undid that.)*
+- **Stats** (armour: hood / robe / leggings / boots):
+  - Novice: 2/4/3/1, toughness 0, enchantability 20, repaired with shadow silk.
+  - Intermediate: 2/6/5/2, toughness 1, enchantability 22, repaired with malice tendril.
+  - Advanced: 3/8/6/3, toughness 2, enchantability 25, repaired with greed heartwood.
+- **Recipes**: bench, shaped. Slot 0 is the same piece one grade below (the plain robe for Novice); the result keeps its components.
+  - Novice: + 2 shadow silk, 4 malice fibre, 4 corruption crystal, 32 corruption dust.
+  - Intermediate: + 2 malice tendril, an eldritch membrane, 2 soul resin, 4 ancient corruption crystal.
+  - Advanced: + 2 greed heartwood, a Memory Fragment, a chaos catalyst, 4 harmonized corruption crystal.
+- **Who asks the veil** (`CorruptionVeilApi.hiddenFrom`):
+  - `CorruptedRemnant.canAttack` (and through it the corrupted dragon);
+  - `GoeticDemon.canAttack`;
+  - `Colossus.prey` (Baal, Agares);
+  - `Greed.eligible`;
+  - the plants' blindness loop.
+  - Vanilla target goals consult `canAttack` both when choosing and when keeping a target.
+- **Limit**: the veil only stops the wearer being targeted. A boss's area attack aimed at something else still catches them; the Advanced grade still negates its corruption damage.
+
+### 41.4 The original robe
+- Its tooltip gains a last line, `tooltip.corruption.robe_sage`: "The attire of the Great Sage's path, which is yet to open". Nothing else about it changed.
+- The README states its place. It is also the base of the Novice robe.
+- **Pre-existing bug, fixed**: the plain robe was in none of the vanilla armour tags (`minecraft:head_armor` …). Since 1.21, armour enchantments only go on items in those tags, so despite its enchantability 22 it could not be enchanted at a table or anvil. All four pieces are now in them (merged by `write_gear.py`), as are the corrupted robes. Without this, the robe → Novice upgrade would have had no enchantments to keep.
+
+### 41.5 Recipes that keep what they remake (`keep`)
+- `corruption:alchemy_shaped` takes an optional `"keep": "<slot 0-4>"`, and `corruption:altar_shaped` an optional `"keep": "<pillar 1-6>"`. The result gets that input's data components (enchantments, wear, name). Used by the sword conversions and every robe upgrade.
+- `KeptComponents.onto` does the copy. Both codecs are split into `FIELDS` plus a checked `CODEC`, and the stream codecs carry `keep`.
+- `AltarOfferingBlockEntity.complete` now assembles the result before the pillars are consumed, so the kept item is still there to copy.
+
+### 41.6 Functional blocks and Silk Touch
+- **Crafting-table recipes**: transmuter, bench, brass cauldron, altar pillar, altar offering, arcane lectern, arcane pedestal, arcane charger. Patterns are in the README.
+  - The transmuter and bench use only dust, crystals and corruption sticks, so the chain starts without Silk Touch.
+  - The others use Corruption, malice and cursed bricks.
+- **Loot tables** (`write_gear.py`):
+  - The five plants drop themselves to shears (`#c:tools/shear`) or Silk Touch, and dust otherwise, as before.
+  - The Corruption block, deactivated corruption and malice drop themselves to Silk Touch only, and dust otherwise. Deactivated corruption follows the Corruption block, as the README says the two drop alike.
+- **README fix**: the Corruption block's README line said it dropped itself to a pickaxe. Its loot table actually dropped dust; the line is corrected.
+
+### 41.7 Layering
+- **core**: `CorruptedRobeRules` (grades, `worn`, `step`), `ArcaneBladeRules` (numbers, `arcane`, `refused`, `curses`).
+- **api**:
+  - `CorruptedRobeItem`;
+  - `CorruptionVeilApi` (`hiddenFrom`, `damageTaken`, `heldCorruption`, `CORRUPTION_DAMAGE`);
+  - `ArcaneWeapons` (`MARKED`, `CURSED`, `weapon`, `isArcaneBlow`, `isCursedBlow`);
+  - `CorruptionFactionApi.BOSSES` and `isBoss`.
+  - No api class imports common.
+- **common**:
+  - items: `CorruptionBladeItem`, `CorruptedRobeArmorItem`;
+  - events: `CorruptionBlades`, `CorruptedRobes`;
+  - registry: `ModArmorMaterials` (three robe materials), `ModItems`, `ModCreativeModeTabs`, `ModAttachments.CORRUPTION_KEPT`;
+  - `KeptComponents`, and the hooks listed above.
+
+### 41.8 Data and art
+- **Generator**: `gamemodels/corruption_gear/write_gear.py` (new) writes item models, 23 recipes, 10 loot tables, tags and lang. It merges into existing tag and lang files instead of replacing them.
+- **New tags**:
+  - `corruption:arcane_weapons`, `corruption:cursed_weapons`;
+  - `minecraft:swords` and the four `minecraft:*_armor` tags;
+  - `corruption:bosses`, also added to `c:bosses`;
+  - damage type `corruption:corruption_damage`.
+- **Textures**: `gamemodels/corruption_gear/draw_gear.py` (new) draws both swords, 12 robe icons, and the worn layers `textures/models/armor/<grade>_corrupted_robe_layer_1/2.png`.
+- Lang is in en_us and zh_cn.
+
+### 41.9 Tests
+- **`CorruptedRobeRulesTest`** (new, 3): grade numbers, set and lowest grade, and the hold's steps.
+- **`ArcaneBladeRulesTest`** (new, 4): damage, the mark, refusal and curse, and the curse's length.
+- **`CorruptedGearServerTest`** (new, 11): the hold and its return, including through death; the veil from remnants and from Andromalius; corruption damage halved and negated; the swords' 16/32, tags and durability; the energy sword hurting Andromalius where a netherite sword cannot; the arcane sword refused by him, cursing an iron golem but not a remnant; `keep` on the bench and the altar; every robe, blade and functional-block recipe loading; plant and block drops to shears and Silk Touch; the vine's and Greed's drops on a player kill only.
+- **`CorruptionMaterialsServerTest`**: the two dropped materials are exempt from the one-recipe rule, and must be named in their entity loot tables instead.
+- **Checked**: the death test fails with `CORRUPTION_KEPT` not kept through death (the first version), and passes with it. *(That test copied attachments by hand and missed the real reset on death; replaced in §43.2.)*
+
+### 41.10 Run
+- See §42.6 for the full suite. Nothing here was checked in game.
+
+## 42. Seere's blinks and spikes: the nerf corrected
+
+**Why.** The report: Seere's blinks and spikes hardly hurt anything, players included. Was hit detection broken? Only a slight cut had been meant.
+
+### 42.1 What was measured
+A throwaway server probe ran each version against a 20-health villager in various armour (armour is reckoned the same for players), a Warden, and an iron golem. It counted the damage actually dealt over a whole run, curse included:
+
+| One run | Bare (20) | Diamond | Netherite + Prot IV | Warden (500) | Iron golem (100) |
+|---|---|---|---|---|---|
+| Blinks before §40 (12 every blink, Curse II 6 s) | dead | dead | 7.8 | dead (600) | dead |
+| Blinks after §40 (6 once, Curse I 1.5 s) | 9 | 2.3 | 0.8 | 81 | 21 |
+| **Blinks now** (12 every blink, Curse I 1.5 s) | dead | 16.1 | 5.4 | 123 | 63 |
+| Spikes 14 (unchanged until now) | 14 | 4.8 | 1.6 | 14 | 14 |
+| **Spikes now** (18) | 18 | 6.8 | 2.2 | 18 | 18 |
+
+### 42.2 What was wrong
+- **Detection was fine**: every blink and the spike field registered on every target.
+- **§40 cut too deep**: one hit of 6 per run instead of up to four of 12.
+- **§40 rested on a false premise**: that `corruption:corruption` ignores armour. It does not, and was never meant to (README, "腐化伤害", uses vanilla armour, effects and absorption). Only `corruption:corruption_conversion` is in the bypass tags.
+  - So armour and Protection soak the blinks, the spikes and the curse's bite.
+  - The nerf had been checked only on an unarmoured Warden. Through diamond armour a whole run did about 2 health.
+- **What really killed the Warden**: Curse II for 6 s, re-laid by every blink. A curse whose remaining time is a whole number of seconds bites at once when re-laid, so it bit again with every blink.
+
+### 42.3 The fix (`SeereRules`)
+- **Blinks**: every blink hurts again, for 12 (`hitsEach` 4). The curse stays Curse I for 30 ticks.
+  - Re-laid by every blink, so short a curse does not bite until half a second after the last: once a run.
+  - A player in full diamond armour is left with about 4 of 20 health. The Warden keeps about three quarters.
+- **Spikes**: 14 → 18. They had never been changed, but the report found them weak through armour too.
+  - About 6.8 through full diamond armour.
+  - An unarmoured player survives with 2.
+  - This is a judgement call; 14 is a one-number revert.
+- `PhaseDashRules.hitsEach` and its per-creature count stay, for bosses (an add-on's) that want them.
+
+### 42.4 Docs corrected
+- The `PhaseDashRules` and `SeereRules` docs: armour applies, and when a re-laid curse bites.
+- The README's blink, spike and `PhaseDashRules` lines, with the measured numbers.
+- §40.1's claim is marked wrong.
+
+### 42.5 Tests (`SeereServerTest`)
+- **The blinks test**: the quarry is hurt by every blink.
+- **The Warden test**: it must keep more than two thirds of its health. It was 75%, which the new numbers clear by only a hair.
+- **`aRunOfHisBlinksTakesMostOfAnArmouredPlayersHealthButLeavesHimStanding`** (new): a 20-health villager in full diamond armour must live through a whole run, curse included, with less than half its health.
+  - The probe measured both earlier versions in this exact setup: the pre-§40 blinks killed it (fails "lives"), and the §40 blinks left 17.8 (fails "less than half").
+- **`aRunHeldToOneHurtACreatureHurtsItOnce`** (new): a `PhaseDashSkill` with `hitsEach` 1 hurts once in a run, keeping the per-creature count tested.
+- **The spikes test**: an unarmoured creature takes exactly the spikes' damage.
+- **Run**: Seere's server (13), rules (7), model (8) and the skill rules (14) pass.
+
+### 42.6 Run
+- **The full suite**: 544 tests (524 + 20 new), all pass.
+- **After it**: the plain robe's armour tags were added once the run had started. The gear (11) and purification (3) tests were run again with them, and pass.
+- **Not checked in game**:
+  - The damage numbers were measured in the test world only, against still creatures ticked by hand, with a villager standing in for a player.
+  - None of the new items, robes or recipes were tried in game.
+
+## 43. The corrupted robes raise but never lower; the gear's textures made from vanilla
+
+**Why.** The requests:
+- Make the textures by copying the vanilla textures (under `source/` at the project root) and modifying them.
+- Change the robes' control of corruption: a corruption below the grade's threshold is raised to it and then kept unchanged; one already above it is not lowered, and is kept unchanged too.
+
+### 43.1 The hold
+- **`CorruptedRobeRules`**:
+  - `Tier.corruption()` is now `Tier.threshold()` (5 / 12 / 19).
+  - `Hold` carries `held` as well as `kept`.
+  - `step(corruption, kept, held, worn)`:
+    - **Taking hold**: remembers the corruption as `kept` and holds it at `max(corruption, threshold)`.
+    - **Holding**: puts it back to `held` whatever moved it. A grade with a higher threshold raises `held` to that threshold; a lower grade never lowers it.
+    - **Letting go**: gives back `kept`, as before. So a robe still never changes a corruption for good.
+- **New attachment `CORRUPTION_HELD`**: the value the robe holds. It is saved, and not kept through death. It is needed now that the held value differs from player to player.
+- **`CorruptionVeilApi.heldCorruption`** (an `OptionalInt` of the grade's value) is now **`holdsCorruption`** (a boolean). `PlayerCorruption.raise` and the purifier ask it.
+- **Tooltip** `tooltip.corruption.robe_hold`: "Raises your corruption to at least %s, then holds it unchanged (never lowers it)" / 「腐化值低于 %s 时提升到该值，之后保持不变（不会降低）」.
+- **Not changed**: taking the set off gives back the corruption from before it was put on, even after a change of grade.
+
+### 43.2 A correction to §41: death
+- §41 made `CORRUPTION_KEPT` survive death, to stop corruption being laundered by dying in the robes. That was a mistake.
+  - `PlayerCorruption.clone` already resets a player's corruption to 0 on death, at LOWEST priority after NeoForge's attachment copy, so there was nothing to launder.
+  - With the remembered value surviving, a player who died in the robes and lost them would have had their old corruption given back after respawning. That undid death's reset.
+- **Reverted**: neither `CORRUPTION_KEPT` nor `CORRUPTION_HELD` survives death.
+- **The §41 test** copied attachments by hand and never ran the reset. It is replaced by `deathTakesTheCorruptionAndWhatTheRobesKeptOfIt`, which posts the game's own `PlayerEvent.Clone` as a real respawn does.
+  - **Checked**: with §41's `copyOnDeath()` put back, this test fails (1 of 12). Without it, it passes.
+- §41.3's and §41.9's statements are marked wrong.
+
+### 43.3 Textures made from vanilla
+- **New `gamemodels/vanilla_textures.py`** (shared):
+  - It loads vanilla textures from `source/neoforge-21.1.218-client-extra-aka-minecraft-resources/assets/minecraft/textures`. That folder is the user's copy, ignored by git; the scripts stop with a message if it is missing.
+  - It records each file's SHA-256. STYLE_GUIDE.md asks for the reference files and their checksums.
+  - `recolour` maps a texture's own shading onto a ramp of the corruption's colours (STYLE_GUIDE.md palette), darkest to darkest and lightest to lightest, so every edge and highlight stays where it was.
+  - `remap` maps an original's colours one to one; `put` sets pixels by hand.
+- **The gear** (`gamemodels/corruption_gear/draw_gear.py`, rewritten):
+
+  | Texture | Vanilla base | Changed |
+  |---|---|---|
+  | Corruption Energy Sword | `item/diamond_sword` | Blade violet with rose energy and a rose-white glint; guard dark; grip the corruption stick's purple |
+  | Corrupted Arcane Sword | `item/netherite_sword` | Near black, edge and glint dark rose; three rose runes down the blade |
+  | Robe hood (×3 grades) | `item/leather_helmet` + overlay | Dyed per grade (by the leather's six greys), strap in the trim; peaked top; two eyes in the dark of the opening |
+  | Robe (×3) | `item/leather_chestplate` | Dyed; front opening in two trim tones, a trimmed hem, two clasps at the neck |
+  | Leggings (×3) | `item/leather_leggings` + overlay | Dyed; knee patches in dark worked leather; a trimmed belt with a clasp |
+  | Boots (×3) | `item/leather_boots` + overlay | Dyed; the leather worked dark, lit with the trim |
+  | Worn layers (×3) | `models/armor/leather_layer_1/2` + overlays | Dyed. The cap let down into a hood over the sides and back of the head, framing the face; the sleeves let down to the wrist, with a cuff; the leggings let down to the ankle. Each is extended by copying the cloth's own pixels downward. Robe opening, hem and neck clasps trimmed; waistband in the trim |
+
+- **Grades**: Novice grey violet with dark rose, Intermediate deep violet with silver, Advanced near black with gold.
+- **The six new materials** (`gamemodels/corruption_materials/draw_materials.py`; the other 14 are unchanged and still drawn from scratch):
+
+  | Material | Vanilla base | Changed |
+  |---|---|---|
+  | Malice Tendril | `block/twisting_vines` | Teal to dark rose; rose glints at the tips |
+  | Greed Heartwood | `block/dark_oak_log_top` | Cut round; rings to dark rose heartwood; a rim of the corruption's dark bark from the log's own pixels; gold sap in the rings |
+  | Resentment | `item/ender_eye` | Rose iris, black slit pupil, dark violet rim, rose-white glint |
+  | Memory Fragment | `item/echo_shard` | Pale lavender glass lit from above; its echoes turned to gold flecks |
+  | Corrupted Memory Gem | `item/diamond` | Violet throughout; a rose heart |
+  | Corruption Energy Brick | `item/nether_brick` | Dark violet; a branching crack with rose light inside it (STYLE_GUIDE.md cracks) |
+
+- `vanilla_sources.md` beside each script lists the vanilla files used and their SHA-256.
+- Previews: `preview_gear.png` (items, each grade worn from the front, and both layers) and `preview_materials.png`.
+- **Not changed**: every other texture (the 14 earlier materials, the plain robe, blocks, entities) is still drawn as before.
+
+### 43.4 A generator fix (`write_gear.py`, `write_materials.py`)
+- **The bug**: both generators merged their lang entries the same wrong way. On reaching the anchor key (`tooltip.corruption.ward_whole` or `item.corruption.ink`) they inserted every entry given, including ones already in the file further down. When the loop then reached such an entry's own place, its old value overwrote the new one.
+- **The effect**: a re-run could add keys but never change the text of one already there below the anchor. The new `robe_hold` tooltip stayed "Your corruption is held at %s" until this was found.
+- **The fix**: an entry already there is replaced where it stands; only new keys go after the anchor. An assertion now checks every entry is in the file with its value.
+- **Checked**: the materials generator, re-run, rewrites its files unchanged.
+
+### 43.5 Tests
+- **`CorruptedRobeRulesTest`** (5):
+  - grade numbers;
+  - sets;
+  - putting a set on (raised when below, left when at or above);
+  - holding (put back whatever moved it; a higher threshold raises it, a lower one never lowers it; an old save with nothing held);
+  - taking it off.
+- **`CorruptedGearServerTest`** (12):
+  - **Raised**: a player at 3 in Novice is raised to 5, cannot be raised or purified, and gets 3 back on taking it off.
+  - **Not lowered**: a player at 8 in Novice stays at 8, and a direct change is put back. Intermediate raises them to 12, Advanced to 19, and a lower grade leaves 19. Losing a piece gives back 8, after which they are free to grow again.
+  - **Death**: the real respawn event, as in 43.2.
+- **Run**: see 43.6.
+
+### 43.6 Run
+- **The full suite**: 547 tests, 545 pass. The two failures are `DantalionModelTest.thePicturesHeNeedsAreThere` and `SeereModelTest.thePicturesHeNeedsAreThere`.
+  - Both find the Dantalion and Seere emblems missing from `textures/gui/colossus_boss_bar.png`.
+  - That file is back to the committed version (byte for byte HEAD's), which predates both emblems. Nothing in this work touched it.
+  - It was left as it is, as asked. `python gamemodels/boss_bar/draw_boss_bar.py` redraws it with the emblems.
+- **Not in that run**: the robe tooltip's text fix (one string, no keys) came after the run had started; it touches no test.
+- **Not checked in game**.
+
+## 44. Dantalion's and Seere's heads on the boss bar, drawn again in more detail
+
+**Why.** The request: draw Dantalion's and Seere's heads on `colossus_boss_bar.png` again, in more detail. The file had been put back to the committed version, which has neither (§43.6).
+
+### 44.1 The heads (`gamemodels/boss_bar/draw_boss_bar.py`)
+- **Built from shapes, not typed out as letter grids** like the older emblems. Each part is a polygon, shaded from a ramp of the boss's own texture colours and lit along its edges (a small `Canvas` helper), then finished pixel by pixel and outlined in near black. Still 24 × 24, in the same slots (96,72 and 128,72), so `ColossusBossBar` needs no change.
+- **Dantalion** (was: the Eye of Providence over an open book):
+  - His mirror drawn as a head: a dark tarnished oval with rose lights round the glass.
+  - Swept horns with rose tips, and his red eye in a brass triangle at the crown.
+  - One of his many faces looking out of the glass, in old ivory: cracked across the brow, rose eyes with weeping shadows under them, a dark mouth.
+  - A mask hung at each side of the frame, and the spike beneath.
+- **Seere** (was: a chess knight's silhouette with a wing):
+  - His head in profile, facing the bar, in his coat colours.
+  - Pricked ears, a pale forelock, the blaze down the front of the face to the nostril.
+  - The eye a slit of his indigo light with a white core under a dark brow; a lit nose bridge, a shaded jowl and jaw, the muzzle with its nostril and mouth.
+  - The arched neck with a pale, strand-striped mane glinting indigo, and three wing feathers behind with indigo tips.
+- **Checked**:
+  - Re-running the script changes only the two slots: 764 pixels, none outside them.
+  - Dantalion's slot has 342 drawn pixels, Seere's 422 (13 of them indigo); the tests ask for more than 150, and more than 5 indigo.
+
+### 44.2 Tests and run
+- `DantalionModelTest` (14) and `SeereModelTest` (8) pass, including the two boss-bar checks that failed in §43.6.
+- Nothing was checked in game.

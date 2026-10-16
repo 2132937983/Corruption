@@ -36,8 +36,8 @@
       "on_hit": [
         {
           "type": "damage",
-          "amount": 6,
-          "radius": 2.5,
+          "amount": 12,
+          "radius": 5,
           "damage_type": "corruption:corruption"
         }
       ]

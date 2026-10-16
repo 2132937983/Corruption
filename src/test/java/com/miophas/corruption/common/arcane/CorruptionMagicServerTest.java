@@ -6,6 +6,9 @@ import com.miophas.corruption.api.arcane.ArcaneApi;
 import com.miophas.corruption.api.arcane.ArcaneCasting;
 import com.miophas.corruption.api.arcane.ArcaneString;
 import com.miophas.corruption.api.arcane.WandSpells;
+import com.miophas.corruption.common.entity.CorruptedRemnant;
+import com.miophas.corruption.common.entity.ReanimationEvents;
+import com.miophas.corruption.common.entity.SpellBeamEntity;
 import com.miophas.corruption.common.entity.SpellProjectile;
 import com.miophas.corruption.common.entity.SpellVisualEntity;
 import com.miophas.corruption.common.entity.TestWorld;
@@ -21,12 +24,18 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Pig;
+import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
+import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
@@ -175,6 +184,223 @@ class CorruptionMagicServerTest {
             seen.tick();
             assertTrue(seen.isRemoved(), "and is gone after it");
         });
+    }
+
+    /**
+     * A spell reaches as far as its radius says: a blast of sixteen blocks hurts and throws a creature fifteen
+     * blocks off (once, everything was cut short at twelve), and leaves one at seventeen alone.
+     */
+    @Test void aSpellReachesAsFarAsItsRadiusSays(MinecraftServer server) {
+        TestWorld.onServer(server, level -> {
+            SpellEffects.install();
+            int x = 46_240;
+            TestWorld.load(level, x - 24, x + 24, 3000 - 24, 3000 + 24);
+            FakePlayer player = caster(level, x, "reach_caster");
+            Pig near = pig(level, x + 15.5), far = pig(level, x + 17.5);
+            try {
+                ArcaneCasting.world().perform(player, ArcaneCasting.Origin.of(player), new SpellAction.Damage(5, 16));
+                ArcaneCasting.world().perform(player, ArcaneCasting.Origin.of(player), new SpellAction.Push(16, 1.5, .2));
+                assertEquals(near.getMaxHealth() - 5, near.getHealth(), 1e-3, "fifteen blocks off, within sixteen: hurt");
+                assertTrue(near.getDeltaMovement().x > 1, "and thrown away from the caster");
+                assertEquals(far.getMaxHealth(), far.getHealth(), 1e-3, "seventeen blocks off: untouched");
+                assertEquals(0, far.getDeltaMovement().x, 1e-6, "and unmoved");
+            } finally {
+                near.discard();
+                far.discard();
+            }
+        });
+    }
+
+    /**
+     * A bolt's blast throws what it catches away from the caster: a creature standing between the caster and where
+     * the bolt landed is driven on, away from them, not flung back onto them as a push from the blast would.
+     */
+    @Test void aBlastWhereABoltLandsThrowsAwayFromTheCaster(MinecraftServer server) {
+        TestWorld.onServer(server, level -> {
+            SpellEffects.install();
+            int x = 46_304;
+            TestWorld.load(level, x - 24, x + 24, 3000 - 24, 3000 + 24);
+            FakePlayer player = caster(level, x, "blast_caster");
+            Pig between = pig(level, x + 4.5), beyond = pig(level, x + 10.5);
+            try {
+                Vec3 landed = new Vec3(x + 7.5, -59, 3000.5);
+                ArcaneCasting.Origin struck = ArcaneCasting.Origin.impact(landed, new Vec3(1, 0, 0));
+                ArcaneCasting.world().perform(player, struck, new SpellAction.Push(8, 1.4, .4, SpellAction.Push.From.CASTER));
+                assertTrue(between.getDeltaMovement().x > 1, "between the caster and the blast: driven on, away from the caster");
+                assertTrue(beyond.getDeltaMovement().x > 1, "beyond the blast: away from the caster too");
+                between.setDeltaMovement(Vec3.ZERO);
+                ArcaneCasting.world().perform(player, struck, new SpellAction.Push(8, 1.4, .4));
+                assertTrue(between.getDeltaMovement().x < -1, "where a push from the blast itself would have flung it back at the caster");
+            } finally {
+                between.discard();
+                beyond.discard();
+            }
+        });
+    }
+
+    /**
+     * A beam fires from its caster's hand along their gaze until its time is up: every pulse it hurts what stands in
+     * its line, each pulse landing however close together they come, and never what is behind its caster or off to
+     * the side; it follows their gaze as they turn; a wall stops it; and when its time is up, it is gone.
+     */
+    @Test void aBeamFiresAlongTheCastersGazeUntilItEnds(MinecraftServer server) {
+        TestWorld.onServer(server, level -> {
+            SpellEffects.install();
+            int x = 46_368;
+            TestWorld.load(level, x - 24, x + 24, 3000 - 24, 3000 + 24);
+            FakePlayer player = caster(level, x, "beam_caster");
+            player.moveTo(x + .5, -60, 3000.5, -90, 0);
+            Pig ahead = pig(level, x + 10.5), behind = pig(level, x - 6.5), aside = pig(level, x + 10.5, 3004.5), round = pig(level, x + .5, 2991.5);
+            BlockPos wall = new BlockPos(x, -59, 2995);
+            try {
+                SpellAction.Beam fired = new SpellAction.Beam(32, 1, 12, 2, List.of(new SpellAction.Damage(2, .5)), 0xFFD24A, 0xFFFFFF, 0, "");
+                // Caught as it joins, and kept (the catching above discards what it catches).
+                List<SpellBeamEntity> beams = new ArrayList<>();
+                Consumer<EntityJoinLevelEvent> catcher = event -> { if (event.getEntity() instanceof SpellBeamEntity one) beams.add(one); };
+                NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, false, EntityJoinLevelEvent.class, catcher);
+                try { ArcaneCasting.world().perform(player, ArcaneCasting.Origin.of(player), fired); }
+                finally { NeoForge.EVENT_BUS.unregister(catcher); }
+                assertEquals(1, beams.size(), "one beam, fired");
+                SpellBeamEntity beam = beams.get(0);
+                tick(beam, 3);
+                assertEquals(ahead.getMaxHealth() - 4, ahead.getHealth(), 1e-3, "two pulses two ticks apart, both landing on what stands in its line");
+                assertEquals(behind.getMaxHealth(), behind.getHealth(), 1e-3, "nothing behind its caster");
+                assertEquals(aside.getMaxHealth(), aside.getHealth(), 1e-3, "nor four blocks off to the side of it");
+                player.setYRot(180);
+                tick(beam, 4);
+                assertEquals(round.getMaxHealth() - 4, round.getHealth(), 1e-3, "it follows its caster's gaze as they turn");
+                assertEquals(ahead.getMaxHealth() - 4, ahead.getHealth(), 1e-3, "and leaves what it has turned from");
+                level.setBlock(wall, Blocks.STONE.defaultBlockState(), 3);
+                level.setBlock(wall.above(), Blocks.STONE.defaultBlockState(), 3);
+                tick(beam, 2);
+                assertEquals(round.getMaxHealth() - 4, round.getHealth(), 1e-3, "a wall stops it");
+                tick(beam, 3);
+                assertFalse(beam.isRemoved(), "twelve ticks it fires");
+                tick(beam, 1);
+                assertTrue(beam.isRemoved(), "and then it is gone");
+                assertEquals(player.getMaxHealth(), player.getHealth(), 1e-3, "never hurting its caster");
+            } finally {
+                level.setBlock(wall, Blocks.AIR.defaultBlockState(), 3);
+                level.setBlock(wall.above(), Blocks.AIR.defaultBlockState(), 3);
+                for (Pig pig : List.of(ahead, behind, aside, round)) pig.discard();
+            }
+        });
+    }
+
+    /**
+     * What a spell's explosion breaks is as its data says: of the blocks it would break, none further than its radius,
+     * none tougher than its limit, and only the nearest, as many as it may (air takes nothing from the count).
+     */
+    @Test void aSpellsExplosionBreaksOnlyWhatItsDataAllows(MinecraftServer server) {
+        TestWorld.onServer(server, level -> {
+            int x = 46_432;
+            TestWorld.load(level, x - 24, x + 24, 3000 - 24, 3000 + 24);
+            Vec3 at = new Vec3(x + .5, -50.5, 3000.5);
+            BlockPos middle = BlockPos.containing(at);
+            List<BlockPos> blocks = new ArrayList<>();
+            try {
+                for (int out = 1; out <= 6; out++) {
+                    level.setBlock(middle.east(out), Blocks.STONE.defaultBlockState(), 3);
+                    blocks.add(middle.east(out));
+                }
+                level.setBlock(middle.west(1), Blocks.OBSIDIAN.defaultBlockState(), 3);
+                blocks.add(middle.west(1));
+                blocks.add(middle.above(2));
+                SpellExplosions.bound(level, null, blocks, at, new SpellAction.Explode(4, true, 4.5, 3, 6));
+                assertEquals(List.of(middle.east(1), middle.east(2), middle.east(3), middle.above(2)), blocks,
+                        "the three nearest stones within reach, and the air; not the obsidian, not what lies past the radius");
+
+                // An explosion going off for real, in a solid block of stone: whatever its force would break, the bounds hold.
+                for (BlockPos pos : BlockPos.betweenClosed(middle.offset(-6, -6, -6), middle.offset(6, 6, 6))) level.setBlock(pos, Blocks.STONE.defaultBlockState(), 3);
+                level.setBlock(middle.north(1), Blocks.OBSIDIAN.defaultBlockState(), 3);
+                FakePlayer player = caster(level, x, "blast_maker");
+                SpellExplosions.explode(player, at, new SpellAction.Explode(6, true, 3, 12, 6));
+                int broken = 0;
+                for (BlockPos pos : BlockPos.betweenClosed(middle.offset(-6, -6, -6), middle.offset(6, 6, 6))) {
+                    if (!level.getBlockState(pos).isAir()) continue;
+                    broken++;
+                    assertTrue(Vec3.atCenterOf(pos).distanceTo(at) <= 3 + 1e-6, "nothing broken past its radius: " + pos);
+                }
+                assertTrue(broken > 0 && broken <= 12, "some broken, and twelve at most: " + broken);
+                assertTrue(level.getBlockState(middle.north(1)).is(Blocks.OBSIDIAN), "nothing tougher than its limit");
+                assertEquals(player.getMaxHealth(), player.getHealth(), 1e-3, "and its caster unhurt");
+            } finally {
+                for (BlockPos pos : BlockPos.betweenClosed(middle.offset(-7, -7, -7), middle.offset(7, 7, 7))) level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+            }
+        });
+    }
+
+    private static <T extends Entity> T place(ServerLevel level, EntityType<T> type, Vec3 at) {
+        T entity = type.create(level);
+        entity.moveTo(at.x, at.y, at.z, 0, 0);
+        assertTrue(level.addFreshEntity(entity));
+        return entity;
+    }
+
+    @Test void aSpellTurnsTheCreaturesItReachesIntoRemnantsWhereTheyStand(MinecraftServer server) {
+        TestWorld.onServer(server, level -> {
+            SpellEffects.install();
+            int x = 45_200;
+            FakePlayer player = caster(level, x, "remnant_maker");
+            Vec3 at = new Vec3(x + .5, -60, 3010.5);
+            ArcaneCasting.Origin origin = new ArcaneCasting.Origin(at, at, new Vec3(0, 0, 1));
+            Pig pig = place(level, EntityType.PIG, at.add(2, 0, 0));
+            Zombie zombie = place(level, EntityType.ZOMBIE, at.add(-2, 0, 1));
+            Wolf pet = place(level, EntityType.WOLF, at.add(0, 0, 2));
+            pet.setTame(true, false);
+            pet.setOwnerUUID(player.getUUID());
+            Zombie summoned = place(level, EntityType.ZOMBIE, at.add(1, 0, -2));
+            SpellSummons.bind(summoned, player);
+            Pig kept = place(level, EntityType.PIG, at.add(-1, 0, -1));
+            kept.setInvulnerable(true);
+            WitherBoss boss = place(level, EntityType.WITHER, at.add(0, 0, -4));
+            Pig far = place(level, EntityType.PIG, at.add(9, 0, 0));
+            CorruptedRemnant already = place(level, ModEntities.CORRUPTED_REMNANT.get(), at.add(-3, 0, -1));
+            List<LivingEntity> placed = List.of(pig, zombie, pet, summoned, kept, boss, far, already);
+            try {
+                ArcaneCasting.world().perform(player, origin, new SpellAction.CorruptCreatures(6, 0));
+                assertTrue(pig.isAlive() && zombie.isAlive(), "a chance of none turns none");
+
+                List<Entity> joined = catching(() -> {
+                    ArcaneCasting.world().perform(player, origin, new SpellAction.CorruptCreatures(6));
+                    ReanimationEvents.tick(null);
+                });
+                assertTrue(pig.isDeadOrDying() && zombie.isDeadOrDying(), "what it reaches falls to the corruption at once");
+                for (LivingEntity spared : List.of(pet, summoned, kept, boss, far, already))
+                    assertTrue(spared.isAlive() && spared.getHealth() == spared.getMaxHealth(), "but not " + spared
+                            + ": the caster's own, what is kept from harm, a boss, what is out of reach, or what is of the corruption already");
+                List<CorruptedRemnant> risen = joined.stream().filter(CorruptedRemnant.class::isInstance).map(CorruptedRemnant.class::cast)
+                        .filter(remnant -> remnant.position().distanceTo(at) < 8).toList();
+                assertEquals(2, risen.size(), "a remnant rises for each: " + risen);
+                for (CorruptedRemnant remnant : risen) {
+                    LivingEntity was = remnant.appearance().getString("Type").equals("minecraft:pig") ? pig : zombie;
+                    assertEquals(BuiltInRegistries.ENTITY_TYPE.getKey(was.getType()).toString(), remnant.appearance().getString("Type"), "in its own likeness");
+                    assertTrue(remnant.position().distanceTo(was.position()) < 1e-6, "where it stood");
+                    assertEquals(was.getMaxHealth(), remnant.getHealth(), 1e-3, "whole");
+                }
+                assertNotEquals(risen.get(0).appearance().getString("Type"), risen.get(1).appearance().getString("Type"), "one for the pig, one for the zombie");
+            } finally {
+                placed.forEach(Entity::discard);
+            }
+        });
+    }
+
+    /** Ticks an entity as its level would, this many times. */
+    private static void tick(Entity entity, int ticks) {
+        for (int tick = 0; tick < ticks && !entity.isRemoved(); tick++) {
+            entity.tickCount++;
+            entity.tick();
+        }
+    }
+
+    private static Pig pig(ServerLevel level, double x) { return pig(level, x, 3000.5); }
+
+    private static Pig pig(ServerLevel level, double x, double z) {
+        Pig pig = EntityType.PIG.create(level);
+        pig.moveTo(x, -60, z, 0, 0);
+        pig.setNoAi(true);
+        level.addFreshEntity(pig);
+        return pig;
     }
 
     @Test void aVolleyIsDrawnEvenlyAndShapesAreWhereTheySay() {

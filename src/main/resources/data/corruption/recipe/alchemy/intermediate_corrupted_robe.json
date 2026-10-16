@@ -1,0 +1,29 @@
+{
+  "type": "corruption:alchemy_shaped",
+  "slots": {
+    "0": {
+      "item": "corruption:novice_corrupted_robe",
+      "count": 1
+    },
+    "1": {
+      "item": "corruption:malice_tendril",
+      "count": 2
+    },
+    "2": {
+      "item": "corruption:eldritch_membrane",
+      "count": 1
+    },
+    "3": {
+      "item": "corruption:soul_resin",
+      "count": 2
+    },
+    "4": {
+      "item": "corruption:ancient_corruption_crystal",
+      "count": 4
+    }
+  },
+  "result": {
+    "id": "corruption:intermediate_corrupted_robe"
+  },
+  "keep": "0"
+}

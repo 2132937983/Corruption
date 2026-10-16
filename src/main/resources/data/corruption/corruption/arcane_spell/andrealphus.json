@@ -1,40 +1,123 @@
 {
-  "energy": "8KCE",
-  "cooldown": 100,
-  "min_corruption": 10,
+  "energy": "2KCE",
+  "cooldown": 40,
+  "min_corruption": 5,
   "corruption_gain": 1,
   "actions": [
     {
-      "type": "apply_effect",
-      "effect": "minecraft:levitation",
-      "target": "self",
-      "duration": 40,
-      "amplifier": 2
+      "type": "visual",
+      "effect": "corruption:wings",
+      "radius": 8,
+      "height": 1.5,
+      "ticks": 60,
+      "color": "#1A8C7A",
+      "accent": "#2A4FB0",
+      "sound": "minecraft:entity.parrot.fly"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:constellation",
+      "radius": 8,
+      "height": 5,
+      "ticks": 70,
+      "color": "#1A8C7A",
+      "accent": "#60C0FF"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#1A8C7A",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#1A8C7A"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#1A8C7A"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 20,
+          "height": 1.5,
+          "ticks": 18,
+          "color": "#1A8C7A",
+          "accent": "#60C0FF"
+        },
+        {
+          "type": "damage",
+          "amount": 48,
+          "radius": 20
+        },
+        {
+          "type": "push",
+          "radius": 20,
+          "strength": 1.2,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 20,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:levitation",
+          "target": "nearby",
+          "radius": 20,
+          "duration": 60,
+          "amplifier": 1
+        }
+      ]
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:slow_falling",
       "target": "self",
-      "duration": 1200
+      "duration": 2400
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:speed",
       "target": "self",
-      "duration": 1200,
+      "duration": 2400,
       "amplifier": 1
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:jump_boost",
       "target": "self",
-      "duration": 1200,
+      "duration": 2400,
       "amplifier": 2
     },
     {
       "type": "particles",
       "shape": "spiral",
-      "radius": 1.5,
+      "radius": 3,
       "height": 3,
       "particles": [
         {

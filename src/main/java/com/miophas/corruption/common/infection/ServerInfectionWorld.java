@@ -41,7 +41,7 @@ public final class ServerInfectionWorld implements InfectionWorld {
     }
 
     private static boolean isSourceState(BlockState state) {
-        return CorruptionConversions.isCorrupted(state);
+        return CorruptionConversions.isSource(state);
     }
 
     @Override

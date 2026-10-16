@@ -37,6 +37,10 @@ public final class SpellText {
         if (action instanceof SpellAction.Lightning strike && strike.damage() > 0)
             lines.add(strike.damageType().isEmpty() ? tell(indent + "  ", "spell.corruption.strike_damage", number(strike.damage()))
                     : tell(indent + "  ", "spell.corruption.strike_damage_typed", number(strike.damage()), damageName(strike.damageType())));
+        if (action instanceof SpellAction.Beam beam && !beam.onHit().isEmpty()) {
+            lines.add(tell(indent, "spell.corruption.beam_pulse", seconds(beam.interval())));
+            for (SpellAction payload : beam.onHit()) add(lines, payload, indent + "  ");
+        }
         if (!(action instanceof SpellAction.LaunchBolt bolt) || bolt.onHit().isEmpty()) return;
         lines.add(tell(indent, "spell.corruption.on_hit"));
         for (SpellAction payload : bolt.onHit()) add(lines, payload, indent + "  ");
@@ -53,11 +57,24 @@ public final class SpellText {
                     : tell(indent, "spell.corruption.damage_typed", number(hurt.amount()), number(hurt.radius()), damageName(hurt.type()));
             case SpellAction.Ignite ignite -> tell(indent, "spell.corruption.ignite_area", number(ignite.seconds()), number(ignite.radius()));
             case SpellAction.Freeze freeze -> tell(indent, "spell.corruption.freeze_area", seconds(freeze.ticks()), number(freeze.radius()));
-            case SpellAction.Corrupt corrupt -> tell(indent, "spell.corruption.corrupt_area", number(corrupt.radius()), percent(corrupt.chance()));
+            case SpellAction.Corrupt corrupt -> tell(indent, corrupt.inert() ? "spell.corruption.corrupt_area_inert" : "spell.corruption.corrupt_area",
+                    number(corrupt.radius()), percent(corrupt.chance()));
+            case SpellAction.Quell quiet -> tell(indent, "spell.corruption.quell_corruption", number(quiet.radius()));
+            case SpellAction.RaiseRemnants raise -> raise.lifetime() > 0 ? tell(indent, "spell.corruption.raise_remnants", number(raise.count()), seconds(raise.lifetime()))
+                    : tell(indent, "spell.corruption.raise_remnants_forever", number(raise.count()));
+            case SpellAction.MarkPrey mark -> tell(indent, "spell.corruption.mark_prey", number(mark.radius()), seconds(mark.ticks()));
+            case SpellAction.Truce truce -> tell(indent, "spell.corruption.truce", number(truce.radius()), seconds(truce.ticks()));
+            case SpellAction.CorruptCreatures turn -> turn.chance() >= 1 ? tell(indent, "spell.corruption.corrupt_creatures", number(turn.radius()))
+                    : tell(indent, "spell.corruption.corrupt_creatures_chance", number(turn.radius()), percent(turn.chance()));
             case SpellAction.Summon summon -> tell(indent, "spell.corruption.summon", entityName(summon.entity()), number(summon.count()));
             case SpellAction.Lightning strike -> tell(indent, strike.corrupt() ? "spell.corruption.lightning_corrupt" : "spell.corruption.lightning",
                     number(strike.count()), number(strike.radius()));
-            case SpellAction.Explode burst -> tell(indent, burst.breaksBlocks() ? "spell.corruption.explode_breaks" : "spell.corruption.explode", number(burst.power()));
+            case SpellAction.Explode burst -> !burst.breaksBlocks() ? tell(indent, "spell.corruption.explode", number(burst.power()))
+                    : burst.crushes() ? tell(indent, "spell.corruption.explode_crushes", number(burst.power()), bound(burst.maxBlocks(), SpellAction.Explode.ANY_COUNT),
+                            number(burst.crushReach()), number(burst.crushHardness()))
+                    : !burst.limited() ? tell(indent, "spell.corruption.explode_breaks", number(burst.power()))
+                    : tell(indent, "spell.corruption.explode_breaks_limited", number(burst.power()), bound(burst.maxBlocks(), SpellAction.Explode.ANY_COUNT),
+                            bound(burst.breakRadius(), SpellAction.Explode.ANY_REACH), bound(burst.maxResistance(), SpellAction.Explode.ANY_RESISTANCE));
             case SpellAction.Teleport step -> tell(indent, "spell.corruption.teleport", number(step.distance()));
             case SpellAction.Weather sky -> tell(indent, "spell.corruption.weather", skyName(sky.sky()), seconds(sky.ticks()));
             case SpellAction.Pacify quiet -> tell(indent, "spell.corruption.pacify", number(quiet.radius()));
@@ -69,6 +86,7 @@ public final class SpellText {
                     ? tell(indent, "spell.corruption.launch_sky", entityName(bolt.entity()), number(bolt.count()), number(bolt.fan()))
                     : bolt.count() > 1 ? tell(indent, "spell.corruption.launch_volley", entityName(bolt.entity()), number(bolt.count()), number(bolt.speed()), number(bolt.fan()))
                     : tell(indent, "spell.corruption.launch_bolt", entityName(bolt.entity()), number(bolt.speed()));
+            case SpellAction.Beam beam -> tell(indent, "spell.corruption.beam", number(beam.length()), number(beam.width()), seconds(beam.ticks()));
         };
     }
 
@@ -109,6 +127,8 @@ public final class SpellText {
 
     /** A count of ticks as the seconds a player thinks in. */
     private static String seconds(int ticks) { return number(ticks / 20.0); }
+    /** A bound, or "∞" for one left at its widest. */
+    private static String bound(double value, double widest) { return value >= widest ? "∞" : number(value); }
 
     /** A share as the hundredths a player thinks in. */
     private static String percent(double chance) { return number(chance * 100) + "%"; }

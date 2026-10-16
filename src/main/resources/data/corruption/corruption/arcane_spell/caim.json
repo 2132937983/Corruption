@@ -1,31 +1,95 @@
 {
-  "energy": "6KCE",
-  "cooldown": 40,
+  "energy": "2KCE",
+  "cooldown": 30,
+  "min_corruption": 3,
   "corruption_gain": 1,
   "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:feathers",
+      "radius": 6,
+      "ticks": 50,
+      "color": "#C08040",
+      "accent": "#FFE0A0",
+      "sound": "minecraft:entity.parrot.fly"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:hellfire",
+      "radius": 4,
+      "height": 0.8,
+      "ticks": 40,
+      "color": "#A0A0A0",
+      "accent": "#FFE0C0"
+    },
     {
       "type": "apply_effect",
       "effect": "minecraft:slow_falling",
       "target": "self",
-      "duration": 600
+      "duration": 2400
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:jump_boost",
       "target": "self",
-      "duration": 600,
+      "duration": 2400,
       "amplifier": 2
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:speed",
       "target": "self",
-      "duration": 600
+      "duration": 2400,
+      "amplifier": 1
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "count": 3,
+      "fan": 20,
+      "trail": [
+        {
+          "particle": "minecraft:white_ash",
+          "count": 2,
+          "spread": 0.05
+        },
+        {
+          "particle": "minecraft:flame",
+          "count": 1,
+          "spread": 0.05
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:white_ash",
+          "count": 20,
+          "spread": 0.4
+        },
+        {
+          "particle": "minecraft:flame",
+          "count": 10,
+          "spread": 0.3
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "damage",
+          "amount": 28,
+          "radius": 5
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:blindness",
+          "target": "nearby",
+          "radius": 5,
+          "duration": 60
+        }
+      ]
     },
     {
       "type": "particles",
       "shape": "spiral",
-      "radius": 1.2,
+      "radius": 2.4,
       "height": 2.5,
       "particles": [
         {

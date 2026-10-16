@@ -21,12 +21,13 @@ public final class PlayerCorruption {
     }
     /**
      * Raises a player's corruption by this much: the one way it grows, whatever grows it (the curse, a spell's cost,
-     * the corruption's bread). What they wear bears on it first (CorruptionWardItem: a robe holds some of it back).
-     * Made whole by it, a player in survival is converted at once; a player in creative never is. Answers how much it
-     * grew.
+     * the corruption's bread). What they wear bears on it first (CorruptionWardItem: a robe holds some of it back; a
+     * corrupted robe holds it fast, and then nothing raises it, see CorruptionVeilApi). Made whole by it, a player in
+     * survival is converted at once; a player in creative never is. Answers how much it grew.
      */
     public static int raise(Player player,int gain){
         if(player.level().isClientSide||!player.isAlive()||player.isSpectator()||gain<=0)return 0;
+        if(com.miophas.corruption.api.corruption.CorruptionVeilApi.holdsCorruption(player))return 0;
         int through=CorruptionWard.gain(gain,CorruptionWardItem.worn(player),player.getRandom()::nextDouble);
         int before=value(player),after=PlayerCorruptionApi.increase(before,through);
         if(after!=before)player.setData(ModAttachments.PLAYER_CORRUPTION,after);

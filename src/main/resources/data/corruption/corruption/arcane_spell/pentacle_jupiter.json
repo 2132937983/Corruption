@@ -7,7 +7,7 @@
     {
       "type": "visual",
       "effect": "corruption:rune_ring",
-      "radius": 1.8,
+      "radius": 3.6,
       "height": 2,
       "ticks": 30,
       "color": "#8AB8FF",
@@ -52,8 +52,17 @@
       "on_hit": [
         {
           "type": "visual",
+          "effect": "corruption:lightning",
+          "radius": 12,
+          "height": 24,
+          "ticks": 30,
+          "color": "#8AB8FF",
+          "accent": "#FFFFFF"
+        },
+        {
+          "type": "visual",
           "effect": "corruption:light_pillar",
-          "radius": 2.5,
+          "radius": 5,
           "height": 28,
           "ticks": 30,
           "color": "#8AB8FF",
@@ -62,7 +71,7 @@
         {
           "type": "visual",
           "effect": "corruption:shockwave",
-          "radius": 7,
+          "radius": 14,
           "height": 2,
           "ticks": 18,
           "color": "#8AB8FF",
@@ -71,7 +80,7 @@
         },
         {
           "type": "lightning",
-          "radius": 6,
+          "radius": 12,
           "count": 10,
           "damage": 40
         }

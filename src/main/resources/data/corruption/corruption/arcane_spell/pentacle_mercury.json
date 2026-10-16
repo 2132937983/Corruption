@@ -6,8 +6,17 @@
   "actions": [
     {
       "type": "visual",
+      "effect": "corruption:rift",
+      "radius": 4,
+      "height": 2.2,
+      "ticks": 30,
+      "color": "#9ADFFF",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "visual",
       "effect": "corruption:vortex",
-      "radius": 2,
+      "radius": 4,
       "height": 3,
       "ticks": 20,
       "color": "#9ADFFF",
@@ -17,7 +26,7 @@
     {
       "type": "particles",
       "shape": "spiral",
-      "radius": 2,
+      "radius": 4,
       "height": 3,
       "particles": [
         {

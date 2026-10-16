@@ -29,7 +29,8 @@ public final class CorruptedDragonBreath extends AreaEffectCloud {
         if(level().isClientSide||isRemoved()||tickCount<getWaitTime()||tickCount%5!=0)return;
         victims.entrySet().removeIf(e->e.getValue()<=tickCount);
         for(var victim:level().getEntitiesOfClass(LivingEntity.class,getBoundingBox(),e->e.isAlive()&&!e.isSpectator()
-                &&!CorruptionFactionApi.isRemnant(e)&&!(e instanceof net.minecraft.world.entity.player.Player p&&p.getAbilities().invulnerable))) {
+                &&(!CorruptionFactionApi.isRemnant(e)||com.miophas.corruption.common.arcane.PreyMarks.feuding(getOwner(),e))
+                &&!(e instanceof net.minecraft.world.entity.player.Player p&&p.getAbilities().invulnerable))) {
             double x=victim.getX()-getX(),z=victim.getZ()-getZ();
             if(x*x+z*z>getRadius()*getRadius()||victims.containsKey(victim.getUUID()))continue;
             victims.put(victim.getUUID(),tickCount+RemnantDragonApi.reapplication());

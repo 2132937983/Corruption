@@ -1,25 +1,114 @@
 {
-  "energy": "3KCE",
+  "energy": "1KCE",
   "cooldown": 40,
   "corruption_gain": 1,
   "actions": [
     {
+      "type": "visual",
+      "effect": "corruption:dome",
+      "radius": 5,
+      "ticks": 60,
+      "color": "#B0202A",
+      "accent": "#FFB0B0",
+      "sound": "minecraft:item.armor.equip_netherite"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#B0202A",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#B0202A"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#B0202A"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:chains",
+          "radius": 16,
+          "height": 1.2,
+          "ticks": 60,
+          "color": "#8A1020",
+          "accent": "#FF8080"
+        },
+        {
+          "type": "damage",
+          "amount": 36,
+          "radius": 16
+        },
+        {
+          "type": "push",
+          "radius": 16,
+          "strength": 1.2,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 60,
+          "amplifier": 3
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:weakness",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 300,
+          "amplifier": 1
+        }
+      ]
+    },
+    {
       "type": "apply_effect",
       "effect": "minecraft:resistance",
       "target": "self",
-      "duration": 600,
+      "duration": 2400,
       "amplifier": 1
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:absorption",
       "target": "self",
-      "duration": 600
+      "duration": 2400,
+      "amplifier": 2
     },
     {
       "type": "particles",
       "shape": "spiral",
-      "radius": 1,
+      "radius": 2,
       "height": 2.5,
       "particles": [
         {

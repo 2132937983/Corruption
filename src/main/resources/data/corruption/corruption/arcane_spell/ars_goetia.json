@@ -6,8 +6,26 @@
   "actions": [
     {
       "type": "visual",
+      "effect": "corruption:sigil",
+      "radius": 6,
+      "height": 3.2,
+      "ticks": 80,
+      "color": "#8A0303",
+      "accent": "#FFB040"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:souls",
+      "radius": 12,
+      "height": 8,
+      "ticks": 80,
+      "color": "#8A0303",
+      "accent": "#FFB040"
+    },
+    {
+      "type": "visual",
       "effect": "corruption:magic_circle",
-      "radius": 8,
+      "radius": 16,
       "height": 3,
       "ticks": 80,
       "color": "#8A0303",
@@ -18,7 +36,7 @@
     {
       "type": "visual",
       "effect": "corruption:rune_ring",
-      "radius": 4,
+      "radius": 8,
       "height": 3,
       "ticks": 80,
       "color": "#8A0303",
@@ -27,7 +45,7 @@
     {
       "type": "particles",
       "shape": "ring",
-      "radius": 8,
+      "radius": 16,
       "particles": [
         {
           "particle": "minecraft:soul_fire_flame",
@@ -84,7 +102,7 @@
         {
           "type": "visual",
           "effect": "corruption:shockwave",
-          "radius": 8,
+          "radius": 16,
           "height": 3,
           "ticks": 24,
           "color": "#8A0303",
@@ -95,7 +113,7 @@
         {
           "type": "particles",
           "shape": "ring",
-          "radius": 6,
+          "radius": 12,
           "particles": [
             {
               "particle": "minecraft:soul_fire_flame",
@@ -107,11 +125,19 @@
         },
         {
           "type": "lightning",
-          "radius": 6,
+          "radius": 12,
           "count": 12,
           "corrupt": true,
           "damage": 45,
           "damage_type": "corruption:corruption"
+        },
+        {
+          "type": "explode",
+          "power": 6,
+          "breaks_blocks": true,
+          "break_radius": 6,
+          "max_blocks": 200,
+          "max_resistance": 9
         }
       ]
     }

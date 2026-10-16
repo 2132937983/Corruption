@@ -16,6 +16,9 @@ import net.minecraft.world.item.TooltipFlag;
  * corruption's growth in its wearer ({@link CorruptionWardItem}). Each piece holds back its own share of every point
  * the wearer would gain, the robe itself the most; worn whole, the four hold back four fifths of it. It does nothing
  * for corruption already there.
+ *
+ * <p>It is the attire of the Great Sage's path, which is yet to open, and its tooltip says so. The corrupted robes
+ * (CorruptedRobeArmorItem) are another thing: the corruption's own, which veil their wearer from its creatures.
  */
 public final class RobeArmorItem extends ArmorItem implements CorruptionWardItem {
     /** How much of the corruption's growth each piece holds back. */
@@ -46,6 +49,7 @@ public final class RobeArmorItem extends ArmorItem implements CorruptionWardItem
         for (ArmorItem.Type piece : new ArmorItem.Type[]{ArmorItem.Type.HELMET, ArmorItem.Type.CHESTPLATE, ArmorItem.Type.LEGGINGS, ArmorItem.Type.BOOTS})
             whole += share(piece);
         lines.add(Component.translatable("tooltip.corruption.ward_whole", percent(whole)).withStyle(ChatFormatting.DARK_AQUA));
+        lines.add(Component.translatable("tooltip.corruption.robe_sage").withStyle(ChatFormatting.GOLD, ChatFormatting.ITALIC));
     }
 
     private static String percent(double share) { return Math.round(share * 100) + "%"; }

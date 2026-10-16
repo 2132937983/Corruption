@@ -192,8 +192,10 @@ class AgaresServerTest {
             for (int tick = 0; tick < AgaresApi.deathTicks() - 1; tick++) agares.tick();
             assertFalse(agares.isRemoved(), "still sinking");
             assertTrue(part(agares, "hips").getBoundingBox().minY < standing - 100, "its hitboxes sink with it");
+            for (int tick = 0; tick < Agares.DEATH.linger(); tick++) agares.tick();
+            assertFalse(agares.isRemoved(), "its body is gone in its last burst, but it lingers while its death plays out");
             agares.tick();
-            assertTrue(agares.isRemoved());
+            assertTrue(agares.isRemoved(), "and then it is gone");
         });
     }
 }

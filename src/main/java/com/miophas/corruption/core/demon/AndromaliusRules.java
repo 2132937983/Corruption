@@ -1,5 +1,10 @@
 package com.miophas.corruption.core.demon;
 
+import com.miophas.corruption.core.demon.skill.ChargeRules;
+import com.miophas.corruption.core.demon.skill.GazeRules;
+import com.miophas.corruption.core.demon.skill.SkillTiming;
+import java.util.List;
+
 /**
  * Andromalius, the seventy-second spirit, as rules: plain Java, no game code. What he does, and when, is decided
  * here ({@link #choose}, {@link #intent}); the entity only carries it out.
@@ -14,6 +19,9 @@ package com.miophas.corruption.core.demon;
  * </ul>
  * Every so often, and always when it is blinded or slowed, he <b>hunts</b>: closes in fast and strikes.
  * <ul>
+ *   <li><b>The charge.</b> Hunting it, or with it hidden from him behind a wall, he coils and then rushes it head
+ *       down, straight along the line he last saw it on, ramming what he meets and smashing through every block
+ *       softer than obsidian in his way ({@link #CHARGE}).</li>
  *   <li><b>The bite.</b> Within reach, he rears and lunges, his fangs leaving poison.</li>
  *   <li><b>The tail.</b> Something behind him or at his side is lashed with his tail and thrown off.</li>
  * </ul>
@@ -29,12 +37,29 @@ package com.miophas.corruption.core.demon;
  */
 public final class AndromaliusRules {
     public static final double MAX_HEALTH = 160, ARMOR = 8, SPEED = .32, FOLLOW_RANGE = 48, KNOCKBACK_RESISTANCE = .8;
+    /**
+     * His body's hitboxes, measured from his model at rest: his head reared some three and a half blocks up and a
+     * block and a half ahead, his neck under it, the coil he rises from, and his tail lying in an S on the ground
+     * behind him to nearly seven blocks back. His own box only stands for him in the world (it bumps into walls
+     * and is what creatures go for); blows land on these.
+     */
+    public static final List<BodyPart> BODY = List.of(
+            new BodyPart("head", 1.45, 0, 2.95, 1.1, 1.05),
+            new BodyPart("neck", 1.2, 0, 1, 1.05, 2),
+            new BodyPart("coil", .3, 0, 0, 1.4, 1.2),
+            new BodyPart("tail_0", -1.1, 0, 0, 1, .9),
+            new BodyPart("tail_1", -2.3, -.5, 0, .95, .8),
+            new BodyPart("tail_2", -3.5, -.75, 0, .9, .75),
+            new BodyPart("tail_3", -4.7, -.3, 0, .85, .7),
+            new BodyPart("tail_4", -5.85, -.4, 0, .75, .6),
+            new BodyPart("tail_tip", -6.75, -.85, 0, .6, .5));
+
     /** What a bite does, before armour: nine, and Poison II for four seconds. */
     public static final double BITE_DAMAGE = 9;
     public static final int POISON_TICKS = 80, POISON_LEVEL = 1;
 
     /** What he does, as the client poses it. */
-    public enum Attack { NONE, GAZE, VOLLEY, BITE, TAIL }
+    public enum Attack { NONE, GAZE, VOLLEY, BITE, TAIL, CHARGE }
 
     /** How he moves when he is not striking. */
     public enum Intent {
@@ -81,6 +106,10 @@ public final class AndromaliusRules {
     /** He hunts this often, at the latest; for this long, or this many bites; then draws back for this long. */
     public static final int HUNT_EVERY = 200, HUNT_TICKS = 120, HUNT_BITES = 3, RETREAT_TICKS = 30;
 
+    // ---- dying ----
+    /** He takes this long to die: rearing and writhing, then falling, and gone in a burst of light at the end of it. */
+    public static final int DEATH_TICKS = 70;
+
     // ---- the ward and dodging ----
     public static final int SHIELD_TICKS = 80, SHIELD_COOLDOWN = 80;
     /** How much of a hurt reaches him through his ward. */
@@ -97,6 +126,17 @@ public final class AndromaliusRules {
     public static final double ENRAGED_SPEED = .25, ENRAGED_COOLDOWN = .6;
 
     public static boolean enraged(float healthShare) { return healthShare <= ENRAGED_AT; }
+
+    // ---- his skills, as the modules every boss may share carry them out ----
+
+    /** His gaze: the eye on his brow, no Eyes of Providence about it. */
+    public static final GazeRules GAZE = new GazeRules(new SkillTiming(GAZE_WINDUP, GAZE_WINDUP + 1, GAZE_COOLDOWN), GAZE_MIN, GAZE_MAX,
+            SLOWNESS_TICKS, SLOWNESS_LEVEL, BLINDNESS_TICKS, 0, 0, 0);
+    /**
+     * His charge: coiled for 16 ticks, then 16 ticks at 1.35 blocks a tick (some 21 blocks) at what is 7 to 22 blocks
+     * off; twelve to what he rams, thrown off hard; every 10 seconds at the most.
+     */
+    public static final ChargeRules CHARGE = new ChargeRules(new SkillTiming(16, 32, 200), 7, 22, 1.35, 12, 1.5, ChargeRules.OBSIDIAN);
 
     /** A cooldown as long as it is for him now: shorter enraged. */
     public static int cooldown(int ticks, boolean enraged) { return enraged ? (int) Math.round(ticks * ENRAGED_COOLDOWN) : ticks; }
@@ -115,16 +155,23 @@ public final class AndromaliusRules {
      * @param gazeReady and the rest: whether each attack has come round again
      */
     public record Situation(double distance, boolean sight, boolean behind, boolean impaired, boolean hunting, boolean retreating,
-                            boolean gazeReady, boolean volleyReady, boolean biteReady, boolean tailReady) {}
+                            boolean gazeReady, boolean volleyReady, boolean biteReady, boolean tailReady, boolean chargeReady) {
+        /** As things stood before he could charge: his charge not ready. */
+        public Situation(double distance, boolean sight, boolean behind, boolean impaired, boolean hunting, boolean retreating,
+                         boolean gazeReady, boolean volleyReady, boolean biteReady, boolean tailReady) {
+            this(distance, sight, behind, impaired, hunting, retreating, gazeReady, volleyReady, biteReady, tailReady, false);
+        }
+    }
 
     /**
      * What he does next, if anything: his tail for what is close behind him, his fangs for what is in reach in
-     * front, his gaze for what is at the right distance and not already blinded, his fireballs for what is in
-     * range but not on top of him.
+     * front, his charge for what he is hunting or cannot see within its reach, his gaze for what is at the right
+     * distance and not already blinded, his fireballs for what is in range but not on top of him.
      */
     public static Attack choose(Situation now) {
         if (now.tailReady() && now.behind() && now.distance() <= TAIL_REACH) return Attack.TAIL;
         if (now.biteReady() && !now.behind() && now.distance() <= BITE_REACH) return Attack.BITE;
+        if (now.chargeReady() && !now.retreating() && (now.hunting() || !now.sight()) && CHARGE.inRange(now.distance())) return Attack.CHARGE;
         if (!now.sight()) return Attack.NONE;
         if (now.gazeReady() && !now.impaired() && inGaze(now.distance())) return Attack.GAZE;
         if (now.volleyReady() && now.distance() >= VOLLEY_MIN_RANGE && now.distance() <= VOLLEY_RANGE) return Attack.VOLLEY;

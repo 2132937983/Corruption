@@ -1,28 +1,97 @@
 {
-  "energy": "4KCE",
-  "cooldown": 40,
+  "energy": "1KCE",
+  "cooldown": 30,
   "corruption_gain": 1,
   "actions": [
     {
-      "type": "pacify",
-      "radius": 12
+      "type": "visual",
+      "effect": "corruption:rune_ring",
+      "radius": 4,
+      "height": 1.5,
+      "ticks": 50,
+      "color": "#2A6AC0",
+      "accent": "#A0E8FF"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#2A6AC0",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#2A6AC0"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#2A6AC0"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:tidal_wave",
+          "radius": 18,
+          "height": 2,
+          "ticks": 50,
+          "color": "#2A6AC0",
+          "accent": "#A0E8FF",
+          "sound": "minecraft:block.conduit.activate"
+        },
+        {
+          "type": "damage",
+          "amount": 36,
+          "radius": 18
+        },
+        {
+          "type": "push",
+          "radius": 18,
+          "strength": 1.4,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 18,
+          "duration": 80,
+          "amplifier": 1
+        }
+      ]
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:water_breathing",
       "target": "self",
-      "duration": 1800
+      "duration": 9600
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:conduit_power",
       "target": "self",
-      "duration": 1200
+      "duration": 3600
     },
     {
       "type": "particles",
       "shape": "ring",
-      "radius": 4,
+      "radius": 6,
       "particles": [
         {
           "particle": "minecraft:splash",
@@ -30,7 +99,7 @@
         },
         {
           "particle": "minecraft:fishing",
-          "count": 16
+          "count": 12
         }
       ]
     }

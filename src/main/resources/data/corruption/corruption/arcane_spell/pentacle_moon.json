@@ -6,8 +6,17 @@
   "actions": [
     {
       "type": "visual",
+      "effect": "corruption:constellation",
+      "radius": 12,
+      "height": 8,
+      "ticks": 60,
+      "color": "#6A7ABF",
+      "accent": "#DCE6FF"
+    },
+    {
+      "type": "visual",
       "effect": "corruption:dome",
-      "radius": 6,
+      "radius": 12,
       "ticks": 60,
       "color": "#6A7ABF",
       "accent": "#DCE6FF",
@@ -16,7 +25,7 @@
     {
       "type": "visual",
       "effect": "corruption:rune_ring",
-      "radius": 3,
+      "radius": 6,
       "height": 2.5,
       "ticks": 60,
       "color": "#6A7ABF",
@@ -48,27 +57,27 @@
     },
     {
       "type": "damage",
-      "amount": 25,
-      "radius": 12
+      "amount": 50,
+      "radius": 24
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:blindness",
       "target": "nearby",
-      "radius": 12,
+      "radius": 24,
       "duration": 200
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:darkness",
       "target": "nearby",
-      "radius": 12,
+      "radius": 24,
       "duration": 300
     },
     {
       "type": "particles",
       "shape": "sphere",
-      "radius": 5,
+      "radius": 10,
       "particles": [
         {
           "particle": "minecraft:end_rod",

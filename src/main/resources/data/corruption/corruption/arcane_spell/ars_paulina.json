@@ -6,8 +6,17 @@
   "actions": [
     {
       "type": "visual",
+      "effect": "corruption:wings",
+      "radius": 8,
+      "height": 1.6,
+      "ticks": 80,
+      "color": "#FFF2B0",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "visual",
       "effect": "corruption:dome",
-      "radius": 6,
+      "radius": 12,
       "ticks": 80,
       "color": "#FFF2B0",
       "accent": "#FFFFFF",
@@ -16,7 +25,7 @@
     {
       "type": "visual",
       "effect": "corruption:light_pillar",
-      "radius": 1.5,
+      "radius": 3,
       "height": 30,
       "ticks": 40,
       "color": "#FFF2B0",
@@ -25,7 +34,7 @@
     {
       "type": "visual",
       "effect": "corruption:rune_ring",
-      "radius": 3,
+      "radius": 6,
       "height": 2.5,
       "ticks": 80,
       "color": "#FFF2B0",
@@ -33,7 +42,7 @@
     },
     {
       "type": "pacify",
-      "radius": 12
+      "radius": 24
     },
     {
       "type": "apply_effect",
@@ -73,7 +82,7 @@
     {
       "type": "particles",
       "shape": "sphere",
-      "radius": 3,
+      "radius": 6,
       "particles": [
         {
           "particle": "minecraft:end_rod",

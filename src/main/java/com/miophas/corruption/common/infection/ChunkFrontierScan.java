@@ -37,7 +37,7 @@ final class ChunkFrontierScan {
         while (cursor < total && spent < budget) {
             int index = cursor / BLOCKS_PER_SECTION;
             LevelChunkSection section = sections[index];
-            if (section.hasOnlyAir() || !section.maybeHas(CorruptionConversions::isCorrupted)) {
+            if (section.hasOnlyAir() || !section.maybeHas(CorruptionConversions::isSource)) {
                 cursor = (index + 1) * BLOCKS_PER_SECTION;
                 continue;
             }
@@ -45,7 +45,7 @@ final class ChunkFrontierScan {
             int local = cursor % BLOCKS_PER_SECTION;
             for (; local < BLOCKS_PER_SECTION && spent < budget; local++) {
                 int x = local & 15, z = local >> 4 & 15, y = local >> 8;
-                if (!CorruptionConversions.isCorrupted(section.getBlockState(x, y, z))) {
+                if (!CorruptionConversions.isSource(section.getBlockState(x, y, z))) {
                     spent += READ_COST;
                     continue;
                 }

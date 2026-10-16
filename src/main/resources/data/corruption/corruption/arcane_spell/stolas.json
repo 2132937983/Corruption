@@ -1,31 +1,107 @@
 {
-  "energy": "4KCE",
+  "energy": "2KCE",
   "cooldown": 40,
   "corruption_gain": 1,
   "actions": [
     {
+      "type": "visual",
+      "effect": "corruption:constellation",
+      "radius": 10,
+      "height": 7,
+      "ticks": 90,
+      "color": "#6A7ABF",
+      "accent": "#FFFFFF",
+      "sound": "minecraft:block.amethyst_block.chime"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:feathers",
+      "radius": 5,
+      "ticks": 50,
+      "color": "#A08A6A",
+      "accent": "#F0E8D8"
+    },
+    {
       "type": "apply_effect",
       "effect": "minecraft:night_vision",
       "target": "self",
-      "duration": 2400
+      "duration": 9600
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:slow_falling",
       "target": "self",
-      "duration": 600
+      "duration": 2400
     },
     {
-      "type": "apply_effect",
-      "effect": "minecraft:glowing",
-      "target": "nearby",
-      "radius": 12,
-      "duration": 400
+      "type": "launch_bolt",
+      "speed": 1.6,
+      "trail": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 2,
+          "spread": 0.05
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 24,
+          "spread": 0.4,
+          "speed": 0.05
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 6,
+          "height": 1.5,
+          "ticks": 16,
+          "color": "#6A7ABF",
+          "accent": "#FFFFFF"
+        },
+        {
+          "type": "damage",
+          "amount": 36,
+          "radius": 7
+        },
+        {
+          "type": "launch_bolt",
+          "speed": 1.2,
+          "count": 5,
+          "fan": 5,
+          "from": "sky",
+          "height": 12,
+          "trail": [
+            {
+              "particle": "minecraft:end_rod",
+              "count": 1,
+              "spread": 0.04
+            }
+          ],
+          "burst": [
+            {
+              "particle": "minecraft:end_rod",
+              "count": 10,
+              "spread": 0.3,
+              "speed": 0.03
+            }
+          ],
+          "on_hit": [
+            {
+              "type": "damage",
+              "amount": 20,
+              "radius": 5
+            }
+          ]
+        }
+      ]
     },
     {
       "type": "particles",
       "shape": "sphere",
-      "radius": 4,
+      "radius": 8,
       "particles": [
         {
           "particle": "minecraft:end_rod",

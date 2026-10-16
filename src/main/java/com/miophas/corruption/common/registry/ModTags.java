@@ -17,5 +17,8 @@ public final class ModTags {
     /** What a spell's "launch_bolt" may fly, the spell bolt and a few thrown things by default. */
     public static final TagKey<EntityType<?>> SPELL_BOLTS = TagKey.create(Registries.ENTITY_TYPE,
             ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "spell_bolts"));
+    /** What a spell's "corrupt_creatures" never turns into a remnant: bosses by default ({@code #c:bosses}). */
+    public static final TagKey<EntityType<?>> SPELL_CONVERSION_IMMUNE = TagKey.create(Registries.ENTITY_TYPE,
+            ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "spell_conversion_immune"));
     private ModTags() {}
 }

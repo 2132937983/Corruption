@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": {
+      "item": "corruption:cursed_brick"
+    }
+  },
+  "result": {
+    "id": "corruption:corruption_arcane_brick",
+    "count": 1
+  }
+}

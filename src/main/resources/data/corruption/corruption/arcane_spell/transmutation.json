@@ -5,13 +5,13 @@
   "actions": [
     {
       "type": "corrupt_area",
-      "radius": 3,
+      "radius": 6,
       "chance": 0.25
     },
     {
       "type": "damage",
-      "amount": 4,
-      "radius": 3
+      "amount": 8,
+      "radius": 6
     }
   ]
 }

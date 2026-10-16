@@ -1,13 +1,112 @@
 {
-  "energy": "3KCE",
+  "energy": "1KCE",
   "cooldown": 40,
   "corruption_gain": 1,
   "actions": [
     {
+      "type": "visual",
+      "effect": "corruption:souls",
+      "radius": 6,
+      "height": 6,
+      "ticks": 70,
+      "color": "#4AD8C0",
+      "accent": "#E0FFF8",
+      "sound": "minecraft:particle.soul_escape"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#4AD8C0",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#4AD8C0"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#4AD8C0"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:magic_circle",
+          "radius": 16,
+          "height": 1,
+          "ticks": 60,
+          "color": "#2A8A7A",
+          "accent": "#B0FFF0"
+        },
+        {
+          "type": "damage",
+          "amount": 36,
+          "radius": 16
+        },
+        {
+          "type": "push",
+          "radius": 16,
+          "strength": 1.2,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:wither",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 120,
+          "amplifier": 1
+        }
+      ]
+    },
+    {
       "type": "apply_effect",
       "effect": "minecraft:resistance",
       "target": "self",
-      "duration": 400
+      "duration": 1200
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 6,
+      "particles": [
+        {
+          "particle": "minecraft:soul",
+          "count": 24,
+          "spread": 0.1,
+          "speed": 0.02
+        },
+        {
+          "particle": "minecraft:bubble_pop",
+          "count": 16,
+          "spread": 0.2
+        }
+      ]
     }
   ]
 }

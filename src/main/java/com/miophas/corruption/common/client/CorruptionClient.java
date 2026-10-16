@@ -46,6 +46,8 @@ public final class CorruptionClient {
                 .registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         event.enqueueWork(ArcaneTooltip::registerItemProperties);
         com.miophas.corruption.common.client.visual.SpellVisualRenderer.registerBuiltIn();
+        com.miophas.corruption.common.entity.SpellBeamEntity.firing = com.miophas.corruption.common.client.visual.CameraShake::rumble;
+        MindControlClient.install();
     }
 
     @SubscribeEvent
@@ -77,6 +79,14 @@ public final class CorruptionClient {
                 com.miophas.corruption.common.client.entity.AgaresModel::createBodyLayer);
         event.registerLayerDefinition(com.miophas.corruption.common.client.entity.AndromaliusModel.LAYER_LOCATION,
                 com.miophas.corruption.common.client.entity.AndromaliusModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.SpellBoltModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.SpellBoltModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.DantalionBookModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.DantalionBookModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.SeereModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.SeereModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.DantalionMirrorModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.DantalionMirrorModel::createBodyLayer);
     }
 
     @SubscribeEvent
@@ -85,9 +95,11 @@ public final class CorruptionClient {
         event.registerEntityRenderer(ModEntities.CORRUPTED_DRAGON.get(), CorruptedRemnantRenderer::new);
         event.registerEntityRenderer(ModEntities.CORRUPTED_DRAGON_FIREBALL.get(), net.minecraft.client.renderer.entity.DragonFireballRenderer::new);
         // A spell bolt glows by its own light, as a fireball does.
-        event.registerEntityRenderer(ModEntities.SPELL_BOLT.get(), context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 1.0F, true));
+        event.registerEntityRenderer(ModEntities.SPELL_BOLT.get(), com.miophas.corruption.common.client.entity.SpellBoltRenderer::new);
         // A spell's effect, drawn by whatever is registered for it (see SpellVisualRenderer.registerBuiltIn).
         event.registerEntityRenderer(ModEntities.SPELL_VISUAL.get(), com.miophas.corruption.common.client.visual.SpellVisualRenderer::new);
+        // A spell's beam, drawn from its caster's hand along their gaze as this client sees them.
+        event.registerEntityRenderer(ModEntities.SPELL_BEAM.get(), com.miophas.corruption.common.client.visual.SpellBeamRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.ARCANE_PEDESTAL.get(), ArcanePedestalRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.ARCANE_CHARGER.get(), ArcaneChargerRenderer::new);
         event.registerEntityRenderer(ModEntities.CORRUPTED_DRAGON_BREATH.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
@@ -97,6 +109,9 @@ public final class CorruptionClient {
         event.registerEntityRenderer(ModEntities.BAAL.get(), com.miophas.corruption.common.client.entity.BaalRenderer::new);
         event.registerEntityRenderer(ModEntities.AGARES.get(), com.miophas.corruption.common.client.entity.AgaresRenderer::new);
         event.registerEntityRenderer(ModEntities.ANDROMALIUS.get(), com.miophas.corruption.common.client.entity.AndromaliusRenderer::new);
+        event.registerEntityRenderer(ModEntities.DANTALION.get(), com.miophas.corruption.common.client.entity.DantalionRenderer::new);
+        event.registerEntityRenderer(ModEntities.SEERE.get(), com.miophas.corruption.common.client.entity.SeereRenderer::new);
+        event.registerEntityRenderer(ModEntities.DEMON_BEAM.get(), com.miophas.corruption.common.client.visual.DemonBeamRenderer::new);
     }
 
     @SubscribeEvent

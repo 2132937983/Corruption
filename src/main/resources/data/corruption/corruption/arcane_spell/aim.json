@@ -1,14 +1,24 @@
 {
-  "energy": "5KCE",
-  "cooldown": 60,
-  "min_corruption": 10,
+  "energy": "2KCE",
+  "cooldown": 30,
+  "min_corruption": 3,
   "corruption_gain": 1,
   "actions": [
     {
+      "type": "visual",
+      "effect": "corruption:sigil",
+      "radius": 3,
+      "height": 1.7,
+      "ticks": 30,
+      "color": "#FF6A1A",
+      "accent": "#FFD080",
+      "sound": "minecraft:item.firecharge.use"
+    },
+    {
       "type": "launch_bolt",
       "speed": 1.4,
-      "count": 3,
-      "fan": 20,
+      "count": 5,
+      "fan": 30,
       "look": "minecraft:fire_charge",
       "trail": [
         {
@@ -38,14 +48,24 @@
       ],
       "on_hit": [
         {
+          "type": "visual",
+          "effect": "corruption:hellfire",
+          "radius": 6,
+          "height": 2.5,
+          "ticks": 40,
+          "color": "#FF6A1A",
+          "accent": "#FFD080",
+          "shake": 0.15
+        },
+        {
           "type": "ignite_area",
-          "radius": 3,
-          "seconds": 6
+          "radius": 6,
+          "seconds": 8
         },
         {
           "type": "damage",
-          "amount": 6,
-          "radius": 2.5
+          "amount": 28,
+          "radius": 6
         }
       ]
     }

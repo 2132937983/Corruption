@@ -28,7 +28,7 @@ public final class ColossusBossBar {
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "textures/gui/colossus_boss_bar.png");
     private static final int SHEET_WIDTH = 256, SHEET_HEIGHT = 128, FRAME_WIDTH = 256, FRAME_HEIGHT = 34;
     private static final int HEALTH_X = 36, HEALTH_Y = 12, HEALTH_WIDTH = 200, HEALTH_HEIGHT = 10, HEALTH_V = 40, LOST_V = 56, NOTCH_V = 100;
-    /** Each emblem is a 24-pixel square, the next 32 pixels along: Baal's, Agares's, Andromalius's. */
+    /** Each emblem is a 24-pixel square, the next 32 pixels along: Baal's, Agares's, Andromalius's, Dantalion's, Seere's. */
     private static final int EMBLEM_X = 4, EMBLEM_Y = 4, EMBLEM_SIZE = 24, EMBLEM_V = 72, EMBLEM_STEP = 32;
     /** Lost health stays on the bar, paler, and drains away at this share of the bar a tick. */
     private static final float DRAIN_PER_TICK = .006F;

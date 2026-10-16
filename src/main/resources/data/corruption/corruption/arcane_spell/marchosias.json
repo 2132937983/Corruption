@@ -1,31 +1,104 @@
 {
-  "energy": "6KCE",
-  "cooldown": 60,
-  "min_corruption": 10,
+  "energy": "2KCE",
+  "cooldown": 30,
+  "min_corruption": 3,
   "corruption_gain": 1,
   "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:wings",
+      "radius": 6,
+      "height": 1.5,
+      "ticks": 50,
+      "color": "#FF5A1A",
+      "accent": "#FFD080",
+      "sound": "minecraft:entity.wolf.howl"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#FF5A1A",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#FF5A1A"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#FF5A1A"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:hellfire",
+          "radius": 18,
+          "height": 2,
+          "ticks": 50,
+          "color": "#FF5A1A",
+          "accent": "#FFD080"
+        },
+        {
+          "type": "damage",
+          "amount": 48,
+          "radius": 18
+        },
+        {
+          "type": "push",
+          "radius": 18,
+          "strength": 1.4,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 18,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "ignite_area",
+          "radius": 18,
+          "seconds": 6
+        }
+      ]
+    },
     {
       "type": "apply_effect",
       "effect": "minecraft:strength",
       "target": "self",
-      "duration": 600,
+      "duration": 2400,
       "amplifier": 1
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:resistance",
       "target": "self",
-      "duration": 600
-    },
-    {
-      "type": "ignite_area",
-      "radius": 4,
-      "seconds": 5
+      "duration": 2400
     },
     {
       "type": "particles",
       "shape": "ring",
-      "radius": 4,
+      "radius": 6,
       "particles": [
         {
           "particle": "minecraft:flame",

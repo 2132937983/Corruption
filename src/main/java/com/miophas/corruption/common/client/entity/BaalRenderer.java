@@ -14,7 +14,7 @@ public final class BaalRenderer extends ColossusRenderer<Baal, BaalModel> {
     public static final ResourceLocation GLOW = ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "textures/entity/baal_eyes.png");
 
     public BaalRenderer(EntityRendererProvider.Context context) {
-        super(context, new BaalModel(context.bakeLayer(BaalModel.LAYER_LOCATION)), BaalApi.scale(), BaalApi.heightBlocks());
+        super(context, new BaalModel(context.bakeLayer(BaalModel.LAYER_LOCATION)), BaalApi.scale());
         addLayer(new EyesLayer<>(this) { @Override public RenderType renderType() { return FarView.glow(GLOW); } });
     }
 

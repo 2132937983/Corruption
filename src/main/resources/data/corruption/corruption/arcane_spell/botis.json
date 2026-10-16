@@ -1,11 +1,20 @@
 {
-  "energy": "3KCE",
-  "cooldown": 40,
+  "energy": "1KCE",
+  "cooldown": 20,
   "corruption_gain": 1,
   "actions": [
     {
+      "type": "visual",
+      "effect": "corruption:sigil",
+      "radius": 2.4,
+      "height": 1.6,
+      "ticks": 25,
+      "color": "#3E8E3A",
+      "accent": "#B8F070"
+    },
+    {
       "type": "launch_bolt",
-      "speed": 1.6,
+      "speed": 1.8,
       "trail": [
         {
           "particle": "minecraft:item_slime",
@@ -27,17 +36,33 @@
       ],
       "on_hit": [
         {
+          "type": "visual",
+          "effect": "corruption:miasma",
+          "radius": 5,
+          "ticks": 50,
+          "color": "#3E8E3A",
+          "accent": "#B8F070",
+          "sound": "minecraft:entity.puffer_fish.blow_up"
+        },
+        {
           "type": "damage",
-          "amount": 7,
-          "radius": 2
+          "amount": 40,
+          "radius": 7
         },
         {
           "type": "apply_effect",
           "effect": "minecraft:poison",
           "target": "nearby",
-          "radius": 2.5,
+          "radius": 7,
           "duration": 200,
-          "amplifier": 1
+          "amplifier": 2
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:nausea",
+          "target": "nearby",
+          "radius": 7,
+          "duration": 160
         }
       ]
     }

@@ -6,8 +6,17 @@
   "actions": [
     {
       "type": "visual",
+      "effect": "corruption:blades",
+      "radius": 6,
+      "height": 6,
+      "ticks": 40,
+      "color": "#C0201A",
+      "accent": "#FFB040"
+    },
+    {
+      "type": "visual",
       "effect": "corruption:magic_circle",
-      "radius": 3,
+      "radius": 6,
       "height": 1.5,
       "ticks": 30,
       "color": "#C0201A",
@@ -70,7 +79,7 @@
         {
           "type": "visual",
           "effect": "corruption:shockwave",
-          "radius": 3,
+          "radius": 6,
           "height": 1,
           "ticks": 12,
           "color": "#C0201A",
@@ -79,12 +88,12 @@
         },
         {
           "type": "damage",
-          "amount": 30,
-          "radius": 2.5
+          "amount": 60,
+          "radius": 5
         },
         {
           "type": "ignite_area",
-          "radius": 2.5,
+          "radius": 5,
           "seconds": 6
         }
       ]

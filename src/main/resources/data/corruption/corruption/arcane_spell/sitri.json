@@ -1,27 +1,93 @@
 {
-  "energy": "3KCE",
-  "cooldown": 40,
+  "energy": "1KCE",
+  "cooldown": 30,
   "corruption_gain": 1,
   "actions": [
     {
-      "type": "apply_effect",
-      "effect": "minecraft:weakness",
-      "target": "nearby",
-      "radius": 8,
-      "duration": 300,
-      "amplifier": 1
+      "type": "visual",
+      "effect": "corruption:wings",
+      "radius": 5,
+      "height": 1.5,
+      "ticks": 40,
+      "color": "#C0306A",
+      "accent": "#FFB0D0"
     },
     {
-      "type": "apply_effect",
-      "effect": "minecraft:slowness",
-      "target": "nearby",
-      "radius": 8,
-      "duration": 200
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#E0507A",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#E0507A"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#E0507A"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:chains",
+          "radius": 18,
+          "height": 1.2,
+          "ticks": 60,
+          "color": "#E0507A",
+          "accent": "#FFD0E0",
+          "sound": "minecraft:block.chain.place"
+        },
+        {
+          "type": "damage",
+          "amount": 36,
+          "radius": 18
+        },
+        {
+          "type": "push",
+          "radius": 18,
+          "strength": 1.4,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 18,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:weakness",
+          "target": "nearby",
+          "radius": 18,
+          "duration": 400,
+          "amplifier": 1
+        }
+      ]
     },
     {
       "type": "particles",
       "shape": "sphere",
-      "radius": 3,
+      "radius": 4,
       "particles": [
         {
           "particle": "minecraft:heart",

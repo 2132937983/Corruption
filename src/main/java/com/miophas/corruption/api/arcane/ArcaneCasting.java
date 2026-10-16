@@ -1,7 +1,9 @@
 package com.miophas.corruption.api.arcane;
 
 import com.miophas.corruption.core.arcane.SpellAction;
+import javax.annotation.Nullable;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -18,17 +20,24 @@ public final class ArcaneCasting {
      * @param at the middle of what it reaches: creatures, blocks and summons round about
      * @param launch where a bolt it launches sets off from
      * @param direction which way such a bolt flies; a unit vector, or zero if there is none
+     * @param struck the creature a bolt struck there, if it struck one; null cast by hand, or where a bolt struck a block
      */
-    public record Origin(Vec3 at, Vec3 launch, Vec3 direction) {
+    public record Origin(Vec3 at, Vec3 launch, Vec3 direction, @Nullable Entity struck) {
+        /** Where no creature was struck. */
+        public Origin(Vec3 at, Vec3 launch, Vec3 direction) { this(at, launch, direction, null); }
+
         /** At the caster: round the middle of them; a bolt sets off from just under their eyes, along their gaze. */
         public static Origin of(ServerPlayer caster) {
             return new Origin(caster.getBoundingBox().getCenter(), new Vec3(caster.getX(), caster.getEyeY() - .1, caster.getZ()), caster.getLookAngle());
         }
 
         /** Where a bolt struck, flying this way: a bolt launched there sets off a little short of it, the same way. */
-        public static Origin impact(Vec3 at, Vec3 flying) {
+        public static Origin impact(Vec3 at, Vec3 flying) { return impact(at, flying, null); }
+
+        /** Where a bolt struck this creature (or none), flying this way. */
+        public static Origin impact(Vec3 at, Vec3 flying, @Nullable Entity struck) {
             Vec3 way = flying.lengthSqr() < 1e-8 ? Vec3.ZERO : flying.normalize();
-            return new Origin(at, at.subtract(way.scale(.25)), way);
+            return new Origin(at, at.subtract(way.scale(.25)), way, struck);
         }
     }
 

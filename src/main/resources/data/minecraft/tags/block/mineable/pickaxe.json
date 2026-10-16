@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "corruption:corruption",
+    "corruption:deactivated_corruption",
     "corruption:infected_block",
     "corruption:arcunum",
     "corruption:arcunum_end",

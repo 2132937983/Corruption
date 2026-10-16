@@ -5,6 +5,7 @@ import com.miophas.corruption.api.corruption.AgaresAttack;
 import com.miophas.corruption.api.corruption.ColossusGait;
 import com.miophas.corruption.api.corruption.ColossusLegs;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import net.minecraft.core.particles.ParticleTypes;
@@ -26,6 +27,24 @@ import net.minecraft.world.phys.Vec3;
  * is raked up in its jaws, what is behind is swept by its tail, and what flies is beaten down by its wings.
  */
 public final class Agares extends Colossus {
+    /**
+     * Its death, in frost, thirty times the size it is written at: a ring of frost racing out as it falls, ice bursting
+     * up all round it and the ground splitting under it, a storm breaking over it, a storm of its feathers bursting from
+     * its breast, a second ring as it sinks onto its haunches, and its heart bursting as it goes down; a pillar of light
+     * stands where it fell, and souls rise out of the ground.
+     */
+    public static final BossDeath DEATH = new BossDeath(AgaresApi.deathTicks(), 90, 30, new BossDeath.Rays(24, 18, 0x3F8FD0, 0xF0FCFF), .3F, List.of(
+            BossDeath.beat(0, BossDeath.Anchor.FEET, "shockwave", 16, 3, 50, 0x7FC8FF, 0xF0FCFF, .5, "minecraft:entity.ender_dragon.death", 64, .45F),
+            BossDeath.beat(20, BossDeath.Anchor.FEET, "spikes", 12, 5, 160, 0x7FC8FF, 0xF0FCFF, .2, "minecraft:block.glass.break", 64, .4F),
+            BossDeath.beat(45, BossDeath.Anchor.FEET, "fissure", 16, 3, 180, 0x3F8FD0, 0xE0F8FF, 0, "minecraft:item.mace.smash_ground_heavy", 64, .4F),
+            BossDeath.beat(90, BossDeath.Anchor.FEET, "lightning", 14, 30, 120, 0x9ADFFF, 0xFFFFFF, .3, "minecraft:entity.lightning_bolt.thunder", 64, .5F),
+            BossDeath.beat(120, BossDeath.Anchor.HEART, "feathers", 6, 2, 100, 0x9ADFFF, 0xF0FCFF, 0, "minecraft:entity.ender_dragon.flap", 64, .5F),
+            BossDeath.beat(156, BossDeath.Anchor.FEET, "shockwave", 22, 4, 50, 0x7FC8FF, 0xF0FCFF, .5, "minecraft:entity.generic.explode", 64, .4F),
+            BossDeath.beat(256, BossDeath.Anchor.HEART, "nova", 20, 0, 40, 0x7FC8FF, 0xFFFFFF, 1, "minecraft:entity.generic.explode", 64, .3F),
+            BossDeath.beat(256, BossDeath.Anchor.FEET, "light_pillar", 3, 40, 80, 0x9ADFFF, 0xFFFFFF, 0, "minecraft:block.beacon.deactivate", 64, .5F),
+            BossDeath.beat(258, BossDeath.Anchor.FEET, "shockwave", 30, 5, 60, 0x7FC8FF, 0xF0FCFF, .7, "minecraft:entity.lightning_bolt.thunder", 64, .4F),
+            BossDeath.beat(260, BossDeath.Anchor.FEET, "souls", 5, 28, 90, 0x9ADFFF, 0xF0FCFF, 0, "minecraft:particle.soul_escape", 64, .5F)));
+
     private final Set<UUID> struck = new HashSet<>();
     private long nextScreech;
 
@@ -42,6 +61,8 @@ public final class Agares extends Colossus {
     @Override protected ColossusLegs legs() { return AgaresApi.legs(); }
     @Override protected ColossusGait gait(float cycle, float walk, int attack, float attackTicks, float collapse) { return AgaresApi.gait(cycle, walk, AgaresAttack.byId(attack), attackTicks, collapse); }
     @Override protected int deathTicks() { return AgaresApi.deathTicks(); }
+    @Override protected double heightBlocks() { return AgaresApi.heightBlocks(); }
+    @Override public BossDeath death() { return DEATH; }
     @Override protected double sightBlocks() { return AgaresApi.sightBlocks(); }
     @Override protected double walkBlocksPerTick() { return AgaresApi.walkBlocksPerTick(); }
     @Override protected float turnDegreesPerTick() { return AgaresApi.turnDegreesPerTick(); }

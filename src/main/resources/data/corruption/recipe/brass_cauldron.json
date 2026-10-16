@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "B B",
+    "BMB",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "corruption:corrupted_brass"
+    },
+    "M": {
+      "item": "corruption:malice"
+    }
+  },
+  "result": {
+    "id": "corruption:brass_cauldron"
+  }
+}

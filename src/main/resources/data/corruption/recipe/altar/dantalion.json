@@ -1,0 +1,99 @@
+{
+  "type": "corruption:altar_shaped",
+  "pillars": {
+    "1": {
+      "type": "neoforge:components",
+      "items": "corruption:parchment",
+      "components": {
+        "corruption:inscription": "corruption:dantalion"
+      }
+    },
+    "2": {
+      "type": "neoforge:components",
+      "items": "minecraft:enchanted_book",
+      "components": {
+        "minecraft:stored_enchantments": {
+          "levels": {
+            "minecraft:mending": 1
+          }
+        }
+      }
+    },
+    "3": {
+      "item": "corruption:chaos_catalyst"
+    },
+    "4": {
+      "item": "corruption:corrupted_heartstone"
+    },
+    "5": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "6": {
+      "item": "minecraft:writable_book"
+    }
+  },
+  "offering": "minecraft:villager",
+  "blocks": [
+    {
+      "at": [
+        0,
+        2
+      ],
+      "block": "minecraft:enchanting_table"
+    },
+    {
+      "at": [
+        2,
+        2
+      ],
+      "block": "minecraft:enchanting_table"
+    },
+    {
+      "at": [
+        2,
+        0
+      ],
+      "block": "minecraft:enchanting_table"
+    },
+    {
+      "at": [
+        2,
+        -2
+      ],
+      "block": "minecraft:enchanting_table"
+    },
+    {
+      "at": [
+        0,
+        -2
+      ],
+      "block": "minecraft:enchanting_table"
+    },
+    {
+      "at": [
+        -2,
+        -2
+      ],
+      "block": "minecraft:enchanting_table"
+    },
+    {
+      "at": [
+        -2,
+        0
+      ],
+      "block": "minecraft:enchanting_table"
+    },
+    {
+      "at": [
+        -2,
+        2
+      ],
+      "block": "minecraft:enchanting_table"
+    }
+  ],
+  "corruption": 6,
+  "time": 200,
+  "result": {
+    "entity": "corruption:dantalion"
+  }
+}

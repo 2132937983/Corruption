@@ -1,23 +1,115 @@
 {
-  "energy": "3KCE",
+  "energy": "1KCE",
   "cooldown": 40,
   "corruption_gain": 1,
   "actions": [
     {
-      "type": "pacify",
-      "radius": 10
+      "type": "visual",
+      "effect": "corruption:rune_ring",
+      "radius": 5,
+      "height": 2,
+      "ticks": 50,
+      "color": "#C080FF",
+      "accent": "#FFE0FF"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#C080FF",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#C080FF"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#C080FF"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:resonance",
+          "radius": 16,
+          "height": 3,
+          "ticks": 50,
+          "color": "#C080FF",
+          "accent": "#FFE0FF",
+          "sound": "minecraft:block.note_block.flute"
+        },
+        {
+          "type": "damage",
+          "amount": 36,
+          "radius": 16
+        },
+        {
+          "type": "push",
+          "radius": 16,
+          "strength": 1.4,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:nausea",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 200
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:weakness",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 300,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:mining_fatigue",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 300,
+          "amplifier": 1
+        }
+      ]
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:absorption",
       "target": "self",
-      "duration": 600,
+      "duration": 2400,
       "amplifier": 1
     },
     {
       "type": "particles",
       "shape": "sphere",
-      "radius": 2.5,
+      "radius": 5,
       "particles": [
         {
           "particle": "minecraft:enchant",

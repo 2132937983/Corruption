@@ -5,6 +5,15 @@
   "corruption_gain": 2,
   "actions": [
     {
+      "type": "visual",
+      "effect": "corruption:constellation",
+      "radius": 12,
+      "height": 10,
+      "ticks": 60,
+      "color": "#FFF2B0",
+      "accent": "#FFFFFF"
+    },
+    {
       "type": "launch_bolt",
       "speed": 2,
       "trail": [
@@ -26,7 +35,7 @@
         {
           "type": "visual",
           "effect": "corruption:light_pillar",
-          "radius": 4,
+          "radius": 8,
           "height": 30,
           "ticks": 50,
           "color": "#FFF2B0",
@@ -37,7 +46,7 @@
         {
           "type": "visual",
           "effect": "corruption:magic_circle",
-          "radius": 8,
+          "radius": 16,
           "height": 2,
           "ticks": 60,
           "color": "#FFF2B0",
@@ -74,14 +83,14 @@
           "on_hit": [
             {
               "type": "damage",
-              "amount": 30,
-              "radius": 2.5
+              "amount": 60,
+              "radius": 5
             },
             {
               "type": "apply_effect",
               "effect": "minecraft:glowing",
               "target": "nearby",
-              "radius": 2.5,
+              "radius": 5,
               "duration": 200
             }
           ]

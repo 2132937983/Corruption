@@ -1,6 +1,7 @@
 package com.miophas.corruption.common.client.entity;
 
 import com.miophas.corruption.Corruption;
+import com.miophas.corruption.common.client.visual.DeathVisual;
 import com.miophas.corruption.common.client.visual.WardShell;
 import com.miophas.corruption.common.entity.Andromalius;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -17,7 +18,8 @@ import net.minecraft.resources.ResourceLocation;
 /**
  * Draws Andromalius; then his eyes, the eye on his brow, the marks on his hood and the embers along his sides
  * again, unlit, so they glow in the dark; and, while his ward stands, a shell of hexagons round him. He falls
- * as his model lays him down, not on his side as other creatures do.
+ * as his model lays him down, not on his side as other creatures do, shuddering through his death throes; his death
+ * is drawn about him as he dies ({@link DeathVisual}), and at the end of it his body is gone.
  */
 public final class AndromaliusRenderer extends MobRenderer<Andromalius, AndromaliusModel> {
     public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "textures/entity/andromalius.png");
@@ -33,9 +35,20 @@ public final class AndromaliusRenderer extends MobRenderer<Andromalius, Andromal
     @Override protected float getFlipDegrees(Andromalius entity) { return 0; }
 
     @Override public void render(Andromalius serpent, float yaw, float partial, PoseStack pose, MultiBufferSource buffers, int light) {
-        super.render(serpent, yaw, partial, pose, buffers, light);
-        float ward = serpent.wardStrength(partial);
-        if (ward > 0) WardShell.draw(pose, buffers, 2.4F, 5F, 2.1F, WARD, WARD_ACCENT, serpent.tickCount + partial, ward);
+        if (serpent.deathTime < serpent.death().ticks()) {
+            super.render(serpent, yaw, partial, pose, buffers, light);
+            float ward = serpent.wardStrength(partial);
+            if (ward > 0) WardShell.draw(pose, buffers, 2.4F, 5F, 2.1F, WARD, WARD_ACCENT, serpent.tickCount + partial, ward);
+        }
+        if (serpent.deathTime > 0) DeathVisual.draw(DeathVisual.Dying.of(serpent, partial, entityRenderDispatcher.cameraOrientation()), pose, buffers, false);
+    }
+
+    /** No shadow once his body is gone. */
+    @Override protected float getShadowRadius(Andromalius serpent) { return serpent.deathTime >= serpent.death().ticks() ? 0 : super.getShadowRadius(serpent); }
+
+    /** He shudders through his death throes, until he falls. */
+    @Override protected boolean isShaking(Andromalius serpent) {
+        return super.isShaking(serpent) || serpent.deathTime > 0 && serpent.deathTime < serpent.death().ticks() - AndromaliusModel.FALLING;
     }
 
     /** The glowing pieces are their own bones in the model, so they need no second texture: the same one is drawn again over them. */

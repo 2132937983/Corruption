@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "DCD",
+    "DFD",
+    "SSS"
+  ],
+  "key": {
+    "D": {
+      "item": "corruption:corruption_dust"
+    },
+    "C": {
+      "item": "corruption:corruption_crystal"
+    },
+    "F": {
+      "item": "minecraft:furnace"
+    },
+    "S": {
+      "item": "minecraft:cobbled_deepslate"
+    }
+  },
+  "result": {
+    "id": "corruption:corruption_arcane_transmuter"
+  }
+}

@@ -3,6 +3,9 @@
     "corruption:clavicula_salomonis": {
       "strings": "#corruption:clavicula_salomonis"
     },
+    "corruption:clavicula_salomonis_corruption": {
+      "strings": "#corruption:clavicula_salomonis_corruption"
+    },
     "corruption:clavicula_salomonis_i": {
       "strings": "#corruption:clavicula_salomonis_i"
     },

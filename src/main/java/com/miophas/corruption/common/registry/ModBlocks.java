@@ -34,13 +34,19 @@ public final class ModBlocks {
     public static final DeferredBlock<InfectedBlock> INFECTED_BLOCK = BLOCKS.registerBlock("infected_block",
             InfectedBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD)
                     .instrument(NoteBlockInstrument.BASS).strength(2.0F).sound(INFECTED_SOUND).dynamicShape());
-    public static final DeferredBlock<CorruptionBlock> CORRUPTION = BLOCKS.registerBlock("corruption",
-            CorruptionBlock::new,
-            BlockBehaviour.Properties.of()
-                    .mapColor(MapColor.COLOR_BLACK)
-                    .strength(1.5F, 6.0F)
-                    .sound(SoundType.SCULK)
-                    .requiresCorrectToolForDrops());
+    public static final DeferredBlock<CorruptionBlock> CORRUPTION = BLOCKS.registerBlock("corruption", CorruptionBlock::new, corruption());
+    /** The corruption fallen still: the corruption block, made with the same properties, that never spreads. */
+    public static final DeferredBlock<com.miophas.corruption.common.block.DeactivatedCorruptionBlock> DEACTIVATED_CORRUPTION = BLOCKS.registerBlock(
+            "deactivated_corruption", com.miophas.corruption.common.block.DeactivatedCorruptionBlock::new, corruption());
+
+    /** What the corruption block is made of, and the dormant corruption with it. */
+    private static BlockBehaviour.Properties corruption() {
+        return BlockBehaviour.Properties.of()
+                .mapColor(MapColor.COLOR_BLACK)
+                .strength(1.5F, 6.0F)
+                .sound(SoundType.SCULK)
+                .requiresCorrectToolForDrops();
+    }
 
     public static final DeferredBlock<CorruptionBlock> ARCUNUM = ore("arcunum", 3.0F, SoundType.STONE);
     public static final DeferredBlock<MaliceBlock> MALICE = BLOCKS.registerBlock("malice", MaliceBlock::new,

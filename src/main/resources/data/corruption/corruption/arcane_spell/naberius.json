@@ -1,20 +1,101 @@
 {
-  "energy": "3KCE",
+  "energy": "1KCE",
   "cooldown": 40,
   "corruption_gain": 1,
   "actions": [
     {
-      "type": "apply_effect",
-      "effect": "minecraft:health_boost",
-      "target": "self",
-      "duration": 1200,
-      "amplifier": 1
+      "type": "visual",
+      "effect": "corruption:light_pillar",
+      "radius": 2,
+      "height": 14,
+      "ticks": 40,
+      "color": "#FFE08A",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#5A4A80",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#5A4A80"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#5A4A80"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:feathers",
+          "radius": 16,
+          "ticks": 50,
+          "color": "#3A2A50",
+          "accent": "#C8B0FF",
+          "sound": "minecraft:entity.phantom.flap"
+        },
+        {
+          "type": "damage",
+          "amount": 36,
+          "radius": 16
+        },
+        {
+          "type": "push",
+          "radius": 16,
+          "strength": 1.4,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:weakness",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 300,
+          "amplifier": 1
+        }
+      ]
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:instant_health",
       "target": "self",
-      "duration": 1
+      "duration": 1,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:health_boost",
+      "target": "self",
+      "duration": 6000,
+      "amplifier": 1
     },
     {
       "type": "particles",

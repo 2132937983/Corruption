@@ -7,7 +7,7 @@
     {
       "type": "visual",
       "effect": "corruption:rune_ring",
-      "radius": 1.5,
+      "radius": 3,
       "height": 1.2,
       "ticks": 20,
       "sound": "minecraft:entity.illusioner.cast_spell"
@@ -15,7 +15,7 @@
     {
       "type": "launch_bolt",
       "speed": 1.8,
-      "count": 7,
+      "count": 48,
       "fan": 40,
       "trail": [
         {
@@ -46,16 +46,20 @@
       ],
       "on_hit": [
         {
+          "type": "corrupt_creatures",
+          "radius": 4
+        },
+        {
           "type": "damage",
-          "amount": 12,
-          "radius": 2,
+          "amount": 24,
+          "radius": 4,
           "damage_type": "corruption:corruption"
         },
         {
           "type": "apply_effect",
           "effect": "corruption:corruption_curse",
           "target": "nearby",
-          "radius": 2,
+          "radius": 4,
           "duration": 100
         }
       ]

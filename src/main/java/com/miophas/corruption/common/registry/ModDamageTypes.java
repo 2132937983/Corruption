@@ -19,6 +19,11 @@ public final class ModDamageTypes {
             ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID,"corruption_conversion"));
     public static DamageSource conversion(Level level){return new ContactDamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(CORRUPTION_CONVERSION));}
 
+    /** The corruption taking a creature at once by this one's doing, such as a spell's caster, who has the credit of it. */
+    public static DamageSource conversion(Level level, net.minecraft.world.entity.LivingEntity attacker) {
+        return new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(CORRUPTION_CONVERSION), attacker);
+    }
+
     public static DamageSource corruption(Level level) {
         return new ContactDamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(CORRUPTION));
     }

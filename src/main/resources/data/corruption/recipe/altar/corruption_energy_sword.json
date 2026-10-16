@@ -1,0 +1,13 @@
+{
+  "type": "corruption:altar_shaped",
+  "pillars": {
+    "1": {
+      "item": "corruption:corrupted_arcane_sword"
+    }
+  },
+  "time": 100,
+  "result": {
+    "id": "corruption:corruption_energy_sword"
+  },
+  "keep": "1"
+}

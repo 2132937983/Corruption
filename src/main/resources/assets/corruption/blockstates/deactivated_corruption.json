@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "corruption:block/corruption"
+    }
+  }
+}

@@ -177,12 +177,15 @@ class AndromaliusRulesTest {
         for (Path at = Path.of("").toAbsolutePath(); at != null && folder == null; at = at.getParent())
             if (Files.isDirectory(at.resolve("src/main/java/com/miophas/corruption/core/demon"))) folder = at.resolve("src/main/java/com/miophas/corruption/core/demon");
         assertNotNull(folder);
-        try (Stream<Path> files = Files.list(folder)) {
-            List<String> imports = files.flatMap(file -> {
-                try { return Files.readAllLines(file).stream().filter(line -> line.startsWith("import ") && !line.startsWith("import java.")); }
+        try (Stream<Path> files = Files.walk(folder)) {
+            List<String> imports = files.filter(file -> file.toString().endsWith(".java")).flatMap(file -> {
+                try {
+                    return Files.readAllLines(file).stream().filter(line -> line.startsWith("import ") && !line.startsWith("import java.")
+                            && !line.startsWith("import com.miophas.corruption.core."));
+                }
                 catch (Exception failure) { throw new RuntimeException(failure); }
             }).toList();
-            assertEquals(List.of(), imports, "core/demon imports nothing but java.*");
+            assertEquals(List.of(), imports, "core/demon and its skills import nothing but java.* and the rest of core");
         }
     }
 }

@@ -32,7 +32,7 @@
         {
           "type": "visual",
           "effect": "corruption:magic_circle",
-          "radius": 6,
+          "radius": 12,
           "height": 1.5,
           "ticks": 50,
           "sound": "minecraft:entity.evoker.prepare_summon"
@@ -40,7 +40,7 @@
         {
           "type": "particles",
           "shape": "ring",
-          "radius": 6,
+          "radius": 12,
           "particles": [
             {
               "particle": "minecraft:dust",
@@ -53,7 +53,7 @@
         {
           "type": "launch_bolt",
           "speed": 1.2,
-          "count": 12,
+          "count": 48,
           "fan": 6,
           "from": "sky",
           "height": 14,
@@ -86,10 +86,21 @@
           ],
           "on_hit": [
             {
+              "type": "corrupt_creatures",
+              "radius": 4
+            },
+            {
               "type": "damage",
-              "amount": 16,
-              "radius": 2,
+              "amount": 96,
+              "radius": 4,
               "damage_type": "corruption:corruption"
+            },
+            {
+              "type": "apply_effect",
+              "effect": "corruption:corruption_curse",
+              "target": "nearby",
+              "radius": 4,
+              "duration": 100
             }
           ]
         }

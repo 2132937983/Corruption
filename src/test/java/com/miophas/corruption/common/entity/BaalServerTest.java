@@ -168,19 +168,53 @@ class BaalServerTest {
         });
     }
 
+    /**
+     * With no player about, it goes after the nearest living thing it sees that is not of the corruption, as the
+     * corruption's remnants do; never one of the corruption's own, however near.
+     */
+    @Test void withNoPlayerAboutItHuntsWhatIsNotOfTheCorruption(MinecraftServer server) {
+        onServer(server, level -> {
+            Baal baal = summon(level, 18_000, 18_000, 3);
+            Pig pig = pig(level, baal, 0, 24);
+            pig.setNoAi(true);
+            CorruptedRemnant remnant = ModEntities.CORRUPTED_REMNANT.get().create(level);
+            remnant.setPos(baal.getX(), baal.getY(), baal.getZ() + 14);
+            remnant.setNoAi(true);
+            assertTrue(level.addFreshEntity(remnant));
+            try {
+                assertTrue(baal.isAlliedTo(remnant), "the corruption's own are its allies");
+                baal.setTarget(null);
+                baal.tickCount = 20;
+                baal.customServerAiStep();
+                assertSame(pig, baal.getTarget(), "the beast it sees, with no player about; not the remnant nearer to it");
+            } finally {
+                pig.discard();
+                remnant.discard();
+                baal.discard();
+            }
+        });
+    }
+
     @Test void itDiesSlowly(MinecraftServer server) {
         onServer(server, level -> {
             Baal baal = summon(level, 14000, 14000, 2);
             baal.tick();
             assertTrue(baal.hurt(level.damageSources().genericKill(), Float.MAX_VALUE), "commands still work on it");
             assertTrue(baal.isDeadOrDying());
+            double heart = baal.heart(1).y - baal.getY();
+            assertFalse(part(baal, "head").isPickable(), "nothing to strike at once it is dying");
             for (int tick = 0; tick < BaalApi.deathTicks() - 1; tick++) baal.tick();
             assertFalse(baal.isRemoved(), "still sinking");
             assertTrue(baal.collapse(0) > .98F);
             double sunk = part(baal, "head").getBoundingBox().minY - baal.getY();
             assertTrue(sunk < 147.5 - 20, "its hitboxes sink with it: " + sunk);
+            assertTrue(baal.heart(1).y - baal.getY() < heart - BaalApi.heightBlocks() * .15, "and its heart, where its light pours out, sinks further, with its body");
             baal.tick();
-            assertTrue(baal.isRemoved());
+            assertFalse(baal.isRemoved(), "its body is gone in its last burst, but it lingers while its death plays out");
+            for (int tick = 0; tick < Baal.DEATH.linger() - 1; tick++) baal.tick();
+            assertFalse(baal.isRemoved());
+            baal.tick();
+            assertTrue(baal.isRemoved(), "and then it is gone");
         });
     }
 

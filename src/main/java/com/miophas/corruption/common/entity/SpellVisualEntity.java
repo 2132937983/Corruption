@@ -66,8 +66,17 @@ public final class SpellVisualEntity extends Entity implements IEntityWithComple
     }
 
     /** Drawn whenever any of it could be in sight, not only its foot. */
-    @Override public AABB getBoundingBoxForCulling() {
-        return new AABB(getX() - radius - 1, getY() - 1, getZ() - radius - 1, getX() + radius + 1, getY() + Math.max(height, radius) + 1, getZ() + radius + 1);
+    @Override public AABB getBoundingBoxForCulling() { return reach(getX(), getY(), getZ(), radius, height); }
+
+    /**
+     * All that any effect this size may reach, standing at x, y, z: well past its radius round it (wings spread,
+     * shards burst outward, a sigil stands before its caster) and well over its height (an eye hangs high, rays of
+     * glory round it), so that none of it is ever cut off; and never less than the least some effects are drawn at,
+     * however small (a storm's cloud hangs six blocks up).
+     */
+    public static AABB reach(double x, double y, double z, float radius, float height) {
+        double across = radius * 2.6 + 5, up = Math.max(height, radius) * 1.7 + radius * 1.7 + 8;
+        return new AABB(x - across, y - 2, z - across, x + across, y + up, z + across);
     }
 
     /** Seen from as far as a spell's might deserves. */

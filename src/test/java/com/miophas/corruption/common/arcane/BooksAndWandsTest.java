@@ -84,6 +84,7 @@ class BooksAndWandsTest {
         for (SpellAction action : actions) {
             visit.accept(action);
             if (action instanceof SpellAction.LaunchBolt bolt) walk(bolt.onHit(), visit);
+            if (action instanceof SpellAction.Beam beam) walk(beam.onHit(), visit);
         }
     }
     private static Set<String> tag(String path) throws Exception {
@@ -209,12 +210,49 @@ class BooksAndWandsTest {
         assertTrue(tempest.onHit().stream().anyMatch(action -> action instanceof SpellAction.Lightning lightning
                 && lightning.corrupt() && lightning.count() > 8 && lightning.damageType().equals("corruption:corruption")),
                 "a tempest is a corruption bolt, and many cursed bolts of lightning where it lands");
+        assertTrue(tempest.onHit().stream().anyMatch(action -> action instanceof SpellAction.Lightning lightning && lightning.count() == 20),
+                "twenty of them");
         SpellAction.LaunchBolt rain = spell("corruption_rain").actions().stream().filter(SpellAction.LaunchBolt.class::isInstance)
                 .map(SpellAction.LaunchBolt.class::cast).findFirst().orElseThrow();
         assertTrue(rain.onHit().stream().anyMatch(action -> action instanceof SpellAction.LaunchBolt sky && sky.from() == SpellAction.Source.SKY && sky.count() > 1),
                 "where the rain's bolt strikes, bolts fall from the sky");
         assertTrue(spell("corruption_nova").actions().stream().anyMatch(action -> action instanceof SpellAction.Spectacle), "and it is a sight");
         assertTrue(spell("corruption_nova").actions().stream().noneMatch(action -> action instanceof SpellAction.Corrupt), "that leaves its caster's ground as it was");
+    }
+
+    /**
+     * The Arcana of Corruption commands the corruption more than it harms with it: its mark sends the corruption after
+     * what its bolt strikes and does it no harm; whatever it corrupts, it corrupts with what never spreads; it raises
+     * remnants for a while, stills the corruption, swears a truce; and its last art is a bolt bigger than any other.
+     */
+    @Test void theArcanaOfCorruptionCommandsTheCorruption() throws Exception {
+        List<String> arcana = book("clavicula_salomonis_corruption");
+        assertEquals(List.of("corruption_mark", "corruption_blight", "corruption_host", "corruption_quell", "corruption_oath", "corruption_engulf"), arcana);
+        SpellAction.LaunchBolt mark = spell("corruption_mark").actions().stream().filter(SpellAction.LaunchBolt.class::isInstance)
+                .map(SpellAction.LaunchBolt.class::cast).findFirst().orElseThrow();
+        List<SpellAction> carried = new ArrayList<>();
+        walk(mark.onHit(), carried::add);
+        assertTrue(carried.stream().anyMatch(action -> action instanceof SpellAction.MarkPrey prey && prey.radius() >= 24), "the mark sends the corruption within 24 blocks after its prey");
+        assertTrue(carried.stream().noneMatch(action -> action instanceof SpellAction.Damage || action instanceof SpellAction.Lightning
+                || action instanceof SpellAction.Explode || action instanceof SpellAction.CorruptCreatures), "and does it no harm");
+        List<SpellAction> blight = new ArrayList<>();
+        walk(spell("corruption_blight").actions(), blight::add);
+        assertTrue(blight.stream().anyMatch(action -> action instanceof SpellAction.LaunchBolt), "the blight is a bolt");
+        assertTrue(blight.stream().anyMatch(action -> action instanceof SpellAction.Corrupt corrupt && corrupt.inert()), "that blights the ground");
+        for (String art : arcana)
+            walk(spell(art).actions(), action -> { if (action instanceof SpellAction.Corrupt corrupt) assertTrue(corrupt.inert(), art + " corrupts with what spreads"); });
+        assertTrue(spell("corruption_host").actions().stream().anyMatch(action -> action instanceof SpellAction.RaiseRemnants raise && raise.count() >= 4 && raise.lifetime() > 0),
+                "the host is a band of remnants, for a while");
+        assertTrue(spell("corruption_quell").actions().stream().anyMatch(SpellAction.Quell.class::isInstance));
+        assertTrue(spell("corruption_oath").actions().stream().anyMatch(SpellAction.Truce.class::isInstance));
+        SpellAction.LaunchBolt engulf = spell("corruption_engulf").actions().stream().filter(SpellAction.LaunchBolt.class::isInstance)
+                .map(SpellAction.LaunchBolt.class::cast).findFirst().orElseThrow();
+        assertTrue(engulf.size() >= 3 * SpellAction.LaunchBolt.DEFAULT_SIZE, "a bolt three times the size of any other");
+        for (var book : books().values()) for (String name : book) walk(spell(name).actions(), action -> {
+            if (action instanceof SpellAction.LaunchBolt bolt && !name.equals("corruption_engulf")) assertTrue(bolt.size() <= SpellAction.LaunchBolt.DEFAULT_SIZE, name + " flies no bigger bolt");
+        });
+        long intermediate = capacity(ModItems.INTERMEDIATE_CORRUPTION_ARCANE_STICK);
+        for (String art : arcana) assertTrue(spell(art).energy() <= intermediate, art + " is cast with an Intermediate wand");
     }
 
     /**
@@ -255,6 +293,82 @@ class BooksAndWandsTest {
             walk(spell(art).actions(), action -> { if (action instanceof SpellAction.Visual visual) shown.add(visual); });
             assertFalse(shown.isEmpty(), "the Prologue's " + art + " shows itself");
         }
+    }
+
+    /**
+     * Every one of the seventy-two shows itself with at least one of the twenty effects drawn for the spirits (not only
+     * the first six, which the higher arts had; nor the two after them, drawn for the bosses' deaths), and between them
+     * they use every one of those twenty.
+     */
+    @Test void everyPillarShowsItself() throws Exception {
+        Set<ResourceLocation> spirits = new HashSet<>(SpellVisuals.BUILT_IN.subList(6, SpellVisuals.BUILT_IN.indexOf(SpellVisuals.SHARDS) + 1));
+        assertEquals(20, spirits.size());
+        Set<ResourceLocation> used = new HashSet<>();
+        for (String spirit : GOETIA) {
+            List<ResourceLocation> shown = new ArrayList<>();
+            walk(spell(spirit).actions(), action -> { if (action instanceof SpellAction.Visual visual) shown.add(ResourceLocation.parse(visual.effect())); });
+            assertTrue(shown.stream().anyMatch(spirits::contains), spirit + " shows itself with one of the spirits' effects: " + shown);
+            used.addAll(shown);
+        }
+        assertTrue(used.containsAll(spirits), "every one of the spirits' effects is used: missing " + spirits.stream().filter(effect -> !used.contains(effect)).toList());
+    }
+
+    /**
+     * A spirit's spell spends a parchment and a point of corruption besides its energy, so it must be worth more than a
+     * potion: it is cheap (4 KCE at most, asking a corruption of 10 at most) and comes round within three seconds,
+     * since its cooldown holds the whole wand; most of the seventy-two fight, and hit hard when they do; what they
+     * give their caster lasts at least half a minute; and a spell that summons hurts before it summons, never its
+     * own summoned.
+     */
+    @Test void thePillarsAreWorthWhatTheyCost() throws Exception {
+        int fighting = 0, atRange = 0;
+        for (String spirit : GOETIA) {
+            SpellRule rule = spell(spirit);
+            assertTrue(rule.energy() <= 4_000, spirit + " costs 4 KCE at most, not " + rule.energy());
+            assertTrue(rule.cooldown() <= 60, spirit + " comes round within three seconds, not " + rule.cooldown() + " ticks");
+            assertTrue(rule.minCorruption() <= 10, spirit + " asks a corruption of 10 at most");
+            double[] hardest = {0};
+            List<Integer> lasting = new ArrayList<>();
+            walk(rule.actions(), action -> {
+                if (action instanceof SpellAction.Damage hurt) hardest[0] = Math.max(hardest[0], hurt.amount());
+                if (action instanceof SpellAction.Lightning strike) hardest[0] = Math.max(hardest[0], strike.damage());
+                if (action instanceof SpellAction.ApplyEffect effect && effect.target() == SpellAction.Target.SELF && effect.duration() > 1) lasting.add(effect.duration());
+            });
+            if (hardest[0] > 0) {
+                fighting++;
+                assertTrue(hardest[0] >= 10, spirit + " hits hard if it hits at all, not " + hardest[0]);
+            }
+            // A blast about the caster holds off what rushes them: it reaches eight blocks or more, hits for 16 or
+            // more, and throws back everything it reaches.
+            for (SpellAction action : rule.actions()) {
+                if (!(action instanceof SpellAction.Damage blast)) continue;
+                assertTrue(blast.radius() >= 8, spirit + "'s blast reaches 8 blocks at least, not " + blast.radius());
+                assertTrue(blast.amount() >= 16, spirit + "'s blast hits for 16 at least, not " + blast.amount());
+                assertTrue(rule.actions().stream().anyMatch(other -> other instanceof SpellAction.Push throwing
+                        && throwing.strength() > 0 && throwing.radius() >= blast.radius()), spirit + "'s blast throws back what it hits");
+            }
+            // Fighting at range: a bolt's blast where it lands throws what it catches away from the caster, never
+            // every way from the blast, which would fling some of it onto them.
+            boolean[] byBolt = {false};
+            walk(rule.actions(), action -> {
+                if (!(action instanceof SpellAction.LaunchBolt bolt)) return;
+                boolean blasts = bolt.onHit().stream().anyMatch(hit -> hit instanceof SpellAction.Damage hurt && hurt.radius() >= 8);
+                if (bolt.onHit().stream().anyMatch(SpellAction.Damage.class::isInstance)) byBolt[0] = true;
+                if (!blasts) return;
+                for (SpellAction hit : bolt.onHit())
+                    if (hit instanceof SpellAction.Push throwing && throwing.strength() > 0)
+                        assertEquals(SpellAction.Push.From.CASTER, throwing.from(), spirit + "'s bolt throws what its blast catches away from the caster");
+            });
+            if (byBolt[0]) atRange++;
+            for (int duration : lasting) assertTrue(duration >= 600, spirit + " gives what lasts half a minute at least, not " + duration + " ticks");
+            boolean summoned = false;
+            for (SpellAction action : rule.actions()) {
+                if (action instanceof SpellAction.Summon) summoned = true;
+                assertFalse(summoned && action instanceof SpellAction.Damage, spirit + " hurts before it summons, never its own summoned");
+            }
+        }
+        assertTrue(fighting >= 60, "most of the seventy-two fight: " + fighting);
+        assertTrue(atRange >= 55, "and most of those fight at range, by bolt: " + atRange + " of " + fighting);
     }
 
     @Test void theWandsRiseTierByTier() throws Exception {

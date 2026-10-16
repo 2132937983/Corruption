@@ -1,0 +1,17 @@
+{
+  "type": "corruption:alchemy_shaped",
+  "slots": {
+    "0": {
+      "item": "corruption:corruption_energy_sword",
+      "count": 1
+    },
+    "1": {
+      "item": "corruption:resentment",
+      "count": 3
+    }
+  },
+  "result": {
+    "id": "corruption:corrupted_arcane_sword"
+  },
+  "keep": "0"
+}

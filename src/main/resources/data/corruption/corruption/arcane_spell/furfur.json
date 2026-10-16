@@ -1,19 +1,13 @@
 {
-  "energy": "7KCE",
-  "cooldown": 100,
-  "min_corruption": 10,
+  "energy": "2KCE",
+  "cooldown": 40,
+  "min_corruption": 5,
   "corruption_gain": 1,
   "actions": [
     {
       "type": "weather",
       "sky": "thunder",
       "ticks": 2400
-    },
-    {
-      "type": "push",
-      "radius": 5,
-      "strength": 0.8,
-      "lift": 0.3
     },
     {
       "type": "launch_bolt",
@@ -35,9 +29,51 @@
       ],
       "on_hit": [
         {
+          "type": "visual",
+          "effect": "corruption:lightning",
+          "radius": 10,
+          "height": 12,
+          "ticks": 40,
+          "color": "#8AA8FF",
+          "accent": "#FFFFFF",
+          "shake": 0.4,
+          "sound": "minecraft:entity.lightning_bolt.thunder"
+        },
+        {
+          "type": "visual",
+          "effect": "corruption:vortex",
+          "radius": 16,
+          "height": 4,
+          "ticks": 40,
+          "color": "#9AB8FF",
+          "accent": "#FFFFFF",
+          "sound": "minecraft:entity.breeze.wind_burst"
+        },
+        {
+          "type": "damage",
+          "amount": 32,
+          "radius": 16
+        },
+        {
+          "type": "push",
+          "radius": 16,
+          "strength": 1.6,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
           "type": "lightning",
-          "radius": 4,
-          "count": 3
+          "radius": 10,
+          "count": 6,
+          "damage": 16
         }
       ]
     }

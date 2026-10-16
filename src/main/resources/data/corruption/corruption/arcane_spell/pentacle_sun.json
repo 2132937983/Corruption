@@ -6,8 +6,17 @@
   "actions": [
     {
       "type": "visual",
+      "effect": "corruption:crown",
+      "radius": 12,
+      "height": 3,
+      "ticks": 50,
+      "color": "#FFD24A",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "visual",
       "effect": "corruption:light_pillar",
-      "radius": 3,
+      "radius": 6,
       "height": 32,
       "ticks": 50,
       "color": "#FFD24A",
@@ -18,7 +27,7 @@
     {
       "type": "visual",
       "effect": "corruption:shockwave",
-      "radius": 10,
+      "radius": 20,
       "height": 2,
       "ticks": 24,
       "color": "#FFD24A",
@@ -27,7 +36,7 @@
     {
       "type": "particles",
       "shape": "sphere",
-      "radius": 6,
+      "radius": 12,
       "particles": [
         {
           "particle": "minecraft:end_rod",
@@ -64,20 +73,20 @@
     },
     {
       "type": "damage",
-      "amount": 30,
-      "radius": 10
+      "amount": 60,
+      "radius": 20
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:instant_health",
       "target": "nearby",
-      "radius": 10,
+      "radius": 20,
       "duration": 1,
       "amplifier": 3
     },
     {
       "type": "ignite_area",
-      "radius": 10,
+      "radius": 20,
       "seconds": 6
     }
   ]

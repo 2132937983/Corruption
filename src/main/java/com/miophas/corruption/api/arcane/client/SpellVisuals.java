@@ -7,8 +7,8 @@ import net.minecraft.resources.ResourceLocation;
 
 /**
  * The kinds of spell effect the client can draw, by the id a spell's "visual" action names them by. The mod
- * registers its own six; an add-on registers more the same way, in client setup. An effect no client knows how to
- * draw is simply not drawn.
+ * registers its own ({@link #BUILT_IN}); an add-on registers more the same way, in client setup. An effect no
+ * client knows how to draw is simply not drawn.
  */
 public final class SpellVisuals {
     /** A magic circle on the ground, its rings of runes turning against each other, an echo of it rising. */
@@ -23,8 +23,54 @@ public final class SpellVisuals {
     public static final ResourceLocation DOME = id("dome");
     /** Glowing runes circling and rising round the spot, two rings of them turning opposite ways. */
     public static final ResourceLocation RUNE_RING = id("rune_ring");
+    /** A ring of flame bursting up out of the ground, a lower ring inside it, embers whirling up. */
+    public static final ResourceLocation HELLFIRE = id("hellfire");
+    /** Great wings of feathers of light spreading behind the caster and beating; its height is where the shoulders are. */
+    public static final ResourceLocation WINGS = id("wings");
+    /** A storm of feathers bursting out of the spot, swirling, and drifting down. */
+    public static final ResourceLocation FEATHERS = id("feathers");
+    /** A storm's eye overhead, forked lightning striking the ground round the spot one bolt after another. */
+    public static final ResourceLocation LIGHTNING = id("lightning");
+    /** Cracks racing out over the ground, molten light in them, shards of the ground flung up. */
+    public static final ResourceLocation FISSURE = id("fissure");
+    /** Ring after ring of faceted spikes bursting up out of the ground, outward from the middle. */
+    public static final ResourceLocation SPIKES = id("spikes");
+    /** Swords of light appearing high over the ground, point down, then plunging into it one after another. */
+    public static final ResourceLocation BLADES = id("blades");
+    /** Souls, wisps and skulls, spiralling up out of a whirl of light on the ground, trailing light. */
+    public static final ResourceLocation SOULS = id("souls");
+    /** An eye opening in the air, turned to whoever looks, in a triangle of light, a beam of its sight sweeping the ground. */
+    public static final ResourceLocation EYE = id("eye");
+    /** Stars appearing in a dome overhead, joined by lines of light into a figure, the sky turning. */
+    public static final ResourceLocation CONSTELLATION = id("constellation");
+    /** A spirit's seal traced stroke by stroke in a ring of runes standing before the caster, the way they faced. */
+    public static final ResourceLocation SIGIL = id("sigil");
+    /** A wave of water rising in a ring and rushing out, its crest curling over in foam and spray. */
+    public static final ResourceLocation TIDAL_WAVE = id("tidal_wave");
+    /** A flower of light opening on the ground, light and pollen rising from its heart. */
+    public static final ResourceLocation BLOOM = id("bloom");
+    /** Chains of light shooting up from round the spot and lashing together over its middle. */
+    public static final ResourceLocation CHAINS = id("chains");
+    /** Rings of sound pulsing out on the beat, staves of music round them, notes riding and rising off them. */
+    public static final ResourceLocation RESONANCE = id("resonance");
+    /** A portal of racing sparks spinning open in the air before the caster, space whirling inside it. */
+    public static final ResourceLocation RIFT = id("rift");
+    /** Billows of glowing, sickly cloud rolling out low over the ground, bubbles rising and bursting. */
+    public static final ResourceLocation MIASMA = id("miasma");
+    /** A crown of light coming down over the spot, rays of glory round it, gold dust falling. */
+    public static final ResourceLocation CROWN = id("crown");
+    /** A transmutation circle drawn on the ground, arcs of light leaping over it, the reaction flaring up. */
+    public static final ResourceLocation ALCHEMY = id("alchemy");
+    /** Mirror shards gathering round the spot, circling, tumbling and glinting, then bursting outward. */
+    public static final ResourceLocation SHARDS = id("shards");
+    /** Rays of light bursting one after another out of a point high over the spot, turning slowly, as a great creature dies. */
+    public static final ResourceLocation RAYS = id("rays");
+    /** A star bursting high over the spot: a blinding flash and a cross of light, rings racing out, sparks flung every way. */
+    public static final ResourceLocation NOVA = id("nova");
     /** The mod's own, in the order above. */
-    public static final List<ResourceLocation> BUILT_IN = List.of(MAGIC_CIRCLE, SHOCKWAVE, LIGHT_PILLAR, VORTEX, DOME, RUNE_RING);
+    public static final List<ResourceLocation> BUILT_IN = List.of(MAGIC_CIRCLE, SHOCKWAVE, LIGHT_PILLAR, VORTEX, DOME, RUNE_RING,
+            HELLFIRE, WINGS, FEATHERS, LIGHTNING, FISSURE, SPIKES, BLADES, SOULS, EYE, CONSTELLATION, SIGIL, TIDAL_WAVE, BLOOM, CHAINS, RESONANCE,
+            RIFT, MIASMA, CROWN, ALCHEMY, SHARDS, RAYS, NOVA);
 
     private static final Map<ResourceLocation, SpellVisual> VISUALS = new ConcurrentHashMap<>();
 

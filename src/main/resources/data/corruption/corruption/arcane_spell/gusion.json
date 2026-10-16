@@ -1,22 +1,64 @@
 {
-  "energy": "2KCE",
+  "energy": "1KCE",
   "cooldown": 60,
   "corruption_gain": 1,
   "actions": [
     {
+      "type": "visual",
+      "effect": "corruption:bloom",
+      "radius": 6,
+      "height": 3,
+      "ticks": 60,
+      "color": "#F48FB0",
+      "accent": "#FFFFFF",
+      "sound": "minecraft:block.amethyst_block.chime"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:rune_ring",
+      "radius": 5,
+      "height": 1.5,
+      "ticks": 50,
+      "color": "#F48FB0",
+      "accent": "#FFFFFF"
+    },
+    {
       "type": "pacify",
-      "radius": 10
+      "radius": 24
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slowness",
+      "target": "nearby",
+      "radius": 20,
+      "duration": 300,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:instant_health",
+      "target": "self",
+      "duration": 1,
+      "amplifier": 1
     },
     {
       "type": "apply_effect",
       "effect": "minecraft:regeneration",
       "target": "self",
-      "duration": 200
+      "duration": 900,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:absorption",
+      "target": "self",
+      "duration": 3600,
+      "amplifier": 1
     },
     {
       "type": "particles",
       "shape": "ring",
-      "radius": 3,
+      "radius": 6,
       "particles": [
         {
           "particle": "minecraft:heart",
@@ -27,7 +69,7 @@
     {
       "type": "particles",
       "shape": "burst",
-      "radius": 1,
+      "radius": 2,
       "particles": [
         {
           "particle": "minecraft:happy_villager",

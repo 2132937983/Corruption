@@ -46,9 +46,10 @@ public final class ModItems {
      * The keys to the corruption's arcane: on the arcane lectern each reveals the strings data_maps/item/arcane_key.json
      * gives it. The Prologue (the first key the mod had, which keeps its id) holds the corruption's own arts; the
      * eight books of the Key, the seventy-two spirits of the Ars Goetia, nine to a book; the Ascension, the planetary
-     * pentacles; the Lesser Key, the ancients' five arts.
+     * pentacles; the Lesser Key, the ancients' five arts; the Arcana of Corruption, the corruption's higher arts.
      */
     public static final DeferredItem<Item> CLAVICULA_SALOMONIS = key("clavicula_salomonis", Rarity.EPIC);
+    public static final DeferredItem<Item> CLAVICULA_SALOMONIS_CORRUPTION = key("clavicula_salomonis_corruption", Rarity.EPIC);
     public static final DeferredItem<Item> CLAVICULA_SALOMONIS_I = key("clavicula_salomonis_i", Rarity.UNCOMMON);
     public static final DeferredItem<Item> CLAVICULA_SALOMONIS_II = key("clavicula_salomonis_ii", Rarity.UNCOMMON);
     public static final DeferredItem<Item> CLAVICULA_SALOMONIS_III = key("clavicula_salomonis_iii", Rarity.UNCOMMON);
@@ -59,8 +60,8 @@ public final class ModItems {
     public static final DeferredItem<Item> CLAVICULA_SALOMONIS_VIII = key("clavicula_salomonis_viii", Rarity.RARE);
     public static final DeferredItem<Item> CLAVICULA_SALOMONIS_ASCENSION = key("clavicula_salomonis_ascension", Rarity.EPIC);
     public static final DeferredItem<Item> LEMEGETON = key("lemegeton", Rarity.EPIC);
-    /** The keys, in the order they are read: the Prologue, the eight books, the Ascension, the Lesser Key. */
-    public static final List<DeferredItem<Item>> KEYS = List.of(CLAVICULA_SALOMONIS, CLAVICULA_SALOMONIS_I, CLAVICULA_SALOMONIS_II,
+    /** The keys, in the order they are read: the Prologue and the Arcana of Corruption, the eight books, the Ascension, the Lesser Key. */
+    public static final List<DeferredItem<Item>> KEYS = List.of(CLAVICULA_SALOMONIS, CLAVICULA_SALOMONIS_CORRUPTION, CLAVICULA_SALOMONIS_I, CLAVICULA_SALOMONIS_II,
             CLAVICULA_SALOMONIS_III, CLAVICULA_SALOMONIS_IV, CLAVICULA_SALOMONIS_V, CLAVICULA_SALOMONIS_VI, CLAVICULA_SALOMONIS_VII,
             CLAVICULA_SALOMONIS_VIII, CLAVICULA_SALOMONIS_ASCENSION, LEMEGETON);
     /** The wands, lowest tier first. */
@@ -99,9 +100,35 @@ public final class ModItems {
             () -> new CorruptionMaterialItem(new Item.Properties().rarity(Rarity.RARE)));
     public static final DeferredItem<CorruptionMaterialItem> CHAOS_CATALYST = ITEMS.register("chaos_catalyst",
             () -> new CorruptionMaterialItem(new Item.Properties().rarity(Rarity.RARE)));
+    /** What the malice vine leaves when it is cut down, and what greed leaves: no machine makes either. */
+    public static final DeferredItem<CorruptionMaterialItem> MALICE_TENDRIL = ITEMS.register("malice_tendril",
+            () -> new CorruptionMaterialItem(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final DeferredItem<CorruptionMaterialItem> GREED_HEARTWOOD = ITEMS.register("greed_heartwood",
+            () -> new CorruptionMaterialItem(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    /** The corruption's plants brewed down to their spite. */
+    public static final DeferredItem<CorruptionMaterialItem> RESENTMENT = ITEMS.register("resentment",
+            () -> new CorruptionMaterialItem(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    /** The memories the corruption could not digest, and what is made of them: the advanced materials. */
+    public static final DeferredItem<CorruptionMaterialItem> MEMORY_FRAGMENT = ITEMS.register("memory_fragment",
+            () -> new CorruptionMaterialItem(new Item.Properties().rarity(Rarity.RARE)));
+    public static final DeferredItem<CorruptionMaterialItem> CORRUPTED_MEMORY_GEM = ITEMS.register("corrupted_memory_gem",
+            () -> new CorruptionMaterialItem(new Item.Properties().rarity(Rarity.RARE)));
+    public static final DeferredItem<CorruptionMaterialItem> CORRUPTION_ENERGY_BRICK = ITEMS.register("corruption_energy_brick",
+            () -> new CorruptionMaterialItem(new Item.Properties().rarity(Rarity.EPIC)));
     /** The materials, rawest first. */
     public static final List<DeferredItem<CorruptionMaterialItem>> MATERIALS = List.of(VOID_ASH, CURSED_IRON_INGOT, BLIGHTED_BONE, TAINTED_FLESH,
-            CORRUPTED_ICHOR, MALICE_FIBER, SOUL_RESIN, SHADOW_SILK, BLOODSTONE, RUNE_SLATE, ELDRITCH_MEMBRANE, ABYSSAL_PEARL, CORRUPTED_HEARTSTONE, CHAOS_CATALYST);
+            CORRUPTED_ICHOR, MALICE_FIBER, SOUL_RESIN, SHADOW_SILK, BLOODSTONE, RUNE_SLATE, ELDRITCH_MEMBRANE, ABYSSAL_PEARL, CORRUPTED_HEARTSTONE, CHAOS_CATALYST,
+            MALICE_TENDRIL, GREED_HEARTWOOD, RESENTMENT, MEMORY_FRAGMENT, CORRUPTED_MEMORY_GEM, CORRUPTION_ENERGY_BRICK);
+    /**
+     * The corruption's blades (ArcaneBladeRules): the energy sword, which bears the arcane's mark and reaches the
+     * corruption's lords; and the arcane sword, twice as heavy and cursed besides, which they turn aside.
+     */
+    public static final DeferredItem<com.miophas.corruption.common.item.CorruptionBladeItem> CORRUPTION_ENERGY_SWORD = ITEMS.register("corruption_energy_sword",
+            () -> new com.miophas.corruption.common.item.CorruptionBladeItem(com.miophas.corruption.core.arcane.ArcaneBladeRules.ENERGY_SWORD_DURABILITY,
+                    () -> net.minecraft.world.item.crafting.Ingredient.of(CORRUPTION_ENERGY_BRICK.get()), com.miophas.corruption.core.arcane.ArcaneBladeRules.ENERGY_SWORD_DAMAGE));
+    public static final DeferredItem<com.miophas.corruption.common.item.CorruptionBladeItem> CORRUPTED_ARCANE_SWORD = ITEMS.register("corrupted_arcane_sword",
+            () -> new com.miophas.corruption.common.item.CorruptionBladeItem(com.miophas.corruption.core.arcane.ArcaneBladeRules.ARCANE_SWORD_DURABILITY,
+                    () -> net.minecraft.world.item.crafting.Ingredient.of(RESENTMENT.get()), com.miophas.corruption.core.arcane.ArcaneBladeRules.ARCANE_SWORD_DAMAGE));
     /** Bread baked through with the corruption: eaten for no hunger at all, it leaves its eater one point more corrupted. */
     public static final DeferredItem<com.miophas.corruption.common.item.CorruptedBreadItem> CORRUPTED_BREAD = ITEMS.register("corrupted_bread",
             () -> new com.miophas.corruption.common.item.CorruptedBreadItem(new Item.Properties()));
@@ -114,6 +141,8 @@ public final class ModItems {
     public static final DeferredItem<com.miophas.corruption.common.item.RobeArmorItem> ROBE = robe("robe", net.minecraft.world.item.ArmorItem.Type.CHESTPLATE);
     public static final DeferredItem<com.miophas.corruption.common.item.RobeArmorItem> ROBE_LEGGINGS = robe("robe_leggings", net.minecraft.world.item.ArmorItem.Type.LEGGINGS);
     public static final DeferredItem<com.miophas.corruption.common.item.RobeArmorItem> ROBE_BOOTS = robe("robe_boots", net.minecraft.world.item.ArmorItem.Type.BOOTS);
+    /** The corrupted robes, a set of four in each grade (CorruptedRobeRules): hood, robe, leggings and boots, novice to advanced. */
+    public static final List<DeferredItem<com.miophas.corruption.common.item.CorruptedRobeArmorItem>> CORRUPTED_ROBES = corruptedRobes();
     /** The robe's pieces, head to foot. */
     public static final List<DeferredItem<com.miophas.corruption.common.item.RobeArmorItem>> ROBE_SET = List.of(ROBE_HOOD, ROBE, ROBE_LEGGINGS, ROBE_BOOTS);
     public static final DeferredItem<Item> PURE_LEAF =
@@ -131,12 +160,17 @@ public final class ModItems {
             () -> new InfectedBlockItem(ModBlocks.INFECTED_BLOCK.get(), new Item.Properties()));
     public static final DeferredItem<BlockItem> CORRUPTION =
             ITEMS.registerSimpleBlockItem("corruption", ModBlocks.CORRUPTION);
+    /** The dormant corruption: it looks just like the corruption, so its item says what sets it apart. */
+    public static final DeferredItem<BlockItem> DEACTIVATED_CORRUPTION = ITEMS.register("deactivated_corruption",
+            () -> new com.miophas.corruption.common.item.DescribedBlockItem(ModBlocks.DEACTIVATED_CORRUPTION.get(), new Item.Properties()));
 
     public static final DeferredItem<BlockItem> CORRUPTION_BENCH = ITEMS.registerSimpleBlockItem("corruption_bench", ModBlocks.CORRUPTION_BENCH);
     public static final DeferredItem<BlockItem> ARCUNUM = ITEMS.registerSimpleBlockItem("arcunum", ModBlocks.ARCUNUM);
     public static final DeferredItem<BlockItem> MALICE = ITEMS.registerSimpleBlockItem("malice", ModBlocks.MALICE);
     public static final DeferredItem<BlockItem> CORRUPTION_ARCANE_BRICK =
             ITEMS.registerSimpleBlockItem("corruption_arcane_brick", ModBlocks.CORRUPTION_ARCANE_BRICK);
+    /** Fired from clay bricks in the arcane transmuter, 20 KCE apiece; four build a corruption arcane brick. */
+    public static final DeferredItem<Item> CURSED_BRICK = ITEMS.register("cursed_brick", () -> new Item(new Item.Properties()));
     /** Copper, transmuted in the arcane transmuter: c:ingots/corrupted_brass. */
     public static final DeferredItem<Item> CORRUPTED_BRASS = ITEMS.register("corrupted_brass", () -> new Item(new Item.Properties()));
     public static final DeferredItem<BlockItem> CORRUPTED_BRASS_BLOCK = ITEMS.registerSimpleBlockItem("corrupted_brass_block", ModBlocks.CORRUPTED_BRASS_BLOCK);
@@ -167,6 +201,28 @@ public final class ModItems {
 
     private static DeferredItem<com.miophas.corruption.common.item.RobeArmorItem> robe(String id, net.minecraft.world.item.ArmorItem.Type type) {
         return ITEMS.register(id, () -> new com.miophas.corruption.common.item.RobeArmorItem(type));
+    }
+
+    private static List<DeferredItem<com.miophas.corruption.common.item.CorruptedRobeArmorItem>> corruptedRobes() {
+        List<DeferredItem<com.miophas.corruption.common.item.CorruptedRobeArmorItem>> robes = new java.util.ArrayList<>();
+        var tiers = com.miophas.corruption.core.corruption.CorruptedRobeRules.Tier.values();
+        List<net.neoforged.neoforge.registries.DeferredHolder<net.minecraft.world.item.ArmorMaterial, net.minecraft.world.item.ArmorMaterial>> materials = List.of(
+                ModArmorMaterials.NOVICE_CORRUPTED_ROBE, ModArmorMaterials.INTERMEDIATE_CORRUPTED_ROBE, ModArmorMaterials.ADVANCED_CORRUPTED_ROBE);
+        int[] durability = {15, 25, 37};
+        String[] pieces = {"_hood", "", "_leggings", "_boots"};
+        net.minecraft.world.item.ArmorItem.Type[] types = {net.minecraft.world.item.ArmorItem.Type.HELMET, net.minecraft.world.item.ArmorItem.Type.CHESTPLATE,
+                net.minecraft.world.item.ArmorItem.Type.LEGGINGS, net.minecraft.world.item.ArmorItem.Type.BOOTS};
+        for (int grade = 0; grade < tiers.length; grade++) {
+            var tier = tiers[grade];
+            var material = materials.get(grade);
+            int lasts = durability[grade];
+            for (int piece = 0; piece < pieces.length; piece++) {
+                var type = types[piece];
+                robes.add(ITEMS.register(tier.name().toLowerCase(java.util.Locale.ROOT) + "_corrupted_robe" + pieces[piece],
+                        () -> new com.miophas.corruption.common.item.CorruptedRobeArmorItem(tier, material, type, lasts)));
+            }
+        }
+        return List.copyOf(robes);
     }
 
     private static DeferredItem<CorruptionMaterialItem> material(String id) {

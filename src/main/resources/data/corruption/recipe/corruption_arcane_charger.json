@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "KRK",
+    "BXB",
+    "BBB"
+  ],
+  "key": {
+    "K": {
+      "item": "corruption:corrupted_brass"
+    },
+    "R": {
+      "item": "minecraft:redstone_block"
+    },
+    "X": {
+      "item": "corruption:corruption"
+    },
+    "B": {
+      "item": "corruption:cursed_brick"
+    }
+  },
+  "result": {
+    "id": "corruption:corruption_arcane_charger"
+  }
+}

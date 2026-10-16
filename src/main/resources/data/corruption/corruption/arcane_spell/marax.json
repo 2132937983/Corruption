@@ -1,24 +1,110 @@
 {
-  "energy": "4KCE",
-  "cooldown": 100,
+  "energy": "2KCE",
+  "cooldown": 40,
   "corruption_gain": 1,
   "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:constellation",
+      "radius": 8,
+      "height": 6,
+      "ticks": 80,
+      "color": "#B080FF",
+      "accent": "#FFFFFF",
+      "sound": "minecraft:block.amethyst_block.chime"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:shards",
+      "radius": 4,
+      "height": 1.8,
+      "ticks": 60,
+      "color": "#B080FF",
+      "accent": "#F0E0FF"
+    },
     {
       "type": "apply_effect",
       "effect": "minecraft:haste",
       "target": "self",
-      "duration": 1200,
+      "duration": 6000,
       "amplifier": 1
     },
     {
       "type": "give_item",
       "item": "minecraft:amethyst_shard",
-      "count": 2
+      "count": 4
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "look": "minecraft:amethyst_shard",
+      "trail": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 2,
+          "spread": 0.05
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 20,
+          "spread": 0.4,
+          "speed": 0.05
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 6,
+          "height": 1.5,
+          "ticks": 16,
+          "color": "#B080FF",
+          "accent": "#FFFFFF"
+        },
+        {
+          "type": "damage",
+          "amount": 32,
+          "radius": 7
+        },
+        {
+          "type": "launch_bolt",
+          "speed": 1.2,
+          "count": 5,
+          "fan": 5,
+          "from": "sky",
+          "height": 12,
+          "look": "minecraft:amethyst_shard",
+          "trail": [
+            {
+              "particle": "minecraft:end_rod",
+              "count": 1,
+              "spread": 0.04
+            }
+          ],
+          "burst": [
+            {
+              "particle": "minecraft:end_rod",
+              "count": 10,
+              "spread": 0.3,
+              "speed": 0.03
+            }
+          ],
+          "on_hit": [
+            {
+              "type": "damage",
+              "amount": 20,
+              "radius": 5
+            }
+          ]
+        }
+      ]
     },
     {
       "type": "particles",
       "shape": "spiral",
-      "radius": 1.5,
+      "radius": 3,
       "height": 2.5,
       "particles": [
         {

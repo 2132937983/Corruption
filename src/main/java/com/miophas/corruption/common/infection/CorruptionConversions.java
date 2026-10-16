@@ -51,5 +51,10 @@ public final class CorruptionConversions {
         return state.getBlock() instanceof CorruptionBlock || state.getBlock() instanceof com.miophas.corruption.common.block.CorruptedLiquidBlock;
     }
 
+    /** Whether this is a source of the infection: corrupted, and of a corruption that spreads (not the dormant corruption). */
+    public static boolean isSource(BlockState state) {
+        return isCorrupted(state) && !(state.getBlock() instanceof CorruptionBlock corruption && !corruption.spreads());
+    }
+
     private CorruptionConversions() {}
 }

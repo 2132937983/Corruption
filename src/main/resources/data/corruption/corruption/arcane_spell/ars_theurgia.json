@@ -6,8 +6,17 @@
   "actions": [
     {
       "type": "visual",
+      "effect": "corruption:lightning",
+      "radius": 16,
+      "height": 14,
+      "ticks": 50,
+      "color": "#BFE8FF",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "visual",
       "effect": "corruption:vortex",
-      "radius": 8,
+      "radius": 16,
       "height": 10,
       "ticks": 60,
       "color": "#BFE8FF",
@@ -18,7 +27,7 @@
     {
       "type": "visual",
       "effect": "corruption:shockwave",
-      "radius": 12,
+      "radius": 24,
       "height": 3,
       "ticks": 24,
       "color": "#BFE8FF",
@@ -31,19 +40,19 @@
     },
     {
       "type": "push",
-      "radius": 12,
+      "radius": 24,
       "strength": 3,
       "lift": 1.4
     },
     {
       "type": "damage",
-      "amount": 40,
-      "radius": 12
+      "amount": 80,
+      "radius": 24
     },
     {
       "type": "particles",
       "shape": "ring",
-      "radius": 12,
+      "radius": 24,
       "particles": [
         {
           "particle": "minecraft:cloud",
@@ -81,14 +90,14 @@
       "on_hit": [
         {
           "type": "push",
-          "radius": 4,
+          "radius": 8,
           "strength": 2,
           "lift": 1
         },
         {
           "type": "damage",
-          "amount": 24,
-          "radius": 3
+          "amount": 48,
+          "radius": 6
         }
       ]
     }

@@ -37,15 +37,22 @@
       "on_hit": [
         {
           "type": "visual",
+          "effect": "corruption:lightning",
+          "radius": 10,
+          "height": 12,
+          "ticks": 30
+        },
+        {
+          "type": "visual",
           "effect": "corruption:magic_circle",
-          "radius": 5,
+          "radius": 10,
           "height": 2,
           "ticks": 40
         },
         {
           "type": "visual",
           "effect": "corruption:shockwave",
-          "radius": 6,
+          "radius": 12,
           "height": 2,
           "ticks": 16,
           "shake": 0.4
@@ -53,7 +60,7 @@
         {
           "type": "particles",
           "shape": "ring",
-          "radius": 5,
+          "radius": 10,
           "particles": [
             {
               "particle": "corruption:corruption_particle",
@@ -70,9 +77,13 @@
           ]
         },
         {
+          "type": "corrupt_creatures",
+          "radius": 12
+        },
+        {
           "type": "lightning",
-          "radius": 5,
-          "count": 10,
+          "radius": 10,
+          "count": 20,
           "corrupt": true,
           "damage": 22,
           "damage_type": "corruption:corruption"
@@ -81,9 +92,16 @@
           "type": "apply_effect",
           "effect": "minecraft:slowness",
           "target": "nearby",
-          "radius": 5,
+          "radius": 10,
           "duration": 100,
           "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "corruption:corruption_curse",
+          "target": "nearby",
+          "radius": 12,
+          "duration": 120
         }
       ]
     }

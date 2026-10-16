@@ -1,0 +1,11 @@
+{
+  "type": "corruption:arcane_transmutation",
+  "ingredient": {
+    "item": "minecraft:brick",
+    "count": 1
+  },
+  "energy": "20KCE",
+  "result": {
+    "id": "corruption:cursed_brick"
+  }
+}
