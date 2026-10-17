@@ -1,0 +1,77 @@
+{
+  "type": "corruption:altar_shaped",
+  "pillars": {
+    "1": {
+      "type": "neoforge:components",
+      "items": "corruption:parchment",
+      "components": {
+        "corruption:inscription": "corruption:belial"
+      }
+    },
+    "2": {
+      "item": "minecraft:blaze_rod"
+    },
+    "3": {
+      "item": "corruption:corrupted_heartstone"
+    },
+    "4": {
+      "item": "minecraft:gold_block"
+    },
+    "5": {
+      "item": "corruption:chaos_catalyst"
+    },
+    "6": {
+      "item": "minecraft:ghast_tear"
+    }
+  },
+  "offering": "minecraft:villager",
+  "blocks": [
+    {
+      "at": [
+        2,
+        2
+      ],
+      "block": "minecraft:magma_block"
+    },
+    {
+      "at": [
+        2,
+        -2
+      ],
+      "block": "minecraft:magma_block"
+    },
+    {
+      "at": [
+        -2,
+        -2
+      ],
+      "block": "minecraft:magma_block"
+    },
+    {
+      "at": [
+        -2,
+        2
+      ],
+      "block": "minecraft:magma_block"
+    },
+    {
+      "at": [
+        0,
+        2
+      ],
+      "block": "minecraft:gold_block"
+    },
+    {
+      "at": [
+        0,
+        -2
+      ],
+      "block": "minecraft:gold_block"
+    }
+  ],
+  "corruption": 12,
+  "time": 240,
+  "result": {
+    "entity": "corruption:belial"
+  }
+}

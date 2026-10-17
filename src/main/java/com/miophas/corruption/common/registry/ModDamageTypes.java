@@ -32,6 +32,17 @@ public final class ModDamageTypes {
         return new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(CORRUPTION), attacker);
     }
 
+    /**
+     * Hurt in the mind (corruption:psychic): armour does not turn it aside (the tag minecraft:bypasses_armor), though
+     * Protection and Resistance do, and it throws nothing back (minecraft:no_knockback).
+     */
+    public static final ResourceKey<DamageType> PSYCHIC = ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "psychic"));
+
+    /** Hurt in the mind by this one's doing. */
+    public static DamageSource psychic(Level level, net.minecraft.world.entity.LivingEntity attacker) {
+        return new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(PSYCHIC), attacker);
+    }
+
     /** Environmental contact keeps damage events/cooldowns without knockback or panic AI. */
     private static final class ContactDamageSource extends DamageSource {
         private ContactDamageSource(Holder<DamageType> type) { super(type); }

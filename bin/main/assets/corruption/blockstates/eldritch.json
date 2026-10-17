@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "hanging=false,tip=false": {
+      "model": "corruption:block/eldritch"
+    },
+    "hanging=false,tip=true": {
+      "model": "corruption:block/eldritch_end"
+    },
+    "hanging=true,tip=false": {
+      "model": "corruption:block/eldritch",
+      "x": 180
+    },
+    "hanging=true,tip=true": {
+      "model": "corruption:block/eldritch_end",
+      "x": 180
+    }
+  }
+}

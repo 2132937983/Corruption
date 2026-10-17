@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "top": "corruption:block/block_corruption_arcane_transmuter_top",
+    "front": "corruption:block/block_corruption_arcane_transmuter_front",
+    "side": "corruption:block/block_corruption_arcane_transmuter_side",
+    "bottom": "corruption:block/block_corruption_bench_bottom"
+  }
+}

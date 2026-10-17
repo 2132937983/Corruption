@@ -1,0 +1,23 @@
+{
+  "type": "corruption:altar_shapeless",
+  "pillars": [
+    {
+      "item": "minecraft:phantom_membrane"
+    },
+    {
+      "item": "corruption:tainted_flesh"
+    },
+    {
+      "item": "corruption:corrupted_ichor"
+    },
+    {
+      "item": "corruption:blighted_bone"
+    }
+  ],
+  "offering": "minecraft:chicken",
+  "time": 80,
+  "result": {
+    "id": "corruption:eldritch_membrane",
+    "count": 2
+  }
+}

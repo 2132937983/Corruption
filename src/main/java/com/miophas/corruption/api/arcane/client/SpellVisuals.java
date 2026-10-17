@@ -67,10 +67,12 @@ public final class SpellVisuals {
     public static final ResourceLocation RAYS = id("rays");
     /** A star bursting high over the spot: a blinding flash and a cross of light, rings racing out, sparks flung every way. */
     public static final ResourceLocation NOVA = id("nova");
+    /** A staff of music racing out over the ground at an even pace, notes riding it and lifting off it: one ring of a crescendo. */
+    public static final ResourceLocation CRESCENDO = id("crescendo");
     /** The mod's own, in the order above. */
     public static final List<ResourceLocation> BUILT_IN = List.of(MAGIC_CIRCLE, SHOCKWAVE, LIGHT_PILLAR, VORTEX, DOME, RUNE_RING,
             HELLFIRE, WINGS, FEATHERS, LIGHTNING, FISSURE, SPIKES, BLADES, SOULS, EYE, CONSTELLATION, SIGIL, TIDAL_WAVE, BLOOM, CHAINS, RESONANCE,
-            RIFT, MIASMA, CROWN, ALCHEMY, SHARDS, RAYS, NOVA);
+            RIFT, MIASMA, CROWN, ALCHEMY, SHARDS, RAYS, NOVA, CRESCENDO);
 
     private static final Map<ResourceLocation, SpellVisual> VISUALS = new ConcurrentHashMap<>();
 

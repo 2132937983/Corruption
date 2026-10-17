@@ -2588,3 +2588,1132 @@ A throwaway server probe ran each version against a 20-health villager in variou
 ### 44.2 Tests and run
 - `DantalionModelTest` (14) and `SeereModelTest` (8) pass, including the two boss-bar checks that failed in §43.6.
 - Nothing was checked in game.
+
+## 45. Decarabia, the star in a pentacle: a fourth demon, star and goshawk; and a relic for every lord
+
+**Why.** The request: a new boss, Decarabia, whose form is a five-pointed star; detail in the texture rather than the geometry; two phases, the second a goshawk, flying in both.
+- **First phase**:
+  - spinning in the air and firing corruption projectiles from his five points;
+  - closing in and spinning for a melee attack;
+  - splitting into smaller clones that use the first phase's abilities until the main body is hurt; then they merge back, he is stunned for a long time, and the split goes on cooldown.
+- **At half health**: the second phase, fully healed.
+- **Second phase** (the first phase's skills dropped):
+  - a screech that stuns the player;
+  - a dive on the player's place, as Seere's, with no end lag;
+  - several dives one after another;
+  - lightning on the target's place;
+  - a wing-beat barrage of 64 spell corruption projectiles at the target's place.
+- **His rite**: a villager offered; a diamond, gold, emerald, lapis, redstone and quartz block laid out in a hexagon.
+- **Then**: a dedicated drop for every boss, to be the summoning items of a future final boss.
+
+### 45.1 Rules (`core/demon/DecarabiaRules`, `core/demon/skill`)
+- **Decarabia**:
+  - 360 health, 8 armour, knockback resistance 1;
+  - the star 2.4 × 2.4 blocks and 0.45 blocks a tick; the goshawk 2 × 1.4 and 0.95;
+  - death 3.5 s.
+- **Where he keeps**:
+  - the star about 9 blocks from his quarry, 3.5–6 over the ground: back off nearer than 5, close in further than 16;
+  - the goshawk about 12 blocks off, 8–13 over the ground.
+- **The star's skills** (`choose`, by weight, among what has come round and serves):
+
+  | Skill | Weight | Range | What it does | Cooldown |
+  | --- | --- | --- | --- | --- |
+  | Volley | 5 | 3–26 | Spins up for 0.8 s to 13°/tick; then every 4 ticks for 3 s a bolt from each point (75), 0.9 blocks/tick, ≤ 3° off, 6 corruption each | 7 s |
+  | Spin | 6 within 7 blocks, else 2 | 0–16 | Spins up for 0.6 s, then flies at its quarry for 2 s, 5 to everything within 3 blocks every 0.25 s, knocked away | 6 s |
+  | Split | 4, at or below 95% health | any, in sight | Gathers for 1.2 s, then five small stars (one of them him) 5 blocks round where he was | 45 s, from the merge |
+
+- **The split**:
+  - four likenesses, each 45% his size and with 24 health of its own;
+  - each small star (him among them) has a smaller volley (every 8 ticks, 3 each) and spin (3 every 0.3 s);
+  - struck himself: merged, stunned 8 s;
+  - unfound for 30 s: merged, not stunned.
+- **The change**: at half health, over 3 s, through which nothing hurts him but what passes every defence; healed to full by its end (`DantalionRules.healthAt`).
+- **The goshawk's skills** (a stunned quarry makes both stoops three times as likely):
+
+  | Skill | Weight | Range | What it does | Cooldown |
+  | --- | --- | --- | --- | --- |
+  | Screech | 3, quarry not stunned | 0–22 | Draws breath 0.7 s; everything not of the corruption within 18 stunned 2.5 s | 13 s |
+  | Stoop | 4 | 4–46, quarry 3+ below | Climbs 0.8 s; down at 1.9/tick; 18 within 3.5, thrown; up to 18 blocks torn up within 2.5; over as soon as it strikes | 8 s |
+  | Stoops | 3 | as the stoop | Three: each climbs 0.5 s, then stoops on where the quarry stands then (2/tick, 12 within 3, up to 6 blocks); one not down in 1.5 s is given up | 16 s |
+  | Lightning | 3 | 4–40 | Nine marked within 7 blocks; after 1.6 s one every 3 ticks, 10 corruption within 2.2 | 15 s |
+  | Barrage | 3 | 4–40 | Marks 6 blocks round where the quarry stood; wings raised 1.2 s; 64 bolts, 4 a tick, arcing down 1 s later spread over the mark, 6 each and within 1.2 | 21 s |
+
+- **New skill rules**:
+  - `SpinVolleyRules`: `turned` (now taking a fractional tick, for the client), `pointAt`, `tip`, golden-angle `scatter`, `bolts`.
+  - `SpinRules`: `strikes`, `blows`.
+  - `ScreechRules`: `reaches`.
+  - `BarrageRules`:
+    - `loosed` and `landing`;
+    - `launch`, the throw that lands a bolt falling `GRAVITY` faster each tick on its mark after exactly `flight` ticks;
+    - its timing stretched to cover every bolt.
+  - `DiveChainRules`: its timing covers every dive.
+
+### 45.2 API (`api/demon/skill`, `api/corruption`)
+- **`BossSkill.finished(boss)`**: a skill may end before its time is up. The default is never; `SkillSet` ends a skill when it says so.
+- **`BossSkillApi`**:
+  - new: `spinVolley`, `spin`, `screech`, `barrage`, `diveChain`;
+  - `dive(rules, colour, accent, upAtOnce)`: a stoop that is over as soon as it strikes.
+- **`CorruptionFactionApi.RELICS`**: the item tag `corruption:boss_relics`.
+
+### 45.3 The entity and its pieces (`common`)
+- **`Decarabia`**:
+  - `GoeticDemon`; no gravity; flies by his own thrust.
+  - Two skill sets: his own and a small star's.
+  - His likenesses are the same entity type with a synced flag. They:
+    - have no boss bar (`GoeticDemon.barShown()`, new);
+    - are not saved;
+    - leave no loot and no xp;
+    - die with a short burst of light (`LIKENESS_DEATH`);
+    - follow his quarry, and are gone the moment he is whole again or gone.
+  - His own size is set through `Attributes.SCALE`, so his box and his drawing shrink with it.
+  - Hurt while split (by anything that actually hurts him), he is found out.
+  - Saved split, he comes back whole.
+- **`DemonBolt`** (`corruption:demon_bolt`): the demons' corruption bolt.
+  - Corruption damage, with an optional splash.
+  - It passes through the boss's allies, creative and spectator players, and other bolts.
+  - It respects the usual moment of invulnerability after a hit.
+  - Drawn as the arcane's spell bolt, in the boss's colour: `SpellBoltRenderer.drawOwn` was split out for `DemonBoltRenderer`.
+- **Stun** (`corruption:stunned`, `ModEffects.STUNNED`):
+  - movement, jump and flying speed taken to nothing;
+  - `Stuns` cancels a stunned creature's own blows and its use of items, blocks and creatures;
+  - `StunClient` stops a stunned player's movement and use keys, and lays a faint pale glare over the screen.
+- **Skills** (`common/entity/skill`): `SpinVolleySkill`, `SpinSkill`, `ScreechSkill`, `BarrageSkill`, `DiveChainSkill`.
+- **`DiveSkill`**:
+  - can be over at once on striking;
+  - its landing is now the shared `DiveSkill.land`, used by the chain too;
+  - debris is only torn up when the rules allow any.
+- **Registry**: entity types `decarabia` (fire immune) and `demon_bolt`; Decarabia added to `corruption:bosses` and `corruption:corrupted_remnants`.
+
+### 45.4 Interpretations (choices the request left open)
+- **The clones**:
+  - five small stars in all, as many as his points: him and four likenesses, at 45% size;
+  - they use the volley and the spin (not the split);
+  - "the main body takes damage" means any hit that actually hurts him;
+  - the stun is 8 s and the split cooldown 45 s, counted from the merge.
+- **Added: an unfound timeout.** Left unfound 30 s, the clones come back without a stun. Without it he could stay split for ever.
+- **Added: no split at full health.** He splits only once hurt (95% or less).
+- **The change**: modelled on Dantalion's: 3 s untouchable while he heals to full.
+- **"No end lag"**: the stoop ends the tick it strikes, and he is free to fly or choose again at once.
+- **Unspecified numbers**: the lightning is nine bolts, and the screech's stun 2.5 s.
+- **The rite's pillars**: inscribed parchment, feather, abyssal pearl, corrupted heartstone, diamond, emerald.
+  - Corruption 10 is asked of a player at the altar.
+  - The hexagon lies inside the pillars' own, in the same orientation.
+- **The relics**: one item per boss; the items, names and looks are my choice. They are guaranteed drops and do nothing yet.
+- **The boss bar emblem**: the star in a pentacle. A goshawk's head before a star was tried first; at 24 px it read as a striped ball.
+
+### 45.5 Models, texture and animation (`gamemodels/decarabia`, `common/client/entity`)
+- **Geometry** (`decarabia_model.py`, data): `geo/decarabia_star.json` and `geo/decarabia_hawk.json`.
+  - **Star**: a core; five rays of three steps each on a `wheel` bone of their own; the pentacle's ring, a thin plane behind.
+  - **Goshawk**:
+    - body, head, opening lower beak, fanned tail;
+    - wings of three pieces each, a leading edge and a thin plane of feathers;
+    - two legs.
+- **Texture** (`paint_texture.py`): one 256 × 128 texture for both shapes, and a glow texture over the same places.
+  - **Star**: dark crystal; stepped gold rims; rose runes on the rays; a gold-ringed slit eye; smaller runes on the ring.
+  - **Goshawk**: slate back; pale barred breast; scalloped feather edges with pale fringes and rose veins; gold eyes.
+  - `export_model.py` writes the game's files and builds both in Blockbench for previews.
+- **`DecarabiaStarModel`**:
+  - The rays turn on the wheel while the core (his eye) stays upright, and the ring turns slowly the other way.
+  - Rays breathe; draw in through a volley's wind-up and thrust out at each beat.
+  - He leans into his spin; stretches and trembles gathering to split; reels when stunned.
+  - In the first half of his change the rays fold in, the ring closes and the core dwindles.
+- **`DecarabiaHawkModel`**:
+  - Wings beat, each piece after the last.
+  - Stooping (by his pitch), wings swept back, tail closed, talons out.
+  - Wings raised and then beating hard at the barrage; head thrown back, then beak wide, to screech; wings spread high for the lightning.
+  - He unfolds out of nothing in the second half of the change, and the wings droop in death.
+  - Every pose eases back to rest after its skill.
+- **`DecarabiaWinding`**: winds the spin, its pace, the ring and the wing beat on frame by frame.
+  - Through a volley it eases the star onto the volley's own turning (`SpinVolleyRules.turned`). By the first shot the drawn points stand where the server looses the bolts from (to within a fifth of a turn, which is invisible).
+- **`DecarabiaRenderer`**:
+  - star or goshawk, with the glow layer;
+  - the goshawk tipped by his pitch;
+  - shaking through the change and the stun;
+  - the shadow scaled with him;
+  - his death drawn with `DeathVisual`.
+- **Death**: 3.5 s plus 2.5 s. Feathers, a constellation, rising souls, a rune ring; 18 gold rays; then a gold nova, a shockwave and a light pillar.
+
+### 45.6 Rite and loot
+- **`recipe/altar/decarabia.json`**:
+  - pillars 1–6: parchment inscribed `corruption:decarabia`, feather, abyssal pearl, corrupted heartstone, diamond, emerald;
+  - a villager on the offering;
+  - the six blocks at (0,2), (2,1), (2,−1), (0,−2), (−2,−1), (−2,1);
+  - corruption 10;
+  - 200 ticks.
+- **The parchment**: the `decarabia` string was already in the Key of Solomon VIII, so it can be copied at the lectern.
+- **`loot_table/entities/decarabia.json`**: 2–4 inscribed parchments, 1–3 diamonds, 2–5 emeralds, 4–10 feathers, 1–2 abyssal pearls, and his relic.
+
+### 45.7 A relic for every lord
+| Boss | Relic | Id | From the vanilla |
+| --- | --- | --- | --- |
+| Baal | Horn of Baal | `baal_horn` | goat horn: charred, its rings glowing as coals, fire in its mouth |
+| Agares | Rimeheart of Agares | `agares_rimeheart` | heart of the sea: ice blue, a frost crack, two icicles |
+| Andromalius | Scale of Andromalius | `andromalius_scale` | turtle scute: crimson going black, drawn to a point, a keel |
+| Dantalion | Mirror Shard of Dantalion | `dantalion_mirror_shard` | prismarine shard: silvered violet glass, a sliver of gold frame, a violet eye |
+| Seere | Pinion of Seere | `seere_pinion` | feather: indigo, silver towards the lit tip, a dark quill |
+| Decarabia | Star of Decarabia | `decarabia_star` | nether star: given a fifth point, gold, its centre cross kept, a rose eye |
+
+- **The item** (`BossRelicItem`):
+  - epic, glinting, fire resistant;
+  - the tooltip: its line, "A relic of one of the corruption's lords", and "Gathered together, they may yet call up something greater";
+  - in the creative tab after the materials.
+- **The tag** `corruption:boss_relics`.
+- **Every boss's loot table** gains one pool that always leaves its relic. This includes Baal and Agares, whose tables were empty.
+- **The scripts** (`gamemodels/boss_relics/`):
+  - `draw_relics.py` draws the textures from vanilla copies; `vanilla_sources.md` holds the checksums.
+  - `write_relics.py` writes the models, the lang, the tag, and merges the pools into the tables.
+  - The existing pools are kept as they were. Andromalius's table was rewritten in the expanded JSON layout the others use; its contents are the same.
+
+### 45.8 Boss bar, lang, docs
+- **`colossus_boss_bar.png`**: Decarabia's emblem in slot 5 (160,72), built with `Canvas` like the two heads before it.
+  - A faceted dark-crystal star rimmed in gold, a rose rune on each point, the tips alight.
+  - His gold slit eye at the heart; the gold pentacle ring behind with rose runes.
+  - Re-running the script changes 397 pixels, all inside that slot.
+- **Lang**, en_us and zh_cn:
+  - `entity.corruption.decarabia` (单卡拉比), `entity.corruption.demon_bolt`, `effect.corruption.stunned`;
+  - the six relics' names and lines, and the two relic tooltips.
+- **README**:
+  - new sections 单卡拉比 and 魔神的遗物;
+  - the skill-module, boss-death and faction sections updated;
+  - each boss's drops now name its relic.
+
+### 45.9 Tests
+- **`StarSkillRulesTest`** (8) and **`DecarabiaRulesTest`** (7): the new rules and his choices.
+- **`DecarabiaServerTest`** (11):
+  - what he is;
+  - the volley's bolts aimed at the quarry;
+  - the spin;
+  - the split, found out (merge, stun, cooldown; likenesses leave nothing);
+  - the split left unfound;
+  - the change;
+  - the screech's stun (a stunned creature cannot strike, and cannot move);
+  - the stoop ending as it strikes;
+  - three stoops striking;
+  - the 64-bolt barrage;
+  - the rite and his loot table.
+- **`DecarabiaModelTest`** (10):
+  - both models bake and pose through every skill;
+  - the points turn while the eye stays upright;
+  - through a volley a drawn point stands where each bolt leaves, every beat;
+  - split and spin poses;
+  - the change folding and unfolding;
+  - the stoop;
+  - barrage and screech poses;
+  - every pose easing back;
+  - wing-beat rates;
+  - the pictures (texture, glow only where painted, the emblem in his gold).
+- **`BossRelicsServerTest`** (3):
+  - every lord in `corruption:bosses` leaves its own relic, exactly one, on each of 16 rolls, and no other lord's;
+  - the tag holds exactly the six;
+  - they glint, resist fire and are epic, and no recipe makes them;
+  - each is drawn, has a model, and is named and described in both languages.
+
+### 45.10 Run
+- **The full suite**: 586 tests in 88 classes, all pass (none failed, none skipped).
+- **Not checked in game.** Nothing of this has been seen in a running client: the models, their poses, the renderer, the stun's locked keys and glare, the emblem and the relic textures in the inventory. The tests check the baked models' poses and the pictures' pixels, not how they look on screen.
+
+## 46. Decarabia's goshawk remodelled in detail
+
+**Why.** The request: the goshawk model was too simplistic and visually unappealing; add detail and refine the modelling so that it looks better.
+
+### 46.1 Geometry (`gamemodels/decarabia/decarabia_model.py`)
+- **Before**: 24 boxes on 12 bones:
+  - a 10 × 10 × 17 block of a body with a breast;
+  - a 7 × 7 × 8 head with a cube for a beak;
+  - a flat rectangular tail;
+  - wings of three flat rectangles each;
+  - block feet.
+- **Now**: 71 boxes on 24 bones.
+  - **Body**: tapers in steps from a deep breast (crop, breast, chest) through the belly to a narrow rump. The back slopes down to the tail and the belly rises to it. A keel under the breast rounds him beneath. The mantle lies over his shoulders, a neck leads to the head, and white undertail coverts fluff out under the tail.
+  - **Head**:
+    - a flat-crowned skull;
+    - a brow 9 wide over a 7-wide skull, so it juts over each eye (the goshawk's scowl);
+    - full cheeks, and eyes standing proud of the skull under the brow;
+    - the beak in steps: cere, upper mandible, a hook curling down past the jaw, which still opens.
+  - **Tail**: coverts over its root, a fan, and the middle pair lying over the fan.
+  - **Wings**:
+    - Each side has a shoulder, then leading edges tapering from 3 to 2 to 1 pixels thick.
+    - Behind each edge, coverts lie over the flight feathers, in two layers.
+    - Each hand has six primaries. Each is a turned feather of its own (12–15 long), swept back 3° to 49°, so they splay into fingers.
+  - **Legs**: a feathered thigh, a yellow shank, three toes forward and one back, and four black talons hooked down.
+- **Every box is a whole number of pixels in each size** (positions may fall between; the planes keep their 0.08 thickness).
+  - **The bug it fixes**: the first build had half-pixel sizes (11.5, 10.5, 6.5…). Those put faces half a texel off on the texture, so the next face's pale colour bled into an edge. That showed as pale seams across the wings at every joint.
+  - **The guard**: an assertion in the script now refuses half-pixel sizes.
+- **The texture**: still 256 × 128; 99 of its rows are used now.
+
+### 46.2 Texture (`paint_texture.py`)
+- **Colours**: new ramps for the goshawk:
+  - a blue-violet slate for the upperparts;
+  - a pale lavender white below;
+  - a black cap, a white brow, a blue-black beak, a yellow cere and feet.
+  - The star keeps its own colours, and the old hawk ramps are gone.
+- **Upperparts**: staggered rows of small feathers, each darker at its root and shadowed inside a pale-fringed tip.
+- **Underparts**:
+  - fine wavering bars across; the throat streaked;
+  - the flanks flecked with short fine dashes. The first build's long bars read as vertical stripes from the side.
+- **Head**:
+  - the black cap and a dark mask behind the eye;
+  - a white brow running from over the beak back to the nape;
+  - slate lores, white streaked cheeks;
+  - a gold eye (black pupil, glint) ringed with rose;
+  - the beak blue-grey at its root going black to its point, with a lit ridge and a nostril in the cere.
+- **Wings**:
+  - **Coverts**: a shade lighter than the flight feathers, in larger rows, their last row's tips notched clear.
+  - **Flight feathers**:
+    - faintly barred above, finely barred beneath;
+    - the tips notched clear;
+    - their ends following one gentle curve from the shoulder to the hand.
+  - **Primaries**:
+    - each with a paler shaft, barred, darkening towards the end;
+    - the outer four narrowed to fingers along their last third;
+    - each end rounded, and edged in his gold.
+- **Tail**:
+  - the fan narrow at its root and spread at its end;
+  - each feather's end clear-shaped, so the end is rounded;
+  - lines running out from the root between the feathers, four dark bands square across, a gold tip.
+- **His mark**: between his shoulders, the five-pointed star he was, in gold with a rose heart (as Seere bears his sigil).
+- **Glow**:
+  - the eyes, the mark, the primaries' and the tail's gold tips;
+  - a few rose veins on the mantle and coverts (rarer than before, when they read as specks of dirt).
+
+### 46.3 Animation (`DecarabiaHawkModel`)
+- **The primaries are bones**: geo_export makes each turned box a bone of its own, `wing_<side>_2#<n>`, and the model finds the twelve. Posed:
+  - their tips bend up off the hand as they bear him, the outermost most;
+  - they flex a little after each beat;
+  - they spread wider at the barrage and at the lightning;
+  - in a stoop they are drawn together, the fan closed.
+- **Everything else** is posed as in §45.
+- **Checked in Blockbench**: the stoop and barrage poses were put on the Blockbench model (the game's turns converted back) and shot. The wings fold back along him with the fingers closed and the talons out; at the barrage they rise with the fingers spread.
+
+### 46.4 Tests
+- **`DecarabiaModelTest`**: now 11 tests.
+  - **Wing tip**: the helper now measures the longest primary's tip, through its own bone.
+  - **Mirroring**: a check that both hands' primaries mirror each other.
+  - **New test `hisPrimariesSplayIntoFingersAndCloseUpInAStoop`**:
+    - each primary further in is swept further back;
+    - the outermost reaches out along the wing;
+    - the fan is spread more than 35° at rest, and closes to under a third of that in a stoop, the same on both hands;
+    - the tips bend up off the hand, the outermost most.
+  - **The other goshawk tests** pass unchanged against the new geometry: the stoop, the barrage, the screech, the change, and easing back to rest.
+
+### 46.5 Run
+- **The full suite**: 587 tests in 88 classes, all pass (none failed, none skipped). That is one more than §45.10: the new primaries test.
+- **Not checked in game.** The model, its texture and its poses have been seen only in Blockbench previews and checked by the tests, not in a running client.
+
+## 47. Belial, the two angels in the chariot of fire; the demons' arcane rule made a setting; Stunned given its icon
+
+**Why.** The request: a new boss, Belial, modelled as two different corrupted angels (one for each phase), both flying, drawing on how he is described or drawn. The first phase must be defeated completely before he heals fully into the second.
+- **First phase**:
+  - energy beams from 2 points;
+  - a volley of corruption projectiles as his basic attack;
+  - blinking;
+  - a large number of Corrupted Remnants summoned at the target's location;
+  - a giant flaming chariot (also modelled) that smashes into the target and destroys blocks along its path.
+- **Second phase**, on top of the first's skills:
+  - beams from 6 points;
+  - more and more frequent volleys;
+  - clones that vanish when the main body is hit, leaving him stunned;
+  - high-frequency psychic attacks.
+- **Also**: a configuration option for whether the boss strictly needs the special attack tag to be hurt.
+- **Mid-way, the user found** that §45's Stunned effect had no icon (`textures/mob_effect/stunned.png`); fixed here (47.9).
+
+### 47.1 What he is drawn from
+- **The Lesser Key of Solomon** (Goetia no. 68): "He appeareth in the Form of Two beautiful Angels sitting in a Chariot of Fire. He speaketh with a Comely Voice." An older text has "a beautifull angell, sitting in a firie chariot".
+- **Milton, Paradise Lost II**: "A fairer person lost not Heav'n... But all was false and hollow."
+- **The Questions of Bartholomew**: "his face was like a lightning of fire and his eyes full of darkness."
+- **So the two forms**:
+  - the **fair** angel, first;
+  - the **hollow** one under him, second: a six-winged seraph (his six beams leave from the eyes of his six wings), his face a mask of fire, his eyes hollows of dark, horned, with a crown of thorns.
+- **Not drawn from**: no Dictionnaire Infernal plate of Belial was found. A late-medieval woodcut (Consolatio peccatorum) shows a horned Belial, which the hollow angel's horns nod to.
+
+### 47.2 Rules (`core/demon/BelialRules`, `core/demon/skill`)
+- **Belial**:
+  - each angel has 400 health, 10 armour, knockback resistance 1;
+  - 0.5 blocks a tick in flight; a 1.5 × 3.6 box;
+  - the change 5 s; the hollow angel's death 4 s;
+  - he keeps 12 blocks from his quarry, 3.5–7 over the ground.
+- **Skills** (`choose`, by weight):
+
+  | Skill | Who | Weight | What it does | Cooldown |
+  | --- | --- | --- | --- | --- |
+  | Volley | both | 6 | Fair: 4 points round him, every 6 ticks after 0.6 s, 20 bolts of 5. Hollow: 6 slowly turning points, every 3 ticks after 0.4 s, 78 bolts of 5 | 2 s / 1.2 s |
+  | Beams | both | 4 | 2 beams (from his hands) or 6 (from his wings' eyes); 1.5 s to gather, 3.5 s pouring, 4 every 4 ticks within 1.3, following at 2°/tick | 15 s |
+  | Blink | both | when pressed | To 9–16 blocks from his quarry, 3–7 up | 7 s |
+  | Summon | both | 3 fair, 2 hollow | 8 remnants in a ring round where his quarry stood; never more than 16 of his | 28 s |
+  | Chariot | both | 3 | 2 s with its line marked; then from 24 blocks short of the quarry, through it and 12 beyond, at 1.2/tick: 20 to all within 2.4 of its path, thrown aside, burning 8 s; blocks softer than obsidian broken | 24 s |
+  | Clones | hollow | 4, at ≤ 90% health | 1.2 s, then five of him 7 blocks round where he was | 45 s, from their going |
+  | Psychic | hollow | 6 | 0.5 s fixed on his quarry; then it and all within 3: 4, Nausea 5 s, Darkness 2 s, Slowness II 2 s | 3 s |
+
+- **Clones**:
+  - four likenesses with 30 health each;
+  - while they are about, all five only volley and strike at the mind (`chooseLikeness`), so that he is one of them;
+  - struck himself: they go and he is stunned 7 s;
+  - unfound for 30 s: they go, and he is not stunned.
+- **New rules**:
+  - **`ChariotRules`**: `path` (the line from the boss's side through the quarry, turned as asked), `along`, `runTicks`, `breaks`, `offLine`.
+  - **`PsychicRules`**: `inRange`, `reaches`.
+  - **`SummonRules`** gains `atQuarry`. The old five-argument constructor keeps calling round the boss.
+
+### 47.3 API
+- **`BossSkillApi`**: `chariot` and `psychic`.
+- **`BeamCaster`**: gains `beamFrom(index, count, circled)`, where each beam of a volley leaves from. By default, the volley's own magic circle, as before.
+
+### 47.4 The entity and its pieces (`common`)
+- **`Belial`** (`GoeticDemon`, `BeamCaster`):
+  - **Defeating the fair angel**: when a hurt would bring him to nothing (and does not pass every defence), he is held at 1 health and changes. 5 s untouchable; his health refills from nothing; the hollow angel from its middle.
+  - **`/kill`**, or anything else that passes every defence, kills the fair angel outright.
+  - **His volley**: each form has its own slot, so the hollow's thicker volley has its own cooldown.
+  - **His likenesses**: the same entity type with a synced flag. No boss bar, not saved, no loot or xp, a short death.
+  - **His beams** leave from `FAIR_HANDS` and `HOLLOW_EYES`: places in his own frame, held to the models by a test.
+- **`FieryChariot`**: a plain entity, not a creature.
+  - **Its run**: it runs its line, breaking blocks in its way that give way to it (mobGriefing permitting), and is wrecked by one that will not.
+  - **What it meets**: each creature within its reach is struck once, as a mob attack by its driver, thrown aside and set burning.
+  - **At the end**: gone in a burst of flame. Nothing hurts it and it is not saved.
+  - **On the client**: it sends its line and pace as it spawns, and each client runs the line itself (it moves too fast for server positions to be drawn smoothly).
+- **`ChariotSkill`**: marks the line (circles at both ends, flames along it), then sends the chariot.
+- **`PsychicSkill`**: an eye over the quarry through the wind-up, then the strike, which ignores a hit's brief protection.
+- **`SummonSkill`**: calls round the quarry when the rules say so.
+- **`BeamVolleySkill`**: asks a `BeamCaster` where each beam leaves from.
+- **Registry**:
+  - entity types `belial` and `fiery_chariot`;
+  - Belial added to `corruption:bosses` and `corruption:corrupted_remnants` (and to `write_gear.py`'s list, so a re-run keeps him).
+
+### 47.5 Models, textures, animation (`gamemodels/belial`, `common/client/entity`)
+- **Data, as Decarabia's**: `belial_model.py` (it reuses `decarabia_model`'s `Model` class, loaded by path), `paint_texture.py`, `export_model.py`. Every box is a whole number of pixels in each size (asserted).
+- **Fair angel** (49 boxes):
+  - a flaring robe with a tattered hem, belt, stole, wide sleeves, fine hands;
+  - long hair (crown, a fall narrowing down his back, locks);
+  - a tilted, cracked halo floating over his head;
+  - two great wings of three pieces (edge, coverts and flight feathers in layers, six splayed primaries).
+  - Painted ivory with gold bands, rotting violet with rose veins from the hem up; his eyes closed, a rose tear; white wings darkening at their ends.
+- **Hollow angel** (62 boxes):
+  - the same frame in black rags, bracers, horns, a crown of thorns standing behind his head;
+  - six wings in three pairs, each an arm, a hand and four primaries, a gold eye on each.
+  - Painted with fire showing through cracks; a face of fire with dark hollows for eyes.
+- **Chariot** (30 boxes):
+  - a car (floor, high front with a gold sun and a rose stone, flame-worked sides), pole and yoke;
+  - two spoked wheels (hub and two discs, rims of flame);
+  - two horses of fire (body, neck, head, four legs, mane and tail of flame).
+  - Drawn 1.6 times as large as built.
+- **Textures**:
+  - `belial.png` and its glow (256 × 256, both angels);
+  - `fiery_chariot.png` and its glow (256 × 128).
+- **Poses**:
+  - **Fair**: hovering, his robe trailing, the halo turning; wings raised in a V and beating slowly, each piece lagging, primaries bending up. His right hand raised for a volley, both raised palms-out for beams, arms spread down to summon, an arm lifted then thrown for the chariot, wings wrapped to blink. He falls back and dwindles in the first half of his change.
+  - **Hollow**: six wings fanned in the plane behind him, faces (and eyes) forward, the pairs beating in a ripple; his crown turning. For beams the fan opens wider (the lowest pair rises towards level); hands raised for a volley; a hand to his brow for the psychic strike; wings wrapped then flung open for his clones; head and wings hanging, swaying, when stunned. He rises out of nothing in the second half of the change.
+- **Renderers**:
+  - **`BelialRenderer`**: switches the two models, adds the glow layer, shakes through the change and the stun, draws the death.
+  - **`FieryChariotRenderer`**: turns the wheels by the distance run and gallops the horses by it.
+- **Checked in Blockbench**: the rest and beam poses were put on the Blockbench models and shot.
+
+### 47.6 Rite and loot (my choices: the request named none)
+- **`recipe/altar/belial.json`**:
+  - pillars: parchment inscribed `corruption:belial`, blaze rod, corrupted heartstone, gold block, chaos catalyst, ghast tear;
+  - a villager offered;
+  - magma blocks at the four corners (2,±2)/(−2,±2), gold blocks at (0,±2);
+  - corruption 12; 240 ticks.
+- **The parchment**: the `belial` string was already in the Key of Solomon VIII.
+- **Loot**: 2–4 inscribed parchments, 4–10 gold ingots, 2–5 blaze rods, 1–2 ghast tears, 1–2 abyssal pearls, and his relic.
+
+### 47.7 His relic and his emblem
+- **Broken Halo of Belial** (`belial_halo`, 彼列的残环): the vanilla clock with its face cleared, leaving the gold rim as a halo, broken at the upper right with rose at the broken ends. Added to `ModItems.RELICS`, the relic tag, the scripts and his loot.
+- **Boss bar slot 6** (192,72): one face split down the middle by a crack of fire.
+  - Left: the fair angel (golden hair, a closed eye, a rose tear, half a gold halo, a white wing).
+  - Right: the hollow (charred, forks of fire, a dark eye, a horn, half a crown of thorns, a black wing).
+  - Re-running the script changes 434 pixels, all inside the slot.
+
+### 47.8 The demons' arcane rule as a setting
+- **`DemonConfig`**: `[demons] arcaneOnly` (default true) in `corruption-server.toml`; `InfectionConfig` builds and loads the section.
+- **The interpretation**: "the Boss" was taken as every Goetic demon, since they all share the rule (`GoeticDemon.accepts`).
+- **Disabled**: any hurt reaches them.
+- **Unaffected**: Baal and Agares, whose own damage rules are not the arcane tag.
+- **Lang**: the setting's name and tooltip in both languages.
+
+### 47.9 Stunned's icon (missed in §45)
+- **`textures/mob_effect/stunned.png`** (18 × 18): vanilla Darkness's spiral recoloured to the stun's pale gold (bright body, darker edge), with three small stars in its clear corners (`gamemodels/mob_effects/draw_effects.py`, checksums in `vanilla_sources.md`).
+- **`EffectIconsTest`**: iterates every effect the mod registers and checks it has a drawn icon and a name in both languages, so the next one cannot be missed silently.
+
+### 47.10 Tests
+- **`BelialRulesTest`** (8): what each angel chooses and never chooses; the blink; clones only once hurt; the summon cap; the five of him while split; the hollow's thicker, quicker volleys and six beams; the summon round the quarry; the chariot's line, reach and what it breaks; the psychic reach.
+- **`BelialModelTest`** (8):
+  - all three models bake and pose through every skill;
+  - his beams' places match his posed hands and wing-eyes within 0.3 blocks;
+  - the hollow wings fan out, faces forward;
+  - the change halves;
+  - every pose eases back;
+  - the chariot's wheels and gallop;
+  - the pictures and the emblem.
+- **`BelialServerTest`** (12):
+  - what he is;
+  - the arcane rule and the setting;
+  - the fair angel defeated, then risen whole as the hollow;
+  - `/kill` ends him;
+  - the volleys (20 and 78 bolts);
+  - two beams from his hands, six from his eyes;
+  - his host round the quarry;
+  - the chariot breaking a stone wall and burning its quarry;
+  - the chariot wrecked on obsidian;
+  - the clones and the stun;
+  - the psychic strike on two minds and not a third;
+  - the rite and his loot.
+- **`BossRelicsServerTest`**: now seven lords.
+- **`EffectIconsTest`** (1): new.
+
+### 47.11 Run
+- **The full suite**: 616 tests in 92 classes, all pass (none failed, none skipped).
+- **After the run**: one change, the chariot's culling box widened to its drawn size (`FieryChariot.getBoundingBoxForCulling`); it was recompiled. No test touches it.
+- **Not checked in game.** The models, poses, textures, the chariot's run and its flames, the beams' look, the psychic strike's effects on screen, the emblem and the new icons have been seen only in Blockbench previews and through the tests, not in a running client.
+
+---
+
+## 48. The corruption's elites: an aberration, a screecher and a lurker; the Malice Vine broods them and defends itself
+
+**Why.** The request: elite mobs between the Corrupted Remnants and the bosses.
+- **What an elite is**: a fair amount of health, skills of its own, a heavier basic attack, and a ranged attack. It needs no special (arcane) damage to be hurt, and the Corruption Curse does it no damage. The Novice Corrupted Robe does not hide its wearer from elites. Elites drop what a Corrupted Remnant drops.
+- **Three to begin with**, one each for land, air and sea, drawn after the creatures of Scape and Run: Parasites and Fungal Infection: Spore in the mod's colours. The user suggested:
+  - land: a Corrupted Ravager / Aberration (pounce, acid, berserk);
+  - air: a Corrupted Screecher / Nightmare (dive, feathers, a stunning and slowing screech);
+  - sea: a Corrupted Lurker / Abyss Devourer (fast underwater, a tentacle grab into the water, high-pressure water bolts, leaking Flowing Corruption).
+- **The Lingering Vine** (缠念藤, `corruption:malice_vine`, "Malice Vine" in en_us):
+  - its sprouting chance down to 5%;
+  - it brings forth a random elite now and then;
+  - a self-defence shockwave round itself.
+
+**Names chosen**: Corrupted Aberration (腐化畸变体; "Ravager" is a vanilla mob's name), Corrupted Screecher (腐化尖啸者) and Corrupted Lurker (腐化潜伏者).
+
+### 48.1 What they are drawn from
+- **Scape and Run: Parasites**: fleshy parasites with too many limbs, maws that split open, eyes in the wrong places, more health and armour than ordinary mobs; and its Beckon, a growth that spawns parasites, which the vine's brood answers.
+- **Fungal Infection: Spore**: evolved infected that are flayed and skeletal, and aquatic infected (the Naiad, the Infected Drowned).
+- Only the wikis' general descriptions could be read (one wiki page timed out), so the shapes are the mod's own; no model or texture was copied from either mod.
+
+### 48.2 Rules (`core/elite`, `core/demon/skill`, `core/plant`)
+- **`EliteRules`**: 20 experience; 14–25 ticks of rest between skills; `pick` (a weighted choice that skips what would not serve).
+- **The three** (each a Skill enum in its set's order, presets and `choose`):
+
+  | | Health | Armour | Basic blow | Moves | Skills (cooldown) |
+  | --- | --- | --- | --- | --- | --- |
+  | Aberration | 120 | 8 | bite 9, every 20 ticks | 0.3, step height 1 | pounce 4–12 blocks, 0.7 s crouch, 0.7 s leap topping 2.2, 14 to what it meets (5 s); acid: 3 lobbed globs, 5 + 5 within 2.5, each leaving a 1.8 pool for 3.5 s that curses for 2 s (4.5 s); berserk at 35%: a roar throwing back what is within 5, then +35% speed, +40% damage, cooldowns halved, for good |
+  | Screecher | 80 | 4 | swoop and bite 7 (2 s) | flies at 0.55, circling 8 off, 4–7 up | dive 5–24, from 3 above, 12 within 2.2, nothing torn up (7 s); 5 feathers over 36°, 4 each (3.5 s); screech within 8: stunned 1.5 s, then Slowness II 5 s (13 s) |
+  | Lurker | 100 | 6 | bite 8 within 2.4, every 20 ticks | darts at 0.6/tick in water; crawls on land | tentacle grab within 12: 6, then pulled 0.4/tick (and 0.1 down in water) until within 2, 2.5 s at most (9 s); 3 water bolts, 6 each, pushing 0.9 (2.5 s) |
+
+- **New skill rules**:
+  - **`PounceRules`**: `along` and `over` give the arc tick by tick, so the leap lands where it aimed unless something stops it.
+  - **`SpitRules`**: straight, fanned or lobbed (`lobbed`, the barrage's gravity). `Look` is BOLT, FEATHER, GLOB or WATER; `push`; and `Pool` (radius, ticks, curse ticks). `looking`, `pushing` and `pooling` make variants.
+  - **`GrabRules`**: reach, near, pull, down, damage; `reaching` gives how far the tentacle is out through the wind-up.
+- **`ScreechRules`** gains `slowTicks` and `slowLevel`. The old five-argument constructor still stuns only.
+- **`MaliceVineRules`**:
+  - **Brood**: every 3600 ticks; at most 2 elites within 32; a player within 32; placed 2–6 blocks from the vine; water looked for within 8.
+  - **`pick`**: one of the sea's only where there is water.
+  - **Shockwave**: radius 3 at stage 0 to 6 at stage 4, set off at 70% of it; 0.7 s wind-up; 6 damage, thrown 1.3 out and 0.45 up; 6 s cooldown.
+
+### 48.3 API
+- **`CorruptionFactionApi`**: `ELITES` (entity type tag `corruption:elites`) and `isElite`.
+- **The robes**: `CorruptedRobeRules.Tier.hiddenFromElites()`. Novice: no. Intermediate and advanced: yes.
+- **`CorruptionVeilApi.hiddenFrom`**: a lord is checked as a lord; an elite as an elite; any other creature of the corruption as before.
+- **`BossSkillApi`**: `pounce`, `spit` and `grab`.
+- **`SpitCaster`**: a creature says where its spit leaves it.
+- **`api/plant/MaliceVineApi`**: the tags `corruption:vine_brood` and `corruption:vine_brood_aquatic`, and the shockwave's reach.
+
+### 48.4 The elites (`common/entity`)
+- **`CorruptionElite<E>`** (abstract, a Monster):
+  - **Faction**: of the corruption's side, allied to it (but for a feud, see PreyMarks), hunting players first, then anything living outside the corruption.
+  - **What it ignores**: invulnerable to `corruption:corruption`, and the Corruption Curse cannot be applied (`canBeAffected`).
+  - **Skills**: one at a time, a rest between them, the skill synced for the client (`skill`, `posedSkill`, `skillTicks`).
+  - **Hooks**: `choose`, `act`, `before` and `cooldown`.
+  - Skills are saved, and let go on death or removal.
+- **`CorruptedAberration`**:
+  - vanilla `MeleeAttackGoal` for the chase and bite (off while a skill runs);
+  - a private `Roar` skill that `before` begins at 35% health;
+  - berserk as transient attribute modifiers, reapplied on load;
+  - a bite entity event for the jaw;
+  - spits from its maw (`MAW`).
+- **`CorruptedScreecher`**:
+  - no gravity, its own flight (as Decarabia's), circling;
+  - a private `Swoop` skill (its basic blow);
+  - falls when dead;
+  - spits from its beak's point (`BEAK`, calibrated from the model: its neck is long).
+- **`CorruptedLurker`**:
+  - `AmphibiousPathNavigation` and `SmoothSwimmingMoveControl` for wandering and crawling;
+  - its own steering for the chase: a 0.12 thrust capped at 0.6;
+  - at the water's edge, for a quarry ashore, it comes no further and surfaces, its maw 0.3 over the water. Without this, its bolts struck the bank.
+  - makes for water with no quarry;
+  - never drowns;
+  - the entity its tentacle reaches for is synced for the renderer.
+- **`DemonBolt`** gains:
+  - a look (sent in its spawn data);
+  - a push on what it strikes;
+  - a pool where it strikes: an `AreaEffectCloud` owned by its shooter, shrinking as it lies, applying the curse.
+
+  Old saves load with the bolt look, no push and no pool.
+- **New skill modules**:
+  - **`PounceSkill`**, **`SpitSkill`** and **`GrabSkill`**. The grab tears its quarry off what it rides, lifts it over the bank, and lets go of a creative or spectator player.
+  - **`ScreechSkill`** applies Slowness after the stun when its rules say so.
+- **Registration**: `ModEntities.CORRUPTED_ABERRATION`, `CORRUPTED_SCREECHER` and `CORRUPTED_LURKER` (MONSTER; tracking 10, every 2 ticks), with their attributes.
+- **Tags**:
+  - `corrupted_remnants` gains the three;
+  - new `elites.json`, `vine_brood.json` (aberration, screecher) and `vine_brood_aquatic.json` (lurker).
+- **Loot**: `loot_table/entities/corrupted_{aberration,screecher,lurker}.json`. Each is a single `minecraft:loot_table` entry for `corruption:entities/corrupted_remnant`, so they always drop what a remnant drops.
+- **No spawn eggs**: the mod has none for any creature. They appear by the vine, or by `/summon`.
+
+### 48.5 The Malice Vine (`common/entity/MaliceVine`, `common/config/InfectionConfig`)
+- **`vineChance`**: the default goes from 0.5 to 0.05 (`InfectionConfig.VINE_CHANCE_DEFAULT`). **A world whose config file already exists keeps 0.5** until the file is edited.
+- **Brood**: counted every 20 ticks.
+  - **When it waits**: on Peaceful; with no player (spectators aside) within 32; while `vineEliteCap` elites are within 32.
+  - **What it picks**: one of the brood tags at random. A type from the aquatic tag is possible only if a water place within 8 fits it.
+  - **Where it puts it**:
+    - a land or air elite: on a sturdy floor 2–6 blocks away, the box clear and dry;
+    - a sea elite: in water. The search scans the cube (not random tries), since a small pool was found only about a quarter of the time by sampling.
+  - **What shows**: a pulse of the vine's crown and a miasma where the elite appears.
+  - **No room found**: it tries again 10 s later.
+- **Shockwave**:
+  - **What sets it off**: something not of its side, not veiled from it, not creative or spectator, coming within 70% of its reach (checked every 10 ticks), or striking it.
+  - **Wind-up**: its crown swells and shudders, its tendrils rise outward, and a rune ring marks the ground.
+  - **Release**: corruption damage and a throw outward, then the cooldown. `gather` respects the cooldown itself.
+- **New settings in `[ecology]`**: `vineEliteIntervalTicks` (3600; 0 turns the brood off) and `vineEliteCap` (2; 0 turns it off).
+- **Saved**: `BroodWaited` and `ShockCooling`.
+- **Client** (`MaliceVineModel`): the swell and the snap of the shockwave, and the brood pulse.
+
+### 48.6 Models, textures, animation (`gamemodels/corrupted_elites`, `common/client/entity`)
+- **Geometry** (`elites_model.py`): every box a whole pixel in each size.
+  - **The aberration**, 44 boxes:
+    - a torso, hump, belly and rump;
+    - 6 crystals on a bone of their own;
+    - two sacs, and a growth with an eye on the left flank;
+    - a skull under a brow, 4 eyes, two tusks;
+    - a maw of four petal bones;
+    - six legs, each a raised thigh, a shin bent to the ground, and a crystal spur.
+  - **The screecher**, 59 boxes:
+    - spine, ribs, a heart in the ribs;
+    - a two-piece neck, skull, crest, beak and hook, a jaw, red eyes;
+    - wings of arm, forearm and hand with torn membrane, three fingers and three ragged primaries;
+    - a fanned tail; tucked legs with talons.
+  - **The lurker**, 52 boxes:
+    - mantle, hump, brow, lip, rear;
+    - fangs above and below, five eyes, spines and sacs;
+    - fins;
+    - a jaw;
+    - six three-piece tentacles, and two clubbed arms;
+    - a lash piece and club (hidden; drawn along the lash).
+- **Textures** (`paint_texture.py`): every skin starts from a vanilla texture copied and recoloured onto the mod's ramps, then altered texel by texel. Checksums are in `vanilla_sources.md`.
+
+  | Elite | Part | Vanilla source |
+  | --- | --- | --- |
+  | Aberration | flesh | hoglin |
+  | Aberration | flank ribs | warden |
+  | Aberration | legs | spider |
+  | Aberration | crystals | amethyst |
+  | Screecher | bone | skeleton |
+  | Screecher | membrane | phantom |
+  | Screecher | feathers and the feather projectile | the feather item |
+  | Lurker | hide | elder guardian |
+  | Lurker | mouth | the squid's beak |
+  | Lurker | tentacles | squid |
+
+  Each elite has a 128×128 texture and a glow texture (eyes, crystals, heart, sacs, veins, tips).
+- **Previews**: `corrupted_<name>_previews.png`, shot in Blockbench. A second pass fixed:
+  - a checkered maw;
+  - blotchy veins;
+  - a grey rib patch;
+  - a hidden hand membrane (its fan widened);
+  - a black beak;
+  - cartoonish eyes and a solid band of fangs on the lurker.
+- **Client**:
+  - **`EliteModel<T>`**: bones by name, `reset` (scale too), and per-elite `blend` easing so that a pose eases out even when a skill ends early.
+  - **`CorruptedAberrationModel`**: a tripod gait (the first and last legs of one side with the middle of the other), the four-petal maw, crouch and leap, the rear for acid with a snap per glob, the roar, and berserk crystals.
+  - **`CorruptedScreecherModel`**: wing beats whipping down each piece, swoop, dive fold, feather snaps, screech (head drawn back, then thrust out).
+  - **`CorruptedLurkerModel`**: tentacle waves in water and a droop out of it, fins, the jaw, arms reaching for the grab.
+  - **Renderers**:
+    - **`CorruptionEliteRenderer`**: a glow layer; the flyer and the swimmer tipped by pitch.
+    - **`CorruptedLurkerRenderer`**: draws the lash piece by piece from the maw to what it holds, with a wave and a sag, reaching out through the wind-up.
+    - **`DemonBoltRenderer`**: draws a FEATHER as two crossed sprite planes along its flight, and a GLOB a little larger.
+  - Each model has a `pose(...)` the tests drive directly.
+
+### 48.7 Language
+- **en_us and zh_cn**: the three names, `vineEliteIntervalTicks` and `vineEliteCap`.
+
+### 48.8 Tests
+- **`EliteSkillRulesTest`** (6):
+  - the pounce arc;
+  - spit timing and fan;
+  - a lob landing on its mark;
+  - looks, push and pool;
+  - the grab;
+  - the screech's slowness.
+- **`EliteRulesTest`** (5):
+  - elites between remnants and the least lord;
+  - `pick`;
+  - each elite's choices: the aberration never chooses to roar; the screecher never screeches at the stunned; the lurker grabs a quarry ashore more readily.
+- **`MaliceVineRulesTest`** (3): shock reach by stage; brood timing and room; the sea's only by water.
+- **`CorruptedRobeRulesTest`**: the elites' grades.
+- **`EliteModelTest`** (8):
+  - all three bake and pose through every skill;
+  - every pose eases back;
+  - mirrored sides;
+  - the aberration's feet on the ground and its tripod;
+  - each spit origin within 0.25–0.3 of its model's mouth;
+  - the screecher's beat, fold and scream;
+  - the lurker's ripple, droop and reach;
+  - the pictures.
+
+  It found two faults, both fixed: the lurker's jaw stayed open after its bolts, and the screecher's beak constant was 0.7 blocks short.
+- **`CorruptionElitesServerTest`** (12):
+  - **What they are**: faction; health; any blow hurts; immune to corruption damage and the curse.
+  - **The robes**: novice versus better.
+  - **Loot**: always 1–4 remains.
+  - **The aberration**: the pounce on a golem; acid globs, and the cursed pools owned by it; brought low, the roar and berserk (speed, damage, cooldowns, a villager thrown).
+  - **The screecher**: feathers; screech stun and slow, sparing an ally; the dive striking without tearing the ground.
+  - **The lurker, chasing**: darting in water (over 0.45/tick) against crawling on land (under a third of that).
+  - **The lurker at the bank**: grab and drag of a villager on the bank; holding at the edge, surfaced and still in water; water bolts striking and throwing back.
+  - **The vine's brood**: nothing with no player; one elite with a player, 2–6 blocks off; nothing at the cap.
+  - **The vine and water**: no water, no lurker place; a ground place; a pool place; a lurker brought forth there.
+  - **The vine's shockwave**: set off by a stranger and not by a robed one; it hurts and throws, spares an ally, and waits its cooldown.
+  - **Struck**, the vine gathers itself.
+- **`EntityNamesServerTest`** (1, new): every creature the mod registers (all but MISC types) is named in en_us and zh_cn, and the elites' textures are there. It guards against the kind of omission §47 found with the Stunned icon.
+
+### 48.9 Run
+- **The full suite**: 650 tests in 97 classes, all pass (none failed, none skipped). `EntityNamesServerTest`, written while it ran, was run on its own afterwards and passes: 651 tests in 98 classes in all.
+- **Not checked in game.** None of these has been seen in a running client:
+  - the elites' models and textures (seen only in Blockbench previews), their animations, the lash, the feather sprites, the pools, the vine's swell and snap;
+  - the AI's feel (pathing, the screecher's circling, the lurker's surfacing at real shores), sounds, balance.
+
+---
+
+## 49. The vine broods every half minute; old settings files brought up to date; a spawn egg for each elite
+
+**Why.** The user's report:
+- the vine brought forth elites too slowly, and they had seen none;
+- the vine's chance still read 0.5 in their settings file, though §48 made it 0.05;
+- they asked for spawn eggs for the elites.
+
+### 49.1 Why it was so
+- **The interval**: §48's default brood interval was 3600 ticks (3 minutes), and the vine counts from when it sprouts or loads. Watching a vine for less than that shows nothing.
+- **A tick-by-tick test** (49.4) finds no fault in the brood itself: with a player near it, an elite comes as soon as the interval is up.
+- **The settings file**: a changed default does not reach a file that already exists. NeoForge writes a value into the file the first time it loads it, and from then on the file's value is used. The user's `run/config/corruption-server.toml` was written by the earlier builds: `vineChance = 0.5`, and `vineEliteIntervalTicks = 3600` (added by NeoForge's own correction when §48's key first loaded). So the new defaults would never have reached it.
+
+### 49.2 Changes
+- **`MaliceVineRules.BROOD_TICKS`**: 3600 → 600 (half a minute). With the default cap of 2, a vine near a player keeps up to two elites about it, a new one half a minute after the last.
+- **Settings versions** (`InfectionConfig`):
+  - **`configVersion`**: a new key at the top of the file, default 0, meaning a file from before versions were kept. The mod writes version 1.
+  - **`migrate`**: runs as the file loads or reloads. On a file of an older version, a setting that still holds an old default which has since changed is moved to the new default: `vineChance` 0.5 → 0.05, and `vineEliteIntervalTicks` 3600 → 600. Any other value is the server's own choice and stays.
+  - The version is then set and the file saved, so it happens once: a server that sets 0.5 again afterwards keeps it.
+  - The helpers are `upgraded(version, value, old, now)`, with the old defaults in `OLD_VINE_CHANCE` and `OLD_VINE_ELITE_INTERVAL`.
+  - Lang: `corruption.configuration.configVersion` ("Settings Version (do not change)" / "设置版本（请勿修改）").
+- **Spawn eggs**:
+  - **Items**: `ModItems.CORRUPTED_ABERRATION_SPAWN_EGG`, `CORRUPTED_SCREECHER_SPAWN_EGG` and `CORRUPTED_LURKER_SPAWN_EGG` (all three in `ELITE_EGGS`). Each is NeoForge's `DeferredSpawnEggItem`, so the game knows it as its elite's egg (`SpawnEggItem.byId`), it works on a spawner, and pick-block gives it.
+  - **Not tinted**: NeoForge tints such eggs by their two colours, so the colours are white and the drawn texture shows as it is.
+  - **Tabs**: the mod's creative tab, and the game's Spawn Eggs tab (`ModCreativeModeTabs.addToGameTabs`, on `BuildCreativeModeTabContentsEvent`).
+  - **Textures** (`paint_texture.EGGS`, `egg_texture`; written by `export_model.py` with their item models): the game's spawn egg (its shell and its spots, `item/spawn_egg.png` and `item/spawn_egg_overlay.png`), each recoloured onto the elite's ramps, then a few pixels set by hand. The checksums are added to `gamemodels/corrupted_elites/vanilla_sources.md`.
+
+    | Egg | Shell | Spots | Marks |
+    | --- | --- | --- | --- |
+    | Aberration | violet-rose flesh | the corruption's crystal | two crystal glints and two rose ones |
+    | Screecher | bone | blood red | two red eyes with dark under them |
+    | Lurker | dark slate hide | rose suckers | one violet eye slit up and down |
+
+  - **Lang**: "Corrupted Aberration Spawn Egg" / "腐化畸变体刷怪蛋", and so on.
+
+### 49.3 Not changed
+- **The other brood conditions**: a player within 32 blocks, no brood on Peaceful (where the elites, being monsters, would despawn at once anyway), at most `vineEliteCap` elites within 32, a retry 10 s after finding no place. They are unchanged.
+
+### 49.4 Tests
+- **`SettingsMigrationServerTest`** (2, new):
+  - `upgraded` moves old defaults and keeps choices;
+  - the test server's own settings file loads at this version;
+  - a file set back to version 0 with the old defaults is brought up to date (0.05, 600, version 1);
+  - a 0.5 set afterwards stays.
+
+  It restores the values it changed.
+- **`CorruptionElitesServerTest`** (14, 2 new):
+  - **The vine, tick by tick**: its clock wound on by hand (the test server ticks nothing itself), with a player near, it brings forth an elite within its interval plus a second.
+  - **Each egg**: it is its elite's (`getType`, `SpawnEggItem.byId`), and used on the ground by a player it brings that elite forth.
+- **`EntityNamesServerTest`**: the eggs' names in both languages, their item models and their pictures.
+
+### 49.5 Run
+- **The full suite**: 655 tests in 99 classes, all pass (none failed, none skipped).
+- **Not checked in game.** None of these was seen in a running client: the eggs' look in the inventory (seen only as images, at 1× and 10× on the inventory grey), the tabs, a vine brooding in a real world, and the migration of `run/config/corruption-server.toml`. That file was not edited by hand: it is migrated the next time a world loads it, and the test server's own settings file went through the same path.
+
+## 50. Eleven more elites: six of the land, three of the air, two of the sea
+
+**Why.** The user's request: "Now lets add more monster(10+) with the style". That means more elites built the way §48's three are: the same rules, models drawn after Scape and Run: Parasites and Fungal Infection: Spore in the mod's colours, textures from vanilla art, spawn eggs, a place in the vine's brood, tests and docs.
+
+### 50.1 The eleven
+
+| Elite | Domain | Health / armour | Basic attack | Skills |
+| --- | --- | --- | --- | --- |
+| Corrupted Brute (腐化蛮兽) | land | 150 / 12 | club, 12, every 1.5 s | slam, charge, hurl |
+| Corrupted Howler (腐化嚎哭者) | land | 90 / 4 | claw, 7, every 1 s | howl (calls up remnants), bile |
+| Corrupted Stalker (腐化追猎者) | land | 85 / 5 | blade, 9, every 0.9 s | fade, phase dash, spines |
+| Corrupted Bloater (腐化胀囊者) | land | 110 / 2 | butt, 8, every 1.25 s | vent, lob; bursts as it dies |
+| Corrupted Mortar (腐化迫击兽) | land | 120 / 10 | ram, 6, only when cornered within 3 | barrage, spike field; keeps 8–24 blocks off |
+| Corrupted Crawler (腐化攀爬者) | land | 80 / 6 | bite, 8, every 0.75 s | pounce, venom; climbs walls |
+| Corrupted Gazer (腐化凝视者) | air | 70 / 2 | nerve lash, 6, within 2.8 | beam, gaze, bolts |
+| Corrupted Hivemother (腐化巢母) | air | 90 / 4 | swoop sting, 7 | swoop, stingers, swarm |
+| Corrupted Drifter (腐化浮囊) | air | 75 / 0 | tendril sting, 6, within 3 | lift, acid rain |
+| Corrupted Maw (腐化渊口) | sea | 140 / 8 | bite, 11, within 2.8 | whirlpool, lunge, spout |
+| Corrupted Naiad (腐化水妖) | sea | 90 / 6 | spear, 9, within 2.4 | spear throw, surge, song |
+
+- **Strength**: each is between a remnant and the least of the lords, as §48's three are. Health runs from 70 to 150 (a remnant has 20; Andromalius 160), and each basic attack is at least twice a remnant's.
+- **Skills**: each is one of the mod's existing modules with presets of its own, or a short skill written inside the elite's class:
+  - the stalker's fade: invisibility and Speed II for 4 s, ended by its next strike;
+  - the bloater's vent;
+  - the maw's whirlpool.
+
+  The README (腐化精英 → 后来的十一种精英) gives each one's ranges, wind-ups, damage and cooldowns.
+- **Shared modules**: several are the lords' own.
+  - Seere: phase dash and spike field.
+  - Decarabia: barrage and screech.
+  - Dantalion: beam.
+  - Andromalius and Dantalion: gaze.
+  - The lurker's grab is the drifter's lift.
+  - The aberration's pounce is the crawler's pounce, the maw's lunge and the naiad's surge.
+- **Summons**: the howler's and the hivemother's crumble away after 30 s and 20 s. `SummonRules` gained `lasts`, which is 0 for the lords, whose summons stay.
+
+### 50.2 What they share, and how it is built
+- **The same rules as §48's three**:
+  - of the corruption, but no lord;
+  - any damage hurts them, and the curse and the corruption's own damage do not;
+  - the Novice robe does not hide its wearer from them;
+  - they drop what a remnant drops and give 20 experience;
+  - each has a spawn egg.
+- **Three bases**, each lifted out of one of the first three. The first three now extend them, and their 27 tests pass unchanged.
+  - **`WalkingElite`** (from the aberration): chasing, the basic attack, spitting from its mouth.
+  - **`FlyingElite`** (from the screecher): circling the quarry at a height, a basic strike within reach or a swoop, falling when dead.
+  - **`SwimmingElite`** (from the lurker): darting in the water, crawling out of it, surfacing at the edge to strike at what is ashore, no drowning.
+- **`CorruptionElite`** gained:
+  - `inFrame`, a place in the elite's own frame as a world position;
+  - the basic-attack event that lets every client animate the blow (moved here from the walking and swimming code).
+- **New shared pieces**:
+  - `SwoopSkill`: the screecher's swoop as a module, used by the hivemother too.
+  - `Lashing` with `LashModel` and `LashingRenderer`: the lurker's drawn tentacle made general. The drifter's tendril is drawn the same way.
+  - `EliteClouds`: the bloater's gas.
+  - `EliteRules.SURFACED`, moved from `LurkerRules`.
+- **The bloater's gas does not poison its own side.** The game's lingering cloud gives its effects to everything standing in it, including the bloater that let it out (a lingering potion does the same to its thrower). `EliteClouds.spareItsOwn` listens to `MobEffectEvent.Applicable`: when a cloud owned by an elite would affect that elite or one of its allies, the effect is not applied. Anything else in the cloud is still cursed and poisoned.
+- **Registration**:
+  - 11 entity types and their attributes;
+  - 11 spawn eggs (`ELITE_EGGS` now 14);
+  - tags: `corrupted_remnants` and `elites` (all 11), `vine_brood` (the 9 of land and air), `vine_brood_aquatic` (maw, naiad);
+  - 11 loot tables that reference the remnant's;
+  - lang in en_us and zh_cn for the entity names and the eggs.
+
+### 50.3 Models, animations and textures
+- **Geometry**: in `gamemodels/corrupted_elites/elites_model.py`. Every box is a whole pixel in each size, planes excepted, and every texture is 128×128. The previews are `corrupted_<name>_previews.png` beside it. The script's docstring describes each shape.
+- **Animation**: `PosedEliteModel` eases each skill's pose in and out by a blend of its own and adds a state blend: the stalker faded, the maw and the naiad in the water. Its helpers move what most elites have: legs that step (two or four), wings that beat, chains that wave. Each model poses its own skills, among them:
+  - the brute raises its club overhead to slam and swings it back over its shoulder to hurl;
+  - the howler throws its head back and its arms wide to howl;
+  - the bloater swells through its vent's wind-up and sags after;
+  - the mortar's tube swells and kicks back at every round;
+  - the crawler's legs ripple down its body;
+  - the gazer turns every stalk forward to stare;
+  - the hivemother's four wings buzz, and she curls her abdomen under to loose her stingers;
+  - the drifter's bell pulses, its tendrils gathering in to lift;
+  - the maw's four lips gape;
+  - the naiad's spear leaves its hand when thrown and is back when the skill is over, and swimming fast, it lies forward.
+- **Shot origins**: where each one's shots leave it was checked against its model, in the pose at the moment it shoots. Four moved to match:
+
+  | Elite | Old | New | Where it is on the model |
+  | --- | --- | --- | --- |
+  | Brute | {-0.6, 2.4, 0.6} | {-0.55, 1.1, 1.65} | the club's end as it is flung forward |
+  | Howler | {0, 2.3, 0.35} | {0, 2.2, 0.8} | the jaws, thrust out |
+  | Crawler | {0, 0.4, 1.1} | {0, 0.25, 1.5} | the mandibles |
+  | Hivemother | {0, 0.15, 0.3} | {0, -0.25, -0.4} | the sting, curled down beneath her |
+
+- **Textures**: each skin starts from vanilla art, as §48's do. While writing this, eight of the new skins were found painted from noise instead, and now take their shading from vanilla:
+
+  | Skin | Vanilla texture |
+  | --- | --- |
+  | the hivemother's abdomen | the bee's stripes (`entity/bee/bee.png`) |
+  | her hive's wax | the honeycomb block (`block/honeycomb_block.png`) |
+  | insect wings | the phantom's membrane |
+  | the drifter's frills and tendrils, the gazer's nerves, the maw's lure | the glow squid (`entity/squid/glow_squid.png`) |
+  | the gazer's lesser eyes | the skeleton's bone |
+
+  The three new files and their checksums are in `vanilla_sources.md`.
+- **Eggs**: each has its own shell and spot colours and a mark of its own, drawn from the vanilla spawn egg as §49's are.
+- **Renderers**:
+  - `CorruptionEliteRenderer` has a factory for each new elite;
+  - the drifter has `CorruptedDrifterRenderer`, a `LashingRenderer`;
+  - fliers and swimmers are tipped as they climb and dive;
+  - all layers and renderers are registered in `CorruptionClient`.
+
+### 50.4 Tests
+- **`EliteRosterRulesTest`** (14, new):
+  - every new elite is between the remnants and the lords, and its skills are in order;
+  - with nothing ready, it uses its basic attack;
+  - each one's choices: the brute hurls at what is far, the stalker fades only from 6 blocks, the bloater vents only within 6, the gazer and the naiad pass over a slowed quarry, the maw whirls only in the water and within reach;
+  - the mortar's `keep` and its reach;
+  - the maw's `pull`;
+  - `SummonRules.lasts` (old constructors give 0, and a negative value becomes 0).
+- **`EliteRosterServerTest`** (14, new, on the test server):
+  - all eleven are of the corruption but no lord; any blow hurts them, the curse and the corruption's damage do not, and only the air's fly;
+  - the Novice robe does not hide its wearer from any of them, and the Intermediate one does;
+  - each drops the remnant's remains;
+  - each has its egg, and the egg hatches it;
+  - each is in the right brood tag;
+  - one skill run per elite:
+    - the brute's slam hits a golem before it;
+    - the howler's remnants crumble at the right time;
+    - the stalker fades and comes out of it by striking;
+    - the bloater's cloud and its burst, and its gas sparing itself and an ally while poisoning a villager;
+    - the mortar's six rounds and its spikes;
+    - the crawler's pounce;
+    - the gazer's beam, gaze and bolts;
+    - the hivemother's crumbling swarm;
+    - the drifter lifting a villager;
+    - the maw drawing a swimmer to its mouth, and unable to whirl on land;
+    - the naiad's spear and song.
+- **`EliteRosterModelTest`** (13, new):
+  - every model bakes and poses through every skill and tick, its values staying finite;
+  - every pose eases back to rest;
+  - left and right mirror each other as built;
+  - each shot origin is within 0.3–0.35 blocks of where the model shoots from;
+  - one or two motions per model;
+  - the textures, glow textures, egg textures and item models are there.
+- **`EntityNamesServerTest`**: now covers every elite in `ELITE_EGGS` (14): names, textures, eggs.
+
+### 50.5 Run
+- **The full suite**: 696 tests in 102 classes, all pass (none failed, none skipped). That is 655 before, plus 41 new.
+- **After the texture change**: the textures were exported again while the suite ran. The tests that read them (`EliteRosterModelTest`, `EliteModelTest`, `EntityNamesServerTest`) were run again on the new files, and they pass.
+- **Not checked in game.** No part of this was seen in a running client or played:
+  - how the models look and move in the world (only the Blockbench previews and the model tests);
+  - the AI in a real world: how well each elite chases, circles, keeps its distance, climbs or swims, and whether the balance feels right;
+  - the stalker's glow while faded (by the renderer's code it shows, as an invisible spider's eyes do);
+  - how remnants called up in a bee's or a vex's likeness look and move;
+  - the drifter's lifted quarry falling;
+  - the vine bringing forth the new elites in a real world.
+
+## 51. Three more elites, and Amdusias
+
+**Why.** The user's request (in Chinese, with their own English translation):
+- Three more elite mobs, drawn after the enemies of Fungal Infection: Spore and Scape and Run: Parasites:
+  1. a thick health pool and a very weak basic attack, but high-frequency psychic damage;
+  2. high speed and a weak basic attack, but a Corruption Curse that works hard (a high DOT);
+  3. one that turns the blocks it walks on into corrupted forms.
+- A new boss, Amdusias: a unicorn that cannot fly and has one phase. His skills:
+  1. Seere's ground skills;
+  2. turning the ground into dormant corruption;
+  3. changing the ground under his target (raising it, sinking it, or spikes that throw the target up);
+  4. psychic attacks;
+  5. a great many hard-hitting corruption bolts from his horn;
+  6. an expanding AOE around himself that hurts and knocks back, shown with musical notes.
+- He is summoned at the altar by sacrificing a horse.
+
+### 51.1 The three elites
+
+| Elite | Domain | Health / armour | Basic attack | Skills |
+| --- | --- | --- | --- | --- |
+| Corrupted Mindweaver (腐化织念者) | land | 240 / 2 | slap, 2, every 1.5 s | thread (psychic), wail |
+| Corrupted Blighthound (腐化疫犬) | land | 60 / 2 | bite, 3, every 0.6 s; every bite deepens the curse | rend, frenzy, a trail of cursed gas |
+| Corrupted Sower (腐化播种者) | land | 130 / 6 | ram, 7, every 1.25 s | corrupts the ground it walks on, seed, snare; mends on the corruption |
+
+- **Inspiration.** The shapes are the mod's own; no model or texture was copied.
+  - Spore's Braiomil (a brain-named evolved infected) and its Mound (buried, the ground above it corrupted, a heartbeat underground).
+  - SRP's Beckon (a hive-heart that turns the land around it into parasite blocks) and Reeker (fast, poisons its prey).
+- **The mindweaver** (`MindweaverRules`, speed 0.2, knockback resistance 0.8). It has more health than the weakest lord (Andromalius, 160), but any damage hurts it.
+  - **Thread** (`PsychicStreamRules`, weight 6).
+    - Within 18 blocks and in sight, it stares at its quarry for 0.6 s: an eye opens over the quarry's head and a heartbeat sounds.
+    - Then, for 4 s, it pulls every 0.4 s (10 pulls). Each pull is 1 psychic damage and heals it 1. Each pull resets the quarry's hurt cooldown.
+    - The thread breaks after two missed pulls: the quarry is beyond 22 blocks or out of sight.
+    - Cooldown 2 s.
+  - **Wail** (`PsychicRules`, the module of Belial's strike at the mind; weight 4, +3 within 6).
+    - Within 10 blocks it gathers itself for 0.8 s.
+    - Then everything not of the corruption within 4 blocks of the quarry takes 5 corruption damage, 5 s of nausea, 3 s of darkness and 3 s of Slowness II.
+    - Cooldown 9 s.
+- **The blighthound** (`BlighthoundRules`).
+  - **Speed** 0.42, ×1.3 when chasing: faster than any other walking elite.
+  - **Every bite deepens the curse** (`CurseStackRules(50, 20, 120, 50, 1)`).
+    - The first bite gives 2.5 s of Curse I.
+    - Each bite after it adds 1 s, up to 6 s. The curse becomes Curse II once 5 s or more remain.
+    - At one bite per 0.6 s, the eighth bite (4.2 s in) brings it to Curse II.
+  - **Rend** (`PounceRules`, weight 5).
+    - From 3 to 10 blocks it crouches for 0.4 s, then springs low (an arc of 0.8, 0.4 s).
+    - The first thing it hits takes 4 damage, and the curse deepens three bites at once.
+    - Cooldown 5 s.
+  - **Frenzy** (weight 6, within 3 blocks).
+    - It gathers itself for 0.3 s, then chases for 1.5 s, biting every 0.3 s.
+    - Each bite does 2 damage, resets the hurt cooldown, and deepens the curse.
+    - The fifth bite brings an uncursed quarry to Curse II.
+    - Cooldown 8 s.
+  - **Trail.** While it runs on the ground, every 0.5 s it leaves a cloud of cursed gas behind it (radius 1.2, for 3 s, shrinking, 2.5 s of Curse I). The gas spares the corruption's side.
+- **The sower** (`SowerRules`).
+  - **Its feet.** Each time it comes onto a new block, up to 4 blocks under its body are taken by the infection, exactly as if it had spread there (`ServerInfectionWorld.tryInfect`).
+    - Gated by `mobGriefing`.
+    - Unbreakable blocks are skipped.
+    - The blocks it takes spread on as any infected block does.
+  - **Mending.** On corrupted ground it heals 1 health a second.
+  - **Seed** (`BlightRules`, weight 5, +3 within 4).
+    - Within 6 blocks it roots for 1 s. Then everything not of the corruption within 4.5 blocks takes 6 corruption damage and is thrown back.
+    - Over the next 0.6 s the infection takes the top of the ground out to 4.5 blocks, nearest first, at most 48 blocks. This is gated by `mobGriefing`.
+    - Cooldown 10 s.
+  - **Snare** (`SnareRules`, weight 5).
+    - From 3 to 16 blocks, in sight, the ground under the quarry cracks and trembles for 0.7 s. A quarry that keeps moving gets away.
+    - Then roots burst up: everything not of the corruption within 1.4 blocks takes 6 corruption damage and Slowness IV for 2 s (4 s on corrupted ground), and is lifted a little.
+    - Cooldown 6 s.
+- **Shared with the other elites.** All three are land elites built on `WalkingElite`. They are in `corruption:corrupted_remnants`, `corruption:elites` and the vine's land brood. Each drops the remnant's remains and has a spawn egg. `ELITE_EGGS` now holds 17.
+
+### 51.2 The psychic damage type and the deepening curse
+- **`corruption:psychic`** (`data/corruption/damage_type/psychic.json`, `ModDamageTypes.psychic(level, attacker)`).
+  - It is in `minecraft:bypasses_armor` and `minecraft:no_knockback`: armour does not reduce it, but Protection and Resistance still do.
+  - It is not in `corruption:corruption_damage`, so the robes do not reduce it.
+  - Death messages in en_us and zh_cn ("%1$s的心智被%2$s拆解殆尽").
+- **`core/corruption/CurseStackRules`** and **`common/entity/CurseStacks.deepen`**: the curse that deepens bite by bite.
+  - It adds whole seconds only, so the curse's bites (on every whole second remaining) keep their rhythm.
+  - It never lowers the level a curse already has, and it leaves an endless curse alone.
+  - It skips the corruption's own side and players in creative or spectator.
+  - The old curse is removed before the new one is added, so the longer, stronger one replaces it.
+
+### 51.3 Amdusias
+- **Who he is.** `corruption:amdusias`, the eighth lord: the sixty-seventh spirit of the Goetia. He is a great duke who comes as a unicorn; at his bidding trumpets and every kind of instrument are heard, with no one playing, and the trees bow down.
+  - Here he stays a unicorn, on the ground, in one shape.
+  - As every `GoeticDemon`, only arcane damage hurts him.
+- **The rite** (`data/corruption/recipe/altar/amdusias.json`).
+  - Pillars: his own inscribed parchment (`corruption:amdusias`), a goat horn, a note block, a corrupted heartstone, an amethyst shard, a bell.
+  - The offering is a horse. Seere's rite also takes a horse, but its pillars and ground differ.
+  - Note blocks on the altar's ground at (2,2), (2,-2), (-2,-2) and (-2,2).
+  - A witness with 14 corruption; the rite takes 12 s.
+- **Stats** (`AmdusiasRules`).
+  - Health 420 (Belial has 400), armour 10, knockback resistance 1, fire immune, speed 0.45.
+  - Steps up 1.6 blocks; a 2 × 3.2 box with three body parts as Seere's; 120 experience.
+  - A green, ten-segment boss bar with his emblem (slot 7 of `colossus_boss_bar.png`): a unicorn's head in profile, his horn spiralled with gold.
+- **Choosing.** After each 0.6 s rest, with his quarry in sight, he picks by weight among the ready skills.
+  - His hooves come first when the quarry is close before him.
+  - Out of sight, he only chases.
+- **His skills.**
+  1. **Hooves, blinks and spikes.** Seere's own rules (`AmdusiasRules` refers to `SeereRules`). Blinks and spikes are weight 4 each.
+     - Seere's burrowing is a way of moving, not a skill, and Amdusias does not have it.
+  2. **Blight** (`BlightRules`, weight 3, +3 within 7).
+     - Within 10 blocks he rears for 0.8 s and stamps: 8 corruption damage and a throw for everything not of the corruption within 7 blocks.
+     - Over 0.7 s the top of the ground out to 7 blocks turns to dormant corruption (`corruption:deactivated_corruption`), nearest first, at most 160 blocks.
+     - Only whole solid blocks change: no ores, fluids, block entities or unbreakable blocks. Gated by `mobGriefing`.
+     - Dormant corruption does not spread, but it hurts what stands on it as all corruption does (sneaking avoids it).
+     - Cooldown 12 s.
+  3. **Upheaval** (`UpheavalRules`, weight 4, +4 when the quarry is more than 2 blocks above him).
+     - From 3 to 28 blocks, in sight, a 3 × 3 circle lights under the quarry and trembles for 0.8 s.
+     - Then one of three. With `mobGriefing`: 40% rise, 30% sink, 30% spikes. Without it, always spikes.
+       - **Rise**: a 3-tall pillar of dormant corruption on each column (only into air or plants). Whatever stands there is carried up with it, never shut inside, then thrown up (0.95/tick) for 8 corruption damage.
+       - **Sink**: the top 3 blocks of each column are flung up and out, as a dive throws debris (`Debris.fling`, stopping at the first block that cannot be flung). The pit's floor turns dormant (never bedrock). Whatever stood there falls in for 8 corruption damage.
+       - **Spikes**: 12 corruption damage and a throw of 1.15/tick (about 7.5 blocks high); the ground is untouched.
+     - Cooldown 9 s.
+  4. **Psychic strike** (`PsychicRules`, Belial's module, weight 3).
+     - Within 32 blocks; 0.7 s later, if he still sees the quarry, 8 corruption damage to everything not of the corruption within 3.5 blocks of it.
+     - 6 s of nausea, 3 s of darkness, 3 s of Slowness II.
+     - Cooldown 7 s.
+  5. **Fanfare** (`FanfareRules`, weight 3, +3 beyond 14).
+     - From 6 to 40 blocks, in sight, he sounds his horn (goat horn sounds) for 1.5 s.
+     - Then over 3 s, 138 bolts leave the tip of his horn:
+       - two a tick, in two mirrored arms that sweep scissor-wise up to 45° either side of the quarry and back in 1.5 s, each bolt a little higher or lower than the last;
+       - and every 0.5 s, a fan of 3 straight at the quarry, 16° across.
+     - Each bolt flies 1.1/tick and does 7 corruption damage (armour reduces it). The bolt's hurt cooldown limits it to two hits a second on one target.
+     - The arms cross the quarry's line only as they cross each other, so moving sideways dodges them.
+     - Cooldown 17 s.
+  6. **Crescendo** (`CrescendoRules`, weight 3; +4 with 2 or more not of the corruption within 8; +2 within 8).
+     - Within 12 blocks he stops; a bell tolls and rings of music pulse about him for 1.2 s.
+     - Then three rings, 0.5 s apart, each going out 0.9/tick to 16 blocks. Each ring is drawn as a racing staff of music (the new `corruption:crescendo` visual), with note particles at its front. Its bell and chime notes rise as a major chord.
+     - Each ring hits each thing once: within 0.8 of its front and 3 blocks above or below his feet, 9 corruption damage, a throw outward of 1.3 and a lift of 0.45.
+     - Cooldown 13 s.
+- **Death.** It lasts 3.5 s (plus 2.5 s lingering) at 1.4× scale, as Seere's. In order:
+  - his last call on his horn (resonance, goat horn), and a ring of force with a horse's death cry;
+  - the souls rising, and shards at his heart with amethyst breaking;
+  - 18 rays 7 long;
+  - a pale green nova, a ring of force and a pillar of light.
+- **Drops.**
+  - 2 to 4 parchments inscribed `corruption:amdusias`, 2 to 5 amethyst shards, 1 to 3 abyssal pearls.
+  - His relic: the **Horn of Amdusias** (`corruption:amdusias_horn`, in `ModItems.RELICS`).
+  - A 50% chance of a goat horn, of any instrument.
+
+### 51.4 New skill modules
+- **Rules** (`core/demon/skill`, pure Java): `PsychicStreamRules`, `BlightRules`, `SnareRules`, `UpheavalRules`, `FanfareRules`, `CrescendoRules`.
+- **Modules** (`common/entity/skill`): `PsychicStreamSkill`, `BlightSkill`, `SnareSkill`, `UpheavalSkill`, `FanfareSkill`, `CrescendoSkill`.
+- **Factories** on `BossSkillApi`, so add-on lords can use them: `psychicStream`, `blight`, `snare`, `upheaval`, `fanfare`, `crescendo`.
+- **`common/infection/GroundBlight`** is lifted out of `SpellEffects`. It turns a block dormant or lets the infection take it, and finds a column's surface. It also adds `unbreakable` (destroy speed below 0). `SpellEffects` now calls it, with no change in what the spells do.
+- **`Debris.fling`** throws one block as debris (the sink uses it).
+- **`corruption:crescendo`**, a new built-in visual (29 now): a staff of music racing out at an even speed, reaching `radius` four ticks before the end.
+
+### 51.5 Fixes and changes along the way
+- **Bedrock.** `CorruptionConversions.canConvert` admits bedrock (the infection may take it as it spreads). The new ground-changing paths skip unbreakable blocks: the blight, the upheaval's sunk floor and the sower's feet.
+  - Not changed: the spells' own blight still goes through `canConvert` as before and could turn exposed bedrock dormant, which can then be mined.
+- **`EliteClouds`** now pushes only when the cloud has a push. The blighthound's trail has none.
+- **The blight's cap.** 80 blocks covered only about 5 blocks out, so it was raised to 160 for Amdusias's 7.
+- **Calibrations.** The model tests measure where each thing leaves the model, and the server constants follow them:
+  - Amdusias's horn tip `{0, 2.75, 2.45}`;
+  - the mindweaver's brain `{0, 1.5, .5}`, the blighthound's jaws `{0, .95, 1.3}`, the sower's mouth `{0, .85, .6}`.
+
+### 51.6 Models, textures and assets
+- **The elites** (`gamemodels/corrupted_elites/`).
+  - Three new models in `elites_model.py`. Every box is a whole pixel in each size.
+  - New vanilla patches in `paint_texture.py`: the brain coral block (the brain's folds) and the dark oak log (the sower's roots). Their checksums are in `vanilla_sources.md`.
+  - The fissure and nerves use the glow squid; the hound's bone, the skeleton; the mound, the hoglin with crystal.
+  - Previews: `corrupted_<name>_previews.png`.
+- **Amdusias** (`gamemodels/amdusias/`).
+  - `amdusias_model.py`: Seere's horse without wings, with a three-tiered horn, a goat's beard and three crystals at the withers.
+  - `paint_texture.py`: the white horse, the bone block's side (the horn) and the amethyst block. A pearl coat with violet in its shadows, mint hair, gold-banded hooves, a lyre sigil on each hip; the eyes, sigils, the horn's spiral and the hair's tips glow.
+  - `export_model.py` writes `geo/amdusias.json` and both textures, and the previews when Blockbench is open.
+- **The relic.** `boss_relics/draw_relics.py` draws `amdusias_horn()` from the pointed dripstone, recoloured by rank onto pearl.
+- **The emblem.** `boss_bar/draw_boss_bar.py` draws `amdusias()` in slot 7.
+- **Code.** `AmdusiasModel` (the poses, eased back to rest), `AmdusiasRenderer` (a glow layer, `DeathVisual`), and three `PosedEliteModel`s with their renderers.
+- **Assets and data.**
+  - Lang in en_us and zh_cn: names, eggs, the relic and its line, the death messages.
+  - Spawn egg item models and textures.
+  - The three elites' loot (the remnant table) and `amdusias.json`.
+  - Tags: `corruption:bosses` and the faction for him; the faction, elites and land brood for the elites.
+  - Doc comments in `DemonBoss`, `ColossusBossBar` and `DemonConfig`.
+
+### 51.7 Docs
+- README (Chinese):
+  - counts now 17 elites and 8 lords;
+  - three table rows and a new section, “再后来的三种精英”;
+  - a new section, “安度西亚斯”;
+  - his relic, death and visual (29 built-ins);
+  - the new rules and modules;
+  - the robes' note on psychic damage, and `arcaneOnly`.
+- `BlighthoundRules`' doc now says eight bites, a little over four seconds, to Curse II (it said "about five seconds").
+
+### 51.8 Tests
+- **`MusicAndBlightRulesTest`** (6, new):
+  - the thread's pulses and breaking;
+  - the fanfare's 138 bolts in two arms and the aimed fans;
+  - the blight running out over its spread;
+  - the crescendo's rings and what each catches;
+  - the upheaval's forms, spikes only without griefing;
+  - roots holding twice as long on the corruption.
+- **`CurseStackRulesTest`** (3, new): the first bite; longer and then stronger; adding keeps the bites in step.
+- **`EliteTrioRulesTest`** (4, new): each chooses what serves; the sower's few blocks a tick; the hound fast, weak and cursing deep; the mindweaver the hardest elite to wear down, with a blow of next to nothing.
+- **`AmdusiasRulesTest`** (4, new): on the ground he is Seere's match; hooves first when close before him; the fanfare is many bolts each hurting hard; he chooses what would serve.
+- **`EliteTrioServerTest`** (8, new, test server):
+  - the sower's feet take the ground, only with leave;
+  - the hound springs three bites deep, worries five, and trails its gas;
+  - the sower's seed and snare;
+  - the curse outlives the hound, tempered by armour (measured);
+  - every bite deepens the curse;
+  - the thread breaks out of reach, and the wail strikes the mind;
+  - each is of the corruption, hatches from its egg, and is in the brood;
+  - the thread hurts through armour again and again and heals it (measured).
+- **`AmdusiasServerTest`** (7, new, test server):
+  - the upheaval's three forms;
+  - the crescendo's rings hurt and throw back what they pass, but not his own;
+  - the psychic strike, and the fanfare's bolts from his horn;
+  - Seere's three skills;
+  - the blight turns the ground dormant only with leave;
+  - he is a lord only the arcane hurts;
+  - the whole rite: a horse among note blocks brings him forth.
+- **`AmdusiasModelTest`** (4, new): every bone and the horn's tip; his poses for rearing, lowering, lifting and every ring; every pose eases back; his textures and emblem.
+- **`EliteTrioModelTest`** (5, new): poses and rest; mirrored sides; what each sends out leaves where its model does; each moves as it should; textures and eggs.
+- **Updated:**
+  - `BossRelicsServerTest` (his relic; the lords include him);
+  - `EntityNamesServerTest` (17 elites);
+  - `EliteRosterServerTest` (the egg count is now at least, not exactly);
+  - `DeathVisualDrawTest` (his death);
+  - `SpellVisualsDrawTest` (29 visuals).
+
+### 51.9 Measured
+Measured on the test server, against a villager stand-in with a player's 20 health:
+- **The blighthound's curse at its deepest** (Curse II, 6 s left), after the hound is gone: a bare stand-in died, and one in full diamond kept 10.64 of 20.
+- **One full mindweaver thread**: 10.00 lost, bare or in diamond alike, since armour does not reduce psychic damage.
+
+### 51.10 Run
+- **The full suite**: 737 tests in 110 classes, all pass (none failed, none skipped). That is 696 before, plus 41 new.
+- After it ran, only the README, this changelog and one doc comment changed.
+- **Not checked in game.** No part of this was seen in a running client or played:
+  - how the models look and move in the world (only the Blockbench previews and the model tests);
+  - the AI in a real world: the hound's chase and its trail, the mindweaver holding its thread, the sower's walk over real terrain, Amdusias's gallop and his choices;
+  - how the fanfare's 138 bolts, the crescendo's rings and the upheaval look and feel, and whether the balance is right;
+  - the rite in a real world.

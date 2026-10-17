@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "corruption:block/block_corruption_arcane_charger_top",
+    "side": "corruption:block/block_corruption_arcane_charger_side",
+    "bottom": "corruption:block/block_general_corruption_func_bottom",
+    "particle": "corruption:block/block_corruption_arcane_charger_side"
+  }
+}

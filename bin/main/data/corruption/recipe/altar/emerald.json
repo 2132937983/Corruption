@@ -1,0 +1,16 @@
+{
+  "type": "corruption:altar_shapeless",
+  "pillars": [
+    {
+      "item": "minecraft:rotten_flesh"
+    },
+    {
+      "item": "minecraft:rotten_flesh"
+    }
+  ],
+  "offering": "minecraft:villager",
+  "result": {
+    "id": "minecraft:emerald",
+    "count": 1
+  }
+}

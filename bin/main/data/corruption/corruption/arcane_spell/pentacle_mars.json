@@ -1,0 +1,102 @@
+{
+  "energy": "32KCE",
+  "cooldown": 80,
+  "min_corruption": 14,
+  "corruption_gain": 2,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:blades",
+      "radius": 6,
+      "height": 6,
+      "ticks": 40,
+      "color": "#C0201A",
+      "accent": "#FFB040"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:magic_circle",
+      "radius": 6,
+      "height": 1.5,
+      "ticks": 30,
+      "color": "#C0201A",
+      "accent": "#FFB040",
+      "sound": "minecraft:entity.blaze.shoot"
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:strength",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:resistance",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:speed",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 1
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 2,
+      "count": 9,
+      "fan": 60,
+      "trail": [
+        {
+          "particle": "minecraft:flame",
+          "count": 2,
+          "spread": 0.08,
+          "speed": 0.01
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.05,
+          "color": "#C0201A"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:flame",
+          "count": 30,
+          "spread": 0.5,
+          "speed": 0.08
+        },
+        {
+          "particle": "minecraft:explosion",
+          "count": 1
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 6,
+          "height": 1,
+          "ticks": 12,
+          "color": "#C0201A",
+          "accent": "#FFB040",
+          "shake": 0.12
+        },
+        {
+          "type": "damage",
+          "amount": 60,
+          "radius": 5
+        },
+        {
+          "type": "ignite_area",
+          "radius": 5,
+          "seconds": 6
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "energy": "2KCE",
+  "cooldown": 60,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:crown",
+      "radius": 6,
+      "height": 2.6,
+      "ticks": 60,
+      "color": "#50E890",
+      "accent": "#FFFFFF",
+      "sound": "minecraft:entity.player.levelup"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:alchemy",
+      "radius": 5,
+      "height": 2,
+      "ticks": 60,
+      "color": "#2A9A5A",
+      "accent": "#D0FFE0"
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:luck",
+      "target": "self",
+      "duration": 9600,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:haste",
+      "target": "self",
+      "duration": 6000,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:night_vision",
+      "target": "self",
+      "duration": 9600
+    },
+    {
+      "type": "give_item",
+      "item": "minecraft:emerald",
+      "count": 2
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 2,
+      "particles": [
+        {
+          "particle": "minecraft:happy_villager",
+          "count": 30,
+          "spread": 0.4
+        },
+        {
+          "particle": "minecraft:wax_on",
+          "count": 10,
+          "spread": 0.4
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CLC",
+    "BMB"
+  ],
+  "key": {
+    "C": {
+      "item": "corruption:corruption_crystal"
+    },
+    "L": {
+      "item": "minecraft:lectern"
+    },
+    "B": {
+      "item": "corruption:cursed_brick"
+    },
+    "M": {
+      "item": "corruption:malice"
+    }
+  },
+  "result": {
+    "id": "corruption:corruption_arcane_lectern"
+  }
+}

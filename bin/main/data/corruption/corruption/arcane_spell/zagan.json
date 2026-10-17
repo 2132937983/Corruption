@@ -1,0 +1,125 @@
+{
+  "energy": "3KCE",
+  "cooldown": 60,
+  "min_corruption": 6,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:crown",
+      "radius": 5,
+      "height": 2.6,
+      "ticks": 50,
+      "color": "#8E1B40",
+      "accent": "#FFD24A"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.6,
+      "color": "#8E1B40",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#8E1B40"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#8E1B40"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:tidal_wave",
+          "radius": 20,
+          "height": 1.5,
+          "ticks": 45,
+          "color": "#8E1B40",
+          "accent": "#FFB0C0",
+          "sound": "minecraft:block.brewing_stand.brew"
+        },
+        {
+          "type": "damage",
+          "amount": 60,
+          "radius": 20
+        },
+        {
+          "type": "push",
+          "radius": 20,
+          "strength": 1.4,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 20,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:nausea",
+          "target": "nearby",
+          "radius": 20,
+          "duration": 200
+        }
+      ]
+    },
+    {
+      "type": "give_item",
+      "item": "minecraft:emerald",
+      "count": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:instant_health",
+      "target": "self",
+      "duration": 1,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:strength",
+      "target": "self",
+      "duration": 2400,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 2,
+      "particles": [
+        {
+          "particle": "minecraft:dust",
+          "count": 40,
+          "spread": 0.4,
+          "color": "#8E1B40"
+        },
+        {
+          "particle": "minecraft:splash",
+          "count": 20,
+          "spread": 0.4
+        }
+      ]
+    }
+  ]
+}

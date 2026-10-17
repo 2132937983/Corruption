@@ -1,0 +1,28 @@
+{
+  "type": "corruption:altar_shaped",
+  "pillars": {
+    "1": {
+      "item": "corruption:corrupted_memory_gem"
+    },
+    "2": {
+      "item": "corruption:corruption_arcane_brick"
+    },
+    "3": {
+      "item": "corruption:corruption_arcane_brick"
+    },
+    "4": {
+      "item": "corruption:corruption_arcane_brick"
+    },
+    "5": {
+      "item": "corruption:corruption_arcane_brick"
+    },
+    "6": {
+      "item": "corruption:corruption_arcane_brick"
+    }
+  },
+  "blocks": [],
+  "time": 160,
+  "result": {
+    "id": "corruption:corruption_energy_brick"
+  }
+}

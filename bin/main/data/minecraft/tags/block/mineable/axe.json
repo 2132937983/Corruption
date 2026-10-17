@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "corruption:infected_block",
+    "corruption:corruption_teeth",
+    "corruption:malice_grass",
+    "corruption:blood_filaments",
+    "corruption:eldritch",
+    "corruption:corruption_bench"
+  ]
+}

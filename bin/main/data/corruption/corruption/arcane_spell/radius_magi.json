@@ -1,0 +1,47 @@
+{
+  "energy": "40KCE",
+  "cooldown": 100,
+  "min_corruption": 12,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:magic_circle",
+      "radius": 6,
+      "height": 2,
+      "ticks": 70,
+      "color": "#FFE7A0",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "beam",
+      "length": 64,
+      "width": 2,
+      "ticks": 60,
+      "interval": 5,
+      "color": "#FFD24A",
+      "accent": "#FFFFFF",
+      "shake": 0.3,
+      "sound": "minecraft:block.beacon.activate",
+      "on_hit": [
+        {
+          "type": "damage",
+          "amount": 24,
+          "radius": 3
+        },
+        {
+          "type": "push",
+          "radius": 3,
+          "strength": 0.5,
+          "lift": 0.1,
+          "from": "caster"
+        },
+        {
+          "type": "ignite_area",
+          "radius": 3,
+          "seconds": 4
+        }
+      ]
+    }
+  ]
+}

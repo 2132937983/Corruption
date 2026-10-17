@@ -1,0 +1,77 @@
+{
+  "energy": "8KCE",
+  "cooldown": 100,
+  "min_corruption": 8,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:rune_ring",
+      "radius": 2.5,
+      "height": 1.4,
+      "ticks": 20,
+      "color": "#C01030",
+      "accent": "#FF8080",
+      "sound": "minecraft:entity.illusioner.prepare_blindness"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 2.2,
+      "color": "#C01030",
+      "size": 0.4,
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#C01030"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:dust",
+          "count": 30,
+          "spread": 0.7,
+          "color": "#C01030"
+        },
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 20,
+          "spread": 0.5,
+          "speed": 0.04
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:eye",
+          "radius": 2.5,
+          "height": 3.5,
+          "ticks": 60,
+          "color": "#C01030",
+          "accent": "#FF8080",
+          "sound": "minecraft:entity.elder_guardian.curse"
+        },
+        {
+          "type": "visual",
+          "effect": "corruption:chains",
+          "radius": 3,
+          "height": 1.5,
+          "ticks": 40,
+          "color": "#C01030",
+          "accent": "#FF8080"
+        },
+        {
+          "type": "mark_prey",
+          "radius": 24,
+          "ticks": 600
+        }
+      ]
+    }
+  ]
+}

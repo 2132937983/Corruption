@@ -1,0 +1,10 @@
+{
+  "values": [
+    "corruption:corruption_mark",
+    "corruption:corruption_blight",
+    "corruption:corruption_host",
+    "corruption:corruption_quell",
+    "corruption:corruption_oath",
+    "corruption:corruption_engulf"
+  ]
+}

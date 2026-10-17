@@ -1,0 +1,128 @@
+{
+  "energy": "2KCE",
+  "cooldown": 60,
+  "min_corruption": 5,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:alchemy",
+      "radius": 6,
+      "height": 3,
+      "ticks": 60,
+      "color": "#8E1B40",
+      "accent": "#FFD24A",
+      "sound": "minecraft:block.brewing_stand.brew"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:light_pillar",
+      "radius": 2,
+      "height": 14,
+      "ticks": 40,
+      "color": "#FFD24A",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#8E1B40",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#8E1B40"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#8E1B40"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 18,
+          "height": 1.5,
+          "ticks": 18,
+          "color": "#8E1B40",
+          "accent": "#FFD24A"
+        },
+        {
+          "type": "damage",
+          "amount": 44,
+          "radius": 18
+        },
+        {
+          "type": "push",
+          "radius": 18,
+          "strength": 1.4,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 18,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:nausea",
+          "target": "nearby",
+          "radius": 18,
+          "duration": 200
+        }
+      ]
+    },
+    {
+      "type": "give_item",
+      "item": "minecraft:gold_ingot",
+      "count": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:strength",
+      "target": "self",
+      "duration": 3600,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 2,
+      "particles": [
+        {
+          "particle": "minecraft:dust",
+          "count": 30,
+          "spread": 0.4,
+          "color": "#FFD24A"
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 30,
+          "spread": 0.4,
+          "color": "#8E1B40"
+        }
+      ]
+    }
+  ]
+}

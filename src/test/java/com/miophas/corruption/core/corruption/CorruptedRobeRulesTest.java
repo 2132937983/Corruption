@@ -25,6 +25,9 @@ class CorruptedRobeRulesTest {
         assertFalse(Tier.NOVICE.hiddenFromBosses());
         assertFalse(Tier.INTERMEDIATE.hiddenFromBosses());
         assertTrue(Tier.ADVANCED.hiddenFromBosses(), "only the highest from its lords");
+        assertFalse(Tier.NOVICE.hiddenFromElites(), "the corruption's elites see through a novice's robes");
+        assertTrue(Tier.INTERMEDIATE.hiddenFromElites(), "but not through better ones");
+        assertTrue(Tier.ADVANCED.hiddenFromElites());
     }
 
     @Test void aSetIsFourPiecesAndOnlyAsGoodAsItsWorst() {

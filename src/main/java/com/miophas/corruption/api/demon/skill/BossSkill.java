@@ -32,6 +32,12 @@ public interface BossSkill<E extends Mob> {
      */
     void tick(E boss, @Nullable LivingEntity target, int elapsed);
 
+    /**
+     * Whether it has done what it was for before its time is up, and is over now: a dive that has struck, say, for a boss
+     * that is away again at once. Asked after every tick of it; most run their full time.
+     */
+    default boolean finished(E boss) { return false; }
+
     /** It is over: run its course, or broken off ({@code broken}: its boss died, changed, or was taken away). */
     default void end(E boss, boolean broken) {}
 

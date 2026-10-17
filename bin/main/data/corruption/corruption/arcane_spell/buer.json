@@ -1,0 +1,62 @@
+{
+  "energy": "1KCE",
+  "cooldown": 40,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:bloom",
+      "radius": 5,
+      "height": 3,
+      "ticks": 60,
+      "color": "#70D870",
+      "accent": "#F4FFE0",
+      "sound": "minecraft:block.beacon.power_select"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:magic_circle",
+      "radius": 5,
+      "height": 1,
+      "ticks": 50,
+      "color": "#70D870",
+      "accent": "#F4FFE0"
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:instant_health",
+      "target": "self",
+      "duration": 1,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:regeneration",
+      "target": "self",
+      "duration": 600,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:resistance",
+      "target": "self",
+      "duration": 1200
+    },
+    {
+      "type": "particles",
+      "shape": "spiral",
+      "radius": 2.4,
+      "height": 2,
+      "particles": [
+        {
+          "particle": "minecraft:happy_villager",
+          "count": 24
+        },
+        {
+          "particle": "minecraft:heart",
+          "count": 6
+        }
+      ]
+    }
+  ]
+}

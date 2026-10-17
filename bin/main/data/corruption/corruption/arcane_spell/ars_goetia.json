@@ -1,0 +1,145 @@
+{
+  "energy": "80KCE",
+  "cooldown": 240,
+  "min_corruption": 16,
+  "corruption_gain": 2,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:sigil",
+      "radius": 6,
+      "height": 3.2,
+      "ticks": 80,
+      "color": "#8A0303",
+      "accent": "#FFB040"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:souls",
+      "radius": 12,
+      "height": 8,
+      "ticks": 80,
+      "color": "#8A0303",
+      "accent": "#FFB040"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:magic_circle",
+      "radius": 16,
+      "height": 3,
+      "ticks": 80,
+      "color": "#8A0303",
+      "accent": "#FFB040",
+      "shake": 0.3,
+      "sound": "minecraft:entity.evoker.prepare_summon"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:rune_ring",
+      "radius": 8,
+      "height": 3,
+      "ticks": 80,
+      "color": "#8A0303",
+      "accent": "#FFB040"
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 16,
+      "particles": [
+        {
+          "particle": "minecraft:soul_fire_flame",
+          "count": 64,
+          "spread": 0.1,
+          "speed": 0.02
+        },
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 64,
+          "spread": 0.1
+        }
+      ]
+    },
+    {
+      "type": "summon",
+      "entity": "corruption:corrupted_remnant",
+      "count": 4
+    },
+    {
+      "type": "summon",
+      "entity": "minecraft:vex",
+      "count": 6
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "trail": [
+        {
+          "particle": "minecraft:soul_fire_flame",
+          "count": 2,
+          "spread": 0.08
+        },
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.05
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:soul_fire_flame",
+          "count": 40,
+          "spread": 0.6,
+          "speed": 0.08
+        },
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 30,
+          "spread": 0.5
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 16,
+          "height": 3,
+          "ticks": 24,
+          "color": "#8A0303",
+          "accent": "#FFB040",
+          "shake": 0.8,
+          "sound": "minecraft:entity.warden.sonic_boom"
+        },
+        {
+          "type": "particles",
+          "shape": "ring",
+          "radius": 12,
+          "particles": [
+            {
+              "particle": "minecraft:soul_fire_flame",
+              "count": 48,
+              "spread": 0.1,
+              "speed": 0.02
+            }
+          ]
+        },
+        {
+          "type": "lightning",
+          "radius": 12,
+          "count": 12,
+          "corrupt": true,
+          "damage": 45,
+          "damage_type": "corruption:corruption"
+        },
+        {
+          "type": "explode",
+          "power": 6,
+          "breaks_blocks": true,
+          "break_radius": 6,
+          "max_blocks": 200,
+          "max_resistance": 9
+        }
+      ]
+    }
+  ]
+}

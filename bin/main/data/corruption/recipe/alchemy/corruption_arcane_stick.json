@@ -1,0 +1,21 @@
+{
+  "type": "corruption:alchemy_shaped",
+  "slots": {
+    "0": {
+      "item": "corruption:corruption_stick",
+      "count": 1
+    },
+    "1": {
+      "item": "minecraft:gold_ingot",
+      "count": 2
+    },
+    "2": {
+      "item": "corruption:corruption_dust",
+      "count": 64
+    }
+  },
+  "result": {
+    "id": "corruption:corruption_arcane_stick",
+    "count": 1
+  }
+}

@@ -68,8 +68,8 @@ public final class SkillSet<E extends Mob> {
 
     /**
      * A tick passes: every cooldown is counted down, whatever a skill left behind it is kept up ({@link BossSkill#linger}),
-     * and the running skill runs on; once it is over, it ends and starts its cooldown, as long as {@code cooldowns} makes
-     * its own (the identity for the cooldown as its rules give it).
+     * and the running skill runs on; once it is over (its time up, or {@link BossSkill#finished} early), it ends and starts
+     * its cooldown, as long as {@code cooldowns} makes its own (the identity for the cooldown as its rules give it).
      */
     public void tick(E boss, @Nullable LivingEntity target, IntUnaryOperator cooldowns) {
         book.cool();
@@ -78,7 +78,7 @@ public final class SkillSet<E extends Mob> {
         if (now < 0) return;
         BossSkill<? super E> skill = skills.get(book.running());
         skill.tick(boss, target, now);
-        if (skill.timing().over(now + 1)) {
+        if (skill.timing().over(now + 1) || skill.finished(boss)) {
             skill.end(boss, false);
             book.finish(cooldowns.applyAsInt(skill.timing().cooldown()));
         }

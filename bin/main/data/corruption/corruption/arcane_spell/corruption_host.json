@@ -1,0 +1,33 @@
+{
+  "energy": "16KCE",
+  "cooldown": 200,
+  "min_corruption": 10,
+  "corruption_gain": 2,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:magic_circle",
+      "radius": 5.5,
+      "height": 1.5,
+      "ticks": 60,
+      "color": "#71334C",
+      "accent": "#FFD24A",
+      "sound": "minecraft:entity.evoker.prepare_summon"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:souls",
+      "radius": 5,
+      "height": 5,
+      "ticks": 60,
+      "color": "#71334C",
+      "accent": "#FFD24A"
+    },
+    {
+      "type": "raise_remnants",
+      "count": 6,
+      "radius": 3.5,
+      "lifetime": 1200
+    }
+  ]
+}

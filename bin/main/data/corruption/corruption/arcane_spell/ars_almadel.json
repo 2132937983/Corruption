@@ -1,0 +1,101 @@
+{
+  "energy": "70KCE",
+  "cooldown": 160,
+  "min_corruption": 15,
+  "corruption_gain": 2,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:constellation",
+      "radius": 12,
+      "height": 10,
+      "ticks": 60,
+      "color": "#FFF2B0",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 2,
+      "trail": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 2,
+          "spread": 0.05
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 30,
+          "spread": 0.5,
+          "speed": 0.08
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:light_pillar",
+          "radius": 8,
+          "height": 30,
+          "ticks": 50,
+          "color": "#FFF2B0",
+          "accent": "#FFFFFF",
+          "shake": 0.5,
+          "sound": "minecraft:block.beacon.activate"
+        },
+        {
+          "type": "visual",
+          "effect": "corruption:magic_circle",
+          "radius": 16,
+          "height": 2,
+          "ticks": 60,
+          "color": "#FFF2B0",
+          "accent": "#FFFFFF"
+        },
+        {
+          "type": "launch_bolt",
+          "speed": 1.6,
+          "count": 16,
+          "fan": 8,
+          "from": "sky",
+          "height": 20,
+          "trail": [
+            {
+              "particle": "minecraft:end_rod",
+              "count": 2,
+              "spread": 0.05
+            },
+            {
+              "particle": "minecraft:dust",
+              "count": 1,
+              "spread": 0.05,
+              "color": "#FFF2B0"
+            }
+          ],
+          "burst": [
+            {
+              "particle": "minecraft:end_rod",
+              "count": 20,
+              "spread": 0.4,
+              "speed": 0.05
+            }
+          ],
+          "on_hit": [
+            {
+              "type": "damage",
+              "amount": 60,
+              "radius": 5
+            },
+            {
+              "type": "apply_effect",
+              "effect": "minecraft:glowing",
+              "target": "nearby",
+              "radius": 5,
+              "duration": 200
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

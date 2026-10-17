@@ -1,0 +1,110 @@
+{
+  "energy": "16KCE",
+  "cooldown": 90,
+  "min_corruption": 14,
+  "corruption_gain": 2,
+  "actions": [
+    {
+      "type": "launch_bolt",
+      "speed": 1.6,
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 2,
+          "spread": 0.06
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 1,
+          "spread": 0.05,
+          "color": "#71334C"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 30,
+          "spread": 0.5,
+          "speed": 0.05
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:magic_circle",
+          "radius": 12,
+          "height": 1.5,
+          "ticks": 50,
+          "sound": "minecraft:entity.evoker.prepare_summon"
+        },
+        {
+          "type": "particles",
+          "shape": "ring",
+          "radius": 12,
+          "particles": [
+            {
+              "particle": "minecraft:dust",
+              "count": 40,
+              "spread": 0.2,
+              "color": "#71334C"
+            }
+          ]
+        },
+        {
+          "type": "launch_bolt",
+          "speed": 1.2,
+          "count": 48,
+          "fan": 6,
+          "from": "sky",
+          "height": 14,
+          "trail": [
+            {
+              "particle": "corruption:corruption_particle",
+              "count": 1,
+              "spread": 0.04
+            },
+            {
+              "particle": "minecraft:dust",
+              "count": 1,
+              "spread": 0.04,
+              "color": "#71334C"
+            }
+          ],
+          "burst": [
+            {
+              "particle": "corruption:corruption_particle",
+              "count": 12,
+              "spread": 0.3,
+              "speed": 0.03
+            },
+            {
+              "particle": "minecraft:dust",
+              "count": 8,
+              "spread": 0.3,
+              "color": "#71334C"
+            }
+          ],
+          "on_hit": [
+            {
+              "type": "corrupt_creatures",
+              "radius": 4
+            },
+            {
+              "type": "damage",
+              "amount": 96,
+              "radius": 4,
+              "damage_type": "corruption:corruption"
+            },
+            {
+              "type": "apply_effect",
+              "effect": "corruption:corruption_curse",
+              "target": "nearby",
+              "radius": 4,
+              "duration": 100
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

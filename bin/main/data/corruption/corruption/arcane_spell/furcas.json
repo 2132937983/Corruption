@@ -1,0 +1,74 @@
+{
+  "energy": "3KCE",
+  "cooldown": 40,
+  "min_corruption": 8,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:sigil",
+      "radius": 3.2,
+      "height": 1.8,
+      "ticks": 40,
+      "color": "#FF5A1A",
+      "accent": "#FFE0A0",
+      "sound": "minecraft:entity.evoker.cast_spell"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 2,
+      "look": "minecraft:fire_charge",
+      "trail": [
+        {
+          "particle": "minecraft:flame",
+          "count": 3,
+          "spread": 0.1,
+          "speed": 0.01
+        },
+        {
+          "particle": "minecraft:lava",
+          "count": 1,
+          "spread": 0.05
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:flame",
+          "count": 50,
+          "spread": 0.8,
+          "speed": 0.1
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:hellfire",
+          "radius": 8,
+          "height": 3,
+          "ticks": 50,
+          "color": "#FF5A1A",
+          "accent": "#FFE0A0",
+          "shake": 0.3
+        },
+        {
+          "type": "ignite_area",
+          "radius": 9,
+          "seconds": 10
+        },
+        {
+          "type": "damage",
+          "amount": 60,
+          "radius": 9
+        },
+        {
+          "type": "explode",
+          "power": 3,
+          "breaks_blocks": true,
+          "break_radius": 3.5,
+          "max_blocks": 40,
+          "max_resistance": 6
+        }
+      ]
+    }
+  ]
+}

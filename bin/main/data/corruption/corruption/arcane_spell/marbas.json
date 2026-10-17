@@ -1,0 +1,143 @@
+{
+  "energy": "1KCE",
+  "cooldown": 40,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:bloom",
+      "radius": 5,
+      "height": 3,
+      "ticks": 60,
+      "color": "#E8A040",
+      "accent": "#FFF0C0",
+      "sound": "minecraft:block.beacon.power_select"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:light_pillar",
+      "radius": 2.4,
+      "height": 16,
+      "ticks": 40,
+      "color": "#FFC060",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#7AB040",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#7AB040"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#7AB040"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 16,
+          "height": 1.5,
+          "ticks": 18,
+          "color": "#E8A040",
+          "accent": "#FFF0C0"
+        },
+        {
+          "type": "damage",
+          "amount": 32,
+          "radius": 16
+        },
+        {
+          "type": "push",
+          "radius": 16,
+          "strength": 1.2,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:poison",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 200,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:hunger",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 300,
+          "amplifier": 1
+        }
+      ]
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:instant_health",
+      "target": "self",
+      "duration": 1,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:regeneration",
+      "target": "self",
+      "duration": 600,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:absorption",
+      "target": "self",
+      "duration": 2400,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 2,
+      "particles": [
+        {
+          "particle": "minecraft:happy_villager",
+          "count": 16,
+          "spread": 0.3
+        },
+        {
+          "particle": "minecraft:item_slime",
+          "count": 12,
+          "spread": 0.3
+        }
+      ]
+    }
+  ]
+}

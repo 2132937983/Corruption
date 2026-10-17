@@ -17,9 +17,10 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * Calling up the corruption's remnants ({@link SummonRules}) as the mod carries it out for any boss. A circle opens
- * under the boss through the wind-up; then the remnants rise round it, each over a whirl of souls, in the likenesses
- * asked for (armed and dressed as such creatures come), at once set on the boss's quarry. Each is marked as the boss's,
- * so that only those still about count against how many it may keep.
+ * through the wind-up under the boss (or under its quarry, where it stood as the call began, for a call round the
+ * quarry); then the remnants rise round it, each over a whirl of souls, in the likenesses asked for (armed and dressed
+ * as such creatures come), at once set on the boss's quarry. Each is marked as the boss's, so that only those still
+ * about count against how many it may keep.
  */
 public final class SummonSkill implements BossSkill<Mob> {
     /** Where a called remnant keeps who called it up. */
@@ -29,6 +30,8 @@ public final class SummonSkill implements BossSkill<Mob> {
 
     private final SummonRules rules;
     private final int colour, accent;
+    /** Where this call's remnants rise round. */
+    private Vec3 middle = Vec3.ZERO;
 
     public SummonSkill(SummonRules rules, int colour, int accent) {
         this.rules = rules;
@@ -43,9 +46,12 @@ public final class SummonSkill implements BossSkill<Mob> {
     @Override public boolean usable(Mob boss, LivingEntity target) { return rules.wanted(called(boss)); }
 
     @Override public void begin(Mob boss, LivingEntity target) {
+        middle = rules.atQuarry() && target != null ? target.position() : boss.position();
         SkillShows.sound(boss, SoundEvents.EVOKER_PREPARE_SUMMON, 2, .6F);
-        if (boss.level() instanceof ServerLevel level)
-            SkillShows.show(level, boss.position(), "magic_circle", rules.radius() + 1.5, 1.5, rules.timing().windup() + 20, colour, accent, 0, boss.getYRot(), true);
+        if (boss.level() instanceof ServerLevel level) {
+            middle = SkillShows.ground(level, middle);
+            SkillShows.show(level, middle, "magic_circle", rules.radius() + 1.5, 1.5, rules.timing().windup() + 20, colour, accent, 0, boss.getYRot(), true);
+        }
     }
 
     @Override public void tick(Mob boss, @Nullable LivingEntity target, int elapsed) {
@@ -54,11 +60,12 @@ public final class SummonSkill implements BossSkill<Mob> {
         double turn = boss.getRandom().nextDouble() * Math.PI * 2;
         for (int one = 0; one < calling; one++) {
             double[] place = rules.place(one, calling, turn);
-            Vec3 at = SkillShows.ground(level, boss.position().add(place[0], 0, place[1]));
+            Vec3 at = SkillShows.ground(level, (rules.atQuarry() ? middle : boss.position()).add(place[0], 0, place[1]));
             EntityType<?> likeness = BuiltInRegistries.ENTITY_TYPE.getOptional(ResourceLocation.tryParse(rules.look(one, start))).orElse(EntityType.ZOMBIE);
             CorruptedRemnant remnant = CorruptedRemnant.raised(level, likeness, at, boss.getYRot());
             if (remnant == null) continue;
             remnant.getPersistentData().putUUID(CALLER, boss.getUUID());
+            if (rules.passes()) remnant.crumbleAt(level.getGameTime() + rules.lasts());
             if (target != null) remnant.setTarget(target);
             if (!level.addFreshEntity(remnant)) continue;
             SkillShows.show(level, at, "souls", 1.2, 3, 30, colour, accent, 0, 0, true);

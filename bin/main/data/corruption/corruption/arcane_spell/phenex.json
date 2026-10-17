@@ -1,0 +1,125 @@
+{
+  "energy": "2KCE",
+  "cooldown": 40,
+  "min_corruption": 5,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:wings",
+      "radius": 8,
+      "height": 1.5,
+      "ticks": 60,
+      "color": "#FF6A1A",
+      "accent": "#FFF0A0",
+      "shake": 0.2,
+      "sound": "minecraft:item.totem.use"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#FF6A1A",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#FF6A1A"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#FF6A1A"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:hellfire",
+          "radius": 18,
+          "height": 3,
+          "ticks": 50,
+          "color": "#FF8A2A",
+          "accent": "#FFF4C0"
+        },
+        {
+          "type": "damage",
+          "amount": 48,
+          "radius": 18
+        },
+        {
+          "type": "push",
+          "radius": 18,
+          "strength": 1.4,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 18,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "ignite_area",
+          "radius": 18,
+          "seconds": 8
+        }
+      ]
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:instant_health",
+      "target": "self",
+      "duration": 1,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:regeneration",
+      "target": "self",
+      "duration": 600,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:fire_resistance",
+      "target": "self",
+      "duration": 6000
+    },
+    {
+      "type": "particles",
+      "shape": "spiral",
+      "radius": 3,
+      "height": 3,
+      "particles": [
+        {
+          "particle": "minecraft:flame",
+          "count": 60,
+          "spread": 0.05
+        },
+        {
+          "particle": "minecraft:lava",
+          "count": 10,
+          "spread": 0.1
+        }
+      ]
+    }
+  ]
+}

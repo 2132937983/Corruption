@@ -4,6 +4,7 @@ import com.miophas.corruption.api.arcane.ArcaneDamage;
 import com.miophas.corruption.api.arcane.ArcaneWeapons;
 import com.miophas.corruption.api.corruption.CorruptionVeilApi;
 import com.miophas.corruption.api.corruption.CorruptionFactionApi;
+import com.miophas.corruption.common.config.DemonConfig;
 import com.miophas.corruption.core.arcane.SpellAction;
 import com.miophas.corruption.core.demon.BodyPart;
 import java.util.List;
@@ -45,7 +46,8 @@ import net.neoforged.neoforge.entity.PartEntity;
  *   <li><b>Only the arcane can hurt it.</b> Blades, arrows, fire, poison, potions and the rest pass through it;
  *       only a hurt with the arcane's mark on it ({@link ArcaneDamage#isSpell}: a spell's own damage, or any
  *       damage type in the tag corruption:spell, which data packs may add to) counts. What passes every defence
- *       (/kill, the void) still does. A player whose blow passes through is told so.</li>
+ *       (/kill, the void) still does. A player whose blow passes through is told so. A server may turn this off
+ *       ({@link DemonConfig#arcaneOnly}, [demons] arcaneOnly in its gameplay settings): then any hurt reaches it.</li>
  *   <li>It shows a boss bar in the mod's own style ({@link DemonBoss}), kept up to date with its health.</li>
  *   <li>It never despawns, takes no fall damage, cannot be leashed, and rides nothing (a boat or a minecart would
  *       only hold it fast).</li>
@@ -103,10 +105,11 @@ public abstract class GoeticDemon extends Monster implements DemonBoss {
 
     /**
      * Whether a hurt reaches a demon: one with the arcane's mark on it (a spell's, or a blow struck by hand with a blade
-     * that bears the mark, see ArcaneWeapons), or one that passes every defence.
+     * that bears the mark, see ArcaneWeapons), or one that passes every defence; or any at all, where the server has
+     * said that the demons need not be hurt by the arcane ({@link DemonConfig#arcaneOnly}).
      */
     public static boolean accepts(DamageSource source) {
-        return ArcaneDamage.isSpell(source) || ArcaneWeapons.isArcaneBlow(source) || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY);
+        return !DemonConfig.arcaneOnly() || ArcaneDamage.isSpell(source) || ArcaneWeapons.isArcaneBlow(source) || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY);
     }
 
     @Override public boolean isInvulnerableTo(DamageSource source) { return super.isInvulnerableTo(source) || !accepts(source); }
@@ -175,7 +178,7 @@ public abstract class GoeticDemon extends Monster implements DemonBoss {
     @Override public Vec3 heart(float partial) { return getPosition(partial).add(0, getBbHeight() * .6, 0); }
 
     @Override public void die(DamageSource source) {
-        if (!level().isClientSide && !isRemoved() && !dead) DemonBoss.logDeath(this, source);
+        if (!level().isClientSide && !isRemoved() && !dead && barShown()) DemonBoss.logDeath(this, source);
         super.die(source);
     }
 
@@ -208,7 +211,10 @@ public abstract class GoeticDemon extends Monster implements DemonBoss {
     @Override public boolean causeFallDamage(float distance, float multiplier, DamageSource source) { return false; }
     @Override public boolean canBeLeashed() { return false; }
 
-    @Override public void startSeenByPlayer(ServerPlayer player) { super.startSeenByPlayer(player); boss.addPlayer(player); }
+    /** Whether it shows its boss bar to those who see it: every demon does, but one that is only a likeness of another. */
+    protected boolean barShown() { return true; }
+
+    @Override public void startSeenByPlayer(ServerPlayer player) { super.startSeenByPlayer(player); if (barShown()) boss.addPlayer(player); }
     @Override public void stopSeenByPlayer(ServerPlayer player) { super.stopSeenByPlayer(player); boss.removePlayer(player); }
     @Override public void setCustomName(Component name) { super.setCustomName(name); boss.setName(getDisplayName()); }
 

@@ -1,0 +1,115 @@
+{
+  "energy": "3KCE",
+  "cooldown": 40,
+  "min_corruption": 8,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:crown",
+      "radius": 6,
+      "height": 2.6,
+      "ticks": 50,
+      "color": "#9AA0C0",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.6,
+      "color": "#C8D0E8",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#C8D0E8"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#C8D0E8"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:resonance",
+          "radius": 22,
+          "height": 3,
+          "ticks": 50,
+          "color": "#C8D0E8",
+          "accent": "#FFFFFF",
+          "shake": 0.2,
+          "sound": "minecraft:item.goat_horn.sound.6"
+        },
+        {
+          "type": "damage",
+          "amount": 60,
+          "radius": 22
+        },
+        {
+          "type": "push",
+          "radius": 22,
+          "strength": 2,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 22,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:weakness",
+          "target": "nearby",
+          "radius": 22,
+          "duration": 300,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:nausea",
+          "target": "nearby",
+          "radius": 22,
+          "duration": 200
+        }
+      ]
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 2,
+      "particles": [
+        {
+          "particle": "minecraft:note",
+          "count": 24,
+          "spread": 0.4
+        },
+        {
+          "particle": "minecraft:poof",
+          "count": 20,
+          "spread": 0.3,
+          "speed": 0.05
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "energy": "1KCE",
+  "cooldown": 30,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:feathers",
+      "radius": 6,
+      "ticks": 50,
+      "color": "#6AB04A",
+      "accent": "#F0E08A",
+      "sound": "minecraft:entity.parrot.fly"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:rune_ring",
+      "radius": 4,
+      "height": 1.5,
+      "ticks": 50,
+      "color": "#6AB04A",
+      "accent": "#F0E08A"
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:luck",
+      "target": "self",
+      "duration": 6000,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:night_vision",
+      "target": "self",
+      "duration": 9600
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 2.6,
+      "count": 7,
+      "fan": 30,
+      "look": "minecraft:arrow",
+      "trail": [
+        {
+          "particle": "minecraft:crit",
+          "count": 1
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:crit",
+          "count": 8,
+          "spread": 0.2
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "damage",
+          "amount": 20,
+          "radius": 4
+        }
+      ]
+    }
+  ]
+}

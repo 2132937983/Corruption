@@ -1,0 +1,68 @@
+{
+  "energy": "2KCE",
+  "cooldown": 30,
+  "min_corruption": 5,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:wings",
+      "radius": 7,
+      "height": 1.5,
+      "ticks": 45,
+      "color": "#5A2080",
+      "accent": "#C080FF",
+      "sound": "minecraft:entity.ender_dragon.flap"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 0.9,
+      "count": 7,
+      "fan": 50,
+      "trail": [
+        {
+          "particle": "minecraft:dragon_breath",
+          "count": 2,
+          "spread": 0.08
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:dragon_breath",
+          "count": 12,
+          "spread": 0.3
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:miasma",
+          "radius": 4,
+          "ticks": 40,
+          "color": "#8A40C0",
+          "accent": "#D0A0FF"
+        },
+        {
+          "type": "damage",
+          "amount": 24,
+          "radius": 5
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:poison",
+          "target": "nearby",
+          "radius": 5,
+          "duration": 160,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:nausea",
+          "target": "nearby",
+          "radius": 5,
+          "duration": 160
+        }
+      ]
+    }
+  ]
+}

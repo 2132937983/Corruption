@@ -1,0 +1,109 @@
+{
+  "energy": "14KCE",
+  "cooldown": 70,
+  "min_corruption": 12,
+  "corruption_gain": 2,
+  "actions": [
+    {
+      "type": "launch_bolt",
+      "speed": 1.6,
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 2,
+          "spread": 0.06
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 1,
+          "spread": 0.05,
+          "color": "#71334C"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 30,
+          "spread": 0.5,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 20,
+          "spread": 0.5,
+          "color": "#71334C"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:lightning",
+          "radius": 10,
+          "height": 12,
+          "ticks": 30
+        },
+        {
+          "type": "visual",
+          "effect": "corruption:magic_circle",
+          "radius": 10,
+          "height": 2,
+          "ticks": 40
+        },
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 12,
+          "height": 2,
+          "ticks": 16,
+          "shake": 0.4
+        },
+        {
+          "type": "particles",
+          "shape": "ring",
+          "radius": 10,
+          "particles": [
+            {
+              "particle": "corruption:corruption_particle",
+              "count": 48,
+              "spread": 0.1,
+              "speed": 0.02
+            },
+            {
+              "particle": "minecraft:dust",
+              "count": 32,
+              "spread": 0.2,
+              "color": "#71334C"
+            }
+          ]
+        },
+        {
+          "type": "corrupt_creatures",
+          "radius": 12
+        },
+        {
+          "type": "lightning",
+          "radius": 10,
+          "count": 20,
+          "corrupt": true,
+          "damage": 22,
+          "damage_type": "corruption:corruption"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 10,
+          "duration": 100,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "corruption:corruption_curse",
+          "target": "nearby",
+          "radius": 12,
+          "duration": 120
+        }
+      ]
+    }
+  ]
+}

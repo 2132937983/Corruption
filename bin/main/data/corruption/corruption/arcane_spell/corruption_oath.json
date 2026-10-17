@@ -1,0 +1,32 @@
+{
+  "energy": "12KCE",
+  "cooldown": 600,
+  "min_corruption": 12,
+  "corruption_gain": 2,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:sigil",
+      "radius": 3,
+      "height": 2.4,
+      "ticks": 60,
+      "color": "#71334C",
+      "accent": "#C6728C",
+      "sound": "minecraft:entity.illusioner.cast_spell"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:rune_ring",
+      "radius": 6,
+      "height": 1,
+      "ticks": 60,
+      "color": "#71334C",
+      "accent": "#C6728C"
+    },
+    {
+      "type": "truce",
+      "radius": 16,
+      "ticks": 1200
+    }
+  ]
+}

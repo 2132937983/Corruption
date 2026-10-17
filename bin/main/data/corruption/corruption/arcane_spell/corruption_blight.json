@@ -1,0 +1,69 @@
+{
+  "energy": "4KCE",
+  "cooldown": 20,
+  "min_corruption": 4,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "launch_bolt",
+      "speed": 1.6,
+      "color": "#9A8AB0",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 2,
+          "spread": 0.06
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 1,
+          "spread": 0.05,
+          "color": "#5A4A6A"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 40,
+          "spread": 1.2,
+          "speed": 0.03
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:magic_circle",
+          "radius": 4.5,
+          "height": 1,
+          "ticks": 40,
+          "color": "#5A4A6A",
+          "accent": "#C6728C"
+        },
+        {
+          "type": "particles",
+          "shape": "sphere",
+          "radius": 3,
+          "particles": [
+            {
+              "particle": "corruption:corruption_particle",
+              "count": 48,
+              "spread": 0.1,
+              "speed": 0.02
+            },
+            {
+              "particle": "minecraft:ash",
+              "count": 24,
+              "spread": 0.2
+            }
+          ]
+        },
+        {
+          "type": "corrupt_area",
+          "radius": 4,
+          "chance": 1,
+          "inert": true
+        }
+      ]
+    }
+  ]
+}

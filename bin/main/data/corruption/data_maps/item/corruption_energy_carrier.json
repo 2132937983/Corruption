@@ -1,0 +1,8 @@
+{
+  "values": {
+    "corruption:corruption_candle": {
+      "capacity": "10KCE",
+      "consumed": true
+    }
+  }
+}

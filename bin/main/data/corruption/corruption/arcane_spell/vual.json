@@ -1,0 +1,68 @@
+{
+  "energy": "1KCE",
+  "cooldown": 60,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:resonance",
+      "radius": 12,
+      "height": 3,
+      "ticks": 50,
+      "color": "#E8C080",
+      "accent": "#FFFFFF",
+      "sound": "minecraft:block.bell.resonate"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:bloom",
+      "radius": 5,
+      "height": 2,
+      "ticks": 50,
+      "color": "#E8C080",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "pacify",
+      "radius": 24
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:weakness",
+      "target": "nearby",
+      "radius": 24,
+      "duration": 600,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slowness",
+      "target": "nearby",
+      "radius": 24,
+      "duration": 600,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:regeneration",
+      "target": "self",
+      "duration": 600,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "sphere",
+      "radius": 6,
+      "particles": [
+        {
+          "particle": "minecraft:heart",
+          "count": 20
+        },
+        {
+          "particle": "minecraft:note",
+          "count": 10
+        }
+      ]
+    }
+  ]
+}

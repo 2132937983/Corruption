@@ -9,8 +9,9 @@ import java.util.Optional;
  * leggings, boots). Worn whole, a set veils its wearer from the corruption's creatures, so that they do not take it
  * for prey, and holds its wearer's corruption fast, no lower than the grade's threshold, so that nothing raises or
  * lowers it;
- * the higher grades also turn aside the corruption's own hurt, half of it and then all of it, and the highest veils
- * its wearer from the corruption's lords as well, so that they do not turn on it even when it strikes them.
+ * the higher grades also turn aside the corruption's own hurt, half of it and then all of it, and veil their wearer from
+ * the corruption's elites, which see through a novice's robes; and the highest veils its wearer from the corruption's
+ * lords as well, so that they do not turn on it even when it strikes them.
  *
  * <p>A set is only as good as its worst piece: four pieces of mixed grades are a set of the lowest of them, and three
  * pieces with anything else in the fourth slot are no set at all.
@@ -30,15 +31,16 @@ public final class CorruptedRobeRules {
 
     /** The three grades. */
     public enum Tier {
-        NOVICE(5, 1, false), INTERMEDIATE(12, .5, false), ADVANCED(19, 0, true);
+        NOVICE(5, 1, false, false), INTERMEDIATE(12, .5, true, false), ADVANCED(19, 0, true, true);
 
         private final int threshold;
         private final double corruptionDamageTaken;
-        private final boolean hiddenFromBosses;
+        private final boolean hiddenFromElites, hiddenFromBosses;
 
-        Tier(int threshold, double corruptionDamageTaken, boolean hiddenFromBosses) {
+        Tier(int threshold, double corruptionDamageTaken, boolean hiddenFromElites, boolean hiddenFromBosses) {
             this.threshold = threshold;
             this.corruptionDamageTaken = corruptionDamageTaken;
+            this.hiddenFromElites = hiddenFromElites;
             this.hiddenFromBosses = hiddenFromBosses;
         }
 
@@ -50,6 +52,9 @@ public final class CorruptedRobeRules {
 
         /** Whether it veils its wearer from the corruption's creatures: every grade does. */
         public boolean hiddenFromRemnants() { return true; }
+
+        /** Whether it veils its wearer from the corruption's elites, which see through a novice's robes: every grade above it. */
+        public boolean hiddenFromElites() { return hiddenFromElites; }
 
         /** Whether it veils its wearer from the corruption's lords too: only the highest. */
         public boolean hiddenFromBosses() { return hiddenFromBosses; }

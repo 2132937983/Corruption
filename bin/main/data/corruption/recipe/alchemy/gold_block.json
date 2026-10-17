@@ -1,0 +1,13 @@
+{
+  "type": "corruption:alchemy_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:gold_ingot",
+      "count": 9
+    }
+  ],
+  "result": {
+    "id": "minecraft:gold_block",
+    "count": 1
+  }
+}

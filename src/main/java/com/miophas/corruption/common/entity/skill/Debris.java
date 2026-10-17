@@ -52,6 +52,20 @@ public final class Debris {
         return torn;
     }
 
+    /**
+     * Flings one block away at this speed, to fall back where it may, if it is {@link #tearable}; whether it went. The
+     * caller asks the world's leave first (the mobGriefing rule).
+     */
+    public static boolean fling(ServerLevel level, BlockPos pos, Vec3 velocity) {
+        if (!level.isLoaded(pos)) return false;
+        BlockState state = level.getBlockState(pos);
+        if (!tearable(level, pos, state)) return false;
+        FallingBlockEntity flung = FallingBlockEntity.fall(level, pos, state);
+        flung.setDeltaMovement(velocity);
+        flung.hurtMarked = true;
+        return true;
+    }
+
     /** Whether a block is torn up: one that can be broken at all, that holds nothing, is no liquid, half of nothing, and no plant in the open. */
     public static boolean tearable(ServerLevel level, BlockPos pos, BlockState state) {
         if (state.isAir() || !state.getFluidState().isEmpty() || state.hasBlockEntity() || state.canBeReplaced()) return false;

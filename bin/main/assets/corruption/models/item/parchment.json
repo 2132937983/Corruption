@@ -1,0 +1,14 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "corruption:item/parchment"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "corruption:inscribed": 1
+      },
+      "model": "corruption:item/parchment_inscribed"
+    }
+  ]
+}

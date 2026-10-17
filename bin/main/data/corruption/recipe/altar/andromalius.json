@@ -1,0 +1,39 @@
+{
+  "type": "corruption:altar_shaped",
+  "pillars": {
+    "1": {
+      "type": "neoforge:components",
+      "items": "corruption:parchment",
+      "components": {
+        "corruption:inscription": "corruption:andromalius"
+      }
+    },
+    "2": {
+      "item": "corruption:abyssal_pearl"
+    },
+    "3": {
+      "item": "corruption:blighted_bone"
+    },
+    "4": {
+      "item": "corruption:corrupted_heartstone"
+    },
+    "5": {
+      "item": "corruption:blighted_bone"
+    },
+    "6": {
+      "item": "corruption:abyssal_pearl"
+    }
+  },
+  "offering": "minecraft:villager",
+  "blocks": [
+    { "at": [2, 2], "block": "#corruption:wither_skulls" },
+    { "at": [2, -2], "block": "#corruption:wither_skulls" },
+    { "at": [-2, -2], "block": "#corruption:wither_skulls" },
+    { "at": [-2, 2], "block": "#corruption:wither_skulls" }
+  ],
+  "corruption": 3,
+  "time": 160,
+  "result": {
+    "entity": "corruption:andromalius"
+  }
+}

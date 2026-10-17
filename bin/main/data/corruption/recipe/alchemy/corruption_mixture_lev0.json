@@ -1,0 +1,17 @@
+{
+  "type": "corruption:alchemy_shapeless",
+  "ingredients": [
+    {
+      "item": "corruption:corruption_dust",
+      "count": 2
+    },
+    {
+      "item": "corruption:corruption_remain",
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "corruption:corruption_mixture_lev0",
+    "count": 1
+  }
+}

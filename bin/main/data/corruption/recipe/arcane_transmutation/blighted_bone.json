@@ -1,0 +1,11 @@
+{
+  "type": "corruption:arcane_transmutation",
+  "ingredient": {
+    "item": "minecraft:bone",
+    "count": 1
+  },
+  "energy": "1KCE",
+  "result": {
+    "id": "corruption:blighted_bone"
+  }
+}

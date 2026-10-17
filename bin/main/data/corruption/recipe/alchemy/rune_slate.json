@@ -1,0 +1,25 @@
+{
+  "type": "corruption:alchemy_shaped",
+  "slots": {
+    "0": {
+      "item": "minecraft:cobbled_deepslate",
+      "count": 4
+    },
+    "1": {
+      "item": "corruption:void_ash",
+      "count": 2
+    },
+    "2": {
+      "item": "corruption:corrupted_ichor",
+      "count": 1
+    },
+    "3": {
+      "item": "corruption:corruption_dust",
+      "count": 16
+    }
+  },
+  "result": {
+    "id": "corruption:rune_slate",
+    "count": 2
+  }
+}

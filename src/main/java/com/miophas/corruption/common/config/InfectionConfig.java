@@ -7,7 +7,14 @@ import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
-/** Gameplay defaults, file persistence and live configuration belong to common. */
+/**
+ * Gameplay defaults, file persistence and live configuration belong to common.
+ *
+ * <p>The file carries the version of the settings it holds ({@code configVersion}). A default the mod changes does not
+ * reach a file that already exists, since the file holds its own value; so a file of an older version is brought up to
+ * date as it loads ({@link #migrate}): a setting that still holds an old default which has since changed is moved to the
+ * new default, and anything else (a server's own choice) is left as it is.
+ */
 public final class InfectionConfig {
     public static final InfectionSettings DEFAULT = new InfectionSettings(4, 64, 16, 1.0, 20, 2048, 0.15, 8);
     public static final int MIN_SPREAD_INTERVAL = 1;
@@ -15,6 +22,12 @@ public final class InfectionConfig {
     public static final int MAX_SOURCES_PER_BATCH = 1024;
     public static final int MAX_CONVERSIONS_PER_BATCH = 128;
     public static final ModConfigSpec SPEC;
+    /** The version of the settings this mod writes, and the file's own (0 for a file from before versions were kept). */
+    public static final int SETTINGS_VERSION = 1;
+    public static final ModConfigSpec.IntValue CONFIG_VERSION;
+    /** Defaults of older versions that have since changed: what a file of an older version holds, if no one chose otherwise. */
+    static final double OLD_VINE_CHANCE = 0.5;
+    static final int OLD_VINE_ELITE_INTERVAL = 3600;
     public static final ModConfigSpec.BooleanValue INFECTION_ENABLED;
     public static final ModConfigSpec.IntValue SPREAD_INTERVAL;
     public static final ModConfigSpec.IntValue SOURCES_PER_BATCH;
@@ -28,16 +41,24 @@ public final class InfectionConfig {
     private static volatile boolean corruptedBlocksFlammable;
     private static volatile InfectionSettings current = DEFAULT;
     public static final ModConfigSpec.DoubleValue MALICE_CHANCE, VINE_CHANCE, DECOR_CHANCE, ELDRITCH_CHANCE, EERIE_CHANCE, ELDRITCH_GROWTH_CHANCE;
-    public static final ModConfigSpec.IntValue VINE_GROWTH_TICKS, BLINDNESS_RADIUS, ATTRACTION_RADIUS;
+    public static final ModConfigSpec.IntValue VINE_GROWTH_TICKS, BLINDNESS_RADIUS, ATTRACTION_RADIUS, VINE_ELITE_INTERVAL, VINE_ELITE_CAP;
     public static final ModConfigSpec.DoubleValue GREED_CHANCE;
     public static final ModConfigSpec.IntValue GREED_GROWTH_TICKS, GREED_RANGE, GREED_RANGE_STEP;
     private record Ecology(double malice, double vine, double decor, int growth, int blindness, int attraction,
-            double eldritch, double eerie, double eldritchGrowth, double greed, int greedGrowth, int greedRange, int greedRangeStep) {}
-    private static final Ecology DEFAULT_ECOLOGY = new Ecology(0.01, 0.5, 0.12, 1200, 4, 16, 0.08, 0.20, 0.10, 0.10, 1200, 6, 4);
+            double eldritch, double eerie, double eldritchGrowth, double greed, int greedGrowth, int greedRange, int greedRangeStep,
+            int eliteInterval, int eliteCap) {}
+    /** How likely a vine is to sprout on new malice, unless the file says otherwise. */
+    public static final double VINE_CHANCE_DEFAULT = 0.05;
+    private static final Ecology DEFAULT_ECOLOGY = new Ecology(0.01, VINE_CHANCE_DEFAULT, 0.12, 1200, 4, 16, 0.08, 0.20, 0.10, 0.10, 1200, 6, 4,
+            com.miophas.corruption.core.plant.MaliceVineRules.BROOD_TICKS, com.miophas.corruption.core.plant.MaliceVineRules.BROOD_CAP);
     private static volatile Ecology ecology = DEFAULT_ECOLOGY;
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+        CONFIG_VERSION = builder.comment("Which version of these settings this file holds, so that the mod can bring an older file up to date as it loads: "
+                        + "a setting still at an old default that has since changed is moved to the new default, and everything else is left as it is. Leave it as it is.")
+                .translation("corruption.configuration.configVersion")
+                .defineInRange("configVersion", 0, 0, Integer.MAX_VALUE);
         builder.comment("Corruption infection settings. Changes apply to all server dimensions without restarting.")
                 .push("infection");
         INFECTION_ENABLED = builder
@@ -88,9 +109,9 @@ public final class InfectionConfig {
         MALICE_CHANCE = builder.comment("Chance an eligible infected solid becomes malice. Ore conversions and fluids retain their own forms.")
                 .translation("corruption.configuration.ecology.maliceChance")
                 .defineInRange("maliceChance", 0.01, 0.0, 1.0);
-        VINE_CHANCE = builder.comment("One-time vine sprouting chance after malice is placed. Shares a mutually exclusive roll with greedChance; needs support and clear growing space.")
+        VINE_CHANCE = builder.comment("One-time vine sprouting chance after malice is placed. Shares a mutually exclusive roll with greedChance; needs support and clear growing space. Vines bring forth elites (see vineEliteIntervalTicks), so they are rare by default.")
                 .translation("corruption.configuration.ecology.vineChance")
-                .defineInRange("vineChance", 0.5, 0.0, 1.0);
+                .defineInRange("vineChance", VINE_CHANCE_DEFAULT, 0.0, 1.0);
         GREED_CHANCE = builder.comment("One-time greed sprouting chance on malice. Uses a single mutually exclusive roll with vineChance; greed has priority if their sum exceeds 1.")
                 .translation("corruption.configuration.ecology.greedChance").defineInRange("greedChance", 0.10, 0, 1);
         GREED_GROWTH_TICKS = builder.translation("corruption.configuration.ecology.greedGrowthTicks")
@@ -117,7 +138,14 @@ public final class InfectionConfig {
                 .defineInRange("vineBlindnessRadius", 4, 1, 16);
         ATTRACTION_RADIUS = builder.translation("corruption.configuration.ecology.vineAttractionRadius")
                 .defineInRange("vineAttractionRadius", 16, 1, 64);
+        VINE_ELITE_INTERVAL = builder.comment("Ticks between the elites a malice vine brings forth (at random: a corrupted aberration or screecher anywhere, a corrupted lurker where there is water near it). It only does so with a player within 32 blocks, never on Peaceful, and not while vineEliteCap elites are within 32 blocks of it. 0 turns this off.")
+                .translation("corruption.configuration.ecology.vineEliteIntervalTicks")
+                .defineInRange("vineEliteIntervalTicks", com.miophas.corruption.core.plant.MaliceVineRules.BROOD_TICKS, 0, 72000);
+        VINE_ELITE_CAP = builder.comment("How many elites may be within 32 blocks of a malice vine before it stops bringing forth more. 0 turns its brood off.")
+                .translation("corruption.configuration.ecology.vineEliteCap")
+                .defineInRange("vineEliteCap", com.miophas.corruption.core.plant.MaliceVineRules.BROOD_CAP, 0, 16);
         builder.pop();
+        DemonConfig.define(builder);
         SPEC = builder.build();
     }
 
@@ -138,6 +166,9 @@ public final class InfectionConfig {
     public static int vineGrowthTicks() { return ecology.growth; }
     public static int blindnessRadius() { return ecology.blindness; }
     public static int attractionRadius() { return ecology.attraction; }
+    /** Ticks between the elites a malice vine brings forth (0: none), and how many may be about it before it stops. */
+    public static int vineEliteInterval() { return ecology.eliteInterval; }
+    public static int vineEliteCap() { return ecology.eliteCap; }
 
     public static void onLoading(ModConfigEvent.Loading event) {
         loadSnapshot(event);
@@ -151,14 +182,17 @@ public final class InfectionConfig {
         if (event.getConfig().getSpec() != SPEC) {
             return;
         }
+        migrate();
         InfectionSettings updated = new InfectionSettings(SPREAD_INTERVAL.get(), SOURCES_PER_BATCH.get(),
                 CONVERSIONS_PER_BATCH.get(), SPREAD_CHANCE.get(), SCAN_INTERVAL.get(), SCAN_BLOCKS_PER_BATCH.get(), BASE_CORRUPTION_CHANCE.get(), MAX_SPREAD_MULTIPLIER.get(), INFECTION_ENABLED.get());
         current = updated;
         corruptedBlocksFlammable = CORRUPTED_BLOCKS_FLAMMABLE.get();
+        DemonConfig.load();
         ecology = new Ecology(MALICE_CHANCE.get(), VINE_CHANCE.get(), DECOR_CHANCE.get(),
                 VINE_GROWTH_TICKS.get(), BLINDNESS_RADIUS.get(), ATTRACTION_RADIUS.get(),
                 ELDRITCH_CHANCE.get(), EERIE_CHANCE.get(), ELDRITCH_GROWTH_CHANCE.get(),
-                GREED_CHANCE.get(), GREED_GROWTH_TICKS.get(), GREED_RANGE.get(), GREED_RANGE_STEP.get());
+                GREED_CHANCE.get(), GREED_GROWTH_TICKS.get(), GREED_RANGE.get(), GREED_RANGE_STEP.get(),
+                VINE_ELITE_INTERVAL.get(), VINE_ELITE_CAP.get());
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server != null) {
             // File watchers can run on another thread; all engine updates stay on the server thread.
@@ -166,11 +200,29 @@ public final class InfectionConfig {
         }
     }
 
+    /**
+     * Brings a file of an older version up to date, once, and saves it: each setting whose default has changed since is
+     * moved to the new default if it still holds the old one. Nothing happens to a file of this version.
+     */
+    static void migrate() {
+        int version = CONFIG_VERSION.get();
+        if (version >= SETTINGS_VERSION) return;
+        VINE_CHANCE.set(upgraded(version, VINE_CHANCE.get(), OLD_VINE_CHANCE, VINE_CHANCE_DEFAULT));
+        VINE_ELITE_INTERVAL.set(upgraded(version, VINE_ELITE_INTERVAL.get(), OLD_VINE_ELITE_INTERVAL, com.miophas.corruption.core.plant.MaliceVineRules.BROOD_TICKS));
+        CONFIG_VERSION.set(SETTINGS_VERSION);
+        SPEC.save();
+    }
+
+    /** A setting from a file of this version, brought up to date: the new default if it holds the old one from before it changed, else as it is. */
+    static double upgraded(int version, double value, double old, double now) { return version < SETTINGS_VERSION && value == old ? now : value; }
+    static int upgraded(int version, int value, int old, int now) { return version < SETTINGS_VERSION && value == old ? now : value; }
+
     public static void onUnloading(ModConfigEvent.Unloading event) {
         if (event.getConfig().getSpec() == SPEC) {
             current = DEFAULT;
             corruptedBlocksFlammable = false;
             ecology = DEFAULT_ECOLOGY;
+            DemonConfig.reset();
         }
     }
 

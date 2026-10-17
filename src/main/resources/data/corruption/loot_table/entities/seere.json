@@ -97,6 +97,15 @@
           "chance": 0.5
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "corruption:seere_pinion"
+        }
+      ]
     }
   ],
   "random_sequence": "corruption:entities/seere"

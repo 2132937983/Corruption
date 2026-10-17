@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:entity",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "value": "corruption:entities/corrupted_remnant"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "corruption:entities/corrupted_sower"
+}

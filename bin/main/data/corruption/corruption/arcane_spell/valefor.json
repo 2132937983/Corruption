@@ -1,0 +1,121 @@
+{
+  "energy": "1KCE",
+  "cooldown": 30,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:shards",
+      "radius": 4,
+      "height": 2.2,
+      "ticks": 50,
+      "color": "#8A98C8",
+      "accent": "#FFFFFF",
+      "sound": "minecraft:entity.illusioner.mirror_move"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#8A98C8",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#8A98C8"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#8A98C8"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 16,
+          "height": 1.5,
+          "ticks": 18,
+          "color": "#8A98C8",
+          "accent": "#FFFFFF"
+        },
+        {
+          "type": "damage",
+          "amount": 36,
+          "radius": 16
+        },
+        {
+          "type": "push",
+          "radius": 16,
+          "strength": 1.4,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:weakness",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 200,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:blindness",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 40
+        }
+      ]
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:invisibility",
+      "target": "self",
+      "duration": 2400
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:speed",
+      "target": "self",
+      "duration": 2400,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 2,
+      "particles": [
+        {
+          "particle": "minecraft:poof",
+          "count": 30,
+          "spread": 0.3,
+          "speed": 0.03
+        }
+      ]
+    }
+  ]
+}

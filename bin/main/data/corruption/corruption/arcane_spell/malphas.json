@@ -1,0 +1,66 @@
+{
+  "energy": "2KCE",
+  "cooldown": 40,
+  "min_corruption": 5,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:feathers",
+      "radius": 5,
+      "ticks": 40,
+      "color": "#2A1A40",
+      "accent": "#B8A0FF",
+      "sound": "minecraft:entity.phantom.flap"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.6,
+      "trail": [
+        {
+          "particle": "minecraft:squid_ink",
+          "count": 2,
+          "spread": 0.05
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:explosion",
+          "count": 2,
+          "spread": 0.3
+        },
+        {
+          "particle": "minecraft:smoke",
+          "count": 20,
+          "spread": 0.5,
+          "speed": 0.03
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:fissure",
+          "radius": 7,
+          "height": 1.5,
+          "ticks": 50,
+          "color": "#6A5A8A",
+          "accent": "#FFB040",
+          "shake": 0.4
+        },
+        {
+          "type": "damage",
+          "amount": 52,
+          "radius": 8
+        },
+        {
+          "type": "explode",
+          "power": 3,
+          "breaks_blocks": true,
+          "break_radius": 4,
+          "max_blocks": 80,
+          "max_resistance": 9
+        }
+      ]
+    }
+  ]
+}

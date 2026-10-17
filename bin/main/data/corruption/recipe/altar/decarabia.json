@@ -1,0 +1,77 @@
+{
+  "type": "corruption:altar_shaped",
+  "pillars": {
+    "1": {
+      "type": "neoforge:components",
+      "items": "corruption:parchment",
+      "components": {
+        "corruption:inscription": "corruption:decarabia"
+      }
+    },
+    "2": {
+      "item": "minecraft:feather"
+    },
+    "3": {
+      "item": "corruption:abyssal_pearl"
+    },
+    "4": {
+      "item": "corruption:corrupted_heartstone"
+    },
+    "5": {
+      "item": "minecraft:diamond"
+    },
+    "6": {
+      "item": "minecraft:emerald"
+    }
+  },
+  "offering": "minecraft:villager",
+  "blocks": [
+    {
+      "at": [
+        0,
+        2
+      ],
+      "block": "minecraft:diamond_block"
+    },
+    {
+      "at": [
+        2,
+        1
+      ],
+      "block": "minecraft:gold_block"
+    },
+    {
+      "at": [
+        2,
+        -1
+      ],
+      "block": "minecraft:emerald_block"
+    },
+    {
+      "at": [
+        0,
+        -2
+      ],
+      "block": "minecraft:lapis_block"
+    },
+    {
+      "at": [
+        -2,
+        -1
+      ],
+      "block": "minecraft:redstone_block"
+    },
+    {
+      "at": [
+        -2,
+        1
+      ],
+      "block": "minecraft:quartz_block"
+    }
+  ],
+  "corruption": 10,
+  "time": 200,
+  "result": {
+    "entity": "corruption:decarabia"
+  }
+}

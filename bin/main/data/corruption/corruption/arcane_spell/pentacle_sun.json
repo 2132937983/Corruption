@@ -1,0 +1,93 @@
+{
+  "energy": "30KCE",
+  "cooldown": 100,
+  "min_corruption": 12,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:crown",
+      "radius": 12,
+      "height": 3,
+      "ticks": 50,
+      "color": "#FFD24A",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:light_pillar",
+      "radius": 6,
+      "height": 32,
+      "ticks": 50,
+      "color": "#FFD24A",
+      "accent": "#FFFFFF",
+      "shake": 0.4,
+      "sound": "minecraft:block.beacon.activate"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:shockwave",
+      "radius": 20,
+      "height": 2,
+      "ticks": 24,
+      "color": "#FFD24A",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "particles",
+      "shape": "sphere",
+      "radius": 12,
+      "particles": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 64,
+          "spread": 0.05,
+          "speed": 0.02
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 60,
+          "spread": 0.1,
+          "color": "#FFD24A"
+        }
+      ]
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:instant_health",
+      "target": "self",
+      "duration": 1,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:fire_resistance",
+      "target": "self",
+      "duration": 2400
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:night_vision",
+      "target": "self",
+      "duration": 2400
+    },
+    {
+      "type": "damage",
+      "amount": 60,
+      "radius": 20
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:instant_health",
+      "target": "nearby",
+      "radius": 20,
+      "duration": 1,
+      "amplifier": 3
+    },
+    {
+      "type": "ignite_area",
+      "radius": 20,
+      "seconds": 6
+    }
+  ]
+}

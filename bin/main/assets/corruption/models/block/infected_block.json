@@ -1,0 +1,8 @@
+{
+  "loader": "corruption:corrupted",
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "minecraft:block/stone",
+    "overlay": "corruption:block/block_corruption_overlay"
+  }
+}

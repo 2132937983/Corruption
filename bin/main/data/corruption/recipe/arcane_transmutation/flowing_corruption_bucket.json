@@ -1,0 +1,10 @@
+{
+  "type": "corruption:arcane_transmutation",
+  "ingredient": {
+    "item": "minecraft:water_bucket"
+  },
+  "energy": "20KCE",
+  "result": {
+    "id": "corruption:flowing_corruption_bucket"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "type": "corruption:arcane_transmutation",
+  "ingredient": {
+    "tag": "c:ingots/copper"
+  },
+  "energy": "5KCE",
+  "result": {
+    "id": "corruption:corrupted_brass"
+  }
+}

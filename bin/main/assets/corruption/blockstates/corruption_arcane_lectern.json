@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,has_key=false": {
+      "model": "corruption:block/corruption_arcane_lectern"
+    },
+    "facing=north,has_key=true": {
+      "model": "corruption:block/corruption_arcane_lectern_key"
+    },
+    "facing=east,has_key=false": {
+      "model": "corruption:block/corruption_arcane_lectern",
+      "y": 90
+    },
+    "facing=east,has_key=true": {
+      "model": "corruption:block/corruption_arcane_lectern_key",
+      "y": 90
+    },
+    "facing=south,has_key=false": {
+      "model": "corruption:block/corruption_arcane_lectern",
+      "y": 180
+    },
+    "facing=south,has_key=true": {
+      "model": "corruption:block/corruption_arcane_lectern_key",
+      "y": 180
+    },
+    "facing=west,has_key=false": {
+      "model": "corruption:block/corruption_arcane_lectern",
+      "y": 270
+    },
+    "facing=west,has_key=true": {
+      "model": "corruption:block/corruption_arcane_lectern_key",
+      "y": 270
+    }
+  }
+}

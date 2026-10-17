@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Rectangles inside the GUI tile atlas. Coordinates are pixels in the texture named here; a screen asks
+  for a tile by name instead of repeating numbers. A "bg_" tile is the empty track, the matching tile
+  without it is the filled bar drawn on top.
+-->
+<tiles texture="corruption:textures/gui/gui_tiles.png" width="270" height="90">
+  <tile name="bg_progress_bar" x="0" y="0" width="22" height="16"/>
+  <tile name="progress_bar" x="0" y="16" width="22" height="16"/>
+  <tile name="bg_loading_bar" x="22" y="0" width="14" height="14"/>
+  <tile name="loading_bar" x="22" y="14" width="14" height="14"/>
+  <tile name="bg_corruption_energy_bar" x="36" y="0" width="68" height="6"/>
+  <tile name="corruption_energy_bar" x="36" y="6" width="68" height="6"/>
+</tiles>

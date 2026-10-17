@@ -10,7 +10,11 @@ import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
-/** Five distinct anchored growth stages, ending in a faceless crown with six hanging tendrils. */
+/**
+ * Five distinct anchored growth stages, ending in a faceless crown with six hanging tendrils; its crown swells and its
+ * tendrils rise as it gathers itself for its shockwave, snap out as it lets loose, and its crown pulses as it brings forth
+ * an elite.
+ */
 public final class MaliceVineModel extends HierarchicalModel<MaliceVine> {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(
             ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "malice_vine"), "main");
@@ -46,6 +50,33 @@ public final class MaliceVineModel extends HierarchicalModel<MaliceVine> {
         for (int i = 0; i < tendrils[stage].length; i++) {
             tendrils[stage][i].xRot += Mth.sin(t * .052F + i * .85F) * .08F;
             tendrils[stage][i].zRot += Mth.sin(t * .047F + i * .85F + .6F) * .10F;
+        }
+        defend(entity, age, crown, tendrils[stage]);
+    }
+
+    /**
+     * Its defence and its brood, as they show: gathering itself for a shockwave its crown swells and shudders and its
+     * tendrils rise outward; letting it loose they snap out wide and fall back; bringing forth an elite, its crown pulses.
+     */
+    private static void defend(MaliceVine vine, float age, ModelPart crown, ModelPart[] tendrils) {
+        float partial = age - vine.tickCount;
+        float gathered = vine.gathered(partial), since = vine.sinceShock(partial), brood = vine.sinceBrood(partial);
+        float snap = since < 10 ? 1 - since / 10 : 0;
+        float pulse = brood < 30 ? Mth.sin(brood / 30 * Mth.PI) : 0;
+        float swell = 1 + .25F * gathered + .15F * snap + .2F * pulse;
+        crown.xScale *= swell;
+        crown.zScale *= swell;
+        crown.yScale *= 1 + .15F * gathered + .1F * pulse;
+        crown.zRot += Mth.sin(age * 2.5F) * .06F * gathered;
+        float out = .9F * gathered + 1.4F * snap;
+        if (out <= 0) return;
+        for (ModelPart tendril : tendrils) {
+            PartPose built = tendril.getInitialPose();
+            float x = built.x, z = built.z, apart = Mth.sqrt(x * x + z * z);
+            if (apart < 1e-3F) continue;
+            // Each swings out away from the crown's middle: a turn about Z for its reach along X, about X for along Z.
+            tendril.zRot -= out * x / apart;
+            tendril.xRot += out * z / apart;
         }
     }
     public static LayerDefinition createBodyLayer() {

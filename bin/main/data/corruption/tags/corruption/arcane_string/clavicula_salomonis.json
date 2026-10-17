@@ -1,0 +1,11 @@
+{
+  "values": [
+    "corruption:corruption",
+    "corruption:transmutation",
+    "corruption:corruption_barrage",
+    "corruption:corruption_nova",
+    "corruption:corruption_vortex",
+    "corruption:corruption_tempest",
+    "corruption:corruption_rain"
+  ]
+}

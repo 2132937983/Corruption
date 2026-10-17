@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CDC",
+    "STS",
+    "S S"
+  ],
+  "key": {
+    "C": {
+      "item": "corruption:corruption_crystal"
+    },
+    "D": {
+      "item": "corruption:corruption_dust"
+    },
+    "T": {
+      "item": "minecraft:crafting_table"
+    },
+    "S": {
+      "item": "corruption:corruption_stick"
+    }
+  },
+  "result": {
+    "id": "corruption:corruption_bench"
+  }
+}

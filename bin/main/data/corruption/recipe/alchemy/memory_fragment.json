@@ -1,0 +1,24 @@
+{
+  "type": "corruption:alchemy_shapeless",
+  "ingredients": [
+    {
+      "item": "corruption:corruption_crystal",
+      "count": 64
+    },
+    {
+      "item": "corruption:ancient_corruption_crystal",
+      "count": 32
+    },
+    {
+      "item": "corruption:corruption",
+      "count": 16
+    },
+    {
+      "item": "corruption:malice",
+      "count": 8
+    }
+  ],
+  "result": {
+    "id": "corruption:memory_fragment"
+  }
+}

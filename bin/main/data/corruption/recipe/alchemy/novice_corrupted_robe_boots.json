@@ -1,0 +1,29 @@
+{
+  "type": "corruption:alchemy_shaped",
+  "slots": {
+    "0": {
+      "item": "corruption:robe_boots",
+      "count": 1
+    },
+    "1": {
+      "item": "corruption:shadow_silk",
+      "count": 2
+    },
+    "2": {
+      "item": "corruption:malice_fiber",
+      "count": 4
+    },
+    "3": {
+      "item": "corruption:corruption_crystal",
+      "count": 4
+    },
+    "4": {
+      "item": "corruption:corruption_dust",
+      "count": 32
+    }
+  },
+  "result": {
+    "id": "corruption:novice_corrupted_robe_boots"
+  },
+  "keep": "0"
+}

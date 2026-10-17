@@ -1,0 +1,118 @@
+{
+  "energy": "1KCE",
+  "cooldown": 30,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:wings",
+      "radius": 6,
+      "height": 1.5,
+      "ticks": 50,
+      "color": "#FFD24A",
+      "accent": "#FFFFFF",
+      "sound": "minecraft:entity.ender_dragon.flap"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#FFD24A",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#FFD24A"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#FFD24A"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 16,
+          "height": 1,
+          "ticks": 16,
+          "color": "#FFD24A",
+          "accent": "#FFFFFF"
+        },
+        {
+          "type": "damage",
+          "amount": 36,
+          "radius": 16
+        },
+        {
+          "type": "push",
+          "radius": 16,
+          "strength": 1.6,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 16,
+          "duration": 80,
+          "amplifier": 1
+        }
+      ]
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:strength",
+      "target": "self",
+      "duration": 3600,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:speed",
+      "target": "self",
+      "duration": 3600,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:jump_boost",
+      "target": "self",
+      "duration": 3600,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 2,
+      "particles": [
+        {
+          "particle": "minecraft:crit",
+          "count": 24,
+          "spread": 0.3
+        },
+        {
+          "particle": "minecraft:enchanted_hit",
+          "count": 24,
+          "spread": 0.3
+        }
+      ]
+    }
+  ]
+}

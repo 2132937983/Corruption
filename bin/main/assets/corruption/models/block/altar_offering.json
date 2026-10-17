@@ -1,0 +1,345 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "bricks": "corruption:block/block_corruption_arcane_brick",
+    "cloth": "corruption:block/block_altar_offering_cloth",
+    "drape": "corruption:block/block_altar_offering_drape",
+    "sigil": "corruption:block/block_altar_offering_sigil",
+    "particle": "corruption:block/block_corruption_arcane_brick"
+  },
+  "elements": [
+    {
+      "name": "base",
+      "from": [
+        1,
+        0,
+        1
+      ],
+      "to": [
+        15,
+        7,
+        15
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1,
+            9,
+            15,
+            16
+          ],
+          "texture": "#bricks"
+        },
+        "east": {
+          "uv": [
+            1,
+            9,
+            15,
+            16
+          ],
+          "texture": "#bricks"
+        },
+        "south": {
+          "uv": [
+            1,
+            9,
+            15,
+            16
+          ],
+          "texture": "#bricks"
+        },
+        "west": {
+          "uv": [
+            1,
+            9,
+            15,
+            16
+          ],
+          "texture": "#bricks"
+        },
+        "down": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#bricks"
+        }
+      }
+    },
+    {
+      "name": "cloth",
+      "from": [
+        0,
+        7,
+        0
+      ],
+      "to": [
+        16,
+        8,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            1
+          ],
+          "texture": "#cloth"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            1
+          ],
+          "texture": "#cloth"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            1
+          ],
+          "texture": "#cloth"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            1
+          ],
+          "texture": "#cloth"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#cloth"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#cloth"
+        }
+      }
+    },
+    {
+      "name": "drape_north",
+      "from": [
+        2,
+        1,
+        0
+      ],
+      "to": [
+        14,
+        7,
+        1
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            2,
+            10,
+            14,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "east": {
+          "uv": [
+            0,
+            10,
+            1,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "west": {
+          "uv": [
+            0,
+            10,
+            1,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "down": {
+          "uv": [
+            2,
+            15,
+            14,
+            16
+          ],
+          "texture": "#drape"
+        }
+      }
+    },
+    {
+      "name": "drape_south",
+      "from": [
+        2,
+        1,
+        15
+      ],
+      "to": [
+        14,
+        7,
+        16
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            10,
+            1,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "south": {
+          "uv": [
+            2,
+            10,
+            14,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "west": {
+          "uv": [
+            0,
+            10,
+            1,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "down": {
+          "uv": [
+            2,
+            15,
+            14,
+            16
+          ],
+          "texture": "#drape"
+        }
+      }
+    },
+    {
+      "name": "drape_west",
+      "from": [
+        0,
+        4,
+        2
+      ],
+      "to": [
+        1,
+        7,
+        14
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            13,
+            1,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "south": {
+          "uv": [
+            0,
+            13,
+            1,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "west": {
+          "uv": [
+            2,
+            13,
+            14,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "down": {
+          "uv": [
+            2,
+            15,
+            14,
+            16
+          ],
+          "texture": "#drape"
+        }
+      }
+    },
+    {
+      "name": "drape_east",
+      "from": [
+        15,
+        4,
+        2
+      ],
+      "to": [
+        16,
+        7,
+        14
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            13,
+            1,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "east": {
+          "uv": [
+            2,
+            13,
+            14,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "south": {
+          "uv": [
+            0,
+            13,
+            1,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "down": {
+          "uv": [
+            2,
+            15,
+            14,
+            16
+          ],
+          "texture": "#drape"
+        }
+      }
+    }
+  ]
+}

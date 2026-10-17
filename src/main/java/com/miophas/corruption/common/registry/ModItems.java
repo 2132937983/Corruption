@@ -2,6 +2,7 @@ package com.miophas.corruption.common.registry;
 
 import com.miophas.corruption.Corruption;
 import com.miophas.corruption.common.item.BasicCorruptionEnergyItem;
+import com.miophas.corruption.common.item.BossRelicItem;
 import com.miophas.corruption.common.item.CorruptionArcaneStickItem;
 import com.miophas.corruption.common.item.CorruptionMaterialItem;
 import com.miophas.corruption.common.item.InfectedBlockItem;
@@ -120,6 +121,21 @@ public final class ModItems {
             CORRUPTED_ICHOR, MALICE_FIBER, SOUL_RESIN, SHADOW_SILK, BLOODSTONE, RUNE_SLATE, ELDRITCH_MEMBRANE, ABYSSAL_PEARL, CORRUPTED_HEARTSTONE, CHAOS_CATALYST,
             MALICE_TENDRIL, GREED_HEARTWOOD, RESENTMENT, MEMORY_FRAGMENT, CORRUPTED_MEMORY_GEM, CORRUPTION_ENERGY_BRICK);
     /**
+     * What each of the corruption's lords leaves when it falls (its loot table), its own: kept for what may one day be
+     * called up with them all (gamemodels/boss_relics writes their data and draws them).
+     */
+    public static final DeferredItem<BossRelicItem> BAAL_HORN = relic("baal_horn");
+    public static final DeferredItem<BossRelicItem> AGARES_RIMEHEART = relic("agares_rimeheart");
+    public static final DeferredItem<BossRelicItem> ANDROMALIUS_SCALE = relic("andromalius_scale");
+    public static final DeferredItem<BossRelicItem> DANTALION_MIRROR_SHARD = relic("dantalion_mirror_shard");
+    public static final DeferredItem<BossRelicItem> SEERE_PINION = relic("seere_pinion");
+    public static final DeferredItem<BossRelicItem> DECARABIA_STAR = relic("decarabia_star");
+    public static final DeferredItem<BossRelicItem> BELIAL_HALO = relic("belial_halo");
+    public static final DeferredItem<BossRelicItem> AMDUSIAS_HORN = relic("amdusias_horn");
+    /** The relics, in the order their lords are met. */
+    public static final List<DeferredItem<BossRelicItem>> RELICS = List.of(BAAL_HORN, AGARES_RIMEHEART, ANDROMALIUS_SCALE, DANTALION_MIRROR_SHARD,
+            SEERE_PINION, DECARABIA_STAR, BELIAL_HALO, AMDUSIAS_HORN);
+    /**
      * The corruption's blades (ArcaneBladeRules): the energy sword, which bears the arcane's mark and reaches the
      * corruption's lords; and the arcane sword, twice as heavy and cursed besides, which they turn aside.
      */
@@ -225,8 +241,60 @@ public final class ModItems {
         return List.copyOf(robes);
     }
 
+    /**
+     * A spawn egg for each of the corruption's elites. Each is drawn as its own (gamemodels/corrupted_elites draws them from
+     * the game's spawn egg), so their colours are white: NeoForge tints every such egg by its colours, and white leaves
+     * the drawing as it is.
+     */
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_ABERRATION_SPAWN_EGG =
+            egg("corrupted_aberration_spawn_egg", ModEntities.CORRUPTED_ABERRATION);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_SCREECHER_SPAWN_EGG =
+            egg("corrupted_screecher_spawn_egg", ModEntities.CORRUPTED_SCREECHER);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_LURKER_SPAWN_EGG =
+            egg("corrupted_lurker_spawn_egg", ModEntities.CORRUPTED_LURKER);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_BRUTE_SPAWN_EGG =
+            egg("corrupted_brute_spawn_egg", ModEntities.CORRUPTED_BRUTE);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_HOWLER_SPAWN_EGG =
+            egg("corrupted_howler_spawn_egg", ModEntities.CORRUPTED_HOWLER);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_STALKER_SPAWN_EGG =
+            egg("corrupted_stalker_spawn_egg", ModEntities.CORRUPTED_STALKER);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_BLOATER_SPAWN_EGG =
+            egg("corrupted_bloater_spawn_egg", ModEntities.CORRUPTED_BLOATER);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_MORTAR_SPAWN_EGG =
+            egg("corrupted_mortar_spawn_egg", ModEntities.CORRUPTED_MORTAR);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_CRAWLER_SPAWN_EGG =
+            egg("corrupted_crawler_spawn_egg", ModEntities.CORRUPTED_CRAWLER);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_GAZER_SPAWN_EGG =
+            egg("corrupted_gazer_spawn_egg", ModEntities.CORRUPTED_GAZER);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_HIVEMOTHER_SPAWN_EGG =
+            egg("corrupted_hivemother_spawn_egg", ModEntities.CORRUPTED_HIVEMOTHER);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_DRIFTER_SPAWN_EGG =
+            egg("corrupted_drifter_spawn_egg", ModEntities.CORRUPTED_DRIFTER);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_MAW_SPAWN_EGG =
+            egg("corrupted_maw_spawn_egg", ModEntities.CORRUPTED_MAW);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_NAIAD_SPAWN_EGG =
+            egg("corrupted_naiad_spawn_egg", ModEntities.CORRUPTED_NAIAD);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_MINDWEAVER_SPAWN_EGG =
+            egg("corrupted_mindweaver_spawn_egg", ModEntities.CORRUPTED_MINDWEAVER);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_BLIGHTHOUND_SPAWN_EGG =
+            egg("corrupted_blighthound_spawn_egg", ModEntities.CORRUPTED_BLIGHTHOUND);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> CORRUPTED_SOWER_SPAWN_EGG =
+            egg("corrupted_sower_spawn_egg", ModEntities.CORRUPTED_SOWER);
+    /** The elites' spawn eggs: the first three (land, air, sea), then the rest as they came (land, air, sea). */
+    public static final List<DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem>> ELITE_EGGS =
+            List.of(CORRUPTED_ABERRATION_SPAWN_EGG, CORRUPTED_SCREECHER_SPAWN_EGG, CORRUPTED_LURKER_SPAWN_EGG, CORRUPTED_BRUTE_SPAWN_EGG, CORRUPTED_HOWLER_SPAWN_EGG, CORRUPTED_STALKER_SPAWN_EGG, CORRUPTED_BLOATER_SPAWN_EGG, CORRUPTED_MORTAR_SPAWN_EGG, CORRUPTED_CRAWLER_SPAWN_EGG, CORRUPTED_GAZER_SPAWN_EGG, CORRUPTED_HIVEMOTHER_SPAWN_EGG, CORRUPTED_DRIFTER_SPAWN_EGG, CORRUPTED_MAW_SPAWN_EGG, CORRUPTED_NAIAD_SPAWN_EGG, CORRUPTED_MINDWEAVER_SPAWN_EGG, CORRUPTED_BLIGHTHOUND_SPAWN_EGG, CORRUPTED_SOWER_SPAWN_EGG);
+
+    private static DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> egg(String id,
+            java.util.function.Supplier<? extends net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Mob>> type) {
+        return ITEMS.register(id, () -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(type, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
+    }
+
     private static DeferredItem<CorruptionMaterialItem> material(String id) {
         return ITEMS.register(id, () -> new CorruptionMaterialItem(new Item.Properties()));
+    }
+
+    private static DeferredItem<BossRelicItem> relic(String id) {
+        return ITEMS.register(id, () -> new BossRelicItem(new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
     }
 
     private static DeferredItem<Item> key(String id, Rarity rarity) {

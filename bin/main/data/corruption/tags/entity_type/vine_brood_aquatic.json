@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "corruption:corrupted_lurker",
+    "corruption:corrupted_maw",
+    "corruption:corrupted_naiad"
+  ]
+}

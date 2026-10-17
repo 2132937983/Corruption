@@ -1,0 +1,69 @@
+{
+  "energy": "1KCE",
+  "cooldown": 60,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:bloom",
+      "radius": 6,
+      "height": 3,
+      "ticks": 60,
+      "color": "#5AC85A",
+      "accent": "#F0FFD0",
+      "sound": "minecraft:entity.zombie_villager.cure"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:light_pillar",
+      "radius": 2,
+      "height": 14,
+      "ticks": 40,
+      "color": "#8AE08A",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:instant_health",
+      "target": "self",
+      "duration": 1,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:regeneration",
+      "target": "self",
+      "duration": 900,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:health_boost",
+      "target": "self",
+      "duration": 6000,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:invisibility",
+      "target": "self",
+      "duration": 2400
+    },
+    {
+      "type": "particles",
+      "shape": "spiral",
+      "radius": 2,
+      "height": 2,
+      "particles": [
+        {
+          "particle": "minecraft:happy_villager",
+          "count": 24
+        },
+        {
+          "particle": "minecraft:composter",
+          "count": 16
+        }
+      ]
+    }
+  ]
+}

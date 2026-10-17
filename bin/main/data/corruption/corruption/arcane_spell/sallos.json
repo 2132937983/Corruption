@@ -1,0 +1,71 @@
+{
+  "energy": "1KCE",
+  "cooldown": 60,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:bloom",
+      "radius": 6,
+      "height": 3,
+      "ticks": 60,
+      "color": "#5AC8E0",
+      "accent": "#FFF4D0",
+      "sound": "minecraft:entity.dolphin.splash"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:crown",
+      "radius": 4,
+      "height": 2.6,
+      "ticks": 50,
+      "color": "#5AC8E0",
+      "accent": "#FFF4D0"
+    },
+    {
+      "type": "pacify",
+      "radius": 24
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:water_breathing",
+      "target": "self",
+      "duration": 9600
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:dolphins_grace",
+      "target": "self",
+      "duration": 3600
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:regeneration",
+      "target": "self",
+      "duration": 900,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:absorption",
+      "target": "self",
+      "duration": 2400,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 8,
+      "particles": [
+        {
+          "particle": "minecraft:splash",
+          "count": 24
+        },
+        {
+          "particle": "minecraft:heart",
+          "count": 8
+        }
+      ]
+    }
+  ]
+}

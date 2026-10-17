@@ -1,0 +1,119 @@
+{
+  "energy": "2KCE",
+  "cooldown": 30,
+  "min_corruption": 5,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:eye",
+      "radius": 4,
+      "height": 5,
+      "ticks": 60,
+      "color": "#E0B040",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#E0B040",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#E0B040"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#E0B040"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:blades",
+          "radius": 16,
+          "height": 6,
+          "ticks": 60,
+          "color": "#E0B040",
+          "accent": "#FFFFFF",
+          "sound": "minecraft:entity.horse.gallop"
+        },
+        {
+          "type": "damage",
+          "amount": 52,
+          "radius": 18
+        },
+        {
+          "type": "push",
+          "radius": 18,
+          "strength": 1.8,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 18,
+          "duration": 80,
+          "amplifier": 1
+        }
+      ]
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:glowing",
+      "target": "nearby",
+      "radius": 24,
+      "duration": 600
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:speed",
+      "target": "self",
+      "duration": 2400,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:strength",
+      "target": "self",
+      "duration": 2400,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 6,
+      "particles": [
+        {
+          "particle": "minecraft:crit",
+          "count": 30
+        },
+        {
+          "particle": "minecraft:smoke",
+          "count": 16,
+          "spread": 0.1,
+          "speed": 0.02
+        }
+      ]
+    }
+  ]
+}

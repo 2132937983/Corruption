@@ -85,8 +85,54 @@ public final class CorruptionClient {
                 com.miophas.corruption.common.client.entity.DantalionBookModel::createBodyLayer);
         event.registerLayerDefinition(com.miophas.corruption.common.client.entity.SeereModel.LAYER_LOCATION,
                 com.miophas.corruption.common.client.entity.SeereModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.AmdusiasModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.AmdusiasModel::createBodyLayer);
         event.registerLayerDefinition(com.miophas.corruption.common.client.entity.DantalionMirrorModel.LAYER_LOCATION,
                 com.miophas.corruption.common.client.entity.DantalionMirrorModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.DecarabiaStarModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.DecarabiaStarModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.DecarabiaHawkModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.DecarabiaHawkModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.BelialFairModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.BelialFairModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.BelialHollowModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.BelialHollowModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.FieryChariotModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.FieryChariotModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedAberrationModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedAberrationModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedScreecherModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedScreecherModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedLurkerModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedLurkerModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedBruteModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedBruteModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedHowlerModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedHowlerModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedStalkerModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedStalkerModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedBloaterModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedBloaterModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedMortarModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedMortarModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedCrawlerModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedCrawlerModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedGazerModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedGazerModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedHivemotherModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedHivemotherModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedDrifterModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedDrifterModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedMawModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedMawModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedNaiadModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedNaiadModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedMindweaverModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedMindweaverModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedBlighthoundModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedBlighthoundModel::createBodyLayer);
+        event.registerLayerDefinition(com.miophas.corruption.common.client.entity.CorruptedSowerModel.LAYER_LOCATION,
+                com.miophas.corruption.common.client.entity.CorruptedSowerModel::createBodyLayer);
     }
 
     @SubscribeEvent
@@ -111,7 +157,29 @@ public final class CorruptionClient {
         event.registerEntityRenderer(ModEntities.ANDROMALIUS.get(), com.miophas.corruption.common.client.entity.AndromaliusRenderer::new);
         event.registerEntityRenderer(ModEntities.DANTALION.get(), com.miophas.corruption.common.client.entity.DantalionRenderer::new);
         event.registerEntityRenderer(ModEntities.SEERE.get(), com.miophas.corruption.common.client.entity.SeereRenderer::new);
+        event.registerEntityRenderer(ModEntities.AMDUSIAS.get(), com.miophas.corruption.common.client.entity.AmdusiasRenderer::new);
+        event.registerEntityRenderer(ModEntities.DECARABIA.get(), com.miophas.corruption.common.client.entity.DecarabiaRenderer::new);
+        event.registerEntityRenderer(ModEntities.BELIAL.get(), com.miophas.corruption.common.client.entity.BelialRenderer::new);
+        event.registerEntityRenderer(ModEntities.FIERY_CHARIOT.get(), com.miophas.corruption.common.client.entity.FieryChariotRenderer::new);
         event.registerEntityRenderer(ModEntities.DEMON_BEAM.get(), com.miophas.corruption.common.client.visual.DemonBeamRenderer::new);
+        event.registerEntityRenderer(ModEntities.DEMON_BOLT.get(), com.miophas.corruption.common.client.entity.DemonBoltRenderer::new);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_ABERRATION.get(), com.miophas.corruption.common.client.entity.CorruptionEliteRenderer::aberration);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_SCREECHER.get(), com.miophas.corruption.common.client.entity.CorruptionEliteRenderer::screecher);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_LURKER.get(), com.miophas.corruption.common.client.entity.CorruptedLurkerRenderer::new);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_BRUTE.get(), com.miophas.corruption.common.client.entity.CorruptionEliteRenderer::brute);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_HOWLER.get(), com.miophas.corruption.common.client.entity.CorruptionEliteRenderer::howler);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_STALKER.get(), com.miophas.corruption.common.client.entity.CorruptionEliteRenderer::stalker);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_BLOATER.get(), com.miophas.corruption.common.client.entity.CorruptionEliteRenderer::bloater);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_MORTAR.get(), com.miophas.corruption.common.client.entity.CorruptionEliteRenderer::mortar);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_CRAWLER.get(), com.miophas.corruption.common.client.entity.CorruptionEliteRenderer::crawler);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_GAZER.get(), com.miophas.corruption.common.client.entity.CorruptionEliteRenderer::gazer);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_HIVEMOTHER.get(), com.miophas.corruption.common.client.entity.CorruptionEliteRenderer::hivemother);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_DRIFTER.get(), com.miophas.corruption.common.client.entity.CorruptedDrifterRenderer::new);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_MAW.get(), com.miophas.corruption.common.client.entity.CorruptionEliteRenderer::maw);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_NAIAD.get(), com.miophas.corruption.common.client.entity.CorruptionEliteRenderer::naiad);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_MINDWEAVER.get(), com.miophas.corruption.common.client.entity.CorruptionEliteRenderer::mindweaver);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_BLIGHTHOUND.get(), com.miophas.corruption.common.client.entity.CorruptionEliteRenderer::blighthound);
+        event.registerEntityRenderer(ModEntities.CORRUPTED_SOWER.get(), com.miophas.corruption.common.client.entity.CorruptionEliteRenderer::sower);
     }
 
     @SubscribeEvent

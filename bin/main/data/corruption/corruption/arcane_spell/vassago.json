@@ -1,0 +1,73 @@
+{
+  "energy": "1KCE",
+  "cooldown": 30,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:eye",
+      "radius": 4.4,
+      "height": 5,
+      "ticks": 70,
+      "color": "#5A7CFF",
+      "accent": "#E8F0FF",
+      "sound": "minecraft:entity.illusioner.prepare_blindness"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:rune_ring",
+      "radius": 4,
+      "height": 1.5,
+      "ticks": 60,
+      "color": "#5A7CFF",
+      "accent": "#E8F0FF"
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:glowing",
+      "target": "nearby",
+      "radius": 24,
+      "duration": 1200
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:night_vision",
+      "target": "self",
+      "duration": 9600
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 2.2,
+      "trail": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 2,
+          "spread": 0.05
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 20,
+          "spread": 0.4,
+          "speed": 0.05
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "damage",
+          "amount": 32,
+          "radius": 7
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:weakness",
+          "target": "nearby",
+          "radius": 7,
+          "duration": 200,
+          "amplifier": 1
+        }
+      ]
+    }
+  ]
+}

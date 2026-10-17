@@ -1,0 +1,63 @@
+{
+  "type": "corruption:altar_shaped",
+  "pillars": {
+    "1": {
+      "type": "neoforge:components",
+      "items": "corruption:parchment",
+      "components": {
+        "corruption:inscription": "corruption:amdusias"
+      }
+    },
+    "2": {
+      "item": "minecraft:goat_horn"
+    },
+    "3": {
+      "item": "minecraft:note_block"
+    },
+    "4": {
+      "item": "corruption:corrupted_heartstone"
+    },
+    "5": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "6": {
+      "item": "minecraft:bell"
+    }
+  },
+  "offering": "minecraft:horse",
+  "blocks": [
+    {
+      "at": [
+        2,
+        2
+      ],
+      "block": "minecraft:note_block"
+    },
+    {
+      "at": [
+        2,
+        -2
+      ],
+      "block": "minecraft:note_block"
+    },
+    {
+      "at": [
+        -2,
+        -2
+      ],
+      "block": "minecraft:note_block"
+    },
+    {
+      "at": [
+        -2,
+        2
+      ],
+      "block": "minecraft:note_block"
+    }
+  ],
+  "corruption": 14,
+  "time": 240,
+  "result": {
+    "entity": "corruption:amdusias"
+  }
+}

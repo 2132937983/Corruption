@@ -1,0 +1,921 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "bricks": "corruption:block/block_corruption_arcane_brick",
+    "cloth": "corruption:block/block_altar_offering_cloth",
+    "drape": "corruption:block/block_altar_offering_drape",
+    "sigil": "corruption:block/block_altar_offering_sigil",
+    "particle": "corruption:block/block_corruption_arcane_brick"
+  },
+  "elements": [
+    {
+      "name": "base",
+      "from": [
+        1,
+        0,
+        1
+      ],
+      "to": [
+        15,
+        7,
+        15
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1,
+            9,
+            15,
+            16
+          ],
+          "texture": "#bricks"
+        },
+        "east": {
+          "uv": [
+            1,
+            9,
+            15,
+            16
+          ],
+          "texture": "#bricks"
+        },
+        "south": {
+          "uv": [
+            1,
+            9,
+            15,
+            16
+          ],
+          "texture": "#bricks"
+        },
+        "west": {
+          "uv": [
+            1,
+            9,
+            15,
+            16
+          ],
+          "texture": "#bricks"
+        },
+        "down": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#bricks"
+        }
+      }
+    },
+    {
+      "name": "cloth",
+      "from": [
+        0,
+        7,
+        0
+      ],
+      "to": [
+        16,
+        8,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            1
+          ],
+          "texture": "#cloth"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            1
+          ],
+          "texture": "#cloth"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            1
+          ],
+          "texture": "#cloth"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            1
+          ],
+          "texture": "#cloth"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#cloth"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#cloth"
+        }
+      }
+    },
+    {
+      "name": "drape_north",
+      "from": [
+        2,
+        1,
+        0
+      ],
+      "to": [
+        14,
+        7,
+        1
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            2,
+            10,
+            14,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "east": {
+          "uv": [
+            0,
+            10,
+            1,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "west": {
+          "uv": [
+            0,
+            10,
+            1,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "down": {
+          "uv": [
+            2,
+            15,
+            14,
+            16
+          ],
+          "texture": "#drape"
+        }
+      }
+    },
+    {
+      "name": "drape_south",
+      "from": [
+        2,
+        1,
+        15
+      ],
+      "to": [
+        14,
+        7,
+        16
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            10,
+            1,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "south": {
+          "uv": [
+            2,
+            10,
+            14,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "west": {
+          "uv": [
+            0,
+            10,
+            1,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "down": {
+          "uv": [
+            2,
+            15,
+            14,
+            16
+          ],
+          "texture": "#drape"
+        }
+      }
+    },
+    {
+      "name": "drape_west",
+      "from": [
+        0,
+        4,
+        2
+      ],
+      "to": [
+        1,
+        7,
+        14
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            13,
+            1,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "south": {
+          "uv": [
+            0,
+            13,
+            1,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "west": {
+          "uv": [
+            2,
+            13,
+            14,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "down": {
+          "uv": [
+            2,
+            15,
+            14,
+            16
+          ],
+          "texture": "#drape"
+        }
+      }
+    },
+    {
+      "name": "drape_east",
+      "from": [
+        15,
+        4,
+        2
+      ],
+      "to": [
+        16,
+        7,
+        14
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            13,
+            1,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "east": {
+          "uv": [
+            2,
+            13,
+            14,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "south": {
+          "uv": [
+            0,
+            13,
+            1,
+            16
+          ],
+          "texture": "#drape"
+        },
+        "down": {
+          "uv": [
+            2,
+            15,
+            14,
+            16
+          ],
+          "texture": "#drape"
+        }
+      }
+    },
+    {
+      "name": "crystal_0",
+      "from": [
+        1,
+        8,
+        1
+      ],
+      "to": [
+        3,
+        11,
+        3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            13,
+            5,
+            15,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "east": {
+          "uv": [
+            13,
+            5,
+            15,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "south": {
+          "uv": [
+            1,
+            5,
+            3,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "west": {
+          "uv": [
+            1,
+            5,
+            3,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "up": {
+          "uv": [
+            1,
+            1,
+            3,
+            3
+          ],
+          "texture": "#sigil"
+        }
+      },
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    },
+    {
+      "name": "crystal_tip_0",
+      "from": [
+        1.5,
+        11,
+        1.5
+      ],
+      "to": [
+        2.5,
+        12,
+        2.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            13.5,
+            4,
+            14.5,
+            5
+          ],
+          "texture": "#sigil"
+        },
+        "east": {
+          "uv": [
+            13.5,
+            4,
+            14.5,
+            5
+          ],
+          "texture": "#sigil"
+        },
+        "south": {
+          "uv": [
+            1.5,
+            4,
+            2.5,
+            5
+          ],
+          "texture": "#sigil"
+        },
+        "west": {
+          "uv": [
+            1.5,
+            4,
+            2.5,
+            5
+          ],
+          "texture": "#sigil"
+        },
+        "up": {
+          "uv": [
+            1.5,
+            1.5,
+            2.5,
+            2.5
+          ],
+          "texture": "#sigil"
+        }
+      },
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    },
+    {
+      "name": "crystal_1",
+      "from": [
+        13,
+        8,
+        1
+      ],
+      "to": [
+        15,
+        11,
+        3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1,
+            5,
+            3,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "east": {
+          "uv": [
+            13,
+            5,
+            15,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "south": {
+          "uv": [
+            13,
+            5,
+            15,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "west": {
+          "uv": [
+            1,
+            5,
+            3,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "up": {
+          "uv": [
+            13,
+            1,
+            15,
+            3
+          ],
+          "texture": "#sigil"
+        }
+      },
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    },
+    {
+      "name": "crystal_tip_1",
+      "from": [
+        13.5,
+        11,
+        1.5
+      ],
+      "to": [
+        14.5,
+        12,
+        2.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1.5,
+            4,
+            2.5,
+            5
+          ],
+          "texture": "#sigil"
+        },
+        "east": {
+          "uv": [
+            13.5,
+            4,
+            14.5,
+            5
+          ],
+          "texture": "#sigil"
+        },
+        "south": {
+          "uv": [
+            13.5,
+            4,
+            14.5,
+            5
+          ],
+          "texture": "#sigil"
+        },
+        "west": {
+          "uv": [
+            1.5,
+            4,
+            2.5,
+            5
+          ],
+          "texture": "#sigil"
+        },
+        "up": {
+          "uv": [
+            13.5,
+            1.5,
+            14.5,
+            2.5
+          ],
+          "texture": "#sigil"
+        }
+      },
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    },
+    {
+      "name": "crystal_2",
+      "from": [
+        1,
+        8,
+        13
+      ],
+      "to": [
+        3,
+        11,
+        15
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            13,
+            5,
+            15,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "east": {
+          "uv": [
+            1,
+            5,
+            3,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "south": {
+          "uv": [
+            1,
+            5,
+            3,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "west": {
+          "uv": [
+            13,
+            5,
+            15,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "up": {
+          "uv": [
+            1,
+            13,
+            3,
+            15
+          ],
+          "texture": "#sigil"
+        }
+      },
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    },
+    {
+      "name": "crystal_tip_2",
+      "from": [
+        1.5,
+        11,
+        13.5
+      ],
+      "to": [
+        2.5,
+        12,
+        14.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            13.5,
+            4,
+            14.5,
+            5
+          ],
+          "texture": "#sigil"
+        },
+        "east": {
+          "uv": [
+            1.5,
+            4,
+            2.5,
+            5
+          ],
+          "texture": "#sigil"
+        },
+        "south": {
+          "uv": [
+            1.5,
+            4,
+            2.5,
+            5
+          ],
+          "texture": "#sigil"
+        },
+        "west": {
+          "uv": [
+            13.5,
+            4,
+            14.5,
+            5
+          ],
+          "texture": "#sigil"
+        },
+        "up": {
+          "uv": [
+            1.5,
+            13.5,
+            2.5,
+            14.5
+          ],
+          "texture": "#sigil"
+        }
+      },
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    },
+    {
+      "name": "crystal_3",
+      "from": [
+        13,
+        8,
+        13
+      ],
+      "to": [
+        15,
+        11,
+        15
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1,
+            5,
+            3,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "east": {
+          "uv": [
+            1,
+            5,
+            3,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "south": {
+          "uv": [
+            13,
+            5,
+            15,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "west": {
+          "uv": [
+            13,
+            5,
+            15,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "up": {
+          "uv": [
+            13,
+            13,
+            15,
+            15
+          ],
+          "texture": "#sigil"
+        }
+      },
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    },
+    {
+      "name": "crystal_tip_3",
+      "from": [
+        13.5,
+        11,
+        13.5
+      ],
+      "to": [
+        14.5,
+        12,
+        14.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1.5,
+            4,
+            2.5,
+            5
+          ],
+          "texture": "#sigil"
+        },
+        "east": {
+          "uv": [
+            1.5,
+            4,
+            2.5,
+            5
+          ],
+          "texture": "#sigil"
+        },
+        "south": {
+          "uv": [
+            13.5,
+            4,
+            14.5,
+            5
+          ],
+          "texture": "#sigil"
+        },
+        "west": {
+          "uv": [
+            13.5,
+            4,
+            14.5,
+            5
+          ],
+          "texture": "#sigil"
+        },
+        "up": {
+          "uv": [
+            13.5,
+            13.5,
+            14.5,
+            14.5
+          ],
+          "texture": "#sigil"
+        }
+      },
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    },
+    {
+      "name": "sigil",
+      "from": [
+        5,
+        8,
+        5
+      ],
+      "to": [
+        11,
+        9,
+        11
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5,
+            7,
+            11,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "east": {
+          "uv": [
+            5,
+            7,
+            11,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "south": {
+          "uv": [
+            5,
+            7,
+            11,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "west": {
+          "uv": [
+            5,
+            7,
+            11,
+            8
+          ],
+          "texture": "#sigil"
+        },
+        "up": {
+          "uv": [
+            5,
+            5,
+            11,
+            11
+          ],
+          "texture": "#sigil"
+        }
+      },
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    }
+  ]
+}

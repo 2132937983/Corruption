@@ -32,7 +32,7 @@ class DeathVisualDrawTest {
 
     @BeforeAll static void effects() { SpellVisualRenderer.registerBuiltIn(); }
 
-    /** Each boss's death, with its heart about where the boss's is: Baal's chest, Agares's, Andromalius's middle, the middle of Dantalion's glass, Seere's breast. */
+    /** Each boss's death, with its heart about where the boss's is: Baal's chest, Agares's, Andromalius's middle, the middle of Dantalion's glass, Seere's breast, Amdusias's. */
     private static Map<String, Object[]> deaths() {
         Map<String, Object[]> deaths = new LinkedHashMap<>();
         deaths.put("Baal's", new Object[]{Baal.DEATH, new Vector3f(0, 115, 8)});
@@ -40,6 +40,7 @@ class DeathVisualDrawTest {
         deaths.put("Andromalius's", new Object[]{Andromalius.DEATH, new Vector3f(0, 2.4F, 0)});
         deaths.put("Dantalion's", new Object[]{Dantalion.DEATH, new Vector3f(0, 1.76F, 0)});
         deaths.put("Seere's", new Object[]{Seere.DEATH, new Vector3f(0, 1.6F, .6F)});
+        deaths.put("Amdusias's", new Object[]{com.miophas.corruption.common.entity.Amdusias.DEATH, new Vector3f(0, 1.6F, .6F)});
         deaths.put("an add-on's", new Object[]{BossDeath.ordinary(4, SpellAction.Visual.ROSE, SpellAction.Visual.GOLD), new Vector3f(0, 2.4F, 0)});
         return deaths;
     }

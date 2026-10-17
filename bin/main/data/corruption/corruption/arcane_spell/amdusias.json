@@ -1,0 +1,113 @@
+{
+  "energy": "2KCE",
+  "cooldown": 40,
+  "min_corruption": 5,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:bloom",
+      "radius": 6,
+      "height": 3,
+      "ticks": 60,
+      "color": "#50D890",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "particles",
+      "shape": "sphere",
+      "radius": 6,
+      "particles": [
+        {
+          "particle": "minecraft:note",
+          "count": 40
+        }
+      ]
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#80FFC0",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#80FFC0"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#80FFC0"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:resonance",
+          "radius": 20,
+          "height": 3,
+          "ticks": 60,
+          "color": "#80FFC0",
+          "accent": "#FFFFFF",
+          "sound": "minecraft:item.goat_horn.sound.5"
+        },
+        {
+          "type": "damage",
+          "amount": 48,
+          "radius": 20
+        },
+        {
+          "type": "push",
+          "radius": 20,
+          "strength": 1.2,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 20,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:levitation",
+          "target": "nearby",
+          "radius": 20,
+          "duration": 40
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:nausea",
+          "target": "nearby",
+          "radius": 20,
+          "duration": 160
+        }
+      ]
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:regeneration",
+      "target": "self",
+      "duration": 600,
+      "amplifier": 1
+    }
+  ]
+}

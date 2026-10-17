@@ -45,6 +45,7 @@ public final class Corruption {
         com.miophas.corruption.common.registry.ModRecipes.TYPES.register(modEventBus);
         com.miophas.corruption.common.registry.ModRecipes.SERIALIZERS.register(modEventBus);
         ModCreativeModeTabs.TABS.register(modEventBus);
+        modEventBus.addListener(ModCreativeModeTabs::addToGameTabs);
         ModFeatures.FEATURES.register(modEventBus);
         NeoForge.EVENT_BUS.register(InfectionEvents.class);
         NeoForge.EVENT_BUS.register(CorruptionCommands.class);

@@ -1,0 +1,117 @@
+{
+  "energy": "2KCE",
+  "cooldown": 40,
+  "min_corruption": 5,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:constellation",
+      "radius": 16,
+      "height": 8,
+      "ticks": 90,
+      "color": "#8A9AFF",
+      "accent": "#FFFFFF",
+      "sound": "minecraft:block.beacon.power_select"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:light_pillar",
+      "radius": 4,
+      "height": 20,
+      "ticks": 40,
+      "color": "#B8C8FF",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#8A9AFF",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#8A9AFF"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#8A9AFF"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 24,
+          "height": 1.5,
+          "ticks": 18,
+          "color": "#8A9AFF",
+          "accent": "#FFFFFF"
+        },
+        {
+          "type": "damage",
+          "amount": 48,
+          "radius": 24
+        },
+        {
+          "type": "push",
+          "radius": 24,
+          "strength": 1.2,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 24,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:levitation",
+          "target": "nearby",
+          "radius": 24,
+          "duration": 60,
+          "amplifier": 1
+        }
+      ]
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slow_falling",
+      "target": "self",
+      "duration": 2400
+    },
+    {
+      "type": "particles",
+      "shape": "column",
+      "radius": 0,
+      "height": 4,
+      "particles": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 40,
+          "spread": 0.1
+        }
+      ]
+    }
+  ]
+}

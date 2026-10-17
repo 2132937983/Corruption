@@ -25,14 +25,20 @@ public final class DiveSkill implements BossSkill<Mob> {
 
     private final DiveRules rules;
     private final int colour, accent;
+    /** Whether the dive is over as soon as it strikes, the boss away again at once, rather than running out its time. */
+    private final boolean upAtOnce;
     private Vec3 aim;
     private boolean struck;
     private int torn;
 
-    public DiveSkill(DiveRules rules, int colour, int accent) {
+    public DiveSkill(DiveRules rules, int colour, int accent) { this(rules, colour, accent, false); }
+
+    /** @param upAtOnce whether it is over as soon as it strikes (no rest after it) */
+    public DiveSkill(DiveRules rules, int colour, int accent, boolean upAtOnce) {
         this.rules = rules;
         this.colour = colour;
         this.accent = accent;
+        this.upAtOnce = upAtOnce;
     }
 
     public DiveRules rules() { return rules; }
@@ -82,6 +88,8 @@ public final class DiveSkill implements BossSkill<Mob> {
             level.sendParticles(ParticleTypes.CLOUD, boss.getX(), boss.getY() + boss.getBbHeight() / 2, boss.getZ(), 4, .5, .5, .5, .02);
     }
 
+    @Override public boolean finished(Mob boss) { return upAtOnce && struck; }
+
     @Override public void end(Mob boss, boolean broken) {
         aim = null;
         boss.setXRot(0);
@@ -90,6 +98,14 @@ public final class DiveSkill implements BossSkill<Mob> {
     /** It strikes: everything near hurt and thrown up and off, the ground torn up, a ring of force over it. */
     private void strike(ServerLevel level, Mob boss) {
         struck = true;
+        torn = land(level, boss, rules, colour, accent);
+    }
+
+    /**
+     * A dive strikes where its boss is: everything within its radius hurt and thrown up and off, the ground torn up
+     * ({@link Debris}), a ring of force over it; how many blocks it tore up. Dives one after another strike so too.
+     */
+    static int land(ServerLevel level, Mob boss, DiveRules rules, int colour, int accent) {
         Vec3 at = boss.position();
         boss.setDeltaMovement(Vec3.ZERO);
         boss.setXRot(0);
@@ -102,10 +118,11 @@ public final class DiveSkill implements BossSkill<Mob> {
             met.push(away.x * rules.knockback(), .6, away.z * rules.knockback());
             met.hurtMarked = true;
         }
-        torn = Debris.tear(level, boss, at.add(0, -.5, 0), rules);
+        int torn = rules.debrisMost() > 0 ? Debris.tear(level, boss, at.add(0, -.5, 0), rules) : 0;
         SkillShows.show(level, at, "shockwave", rules.radius() * 2.2, 2, 22, colour, accent, .6, boss.getYRot(), true);
         SkillShows.show(level, at, "fissure", rules.radius() + 2, 1.5, 40, colour, accent, 0, boss.getYRot(), true);
         level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, at.x, at.y + .5, at.z, 1, 0, 0, 0, 0);
         SkillShows.sound(boss, SoundEvents.GENERIC_EXPLODE.value(), 3, .7F);
+        return torn;
     }
 }

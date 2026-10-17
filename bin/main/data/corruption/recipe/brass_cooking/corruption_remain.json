@@ -1,0 +1,17 @@
+{
+  "type": "corruption:brass_cooking",
+  "ingredients": [
+    {
+      "item": "minecraft:rotten_flesh"
+    }
+  ],
+  "fluid": {
+    "fluid": "corruption:flowing_corruption",
+    "amount": 10
+  },
+  "inscription": "corruption:corruption",
+  "energy": "10CE",
+  "result": {
+    "id": "corruption:corruption_remain"
+  }
+}

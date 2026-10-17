@@ -1,0 +1,63 @@
+{
+  "type": "corruption:altar_shaped",
+  "pillars": {
+    "1": {
+      "type": "neoforge:components",
+      "items": "corruption:parchment",
+      "components": {
+        "corruption:inscription": "corruption:seere"
+      }
+    },
+    "2": {
+      "item": "minecraft:saddle"
+    },
+    "3": {
+      "item": "corruption:eldritch_membrane"
+    },
+    "4": {
+      "item": "corruption:corrupted_heartstone"
+    },
+    "5": {
+      "item": "corruption:abyssal_pearl"
+    },
+    "6": {
+      "item": "minecraft:feather"
+    }
+  },
+  "offering": "minecraft:horse",
+  "blocks": [
+    {
+      "at": [
+        2,
+        2
+      ],
+      "block": "minecraft:hay_block"
+    },
+    {
+      "at": [
+        2,
+        -2
+      ],
+      "block": "minecraft:hay_block"
+    },
+    {
+      "at": [
+        -2,
+        -2
+      ],
+      "block": "minecraft:hay_block"
+    },
+    {
+      "at": [
+        -2,
+        2
+      ],
+      "block": "minecraft:hay_block"
+    }
+  ],
+  "corruption": 8,
+  "time": 200,
+  "result": {
+    "entity": "corruption:seere"
+  }
+}

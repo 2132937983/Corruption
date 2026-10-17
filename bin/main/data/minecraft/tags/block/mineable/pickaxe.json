@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "corruption:corruption",
+    "corruption:deactivated_corruption",
+    "corruption:infected_block",
+    "corruption:arcunum",
+    "corruption:arcunum_end",
+    "corruption:spirit",
+    "corruption:spirit_deepslate",
+    "corruption:malice",
+    "corruption:corruption_arcane_brick",
+    "corruption:corruption_arcane_transmuter",
+    "corruption:corruption_arcane_lectern",
+    "corruption:corrupted_brass_block",
+    "corruption:brass_cauldron",
+    "corruption:altar_pillar",
+    "corruption:altar_offering",
+    "corruption:corruption_arcane_pedestal",
+    "corruption:corruption_arcane_charger"
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "energy": "4KCE",
+  "cooldown": 60,
+  "min_corruption": 10,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:wings",
+      "radius": 8,
+      "height": 1.6,
+      "ticks": 60,
+      "color": "#FF8A2A",
+      "accent": "#FFFFFF",
+      "sound": "minecraft:entity.blaze.shoot"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:crown",
+      "radius": 6,
+      "height": 2.8,
+      "ticks": 60,
+      "color": "#FF6A1A",
+      "accent": "#FFF0C0"
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:fire_resistance",
+      "target": "self",
+      "duration": 3600
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:resistance",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "spiral",
+      "radius": 6,
+      "height": 4,
+      "particles": [
+        {
+          "particle": "minecraft:flame",
+          "count": 60,
+          "spread": 0.05,
+          "speed": 0.02
+        },
+        {
+          "particle": "minecraft:end_rod",
+          "count": 30
+        }
+      ]
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.6,
+      "look": "minecraft:fire_charge",
+      "trail": [
+        {
+          "particle": "minecraft:flame",
+          "count": 3,
+          "spread": 0.1,
+          "speed": 0.01
+        },
+        {
+          "particle": "minecraft:end_rod",
+          "count": 1,
+          "spread": 0.05
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:flame",
+          "count": 40,
+          "spread": 0.6,
+          "speed": 0.1
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:hellfire",
+          "radius": 10,
+          "height": 3,
+          "ticks": 50,
+          "color": "#FF6A1A",
+          "accent": "#FFF0C0",
+          "shake": 0.3
+        },
+        {
+          "type": "damage",
+          "amount": 52,
+          "radius": 10
+        },
+        {
+          "type": "explode",
+          "power": 5,
+          "breaks_blocks": true,
+          "break_radius": 5,
+          "max_blocks": 120,
+          "max_resistance": 6
+        },
+        {
+          "type": "launch_bolt",
+          "speed": 1.4,
+          "count": 8,
+          "fan": 5,
+          "from": "sky",
+          "height": 16,
+          "look": "minecraft:fire_charge",
+          "trail": [
+            {
+              "particle": "minecraft:flame",
+              "count": 2,
+              "spread": 0.1,
+              "speed": 0.01
+            }
+          ],
+          "burst": [
+            {
+              "particle": "minecraft:flame",
+              "count": 30,
+              "spread": 0.5,
+              "speed": 0.08
+            }
+          ],
+          "on_hit": [
+            {
+              "type": "visual",
+              "effect": "corruption:shockwave",
+              "radius": 5,
+              "height": 1,
+              "ticks": 12,
+              "color": "#FF6A1A",
+              "accent": "#FFF0C0"
+            },
+            {
+              "type": "damage",
+              "amount": 36,
+              "radius": 7
+            },
+            {
+              "type": "ignite_area",
+              "radius": 7,
+              "seconds": 8
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

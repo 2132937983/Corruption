@@ -25,5 +25,30 @@ public final class ModEffects {
                     return true;
                 }
             });
+    /**
+     * Stunned (a goshawk's screech, say): it can neither move nor jump (its speed and its jump taken to nothing), nor strike,
+     * nor use anything (see Stuns, and on a player's own client StunClient); stars wheel about its head until it wears off.
+     */
+    public static final DeferredHolder<MobEffect, MobEffect> STUNNED = EFFECTS.register("stunned",
+            () -> new MobEffect(MobEffectCategory.HARMFUL, 0xF2E6A0) {
+                @Override public boolean shouldApplyEffectTickThisTick(int remaining, int amplifier) { return remaining % 3 == 0; }
+                @Override public boolean applyEffectTick(LivingEntity target, int amplifier) {
+                    if (target.level() instanceof net.minecraft.server.level.ServerLevel level)
+                        for (int star = 0; star < 3; star++) {
+                            double round = target.tickCount * .35 + star * Math.PI * 2 / 3, out = Math.max(.35, target.getBbWidth() * .6);
+                            level.sendParticles(net.minecraft.core.particles.ParticleTypes.CRIT, target.getX() + Math.cos(round) * out,
+                                    target.getY() + target.getBbHeight() + .25, target.getZ() + Math.sin(round) * out, 1, 0, 0, 0, 0);
+                        }
+                    return true;
+                }
+            }.addAttributeModifier(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED,
+                    net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "stunned"), -1,
+                    net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+            .addAttributeModifier(net.minecraft.world.entity.ai.attributes.Attributes.JUMP_STRENGTH,
+                    net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "stunned"), -1,
+                    net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+            .addAttributeModifier(net.minecraft.world.entity.ai.attributes.Attributes.FLYING_SPEED,
+                    net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "stunned"), -1,
+                    net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
     private ModEffects() {}
 }

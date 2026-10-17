@@ -1,0 +1,28 @@
+{
+  "type": "corruption:alchemy_shaped",
+  "slots": {
+    "0": {
+      "item": "corruption:corruption_energy_brick",
+      "count": 2
+    },
+    "1": {
+      "item": "corruption:cursed_iron_ingot",
+      "count": 4
+    },
+    "2": {
+      "item": "corruption:chaos_catalyst",
+      "count": 1
+    },
+    "3": {
+      "item": "corruption:corruption_stick",
+      "count": 1
+    },
+    "4": {
+      "item": "corruption:harmonized_corruption_crystal",
+      "count": 2
+    }
+  },
+  "result": {
+    "id": "corruption:corruption_energy_sword"
+  }
+}

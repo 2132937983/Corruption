@@ -1,0 +1,11 @@
+{
+  "block": "minecraft:oak_leaves",
+  "drops": [
+    {
+      "item": "minecraft:apple",
+      "chance": 0.5,
+      "min": 1,
+      "max": 1
+    }
+  ]
+}

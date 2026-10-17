@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 
 /**
  * Draws a spell bolt. One its spell draws as its own is {@link SpellBoltModel}: pointed the way it flies, as big as
@@ -47,18 +48,27 @@ public final class SpellBoltRenderer extends EntityRenderer<SpellProjectile> {
             item.render(bolt, yaw, partial, pose, buffers, light);
             return;
         }
+        drawOwn(model, bolt, bolt.size(), bolt.colour() < 0 ? SpellAction.Visual.ROSE : bolt.colour(), partial, pose, buffers, light);
+        super.render(bolt, yaw, partial, pose, buffers, light);
+    }
+
+    /**
+     * Draws a bolt in the spell bolts' own look ({@link SpellBoltModel}): pointed the way it flies, this big (in blocks), its
+     * shell lit as the world is and its light unlit in this colour, its heart nearly white-hot. A demon's bolts are drawn
+     * so too (DemonBoltRenderer).
+     */
+    static void drawOwn(SpellBoltModel model, Entity bolt, double size, int colour, float partial, PoseStack pose, MultiBufferSource buffers, int light) {
         pose.pushPose();
         pose.translate(0, bolt.getBbHeight() / 2, 0);
         // Its point is -Z: turned the way it flies, as a projectile's turn says (its yaw is along +Z at none), and tipped up as it climbs.
         pose.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partial, bolt.yRotO, bolt.getYRot()) + 180));
         pose.mulPose(Axis.XP.rotationDegrees(Mth.lerp(partial, bolt.xRotO, bolt.getXRot())));
-        float scale = (float) (bolt.size() / SpellAction.LaunchBolt.DEFAULT_SIZE) * FIT;
+        float scale = (float) (size / SpellAction.LaunchBolt.DEFAULT_SIZE) * FIT;
         pose.scale(scale, scale, scale);
         // From the model's space (Y down, X mirrored, 24 pixels up) to the world's, as the game's living things are drawn.
         pose.scale(-1, -1, 1);
         pose.translate(0, -1.501F, 0);
-        model.setupAnim(bolt, 0, 0, bolt.tickCount + partial, 0, 0);
-        int colour = bolt.colour() < 0 ? SpellAction.Visual.ROSE : bolt.colour();
+        model.pose(bolt.tickCount + partial + bolt.getId() * 3.1F);
         model.only(SpellBoltModel.SHELL);
         model.renderToBuffer(pose, buffers.getBuffer(RenderType.entityCutoutNoCull(TEXTURE)), light, OverlayTexture.NO_OVERLAY);
         model.only(SpellBoltModel.LIGHT);
@@ -67,7 +77,6 @@ public final class SpellBoltRenderer extends EntityRenderer<SpellProjectile> {
         model.renderToBuffer(pose, buffers.getBuffer(RenderType.eyes(TEXTURE)), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0xFF000000 | whiter(colour));
         model.only(-1);
         pose.popPose();
-        super.render(bolt, yaw, partial, pose, buffers, light);
     }
 
     /** A colour drawn {@link #WHITE_HOT} of the way to white. */

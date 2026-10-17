@@ -1,0 +1,96 @@
+{
+  "energy": "30KCE",
+  "cooldown": 90,
+  "min_corruption": 12,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:constellation",
+      "radius": 12,
+      "height": 8,
+      "ticks": 60,
+      "color": "#6A7ABF",
+      "accent": "#DCE6FF"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:dome",
+      "radius": 12,
+      "ticks": 60,
+      "color": "#6A7ABF",
+      "accent": "#DCE6FF",
+      "sound": "minecraft:entity.elder_guardian.curse"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:rune_ring",
+      "radius": 6,
+      "height": 2.5,
+      "ticks": 60,
+      "color": "#6A7ABF",
+      "accent": "#DCE6FF"
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:invisibility",
+      "target": "self",
+      "duration": 2400
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:night_vision",
+      "target": "self",
+      "duration": 4800
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:water_breathing",
+      "target": "self",
+      "duration": 4800
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slow_falling",
+      "target": "self",
+      "duration": 2400
+    },
+    {
+      "type": "damage",
+      "amount": 50,
+      "radius": 24
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:blindness",
+      "target": "nearby",
+      "radius": 24,
+      "duration": 200
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:darkness",
+      "target": "nearby",
+      "radius": 24,
+      "duration": 300
+    },
+    {
+      "type": "particles",
+      "shape": "sphere",
+      "radius": 10,
+      "particles": [
+        {
+          "particle": "minecraft:end_rod",
+          "count": 60,
+          "spread": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 60,
+          "spread": 0.1,
+          "color": "#B8C8FF"
+        }
+      ]
+    }
+  ]
+}

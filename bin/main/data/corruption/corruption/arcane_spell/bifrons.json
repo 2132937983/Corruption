@@ -1,0 +1,114 @@
+{
+  "energy": "2KCE",
+  "cooldown": 60,
+  "min_corruption": 5,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:souls",
+      "radius": 6,
+      "height": 5,
+      "ticks": 70,
+      "color": "#9A80FF",
+      "accent": "#FFE0A0",
+      "sound": "minecraft:particle.soul_escape"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "color": "#9A80FF",
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 1,
+          "spread": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 2,
+          "spread": 0.06,
+          "color": "#9A80FF"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 24,
+          "spread": 0.6,
+          "speed": 0.05
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 24,
+          "spread": 0.8,
+          "color": "#9A80FF"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:hellfire",
+          "radius": 18,
+          "height": 0.9,
+          "ticks": 60,
+          "color": "#2AB8FF",
+          "accent": "#E0FFFF"
+        },
+        {
+          "type": "damage",
+          "amount": 44,
+          "radius": 18
+        },
+        {
+          "type": "push",
+          "radius": 18,
+          "strength": 1.4,
+          "lift": 0.4,
+          "from": "caster"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "minecraft:slowness",
+          "target": "nearby",
+          "radius": 18,
+          "duration": 80,
+          "amplifier": 1
+        },
+        {
+          "type": "ignite_area",
+          "radius": 18,
+          "seconds": 6
+        }
+      ]
+    },
+    {
+      "type": "summon",
+      "entity": "minecraft:zombie",
+      "count": 3
+    },
+    {
+      "type": "summon",
+      "entity": "minecraft:husk",
+      "count": 2
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 6,
+      "particles": [
+        {
+          "particle": "minecraft:soul_fire_flame",
+          "count": 24,
+          "spread": 0.05,
+          "speed": 0.01
+        },
+        {
+          "particle": "minecraft:small_flame",
+          "count": 12,
+          "spread": 0.05
+        }
+      ]
+    }
+  ]
+}

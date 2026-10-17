@@ -30,14 +30,15 @@ public final class CorruptionVeilApi {
 
     /**
      * Whether a creature is hidden from one of the corruption's, so that it may not take it for prey nor turn on it
-     * when struck: from its creatures by any set of corrupted robes, from its lords only by the highest grade. What is
-     * not of the corruption sees as it always did.
+     * when struck: from its creatures by any set of corrupted robes, from its elites ({@link CorruptionFactionApi#ELITES})
+     * by any but a novice's, from its lords only by the highest grade. What is not of the corruption sees as it always did.
      */
     public static boolean hiddenFrom(LivingEntity target, @Nullable Entity seer) {
         if (seer == null || seer == target || !CorruptionFactionApi.isRemnant(seer)) return false;
         Optional<CorruptedRobeRules.Tier> worn = worn(target);
         if (worn.isEmpty()) return false;
-        return CorruptionFactionApi.isBoss(seer) ? worn.get().hiddenFromBosses() : worn.get().hiddenFromRemnants();
+        if (CorruptionFactionApi.isBoss(seer)) return worn.get().hiddenFromBosses();
+        return CorruptionFactionApi.isElite(seer) ? worn.get().hiddenFromElites() : worn.get().hiddenFromRemnants();
     }
 
     /** Whether a hurt is the corruption's own. */

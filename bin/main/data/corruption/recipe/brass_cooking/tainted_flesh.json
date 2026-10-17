@@ -1,0 +1,21 @@
+{
+  "type": "corruption:brass_cooking",
+  "ingredients": [
+    {
+      "item": "minecraft:rotten_flesh",
+      "count": 2
+    },
+    {
+      "item": "corruption:corruption_dust",
+      "count": 1
+    }
+  ],
+  "fluid": {
+    "fluid": "corruption:flowing_corruption",
+    "amount": 100
+  },
+  "energy": "50CE",
+  "result": {
+    "id": "corruption:tainted_flesh"
+  }
+}

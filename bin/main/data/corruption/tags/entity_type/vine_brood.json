@@ -1,0 +1,19 @@
+{
+  "replace": false,
+  "values": [
+    "corruption:corrupted_aberration",
+    "corruption:corrupted_screecher",
+    "corruption:corrupted_brute",
+    "corruption:corrupted_howler",
+    "corruption:corrupted_stalker",
+    "corruption:corrupted_bloater",
+    "corruption:corrupted_mortar",
+    "corruption:corrupted_crawler",
+    "corruption:corrupted_gazer",
+    "corruption:corrupted_hivemother",
+    "corruption:corrupted_drifter",
+    "corruption:corrupted_mindweaver",
+    "corruption:corrupted_blighthound",
+    "corruption:corrupted_sower"
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "energy": "1KCE",
+  "cooldown": 30,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:shockwave",
+      "radius": 16,
+      "height": 1.5,
+      "ticks": 18,
+      "color": "#FFA030",
+      "accent": "#FFF0C0"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:rift",
+      "radius": 3.6,
+      "height": 2,
+      "ticks": 40,
+      "color": "#FFA030",
+      "accent": "#FFF0C0",
+      "sound": "minecraft:item.chorus_fruit.teleport"
+    },
+    {
+      "type": "damage",
+      "amount": 32,
+      "radius": 16
+    },
+    {
+      "type": "push",
+      "radius": 16,
+      "strength": 1.6,
+      "lift": 0.4,
+      "from": "caster"
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:slowness",
+      "target": "nearby",
+      "radius": 16,
+      "duration": 80,
+      "amplifier": 1
+    },
+    {
+      "type": "particles",
+      "shape": "burst",
+      "radius": 2,
+      "particles": [
+        {
+          "particle": "minecraft:reverse_portal",
+          "count": 50,
+          "spread": 0.5,
+          "speed": 0.2
+        }
+      ]
+    },
+    {
+      "type": "teleport",
+      "distance": 48
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:speed",
+      "target": "self",
+      "duration": 1200,
+      "amplifier": 2
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "energy": "3KCE",
+  "cooldown": 40,
+  "min_corruption": 8,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:crown",
+      "radius": 6,
+      "height": 2.6,
+      "ticks": 50,
+      "color": "#FF3020",
+      "accent": "#FFD24A",
+      "sound": "minecraft:entity.blaze.shoot"
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:fire_resistance",
+      "target": "self",
+      "duration": 3600
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.4,
+      "count": 5,
+      "fan": 40,
+      "look": "minecraft:fire_charge",
+      "trail": [
+        {
+          "particle": "minecraft:flame",
+          "count": 3,
+          "spread": 0.1,
+          "speed": 0.02
+        },
+        {
+          "particle": "minecraft:soul_fire_flame",
+          "count": 1,
+          "spread": 0.1
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:flame",
+          "count": 40,
+          "spread": 0.6,
+          "speed": 0.1
+        },
+        {
+          "particle": "minecraft:lava",
+          "count": 8,
+          "spread": 0.4
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:hellfire",
+          "radius": 6,
+          "height": 3,
+          "ticks": 40,
+          "color": "#FF3020",
+          "accent": "#FFC060",
+          "shake": 0.2
+        },
+        {
+          "type": "damage",
+          "amount": 44,
+          "radius": 7
+        },
+        {
+          "type": "ignite_area",
+          "radius": 7,
+          "seconds": 8
+        }
+      ]
+    }
+  ]
+}

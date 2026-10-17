@@ -22,6 +22,11 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ModCreativeModeTabs {
+    /** The elites' spawn eggs go in the game's own Spawn Eggs tab as well as the mod's. */
+    public static void addToGameTabs(net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) for (var egg : ModItems.ELITE_EGGS) event.accept(egg.get());
+    }
+
     public static final DeferredRegister<CreativeModeTab> TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Corruption.MOD_ID);
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CORRUPTION =
@@ -63,6 +68,8 @@ public final class ModCreativeModeTabs {
                         output.accept(ModItems.PARCHMENT.get());
                         output.accept(ModItems.INK.get());
                         for (var material : ModItems.MATERIALS) output.accept(material.get());
+                        for (var relic : ModItems.RELICS) output.accept(relic.get());
+                        for (var egg : ModItems.ELITE_EGGS) output.accept(egg.get());
                         output.accept(ModItems.CORRUPTED_BREAD.get());
                         output.accept(ModItems.PURIFIED_WATER.get());
                         for (var piece : ModItems.ROBE_SET) output.accept(piece.get());

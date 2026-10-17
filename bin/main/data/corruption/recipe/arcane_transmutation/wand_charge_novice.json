@@ -1,0 +1,13 @@
+{
+  "type": "corruption:arcane_transmutation",
+  "ingredient": {
+    "item": "corruption:novice_corruption_arcane_stick"
+  },
+  "energy": "10KCE",
+  "result": {
+    "id": "corruption:novice_corruption_arcane_stick",
+    "components": {
+      "corruption:corruption_energy": "10KCE"
+    }
+  }
+}

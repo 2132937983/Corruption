@@ -15,7 +15,7 @@ public interface DemonBoss {
     /** Which boss bar on the client is this creature's; empty until the server has said. */
     Optional<UUID> bossBar();
 
-    /** Its emblem on textures/gui/colossus_boss_bar.png: 0 Baal's, 1 Agares's, 2 Andromalius's. */
+    /** Its emblem on textures/gui/colossus_boss_bar.png: 0 Baal's, 1 Agares's, 2 Andromalius's, 3 Dantalion's, 4 Seere's, 5 Decarabia's, 6 Belial's, 7 Amdusias's. */
     int emblem();
 
     /** How it dies: drawn by every client about its body as it goes, and sounded by the server. */

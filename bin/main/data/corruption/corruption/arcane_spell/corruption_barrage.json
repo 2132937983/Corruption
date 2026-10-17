@@ -1,0 +1,68 @@
+{
+  "energy": "8KCE",
+  "cooldown": 30,
+  "min_corruption": 6,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:rune_ring",
+      "radius": 3,
+      "height": 1.2,
+      "ticks": 20,
+      "sound": "minecraft:entity.illusioner.cast_spell"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 1.8,
+      "count": 48,
+      "fan": 40,
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 2,
+          "spread": 0.06
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 1,
+          "spread": 0.05,
+          "color": "#71334C"
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 20,
+          "spread": 0.4,
+          "speed": 0.04
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 12,
+          "spread": 0.5,
+          "color": "#71334C"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "corrupt_creatures",
+          "radius": 4
+        },
+        {
+          "type": "damage",
+          "amount": 24,
+          "radius": 4,
+          "damage_type": "corruption:corruption"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "corruption:corruption_curse",
+          "target": "nearby",
+          "radius": 4,
+          "duration": 100
+        }
+      ]
+    }
+  ]
+}

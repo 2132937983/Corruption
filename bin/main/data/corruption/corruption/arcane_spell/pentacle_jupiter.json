@@ -1,0 +1,90 @@
+{
+  "energy": "35KCE",
+  "cooldown": 100,
+  "min_corruption": 14,
+  "corruption_gain": 2,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:rune_ring",
+      "radius": 3.6,
+      "height": 2,
+      "ticks": 30,
+      "color": "#8AB8FF",
+      "accent": "#FFFFFF",
+      "sound": "minecraft:item.trident.thunder"
+    },
+    {
+      "type": "weather",
+      "sky": "thunder",
+      "ticks": 3600
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:luck",
+      "target": "self",
+      "duration": 3600,
+      "amplifier": 2
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 2.5,
+      "trail": [
+        {
+          "particle": "minecraft:electric_spark",
+          "count": 3,
+          "spread": 0.1
+        },
+        {
+          "particle": "minecraft:end_rod",
+          "count": 1,
+          "spread": 0.05
+        }
+      ],
+      "burst": [
+        {
+          "particle": "minecraft:electric_spark",
+          "count": 40,
+          "spread": 0.8,
+          "speed": 0.2
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:lightning",
+          "radius": 12,
+          "height": 24,
+          "ticks": 30,
+          "color": "#8AB8FF",
+          "accent": "#FFFFFF"
+        },
+        {
+          "type": "visual",
+          "effect": "corruption:light_pillar",
+          "radius": 5,
+          "height": 28,
+          "ticks": 30,
+          "color": "#8AB8FF",
+          "accent": "#FFFFFF"
+        },
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 14,
+          "height": 2,
+          "ticks": 18,
+          "color": "#8AB8FF",
+          "accent": "#FFFFFF",
+          "shake": 0.6
+        },
+        {
+          "type": "lightning",
+          "radius": 12,
+          "count": 10,
+          "damage": 40
+        }
+      ]
+    }
+  ]
+}

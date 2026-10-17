@@ -62,6 +62,7 @@ public final class SpellVisualRenderer extends EntityRenderer<SpellVisualEntity>
         drawn.put(SpellVisuals.SHARDS, ShardsVisual::new);
         drawn.put(SpellVisuals.RAYS, RaysVisual::new);
         drawn.put(SpellVisuals.NOVA, NovaVisual::new);
+        drawn.put(SpellVisuals.CRESCENDO, CrescendoVisual::new);
         return drawn;
     }
 

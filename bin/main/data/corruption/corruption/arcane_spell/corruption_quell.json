@@ -1,0 +1,40 @@
+{
+  "energy": "6KCE",
+  "cooldown": 120,
+  "min_corruption": 6,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:rune_ring",
+      "radius": 8,
+      "height": 1.6,
+      "ticks": 50,
+      "color": "#9A8AB0",
+      "accent": "#FFFFFF",
+      "sound": "minecraft:block.beacon.deactivate"
+    },
+    {
+      "type": "particles",
+      "shape": "ring",
+      "radius": 7,
+      "particles": [
+        {
+          "particle": "minecraft:soul",
+          "count": 40,
+          "spread": 0.2,
+          "speed": 0.02
+        },
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 40,
+          "spread": 0.2
+        }
+      ]
+    },
+    {
+      "type": "quell_corruption",
+      "radius": 8
+    }
+  ]
+}

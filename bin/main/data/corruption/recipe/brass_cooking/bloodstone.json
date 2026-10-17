@@ -1,0 +1,22 @@
+{
+  "type": "corruption:brass_cooking",
+  "ingredients": [
+    {
+      "item": "minecraft:redstone",
+      "count": 4
+    },
+    {
+      "item": "corruption:tainted_flesh",
+      "count": 1
+    }
+  ],
+  "fluid": {
+    "fluid": "corruption:flowing_corruption",
+    "amount": 250
+  },
+  "energy": "2KCE",
+  "time": 200,
+  "result": {
+    "id": "corruption:bloodstone"
+  }
+}

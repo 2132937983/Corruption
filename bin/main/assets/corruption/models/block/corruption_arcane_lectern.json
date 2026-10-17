@@ -1,0 +1,887 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "body": "corruption:block/block_corruption_arcane_brick",
+    "trim": "corruption:block/block_corruption_arcane_lectern_trim",
+    "top": "corruption:block/block_corruption_arcane_lectern_top",
+    "bottom": "corruption:block/block_corruption_bench_bottom",
+    "candle": "corruption:block/block_corruption_arcane_lectern_candle",
+    "book": "corruption:block/block_corruption_arcane_lectern_book",
+    "particle": "corruption:block/block_corruption_arcane_lectern_trim"
+  },
+  "elements": [
+    {
+      "name": "plinth",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        2,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ],
+          "texture": "#trim"
+        },
+        "east": {
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ],
+          "texture": "#trim"
+        },
+        "south": {
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ],
+          "texture": "#trim"
+        },
+        "west": {
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ],
+          "texture": "#trim"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#trim"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#bottom"
+        }
+      }
+    },
+    {
+      "name": "body",
+      "from": [
+        1,
+        2,
+        1
+      ],
+      "to": [
+        15,
+        10,
+        15
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1,
+            4,
+            15,
+            12
+          ],
+          "texture": "#body"
+        },
+        "east": {
+          "uv": [
+            1,
+            4,
+            15,
+            12
+          ],
+          "texture": "#body"
+        },
+        "south": {
+          "uv": [
+            1,
+            4,
+            15,
+            12
+          ],
+          "texture": "#body"
+        },
+        "west": {
+          "uv": [
+            1,
+            4,
+            15,
+            12
+          ],
+          "texture": "#body"
+        }
+      }
+    },
+    {
+      "name": "pillar_0",
+      "from": [
+        0,
+        2,
+        0
+      ],
+      "to": [
+        2,
+        10,
+        2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            4,
+            2,
+            12
+          ],
+          "texture": "#trim"
+        },
+        "east": {
+          "uv": [
+            0,
+            4,
+            2,
+            12
+          ],
+          "texture": "#trim"
+        },
+        "south": {
+          "uv": [
+            0,
+            4,
+            2,
+            12
+          ],
+          "texture": "#trim"
+        },
+        "west": {
+          "uv": [
+            0,
+            4,
+            2,
+            12
+          ],
+          "texture": "#trim"
+        }
+      }
+    },
+    {
+      "name": "pillar_1",
+      "from": [
+        14,
+        2,
+        0
+      ],
+      "to": [
+        16,
+        10,
+        2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            14,
+            4,
+            16,
+            12
+          ],
+          "texture": "#trim"
+        },
+        "east": {
+          "uv": [
+            14,
+            4,
+            16,
+            12
+          ],
+          "texture": "#trim"
+        },
+        "south": {
+          "uv": [
+            14,
+            4,
+            16,
+            12
+          ],
+          "texture": "#trim"
+        },
+        "west": {
+          "uv": [
+            14,
+            4,
+            16,
+            12
+          ],
+          "texture": "#trim"
+        }
+      }
+    },
+    {
+      "name": "pillar_2",
+      "from": [
+        0,
+        2,
+        14
+      ],
+      "to": [
+        2,
+        10,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            4,
+            2,
+            12
+          ],
+          "texture": "#trim"
+        },
+        "east": {
+          "uv": [
+            0,
+            4,
+            2,
+            12
+          ],
+          "texture": "#trim"
+        },
+        "south": {
+          "uv": [
+            0,
+            4,
+            2,
+            12
+          ],
+          "texture": "#trim"
+        },
+        "west": {
+          "uv": [
+            0,
+            4,
+            2,
+            12
+          ],
+          "texture": "#trim"
+        }
+      }
+    },
+    {
+      "name": "pillar_3",
+      "from": [
+        14,
+        2,
+        14
+      ],
+      "to": [
+        16,
+        10,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            14,
+            4,
+            16,
+            12
+          ],
+          "texture": "#trim"
+        },
+        "east": {
+          "uv": [
+            14,
+            4,
+            16,
+            12
+          ],
+          "texture": "#trim"
+        },
+        "south": {
+          "uv": [
+            14,
+            4,
+            16,
+            12
+          ],
+          "texture": "#trim"
+        },
+        "west": {
+          "uv": [
+            14,
+            4,
+            16,
+            12
+          ],
+          "texture": "#trim"
+        }
+      }
+    },
+    {
+      "name": "cap",
+      "from": [
+        0,
+        10,
+        0
+      ],
+      "to": [
+        16,
+        12,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ],
+          "texture": "#trim"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ],
+          "texture": "#trim"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ],
+          "texture": "#trim"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ],
+          "texture": "#trim"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#top"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#trim"
+        }
+      }
+    },
+    {
+      "name": "candle_0",
+      "from": [
+        1,
+        12,
+        1
+      ],
+      "to": [
+        3,
+        17,
+        3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#candle"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#candle"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#candle"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#candle"
+        },
+        "up": {
+          "uv": [
+            2,
+            0,
+            4,
+            2
+          ],
+          "texture": "#candle"
+        }
+      }
+    },
+    {
+      "name": "wick_0",
+      "from": [
+        1.5,
+        17,
+        1.5
+      ],
+      "to": [
+        2.5,
+        18,
+        2.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        }
+      }
+    },
+    {
+      "name": "candle_1",
+      "from": [
+        13,
+        12,
+        1
+      ],
+      "to": [
+        15,
+        17,
+        3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#candle"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#candle"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#candle"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#candle"
+        },
+        "up": {
+          "uv": [
+            2,
+            0,
+            4,
+            2
+          ],
+          "texture": "#candle"
+        }
+      }
+    },
+    {
+      "name": "wick_1",
+      "from": [
+        13.5,
+        17,
+        1.5
+      ],
+      "to": [
+        14.5,
+        18,
+        2.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        }
+      }
+    },
+    {
+      "name": "candle_2",
+      "from": [
+        1,
+        12,
+        13
+      ],
+      "to": [
+        3,
+        17,
+        15
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#candle"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#candle"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#candle"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#candle"
+        },
+        "up": {
+          "uv": [
+            2,
+            0,
+            4,
+            2
+          ],
+          "texture": "#candle"
+        }
+      }
+    },
+    {
+      "name": "wick_2",
+      "from": [
+        1.5,
+        17,
+        13.5
+      ],
+      "to": [
+        2.5,
+        18,
+        14.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        }
+      }
+    },
+    {
+      "name": "candle_3",
+      "from": [
+        13,
+        12,
+        13
+      ],
+      "to": [
+        15,
+        17,
+        15
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#candle"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#candle"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#candle"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#candle"
+        },
+        "up": {
+          "uv": [
+            2,
+            0,
+            4,
+            2
+          ],
+          "texture": "#candle"
+        }
+      }
+    },
+    {
+      "name": "wick_3",
+      "from": [
+        13.5,
+        17,
+        13.5
+      ],
+      "to": [
+        14.5,
+        18,
+        14.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ],
+          "texture": "#candle"
+        }
+      }
+    }
+  ]
+}

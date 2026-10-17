@@ -65,7 +65,7 @@ public final class BeamVolleySkill implements BossSkill<Mob> {
         for (int index = 0; index < many; index++) {
             double[] circle = rules.circle(index, many);
             circles.add(circle);
-            Vec3 from = origin(boss, circle), to = target.getBoundingBox().getCenter().subtract(from);
+            Vec3 from = origin(boss, index, many, circle), to = target.getBoundingBox().getCenter().subtract(from);
             yaws[index] = yawOf(to);
             pitches[index] = pitchOf(to);
             DemonBeamEntity beam = ModEntities.DEMON_BEAM.get().create(boss.level());
@@ -84,7 +84,7 @@ public final class BeamVolleySkill implements BossSkill<Mob> {
         BeamRules beam = rules.beam();
         for (int index = 0; index < beams.size(); index++) {
             DemonBeamEntity standing = beams.get(index);
-            Vec3 from = origin(boss, circles.get(index));
+            Vec3 from = origin(boss, index, circles.size(), circles.get(index));
             if (target != null && target.isAlive()) {
                 Vec3 to = target.getBoundingBox().getCenter().subtract(from);
                 yaws[index] = beam.timing().windingUp(elapsed) ? yawOf(to) : beam.follow(yaws[index], yawOf(to));
@@ -105,11 +105,15 @@ public final class BeamVolleySkill implements BossSkill<Mob> {
         circles.clear();
     }
 
-    /** Where a beam leaves from: its circle's place round the one before the boss, square to the way it faces. */
-    private Vec3 origin(Mob boss, double[] circle) {
+    /**
+     * Where the index-th of so many beams leaves from: its circle's place round the one before the boss, square to the way
+     * it faces; or wherever the boss, a {@link BeamCaster}, says that beam leaves it from.
+     */
+    private Vec3 origin(Mob boss, int index, int count, double[] circle) {
         Vec3 middle = boss instanceof BeamCaster caster ? caster.beamFrom() : boss.getEyePosition().add(boss.getLookAngle().scale(BEFORE));
         Vec3 ahead = Vec3.directionFromRotation(0, boss.getYRot()), right = new Vec3(-ahead.z, 0, ahead.x);
-        return middle.add(right.scale(circle[0])).add(0, circle[1], 0);
+        Vec3 circled = middle.add(right.scale(circle[0])).add(0, circle[1], 0);
+        return boss instanceof BeamCaster caster ? caster.beamFrom(index, count, circled) : circled;
     }
 
     /** A rune ring standing in the air about a beam's place, facing the way the boss does, for as long as the beam lasts. */

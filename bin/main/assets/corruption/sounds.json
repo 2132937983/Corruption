@@ -1,0 +1,41 @@
+{
+  "entity.corrupted_remnant.ambient": {
+    "subtitle": "subtitles.corruption.entity.corrupted_remnant.ambient",
+    "sounds": [
+      "corruption:entity/corrupted_remnant/idle1",
+      "corruption:entity/corrupted_remnant/idle2",
+      "corruption:entity/corrupted_remnant/idle3",
+      "corruption:entity/corrupted_remnant/idle4"
+    ]
+  },
+  "entity.corrupted_remnant.attack": {
+    "subtitle": "subtitles.corruption.entity.corrupted_remnant.attack",
+    "sounds": [
+      "corruption:entity/corrupted_remnant/attack1",
+      "corruption:entity/corrupted_remnant/attack2",
+      "corruption:entity/corrupted_remnant/attack3"
+    ]
+  },
+  "entity.corrupted_remnant.step": {
+    "subtitle": "subtitles.block.generic.footsteps",
+    "sounds": [
+      "corruption:entity/corrupted_remnant/step1",
+      "corruption:entity/corrupted_remnant/step2",
+      "corruption:entity/corrupted_remnant/step3",
+      "corruption:entity/corrupted_remnant/step4"
+    ]
+  },
+  "entity.corrupted_remnant.hurt": {
+    "subtitle": "subtitles.corruption.entity.corrupted_remnant.hurt",
+    "sounds": [
+      "corruption:entity/corrupted_remnant/hurt1",
+      "corruption:entity/corrupted_remnant/hurt2"
+    ]
+  },
+  "entity.corrupted_remnant.death": {
+    "subtitle": "subtitles.corruption.entity.corrupted_remnant.death",
+    "sounds": [
+      "corruption:entity/corrupted_remnant/death"
+    ]
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "energy": "2KCE",
+  "cooldown": 60,
+  "corruption_gain": 1,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:dome",
+      "radius": 6,
+      "ticks": 70,
+      "color": "#E0D0A0",
+      "accent": "#FFFFFF",
+      "sound": "minecraft:block.beacon.activate"
+    },
+    {
+      "type": "visual",
+      "effect": "corruption:sigil",
+      "radius": 3,
+      "height": 1.7,
+      "ticks": 50,
+      "color": "#E0D0A0",
+      "accent": "#FFFFFF"
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:resistance",
+      "target": "self",
+      "duration": 3600,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:health_boost",
+      "target": "self",
+      "duration": 6000,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:regeneration",
+      "target": "self",
+      "duration": 600,
+      "amplifier": 1
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:absorption",
+      "target": "self",
+      "duration": 2400,
+      "amplifier": 2
+    },
+    {
+      "type": "apply_effect",
+      "effect": "minecraft:glowing",
+      "target": "nearby",
+      "radius": 24,
+      "duration": 1200
+    },
+    {
+      "type": "particles",
+      "shape": "sphere",
+      "radius": 5,
+      "particles": [
+        {
+          "particle": "minecraft:enchant",
+          "count": 40,
+          "spread": 0.1,
+          "speed": 0.2
+        },
+        {
+          "particle": "minecraft:end_rod",
+          "count": 12
+        }
+      ]
+    }
+  ]
+}

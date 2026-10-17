@@ -169,17 +169,10 @@ public final class SpellEffects implements ArcaneCasting.World {
      * ore and no block entity: into that and nothing else (never malice, nor the corruption that spreads), with
      * nothing growing on it. Whether it did.
      */
-    static boolean blight(ServerLevel level, BlockPos at) {
-        if (!level.isLoaded(at)) return false;
-        BlockState state = level.getBlockState(at);
-        if (!CorruptionConversions.canConvert(state, level, at) || CorruptionOreConversions.isOre(state) || !whole(level, at, state)) return false;
-        return level.setBlock(at, ModBlocks.DEACTIVATED_CORRUPTION.get().defaultBlockState(), Block.UPDATE_ALL);
-    }
+    static boolean blight(ServerLevel level, BlockPos at) { return com.miophas.corruption.common.infection.GroundBlight.dormant(level, at); }
 
     /** Whether this is a whole, solid block: no liquid, no block entity, a full cube that hides what is behind it. */
-    private static boolean whole(BlockGetter level, BlockPos at, BlockState state) {
-        return state.getFluidState().isEmpty() && !state.hasBlockEntity() && state.canOcclude() && state.isCollisionShapeFullBlock(level, at);
-    }
+    private static boolean whole(BlockGetter level, BlockPos at, BlockState state) { return com.miophas.corruption.common.infection.GroundBlight.whole(level, at, state); }
 
     /**
      * Stills the corruption round the origin, the nearest first, as much as one cast may: every whole block of it that

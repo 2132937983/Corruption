@@ -1,0 +1,49 @@
+{
+  "variants": {
+    "altar=dormant,facing=north": {
+      "model": "corruption:block/altar_offering"
+    },
+    "altar=dormant,facing=east": {
+      "model": "corruption:block/altar_offering",
+      "y": 90
+    },
+    "altar=dormant,facing=south": {
+      "model": "corruption:block/altar_offering",
+      "y": 180
+    },
+    "altar=dormant,facing=west": {
+      "model": "corruption:block/altar_offering",
+      "y": 270
+    },
+    "altar=formed,facing=north": {
+      "model": "corruption:block/altar_offering"
+    },
+    "altar=formed,facing=east": {
+      "model": "corruption:block/altar_offering",
+      "y": 90
+    },
+    "altar=formed,facing=south": {
+      "model": "corruption:block/altar_offering",
+      "y": 180
+    },
+    "altar=formed,facing=west": {
+      "model": "corruption:block/altar_offering",
+      "y": 270
+    },
+    "altar=binding,facing=north": {
+      "model": "corruption:block/altar_offering_binding"
+    },
+    "altar=binding,facing=east": {
+      "model": "corruption:block/altar_offering_binding",
+      "y": 90
+    },
+    "altar=binding,facing=south": {
+      "model": "corruption:block/altar_offering_binding",
+      "y": 180
+    },
+    "altar=binding,facing=west": {
+      "model": "corruption:block/altar_offering_binding",
+      "y": 270
+    }
+  }
+}

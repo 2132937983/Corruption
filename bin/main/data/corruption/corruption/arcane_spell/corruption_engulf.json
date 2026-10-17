@@ -1,0 +1,102 @@
+{
+  "energy": "36KCE",
+  "cooldown": 240,
+  "min_corruption": 14,
+  "corruption_gain": 3,
+  "actions": [
+    {
+      "type": "visual",
+      "effect": "corruption:vortex",
+      "radius": 3,
+      "height": 3,
+      "ticks": 20,
+      "color": "#71334C",
+      "accent": "#C6728C",
+      "sound": "minecraft:entity.warden.sonic_charge"
+    },
+    {
+      "type": "launch_bolt",
+      "speed": 0.9,
+      "color": "#9B4562",
+      "size": 1.5,
+      "trail": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 4,
+          "spread": 0.3
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 3,
+          "spread": 0.3,
+          "color": "#9B4562"
+        },
+        {
+          "particle": "minecraft:reverse_portal",
+          "count": 2,
+          "spread": 0.3
+        }
+      ],
+      "burst": [
+        {
+          "particle": "corruption:corruption_particle",
+          "count": 64,
+          "spread": 2,
+          "speed": 0.08
+        },
+        {
+          "particle": "minecraft:dust",
+          "count": 48,
+          "spread": 2,
+          "color": "#9B4562"
+        }
+      ],
+      "on_hit": [
+        {
+          "type": "visual",
+          "effect": "corruption:nova",
+          "radius": 8,
+          "height": 2,
+          "ticks": 26,
+          "color": "#9B4562",
+          "accent": "#FFFFFF",
+          "shake": 0.5,
+          "sound": "minecraft:entity.generic.explode"
+        },
+        {
+          "type": "visual",
+          "effect": "corruption:shockwave",
+          "radius": 10,
+          "height": 2,
+          "ticks": 20,
+          "color": "#71334C",
+          "accent": "#C6728C"
+        },
+        {
+          "type": "corrupt_creatures",
+          "radius": 8
+        },
+        {
+          "type": "damage",
+          "amount": 60,
+          "radius": 8,
+          "damage_type": "corruption:corruption"
+        },
+        {
+          "type": "apply_effect",
+          "effect": "corruption:corruption_curse",
+          "target": "nearby",
+          "radius": 8,
+          "duration": 300,
+          "amplifier": 1
+        },
+        {
+          "type": "corrupt_area",
+          "radius": 5,
+          "chance": 1,
+          "inert": true
+        }
+      ]
+    }
+  ]
+}
