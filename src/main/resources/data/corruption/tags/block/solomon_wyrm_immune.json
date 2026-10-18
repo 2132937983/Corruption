@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:dragon_immune",
+    "corruption:altar_offering",
+    "corruption:altar_pillar"
+  ]
+}

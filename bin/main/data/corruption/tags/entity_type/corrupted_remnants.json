@@ -29,6 +29,10 @@
     "corruption:corrupted_mindweaver",
     "corruption:corrupted_blighthound",
     "corruption:corrupted_sower",
-    "corruption:amdusias"
+    "corruption:amdusias",
+    "corruption:solomon",
+    "corruption:solomon_wyrm",
+    "corruption:solomon_hand",
+    "corruption:solomon_drake"
   ]
 }

@@ -44,7 +44,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(EphemeralTestServerProvider.class)
 class BossRelicsServerTest {
     private static final List<String> IDS = List.of("baal_horn", "agares_rimeheart", "andromalius_scale", "dantalion_mirror_shard", "seere_pinion", "decarabia_star",
-            "belial_halo", "amdusias_horn");
+            "belial_halo", "amdusias_horn", "solomon_ring");
 
     /** Each lord, and the relic it leaves. */
     private static Map<EntityType<?>, Item> lords() {
@@ -57,6 +57,7 @@ class BossRelicsServerTest {
         lords.put(ModEntities.DECARABIA.get(), ModItems.DECARABIA_STAR.get());
         lords.put(ModEntities.BELIAL.get(), ModItems.BELIAL_HALO.get());
         lords.put(ModEntities.AMDUSIAS.get(), ModItems.AMDUSIAS_HORN.get());
+        lords.put(ModEntities.SOLOMON.get(), ModItems.SOLOMON_RING.get());
         return lords;
     }
 
@@ -64,7 +65,10 @@ class BossRelicsServerTest {
 
     @Test void everyLordLeavesItsOwnRelicEachTimeItFallsAndNoOtherLordsRelic(MinecraftServer server) {
         TestWorld.onServer(server, level -> {
-            assertEquals(lords().keySet(), BuiltInRegistries.ENTITY_TYPE.getTag(CorruptionFactionApi.BOSSES).orElseThrow().stream().map(Holder::value)
+            // Solomon's dragons are lords too, but their seal leaves his ring for all of them.
+            Set<EntityType<?>> expected = new java.util.HashSet<>(lords().keySet());
+            expected.add(ModEntities.SOLOMON_WYRM.get());
+            assertEquals(expected, BuiltInRegistries.ENTITY_TYPE.getTag(CorruptionFactionApi.BOSSES).orElseThrow().stream().map(Holder::value)
                     .collect(Collectors.toSet()), "every lord of the corruption has a relic");
             // What these tables leave does not hang on who fell, so a stand-in will do to roll them.
             Villager fallen = EntityType.VILLAGER.create(level);

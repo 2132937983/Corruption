@@ -63,6 +63,10 @@ public final class SpellVisualRenderer extends EntityRenderer<SpellVisualEntity>
         drawn.put(SpellVisuals.RAYS, RaysVisual::new);
         drawn.put(SpellVisuals.NOVA, NovaVisual::new);
         drawn.put(SpellVisuals.CRESCENDO, CrescendoVisual::new);
+        drawn.put(SpellVisuals.SKY_BEAM, () -> new SkyBeamsVisual(1));
+        drawn.put(SpellVisuals.PENTAGRAM_BEAMS, () -> new SkyBeamsVisual(5));
+        drawn.put(SpellVisuals.HEXAGRAM_BEAMS, () -> new SkyBeamsVisual(6));
+        drawn.put(SpellVisuals.OCTAGRAM_BEAMS, () -> new SkyBeamsVisual(8));
         return drawn;
     }
 

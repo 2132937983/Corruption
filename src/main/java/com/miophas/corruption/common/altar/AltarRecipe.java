@@ -66,6 +66,9 @@ import net.minecraft.world.level.Level;
  * "octagram", of eight, numbered the same way. Left out, it is the shape of the structure the rite asks for, or
  * else the hexagram. A rite is performed only at an altar of its shape, and asks for nothing on pillars it has not.
  *
+ * A rite takes what lay on its pillars, unless it says "consumes": false: then it only reads them, and leaves them where they
+ * lie (no rite of the mod's own does; a data pack may write one).
+ *
  * @param pillars shaped: one for each of its altar's pillars, slot 1 first, {@link Ingredient#EMPTY} where a pillar
  *                must hold nothing; shapeless: one up to as many as its altar has pillars
  * @param blocks what must stand on the ground, and where; everywhere else on it, nothing
@@ -73,9 +76,16 @@ import net.minecraft.world.level.Level;
  * @param keep shaped only: the pillar (from 1) whose item the result keeps what had been set on, if any
  * @param structure what must stand round the altar, if anything
  * @param form the shape of the altar it is performed at
+ * @param consumes whether it takes what lay on its pillars
  */
 public record AltarRecipe(boolean shaped, List<Ingredient> pillars, Optional<EntityType<?>> offering, List<GroundBlock> blocks, int corruption,
-                          AltarResult result, int time, Optional<Integer> keep, Optional<Holder<AltarStructure>> structure, AltarForm form) implements Recipe<AltarInput> {
+                          AltarResult result, int time, Optional<Integer> keep, Optional<Holder<AltarStructure>> structure, AltarForm form,
+                          boolean consumes) implements Recipe<AltarInput> {
+    /** A rite that takes what lay on its pillars. */
+    public AltarRecipe(boolean shaped, List<Ingredient> pillars, Optional<EntityType<?>> offering, List<GroundBlock> blocks, int corruption,
+                       AltarResult result, int time, Optional<Integer> keep, Optional<Holder<AltarStructure>> structure, AltarForm form) {
+        this(shaped, pillars, offering, blocks, corruption, result, time, keep, structure, form, true);
+    }
     /** A rite that keeps nothing of what it remakes. */
     public AltarRecipe(boolean shaped, List<Ingredient> pillars, Optional<EntityType<?>> offering, List<GroundBlock> blocks, int corruption,
                        AltarResult result, int time) {
@@ -145,10 +155,11 @@ public record AltarRecipe(boolean shaped, List<Ingredient> pillars, Optional<Ent
             TIME.optionalFieldOf("time", RitualRules.DEFAULT_TICKS).forGetter(AltarRecipe::time),
             SLOT.optionalFieldOf("keep").forGetter(AltarRecipe::keep),
             STRUCTURE.optionalFieldOf("structure").forGetter(AltarRecipe::structure),
-            AltarStar.FORM_CODEC.optionalFieldOf("form").forGetter(recipe -> Optional.of(recipe.form())))
-            .apply(instance, (pillars, offering, blocks, corruption, result, time, keep, structure, form) -> {
+            AltarStar.FORM_CODEC.optionalFieldOf("form").forGetter(recipe -> Optional.of(recipe.form())),
+            Codec.BOOL.optionalFieldOf("consumes", true).forGetter(AltarRecipe::consumes))
+            .apply(instance, (pillars, offering, blocks, corruption, result, time, keep, structure, form, consumes) -> {
                 AltarForm shape = shapeOf(form, structure);
-                return new AltarRecipe(true, filledOut(pillars, shape), offering, blocks, corruption, result, time, keep, structure, shape);
+                return new AltarRecipe(true, filledOut(pillars, shape), offering, blocks, corruption, result, time, keep, structure, shape, consumes);
             }));
     public static final MapCodec<AltarRecipe> SHAPED_CODEC = SHAPED_FIELDS.flatXmap(AltarRecipe::checked, AltarRecipe::checked);
 
@@ -180,9 +191,10 @@ public record AltarRecipe(boolean shaped, List<Ingredient> pillars, Optional<Ent
             AltarResult.CODEC.fieldOf("result").forGetter(AltarRecipe::result),
             TIME.optionalFieldOf("time", RitualRules.DEFAULT_TICKS).forGetter(AltarRecipe::time),
             STRUCTURE.optionalFieldOf("structure").forGetter(AltarRecipe::structure),
-            AltarStar.FORM_CODEC.optionalFieldOf("form").forGetter(recipe -> Optional.of(recipe.form())))
-            .apply(instance, (pillars, offering, blocks, corruption, result, time, structure, form) ->
-                    new AltarRecipe(false, pillars, offering, blocks, corruption, result, time, Optional.empty(), structure, shapeOf(form, structure))));
+            AltarStar.FORM_CODEC.optionalFieldOf("form").forGetter(recipe -> Optional.of(recipe.form())),
+            Codec.BOOL.optionalFieldOf("consumes", true).forGetter(AltarRecipe::consumes))
+            .apply(instance, (pillars, offering, blocks, corruption, result, time, structure, form, consumes) ->
+                    new AltarRecipe(false, pillars, offering, blocks, corruption, result, time, Optional.empty(), structure, shapeOf(form, structure), consumes)));
     public static final MapCodec<AltarRecipe> SHAPELESS_CODEC = SHAPELESS_FIELDS.flatXmap(AltarRecipe::checked, AltarRecipe::checked);
 
     private static StreamCodec<RegistryFriendlyByteBuf, AltarRecipe> streamCodecFor(boolean shaped) {
@@ -200,6 +212,7 @@ public record AltarRecipe(boolean shaped, List<Ingredient> pillars, Optional<Ent
             buffer.writeVarInt(recipe.keep().orElse(0));
             structure.encode(buffer, recipe.structure());
             AltarStar.FORM_STREAM_CODEC.encode(buffer, recipe.form());
+            buffer.writeBoolean(recipe.consumes());
         }, buffer -> {
             List<Ingredient> read = pillars.decode(buffer);
             Optional<EntityType<?>> creature = offering.decode(buffer);
@@ -209,7 +222,9 @@ public record AltarRecipe(boolean shaped, List<Ingredient> pillars, Optional<Ent
             int time = buffer.readVarInt(), keep = buffer.readVarInt();
             Optional<Holder<AltarStructure>> standing = structure.decode(buffer);
             AltarForm form = AltarStar.FORM_STREAM_CODEC.decode(buffer);
-            return new AltarRecipe(shaped, read, creature, ground, corruption, result, time, keep == 0 ? Optional.empty() : Optional.of(keep), standing, form);
+            boolean consumes = buffer.readBoolean();
+            return new AltarRecipe(shaped, read, creature, ground, corruption, result, time, keep == 0 ? Optional.empty() : Optional.of(keep), standing, form,
+                    consumes);
         });
     }
 

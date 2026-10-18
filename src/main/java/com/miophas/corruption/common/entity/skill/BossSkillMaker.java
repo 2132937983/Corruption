@@ -22,6 +22,7 @@ import com.miophas.corruption.core.demon.skill.PounceRules;
 import com.miophas.corruption.core.demon.skill.PsychicRules;
 import com.miophas.corruption.core.demon.skill.PsychicStreamRules;
 import com.miophas.corruption.core.demon.skill.ScreechRules;
+import com.miophas.corruption.core.demon.skill.SkyBeamRules;
 import com.miophas.corruption.core.demon.skill.SnareRules;
 import com.miophas.corruption.core.demon.skill.SpikeFieldRules;
 import com.miophas.corruption.core.demon.skill.SpinRules;
@@ -69,4 +70,5 @@ public final class BossSkillMaker implements BossSkillApi.Maker {
     @Override public BossSkill<Mob> upheaval(UpheavalRules rules, int colour, int accent) { return new UpheavalSkill(rules, colour, accent); }
     @Override public BossSkill<Mob> fanfare(FanfareRules rules, int colour, int accent) { return new FanfareSkill(rules, colour, accent); }
     @Override public BossSkill<Mob> crescendo(CrescendoRules rules, int colour, int accent) { return new CrescendoSkill(rules, colour, accent); }
+    @Override public BossSkill<Mob> skyBeams(SkyBeamRules rules, int colour, int accent) { return new SkyBeamSkill(rules, colour, accent); }
 }

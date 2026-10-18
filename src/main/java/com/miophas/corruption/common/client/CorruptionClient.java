@@ -87,6 +87,7 @@ public final class CorruptionClient {
                 com.miophas.corruption.common.client.entity.SeereModel::createBodyLayer);
         event.registerLayerDefinition(com.miophas.corruption.common.client.entity.AmdusiasModel.LAYER_LOCATION,
                 com.miophas.corruption.common.client.entity.AmdusiasModel::createBodyLayer);
+        com.miophas.corruption.common.client.entity.SolomonModels.register(event);
         event.registerLayerDefinition(com.miophas.corruption.common.client.entity.DantalionMirrorModel.LAYER_LOCATION,
                 com.miophas.corruption.common.client.entity.DantalionMirrorModel::createBodyLayer);
         event.registerLayerDefinition(com.miophas.corruption.common.client.entity.DecarabiaStarModel.LAYER_LOCATION,
@@ -158,6 +159,11 @@ public final class CorruptionClient {
         event.registerEntityRenderer(ModEntities.DANTALION.get(), com.miophas.corruption.common.client.entity.DantalionRenderer::new);
         event.registerEntityRenderer(ModEntities.SEERE.get(), com.miophas.corruption.common.client.entity.SeereRenderer::new);
         event.registerEntityRenderer(ModEntities.AMDUSIAS.get(), com.miophas.corruption.common.client.entity.AmdusiasRenderer::new);
+        event.registerEntityRenderer(ModEntities.SOLOMON.get(), com.miophas.corruption.common.client.entity.SolomonRenderer::new);
+        event.registerEntityRenderer(ModEntities.SOLOMON_WYRM.get(), com.miophas.corruption.common.client.entity.SolomonWyrmRenderer::new);
+        event.registerEntityRenderer(ModEntities.SOLOMON_HAND.get(), com.miophas.corruption.common.client.entity.SolomonHandRenderer::new);
+        event.registerEntityRenderer(ModEntities.SOLOMON_DRAKE.get(), com.miophas.corruption.common.client.entity.SolomonDrakeRenderer::new);
+        event.registerEntityRenderer(ModEntities.SOLOMON_FIREBALL.get(), context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 3, true));
         event.registerEntityRenderer(ModEntities.DECARABIA.get(), com.miophas.corruption.common.client.entity.DecarabiaRenderer::new);
         event.registerEntityRenderer(ModEntities.BELIAL.get(), com.miophas.corruption.common.client.entity.BelialRenderer::new);
         event.registerEntityRenderer(ModEntities.FIERY_CHARIOT.get(), com.miophas.corruption.common.client.entity.FieryChariotRenderer::new);

@@ -104,6 +104,28 @@ public final class ModEntities {
             () -> EntityType.Builder.of(com.miophas.corruption.common.entity.Amdusias::new, MobCategory.MONSTER)
                     .sized(com.miophas.corruption.core.demon.AmdusiasRules.WIDTH, com.miophas.corruption.core.demon.AmdusiasRules.HEIGHT).eyeHeight(2.9F)
                     .fireImmune().clientTrackingRange(12).updateInterval(2).build("corruption:amdusias"));
+    /** Solomon: the crowned seal his eight dragons burst out of, hanging over the altar (seen from far off). */
+    public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.Solomon>> SOLOMON = TYPES.register("solomon",
+            () -> EntityType.Builder.of(com.miophas.corruption.common.entity.Solomon::new, MobCategory.MONSTER)
+                    .sized(com.miophas.corruption.core.demon.SolomonRules.CORE_SIZE, com.miophas.corruption.core.demon.SolomonRules.CORE_SIZE).eyeHeight(1.5F)
+                    .fireImmune().clientTrackingRange(16).updateInterval(2).build("corruption:solomon"));
+    /** One of Solomon's flood dragons: four chunks long, so seen from far off, and sent often, for its body follows its head. */
+    public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.SolomonWyrm>> SOLOMON_WYRM = TYPES.register("solomon_wyrm",
+            () -> EntityType.Builder.of(com.miophas.corruption.common.entity.SolomonWyrm::new, MobCategory.MONSTER)
+                    .sized(com.miophas.corruption.core.demon.SolomonRules.HEAD_WIDTH, com.miophas.corruption.core.demon.SolomonRules.HEAD_HEIGHT).eyeHeight(1.4F)
+                    .fireImmune().clientTrackingRange(16).updateInterval(1).build("corruption:solomon_wyrm"));
+    /** A giant hand grown out of the ground at Solomon's bidding: no creature, it falls once and is gone. */
+    public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.SolomonHand>> SOLOMON_HAND = TYPES.register("solomon_hand",
+            () -> EntityType.Builder.<com.miophas.corruption.common.entity.SolomonHand>of(com.miophas.corruption.common.entity.SolomonHand::new, MobCategory.MISC)
+                    .sized(3, 6).fireImmune().noSave().clientTrackingRange(10).updateInterval(20).build("corruption:solomon_hand"));
+    /** One of the small dragons Solomon sends rushing in: no creature, it rushes once and is gone (its clients fly it themselves). */
+    public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.SolomonDrake>> SOLOMON_DRAKE = TYPES.register("solomon_drake",
+            () -> EntityType.Builder.<com.miophas.corruption.common.entity.SolomonDrake>of(com.miophas.corruption.common.entity.SolomonDrake::new, MobCategory.MISC)
+                    .sized(1.4F, .8F).fireImmune().noSave().clientTrackingRange(10).updateInterval(20).build("corruption:solomon_drake"));
+    /** Baal's fireball as Solomon's dragons loose it. */
+    public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.SolomonFireball>> SOLOMON_FIREBALL = TYPES.register("solomon_fireball",
+            () -> EntityType.Builder.<com.miophas.corruption.common.entity.SolomonFireball>of(com.miophas.corruption.common.entity.SolomonFireball::new, MobCategory.MISC)
+                    .sized(1, 1).clientTrackingRange(8).updateInterval(1).build("corruption:solomon_fireball"));
     /** His chariot of fire: no creature, it runs its line and is gone (its clients run the line themselves, from what it sends as it appears). */
     public static final DeferredHolder<EntityType<?>, EntityType<com.miophas.corruption.common.entity.FieryChariot>> FIERY_CHARIOT = TYPES.register("fiery_chariot",
             () -> EntityType.Builder.<com.miophas.corruption.common.entity.FieryChariot>of(com.miophas.corruption.common.entity.FieryChariot::new, MobCategory.MISC)
@@ -211,6 +233,8 @@ public final class ModEntities {
         event.put(DECARABIA.get(), com.miophas.corruption.common.entity.Decarabia.attributes().build());
         event.put(BELIAL.get(), com.miophas.corruption.common.entity.Belial.attributes().build());
         event.put(AMDUSIAS.get(), com.miophas.corruption.common.entity.Amdusias.attributes().build());
+        event.put(SOLOMON.get(), com.miophas.corruption.common.entity.Solomon.attributes().build());
+        event.put(SOLOMON_WYRM.get(), com.miophas.corruption.common.entity.SolomonWyrm.attributes().build());
         event.put(CORRUPTED_ABERRATION.get(), com.miophas.corruption.common.entity.CorruptedAberration.attributes().build());
         event.put(CORRUPTED_SCREECHER.get(), com.miophas.corruption.common.entity.CorruptedScreecher.attributes().build());
         event.put(CORRUPTED_LURKER.get(), com.miophas.corruption.common.entity.CorruptedLurker.attributes().build());

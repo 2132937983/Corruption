@@ -28,8 +28,24 @@ public final class ModDamageTypes {
         return new ContactDamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(CORRUPTION));
     }
 
+    /**
+     * The corruption's hurt by this one's doing; dealt by one that no robe deceives (CorruptionVeilApi.PIERCES_VEIL), it is
+     * Solomon's hurt instead ({@link #SOLOMON}), which no robe turns aside.
+     */
     public static DamageSource corruption(Level level, net.minecraft.world.entity.LivingEntity attacker) {
+        if (com.miophas.corruption.api.corruption.CorruptionVeilApi.pierces(attacker)) return solomon(level, attacker);
         return new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(CORRUPTION), attacker);
+    }
+
+    /**
+     * Solomon's hurt (corruption:solomon): the corruption's, as the king who bound its lords deals it; not in the tag
+     * corruption:corruption_damage, so no corrupted robe turns it aside, and not in corruption:spell.
+     */
+    public static final ResourceKey<DamageType> SOLOMON = ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "solomon"));
+
+    /** Solomon's hurt by this one's doing. */
+    public static DamageSource solomon(Level level, @javax.annotation.Nullable net.minecraft.world.entity.Entity attacker) {
+        return new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(SOLOMON), attacker);
     }
 
     /**

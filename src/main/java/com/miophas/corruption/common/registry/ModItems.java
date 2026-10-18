@@ -189,9 +189,11 @@ public final class ModItems {
     public static final DeferredItem<BossRelicItem> DECARABIA_STAR = relic("decarabia_star");
     public static final DeferredItem<BossRelicItem> BELIAL_HALO = relic("belial_halo");
     public static final DeferredItem<BossRelicItem> AMDUSIAS_HORN = relic("amdusias_horn");
+    /** Solomon's: his seal ring, left by the last but one of the corruption's lords. */
+    public static final DeferredItem<BossRelicItem> SOLOMON_RING = relic("solomon_ring");
     /** The relics, in the order their lords are met. */
     public static final List<DeferredItem<BossRelicItem>> RELICS = List.of(BAAL_HORN, AGARES_RIMEHEART, ANDROMALIUS_SCALE, DANTALION_MIRROR_SHARD,
-            SEERE_PINION, DECARABIA_STAR, BELIAL_HALO, AMDUSIAS_HORN);
+            SEERE_PINION, DECARABIA_STAR, BELIAL_HALO, AMDUSIAS_HORN, SOLOMON_RING);
     /**
      * The corruption's blades (ArcaneBladeRules): the energy sword, which bears the arcane's mark and reaches the
      * corruption's lords; and the arcane sword, twice as heavy and cursed besides, which they turn aside.

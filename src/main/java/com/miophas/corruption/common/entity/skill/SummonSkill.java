@@ -29,6 +29,8 @@ public final class SummonSkill implements BossSkill<Mob> {
     private static final double ABOUT = 48;
 
     private final SummonRules rules;
+    /** How far from it it counts what it has called up. */
+    private double about = ABOUT;
     private final int colour, accent;
     /** Where this call's remnants rise round. */
     private Vec3 middle = Vec3.ZERO;
@@ -43,7 +45,16 @@ public final class SummonSkill implements BossSkill<Mob> {
 
     @Override public SkillTiming timing() { return rules.timing(); }
 
-    @Override public boolean usable(Mob boss, LivingEntity target) { return rules.wanted(called(boss)); }
+    @Override public boolean usable(Mob boss, LivingEntity target) { return rules.wanted(called(boss, about)); }
+
+    /**
+     * Counts what it has called up within this far of it, not the usual 48 blocks: for a caster that calls them up about a
+     * quarry far below it. Answers itself.
+     */
+    public SummonSkill counting(double within) {
+        about = within;
+        return this;
+    }
 
     @Override public void begin(Mob boss, LivingEntity target) {
         middle = rules.atQuarry() && target != null ? target.position() : boss.position();
@@ -56,7 +67,7 @@ public final class SummonSkill implements BossSkill<Mob> {
 
     @Override public void tick(Mob boss, @Nullable LivingEntity target, int elapsed) {
         if (!rules.timing().strikes(elapsed) || !(boss.level() instanceof ServerLevel level)) return;
-        int calling = rules.toCall(called(boss)), start = boss.getRandom().nextInt(Math.max(1, rules.looks().size()));
+        int calling = rules.toCall(called(boss, about)), start = boss.getRandom().nextInt(Math.max(1, rules.looks().size()));
         double turn = boss.getRandom().nextDouble() * Math.PI * 2;
         for (int one = 0; one < calling; one++) {
             double[] place = rules.place(one, calling, turn);
@@ -65,6 +76,8 @@ public final class SummonSkill implements BossSkill<Mob> {
             CorruptedRemnant remnant = CorruptedRemnant.raised(level, likeness, at, boss.getYRot());
             if (remnant == null) continue;
             remnant.getPersistentData().putUUID(CALLER, boss.getUUID());
+            // Called up by one no robe deceives, it is not deceived either.
+            if (com.miophas.corruption.api.corruption.CorruptionVeilApi.pierces(boss)) com.miophas.corruption.api.corruption.CorruptionVeilApi.unveil(remnant);
             if (rules.passes()) remnant.crumbleAt(level.getGameTime() + rules.lasts());
             if (target != null) remnant.setTarget(target);
             if (!level.addFreshEntity(remnant)) continue;
@@ -74,9 +87,12 @@ public final class SummonSkill implements BossSkill<Mob> {
     }
 
     /** How many of the remnants this boss called up are still about. */
-    public static int called(Mob boss) {
+    public static int called(Mob boss) { return called(boss, ABOUT); }
+
+    /** How many of the remnants this boss called up are about, within this far of it. */
+    public static int called(Mob boss, double within) {
         UUID caller = boss.getUUID();
-        return boss.level().getEntitiesOfClass(CorruptedRemnant.class, boss.getBoundingBox().inflate(ABOUT), remnant -> remnant.isAlive()
+        return boss.level().getEntitiesOfClass(CorruptedRemnant.class, boss.getBoundingBox().inflate(within), remnant -> remnant.isAlive()
                 && remnant.getPersistentData().hasUUID(CALLER) && caller.equals(remnant.getPersistentData().getUUID(CALLER))).size();
     }
 }

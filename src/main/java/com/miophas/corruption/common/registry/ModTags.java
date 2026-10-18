@@ -11,6 +11,12 @@ public final class ModTags {
     /** This tag, rather than a wood tag, controls malice combustion. */
     public static final TagKey<Block> FLAMMABLE_CORRUPTION = TagKey.create(Registries.BLOCK,
             ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "flammable_corruption"));
+    /**
+     * What Solomon's dragons fly through without breaking (SolomonWyrm): the Ender Dragon's own ({@code #minecraft:dragon_immune})
+     * and the altar's offering and pillars.
+     */
+    public static final TagKey<Block> SOLOMON_WYRM_IMMUNE = TagKey.create(Registries.BLOCK,
+            ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "solomon_wyrm_immune"));
     /** What a spell's "summon" may call forth; a creature outside it is refused, so data cannot bring in anything. */
     public static final TagKey<EntityType<?>> SPELL_SUMMONS = TagKey.create(Registries.ENTITY_TYPE,
             ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "spell_summons"));

@@ -1,0 +1,34 @@
+{
+  "type": "corruption:altar_shaped",
+  "pillars": {
+    "1": {
+      "item": "corruption:clavicula_salomonis_i"
+    },
+    "2": {
+      "item": "corruption:clavicula_salomonis_ii"
+    },
+    "3": {
+      "item": "corruption:clavicula_salomonis_iii"
+    },
+    "4": {
+      "item": "corruption:clavicula_salomonis_iv"
+    },
+    "5": {
+      "item": "corruption:clavicula_salomonis_v"
+    },
+    "6": {
+      "item": "corruption:clavicula_salomonis_vi"
+    },
+    "7": {
+      "item": "corruption:clavicula_salomonis_vii"
+    },
+    "8": {
+      "item": "corruption:clavicula_salomonis_viii"
+    }
+  },
+  "structure": "corruption:echo_sanctum",
+  "time": 400,
+  "result": {
+    "entity": "corruption:solomon"
+  }
+}

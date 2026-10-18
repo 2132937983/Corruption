@@ -51,13 +51,20 @@ import net.minecraft.world.phys.Vec3;
  * players there (see AltarRecipe): one found gathers for its
  * time, the pillars' offerings drifting in; corrupted lightning strikes; and as {@link RitualRules} says, what
  * the rite took is gone, what it brought forth appears on the offering, and the offering stops binding, so
- * that walks free. If what is on the altar changes before then, the rite comes to nothing.
+ * that walks free. If what is on the altar changes before then, the rite comes to nothing. A rite that leaves what lay on
+ * its pillars is not done again with it until something on the altar is taken away or changed: otherwise it would be done
+ * over and over.
  */
 public final class AltarOfferingBlockEntity extends BlockEntity {
     private int sinceCheck;
     /** The rite under way, and how many ticks it has run. */
     private ResourceLocation working;
     private int elapsed;
+    /**
+     * A rite done that left what lay on its pillars ("consumes": false): it is not done again until something on the altar
+     * is taken away or changed; null while there is none.
+     */
+    private ResourceLocation spent;
     /** The creature bound on it; its id is kept with the block, so it is found again once loaded. */
     private Mob bound;
     private UUID boundId;
@@ -218,6 +225,12 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
     private void rite(Level level, AltarState state) {
         AltarInput input = input(level, state);
         RecipeHolder<AltarRecipe> found = input == null || input.isEmpty() ? null : recipes.getRecipeFor(input, level).orElse(null);
+        // A rite that left what lay on its pillars is not done again until something there is taken away or changed.
+        if (found != null && found.id().equals(spent)) found = null;
+        else if (spent != null) {
+            spent = null;
+            setChanged();
+        }
         if (found == null || working != null && !found.id().equals(working)) stop();
         if (found == null) return;
         working = found.id();
@@ -260,11 +273,11 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
         level.addFreshEntity(bolt);
     }
 
-    /** What the rite took is gone, what it brought forth appears, and the offering stops binding. */
+    /** What the rite took is gone (unless it only reads what lay there), what it brought forth appears, and the offering stops binding. */
     private void complete(Level level, AltarRecipe recipe, AltarInput input) {
         // What it brings forth is made before what it takes is gone: it may keep what was set on one of those things.
         ItemStack made = recipe.assemble(input, level.registryAccess());
-        int[] used = recipe.pillarsUsed(input);
+        int[] used = recipe.consumes() ? recipe.pillarsUsed(input) : null;
         List<AltarPillarBlockEntity> pillars = pillars(level);
         for (int slot : used == null ? new int[0] : used) {
             AltarPillarBlockEntity pillar = pillars.get(slot);
@@ -283,6 +296,7 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
         }
         recipe.result().creature().ifPresent(type -> summon(level, type, top));
         level.playSound(null, worldPosition, SoundEvents.EVOKER_CAST_SPELL, SoundSource.BLOCKS, 1, .8F);
+        spent = recipe.consumes() ? null : working;
         stop();
         become(AltarRules.afterRite(state()), null);
     }
@@ -299,6 +313,7 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
     @Override protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         working = tag.contains("Rite") ? ResourceLocation.tryParse(tag.getString("Rite")) : null;
+        spent = tag.contains("Spent") ? ResourceLocation.tryParse(tag.getString("Spent")) : null;
         elapsed = tag.getInt("Elapsed");
         boundId = tag.hasUUID("Bound") ? tag.getUUID("Bound") : null;
     }
@@ -306,6 +321,7 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
     @Override protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         if (working != null) tag.putString("Rite", working.toString());
+        if (spent != null) tag.putString("Spent", spent.toString());
         tag.putInt("Elapsed", elapsed);
         if (boundId != null) tag.putUUID("Bound", boundId);
     }

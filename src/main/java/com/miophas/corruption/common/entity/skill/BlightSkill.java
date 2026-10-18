@@ -30,6 +30,9 @@ import net.neoforged.neoforge.event.EventHooks;
  * first: to the dormant corruption, or taken by the infection, as the rules say - and, still, taken by it and left
  * dormant there, the block's own variant that spreads no further. What cannot be turned (a block that holds anything, a
  * liquid, an ore for the dormant corruption, what the infection never takes) is passed over.
+ *
+ * <p>Worked at the quarry ({@link #BlightSkill(BlightRules, int, int, boolean)}), it is all the same, but about where the
+ * quarry stood when it began, not about the caster: so a caster far off may blight the ground under its quarry.
  */
 public final class BlightSkill implements BossSkill<Mob> {
     /** How far above and below the caster's feet it looks for the top of the ground. */
@@ -37,15 +40,20 @@ public final class BlightSkill implements BossSkill<Mob> {
 
     private final BlightRules rules;
     private final int colour, accent;
+    private final boolean atQuarry;
     @Nullable private Vec3 origin;
     private final List<BlockPos> ground = new ArrayList<>();
     private final List<LivingEntity> struck = new ArrayList<>();
     private int next, turned;
 
-    public BlightSkill(BlightRules rules, int colour, int accent) {
+    public BlightSkill(BlightRules rules, int colour, int accent) { this(rules, colour, accent, false); }
+
+    /** A blight about where its quarry stands, if {@code atQuarry}, rather than about its caster. */
+    public BlightSkill(BlightRules rules, int colour, int accent, boolean atQuarry) {
         this.rules = rules;
         this.colour = colour;
         this.accent = accent;
+        this.atQuarry = atQuarry;
     }
 
     public BlightRules rules() { return rules; }
@@ -59,7 +67,7 @@ public final class BlightSkill implements BossSkill<Mob> {
     @Override public boolean usable(Mob boss, LivingEntity target) { return rules.inRange(boss.distanceTo(target)); }
 
     @Override public void begin(Mob boss, LivingEntity target) {
-        origin = boss.position();
+        origin = atQuarry ? (boss.level() instanceof ServerLevel level ? SkillShows.ground(level, target.position()) : target.position()) : boss.position();
         ground.clear();
         struck.clear();
         next = turned = 0;

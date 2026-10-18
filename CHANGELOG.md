@@ -4153,3 +4153,790 @@ Both commands are under `/corruption`, permission level 2, in `common/command/Al
   - the JEI line (no rite shows it yet);
   - the commands typed in a client;
   - the registry's sync to a real client.
+
+## 58. The octagram altar, and the Echo Sanctum rebuilt round it
+
+**Why.** The user's request: "readjust the placement of the Altar Pillars to form an 8-pointed star (octagram), with the pillars placed at the eight vertices. We also need to redraw a new octagram magic circle texture to use for it. Additionally, increase the usage of Blocks of Corruption Echo Alloy in the design."
+- Asked whether every altar should become an octagram, the user chose "Sanctum only": the octagram is a second altar shape, and the hexagram altar and its 26 rites are unchanged.
+- Asked how many echo alloy blocks, the user chose 5: the stele, plus a crown on each corner obelisk.
+
+### 58.1 The octagram altar
+- **Pillars** (`core/altar/AltarForm.OCTAGRAM`), as east, north with the altar facing north: (0,4), (3,3), (4,0), (3,-3), (0,-4), (-3,-3), (-4,0), (-3,3).
+  - Pillar 1 is four blocks the way the altar faces, as on the hexagram, and the rest follow clockwise, exactly 45° apart.
+  - The four diagonal pillars are three blocks out both ways, the nearest whole blocks come to a circle.
+  - The ground is the same 9 × 9.
+  - The set is symmetric, so all four facings put the pillars in the same places; only the numbering turns.
+- **`AltarForm`** is a new pure-Java enum: `HEXAGRAM` and `OCTAGRAM`, with `slots`, `east`, `north`, `slotAt`, `isAltar`, `formed`, `step` (how the star joins its corners) and `standing`.
+  - `standing` prefers the octagram, so all eight standing means an octagram.
+  - The two shapes share the north and south pillars, and the hexagram's six can never make an octagram.
+  - `AltarLayout` keeps its old interface, now pointing at the hexagram.
+- **The offering.**
+  - It finds which shape stands every 10 ticks, or when used, and keeps it in a new block state, `star` (`hexagram` / `octagram`). Offerings in old worlds default to `hexagram`.
+  - It reads its pillars, gathers particles from them and takes their items by its own shape.
+  - A change of shape cancels a rite under way.
+  - The blockstate file needed no change: variants may leave a property out, as vanilla's lantern leaves out `waterlogged`.
+- **Rites.** `AltarRecipe` gains `AltarForm form`.
+  - JSON: `"form": "hexagram"` or `"octagram"`. Left out, the rite takes the shape of the structure it asks for, or else the hexagram.
+  - Slots `"1"` to `"8"` are read first; a check then requires the shape to have them. Shaped rites are filled out to the shape's pillar count, and a shapeless rite takes up to that many.
+  - A rite matches only at an altar of its own shape. `AltarInput.form` comes from the pillar count.
+  - Ground blocks may not sit on the shape's own pillar places. That check moved from `GroundBlock`'s codec, which only knew the hexagram, into the rite's check, which knows its shape. So (4,2) is ground round an octagram, and (3,3) round a hexagram.
+  - A rite naming a structure built round the other shape is refused.
+  - The network codec carries the shape, and pillar lists up to 8.
+  - `RitualMatch.ground` and `AltarStructureMap.problem` take the shape; their old signatures mean the hexagram.
+- **JEI.**
+  - Octagram rites show eight pillar slots at the octagram's places, and the ground map marks eight pillars.
+  - The first line is purple: "Octagram altar, pillars by number" (or "on any pillars"). Hovering it explains the numbering.
+
+### 58.2 The octagram circle
+- **The texture.** `textures/misc/altar_circle_octagram.png` is drawn by `gamemodels/altar/draw_altar.py`, ten blocks across like the hexagram's.
+  - It is an {8/3} star, each corner joined to the third after it in one line, with its points exactly under the eight pillars.
+  - A ring round each pillar's foot, and a second round pillar 1's.
+  - The heart ring, and a thinner one inside it.
+  - 64 runes in fours round the rim; the hexagram has 48 in threes.
+- **The renderer.** `AltarRenderers` draws it under an offering whose `star` is octagram. `circle(form)` and `circlePoint(form, slot)` were added; the old `circlePoint(slot)` means the hexagram.
+- **The script.**
+  - `circle()` now takes the pillars, the star's figures and the runes as parameters. Called for the hexagram, it makes the same file as before: the checksum matched.
+  - Diamonds first drawn at the inner octagon's corners fell exactly on the heart ring and showed nothing, so they were taken out.
+- **A file overwritten, then restored.** Running the script also rewrote the offering's three face textures, and `block_altar_offering_sigil.png` came out different from the file on disk. The file had been changed since the script last drew it.
+  - It was restored from git. HEAD's copy has the same SHA-256 as the copy taken before the run, so it is exactly what was there. All six earlier outputs were checked by checksum afterwards.
+  - The script now writes the offering's faces and their preview sheet only with `--faces`. By default it draws the two circles.
+
+### 58.3 The Echo Sanctum, rebuilt
+`echo_sanctum.json` now says `"form": "octagram"`. It is still 11 × 11, from y -1 to y 3.
+- **Platform**: quartz, with arcane bricks under the offering and each of the eight pillars.
+  - The octagram is laid in bottom slabs, following the pillars ({8/3}, 28 slabs), so its lines run close to the circle's.
+  - Three floor patterns were rendered side by side to choose this one: a ring through the pillars; that ring with a diamond inside; and this star, which reads as eight points even before the circle lights.
+  - The stairs on the east, west and south edges are as before.
+- **Corner obelisks**, in line with the diagonal pillars and the offering: an arcane brick base, two quartz blocks, an echo alloy crown (y 2) and a slab cap.
+- **Echo stele**: as before, behind pillar 1. Five echo alloy blocks in all, every one visible.
+- **What it takes**:
+
+  | Block | Count |
+  | --- | --- |
+  | Quartz block | 85 |
+  | Arcane brick block | 14 |
+  | Arcane brick slab (bottom) | 33 |
+  | Arcane brick stairs (bottom) | 5 |
+  | Block of Corruption Echo Alloy | 5 |
+  | Altar Offering, Altar Pillars | 1, 8 |
+
+  - **Arcane bricks**: 36 with the stonecutter, which is 144 cursed bricks and 2,880 KCE. One dust-fed transmuter takes about 4 hours; the transmutations alone take 24 minutes.
+  - **Echo alloy**: 45 alloys, which is 180 netherite scrap, 180 gold ingots and 45 resonant corruption crystals.
+- **Building it.** `AltarStructure` reads `form` (default hexagram) and checks `P` markers against it. `buildWithAltar` places that shape's pillars and sets the offering's `star`. The commands needed no change.
+
+### 58.4 Preview and docs
+- **A third picture.** `render_altar_structure.py` also writes `preview_<name>_formed.png`. It shows the structure's circle (by its `form`) glowing over the floor as the game draws it: additive, hidden only by what stands in front.
+- **Lang**: 3 new keys in each of en_us and zh_cn, for the JEI octagram lines and tip. `corruption.altar.unformed` no longer says "six pillars": it now says six for a hexagram, eight for an octagram.
+- **README** (Chinese):
+  - A new subsection, “八芒星祭坛”.
+  - “祭坛结构：回响圣所” is rewritten for the new layout, with the formed picture, maps generated from the JSON, and the new materials and cost.
+  - The altar section points to the octagram, and the rite format lists `form`.
+
+### 58.5 Tests
+- **`AltarRulesTest`** (2 new):
+  - the octagram's eight pillars: on the ground, clockwise, 45° apart, about four blocks out, and one line through all eight at step 3, with the hexagram as it was;
+  - `standing` prefers the octagram and needs every pillar; `withSlots`; `isAltar` by shape; and ground round an octagram treats (4,2) as ground.
+- **`AltarStructureMapTest`** (1 new): `P` markers are checked against the structure's shape.
+- **`AltarTest`** (2 new):
+  - **The circle**: the octagram circle reaches all eight pillar points, and nothing is drawn outside it.
+  - **Octagram rites**: they read their shape and match only at eight pillars, and a hexagram rite does not match at eight.
+    - Shapeless counts are checked against the shape: 7 on an octagram is fine, 7 on a hexagram and 9 on an octagram are refused.
+    - A pillar 8 on a hexagram is refused, and so is "pentagram".
+    - Ground at (3,3) and (4,2) is checked by shape.
+  - The new lang keys are present in both languages.
+- **`AltarStructureServerTest`** (1 new, others updated):
+  - **The new counts**: every pillar and the offering stand on bricks, and the structure is the octagram's.
+  - **The offering's shape**: built facing any way, it finds and shows the octagram.
+  - **Rites and the network**: a rite asking for the sanctum becomes an octagram rite with 8 pillars. The same rite saying "hexagram" is refused, and the network codec keeps its shape.
+  - **The full rite** still runs inside the sanctum, now at eight pillars.
+  - **New: changing shape.** The offering binds as an octagram. With its pillars swapped for a hexagram's, it shows the hexagram, and a sanctum rite no longer matches there although the sanctum still stands. With one more pillar gone it goes dormant and keeps the last shape.
+  - **Bad markers**: data marking pillars where its shape has none is refused.
+
+### 58.6 Run
+- The altar test classes: 51 of 51 pass (`AltarServerTest` 13, `AltarStructureServerTest` 7, `AltarTest` 12, `AltarRulesTest` 14, `AltarStructureMapTest` 5).
+- **The full suite**: 779 tests in 117 classes, all pass (none failed, none skipped). That is 773 before, plus 6 new; the boss, echo alloy and earlier altar tests all still pass with the shape-aware rites.
+- **Not checked in game**:
+  - the octagram circle as it renders;
+  - an offering switching shape in a running world;
+  - JEI's octagram layout (no octagram rite exists yet, so JEI shows none);
+  - how the rebuilt sanctum looks in a world.
+
+## 59. Solomon, the eight flood dragons
+
+**Why.** The user's design (pasted): a new boss, Solomon, "an amalgamation of eight flood dragons (wyrms). You must defeat every single dragon to defeat the Boss. Each dragon basically hovers/floats in the sky. The length of a single dragon reaches 4 chunks."
+- **Each dragon's skills**: higher-damage beams, a very large number of corruption projectiles, Baal's fireballs, burrowing to erupt under the target, charging the target's fixed location then burrowing away and erupting into the sky, a "Venus Blessing", lightning, and giant hands grown from the ground (modelled).
+- **Global skills**: brainwashing, advanced brainwashing, 3–4 elites, a group of remnants around the target, terrain alteration at the target, Deactivated Corruption at the target, stuns, and small dragons from eight directions charging through the target (modelled).
+- **Not deterred by the Advanced Corrupted Robe.**
+- **His place**: the penultimate boss, before the "Supreme Deity of the Solomon Domain" (not designed yet).
+- **A dedicated drop.**
+- **Summoned** with The Key of Solomon I–VIII on the pillars of the new multiblock.
+- **A redesigned health bar** after L_Ender's Cataclysm.
+
+The user's answers to four questions:
+- **Damage**: spells only, as the goetic demons.
+- **Pacing**: all eight fly from the start, but at most three cast at once.
+- **Venus Blessing**: modelled on the player spell Pentacle of Venus, healing and shielding the dragons about the caster.
+- **The drop**: a ninth relic, the Ring of Solomon, inert like the other eight.
+
+### 59.1 What he is
+- **The seal** (`corruption:solomon`, `common/entity/Solomon`): a crowned octagram core.
+  - It rises 16 blocks over the altar it was called at, then the eight dragons burst out of it, one per book of the Key, each lit in its book's colour.
+  - Nothing hurts it but what bypasses invulnerability. It shows the boss bar (`GoeticDemon` gained `barProgress()` for it) and works the eight edicts.
+  - It keeps count of its dragons. A dragon that dies while the seal is unloaded writes to a world `SavedData`, `SolomonLedger`, which the seal reads.
+  - When the last dragon falls, it dies by that blow, credited to that player. It drops the ring, 2–4 echo alloys, 3–6 resonant corruption crystals and 2000 experience.
+- **A dragon** (`corruption:solomon_wyrm`, `SolomonWyrm`, a `GoeticDemon`):
+  - 400 health (3200 for all eight), armour 12, spells only.
+  - A head 4 blocks long, then 30 links 2 blocks apart: 64 blocks. The body follows the head's path (new pure-Java `core/demon/WyrmChain`).
+  - Every link is its own `PartEntity` hitbox, narrowing from 2.6 to 1.04. Links lying in the ground can't be struck.
+  - It flies through anything (no suffocation, drowning, falls or fluid push). It circles its quarry on a ring of its own: 24–40 out, 12–24 up, a turn every 30 s, at least 8 above the ground. It turns back if more than 112 from the seal.
+  - Clients get the chain when they start tracking it, and draw it interpolated between ticks.
+- **At most three at work**: a dragon starts a skill only while `Solomon.mayCast()` counts fewer than three of its kin busy.
+- **The robe** (new):
+  - The entity type tag `corruption:pierces_veil`: `CorruptionVeilApi.hiddenFrom` is false for its members.
+  - The damage type `corruption:solomon`: `ModDamageTypes.corruption(level, attacker)` returns it for such attackers. It is in neither `corruption:corruption_damage` (so no robe cancels it) nor `corruption:spell`.
+  - A per-creature mark `CorruptionVeilApi.unveil`, set on the remnants and elites he calls, so they ignore robes too.
+  - The Advanced robe still hides its wearer from every other lord.
+
+### 59.2 The dragons' eight skills
+| Skill | Module | In short |
+| --- | --- | --- |
+| Beam | `BeamRules` (existing) | 1.8 s wind-up, then 4 s of a 64-long beam; 9 every 0.2 s (Dantalion and Seere: 5) |
+| Deluge | `BarrageRules` (existing) | 160 bolts, 4 a tick, over 9 blocks about the quarry; 6 each (Decarabia: 64 bolts) |
+| Baal's fireballs | **new** `FireballRules`, `FireballSkill`, entity `SolomonFireball` | 5 fireballs (fire charge ×3) at 1.4 a tick, led; 18 → 9 over 3.5 and alight 5 s; with mobGriefing up to 30 blocks within 2.5 softer than obsidian crushed, and fire set; cannot be struck back |
+| Burrow | **new** `BurrowRules`, `BurrowSkill` | dives in a third of the way, 6 down at 1.3 a tick under the quarry, 1 s of cracking ground, then bursts up: 22 within 4.5, flung up, ground torn up; climbs 22 |
+| Ram | **new** `RamRules`, `RamSkill` | marks where the quarry stood, rams it at 2 a tick (20 within 3, each once), on 10 into the ground, 18 away under it, bursts out (10 within 4), climbs 26 |
+| Venus Blessing | **new** `VenusRules`, `VenusSkill` | first when any dragon within 40 is below 75 %: each healed 20 %, Absorption IV 15 s, Regeneration II 10 s |
+| Lightning | `StrikeRules` (existing) | 9 bolts within 6 of the quarry, 14 each |
+| Giant hands | **new** `HandRules`, `HandSkill`, entity `SolomonHand` | three hands (under the quarry and 5 from it): rise 1 s, rear 0.5 s, slam 0.25 s; 24 within 3.5, flung up; sink 1 s |
+
+Choosing (`SolomonRules.chooseWyrm`):
+- Venus comes first whenever it is wanted.
+- The beam, deluge and fireballs need sight of the quarry; the ram does too.
+- Burrowing, lightning and hands do not need sight.
+- Burrowing and ramming are likelier for a quarry far below.
+
+### 59.3 The seal's eight edicts
+| Edict | Module | In short |
+| --- | --- | --- |
+| Brainwashing | `GazeRules` (Dantalion's) | from up to 96: Slowness II 8 s, Blindness 5 s |
+| Greater brainwashing | `GazeRules` | five eyes: Slowness II 13 s, Blindness 8 s, Wither II 7 s |
+| Elites | **new** `EliteCallRules`, `EliteCallSkill` | 3 or 4 (half and half) of the `corruption:vine_brood` kinds about the quarry; never more than 6 about it |
+| Remnants | `SummonRules` (Belial's) | 8 about the quarry, at most 16 called within 112; crumble after 60 s |
+| Terrain | `UpheavalRules` (Amdusias's) | 7×7 under the quarry heaved up, broken open or speared |
+| Dormant ground | `BlightRules` | centred on the quarry: 10 within 8, then the ground within 8 to Deactivated Corruption (up to 220) |
+| Stun | `ScreechRules` | everything within 7 of the quarry stunned 2.5 s |
+| Drakes | **new** `DrakeRushRules`, `DrakeRushSkill`, entity `SolomonDrake` | 8 drakes on the compass 18 out, 1.5 s gathering, then all through the mark at 1.1 a tick to the far side; 10 within 1.6, each once |
+
+What existing modules needed:
+- `BlightSkill` and `ScreechSkill` gained an at-the-quarry constructor.
+- `SummonSkill` gained `counting(range)`, since a seal high above counts its remnants further off. It also marks what it calls when the caster pierces the veil.
+- Every other boss's behaviour is unchanged.
+
+### 59.4 The rite, and a new rite field
+- **The rite** `altar/solomon.json`:
+  - the octagram altar inside the Echo Sanctum (the shape follows from the structure);
+  - The Key of Solomon I–VIII on pillars 1–8;
+  - a player at corruption 18 or more (dropped in §60: no player is needed);
+  - 20 s.
+- **`"consumes": false`** (new `AltarRecipe` field, default true, carried over the network). A rite with it leaves what lay on its pillars.
+  - Solomon's does, because the eight books are also where the lectern copies their spells from.
+  - The README's octagram section now says this is the first octagram rite. Its sanctum section no longer says no rite asks for it.
+
+### 59.5 What the client sees
+- **Models.** `gamemodels/solomon/solomon_model.py` defines seven: the dragon's head, body link, legs and tail; the hand; the drake; the crown.
+  - The dragon, hand and crown are built at half size and drawn twice as large, so a 64-block dragon fits one texture.
+  - `export_model.py` writes `geo/solomon_*.json` and the textures; with Blockbench open it also saves `.bbmodel`s and previews (`solomon_*_previews.png`).
+- **Textures.** `paint_texture.py` shades every face from vanilla patches, with checksums in `vanilla_sources.md`:
+  - the ender dragon's scales, pale spine and wing membrane;
+  - skeleton bone, the gold block, amethyst, the warden's hide, deepslate and crying obsidian.
+  - The dragon's, hand's and drake's glow is white, for the renderers to tint in the book's colour, over near-black skin.
+  - First review: the gold sheen on the dragon was far too common, the hand's veins came out as dots, the glowing texels showed as grey stripes on the base skin, and the gold snout ridge looked like a helmet. All four were fixed.
+- **Renderers.**
+  - `SolomonWyrmRenderer`: the head, plus every link along the interpolated chain, tapering, each lit by its own place. Legs at links 4 and 12, the tail last. A tinted glow pass, a hurt flash, and crumbling from the tail when dying.
+  - `SolomonRenderer`: the crown and three turning octagram rings.
+  - `SolomonHandRenderer` and `SolomonDrakeRenderer`: pose the bones by age.
+  - The fireball uses vanilla's thrown-item renderer at 3×.
+  - Two sign errors were caught by checking the poses against the exported bones: the whiskers would have crossed inward, and the fingers curled backwards. Both were fixed.
+- **Boss bar.** `SolomonBossBar` follows L_Ender's Cataclysm's bars.
+  - A gold-and-black channel in eight, one place per dragon, each filled in its book's colour as far as its health goes. Lost health drains slowly; a fallen dragon's place is cracked, with a broken seal.
+  - A crowned octagram medallion sits over the middle, and the name is in gold.
+  - The art is drawn by `gamemodels/solomon/draw_boss_bar.py` from vanilla's white boss bar sprite, the gold block and crying obsidian. The shares are synced by the seal.
+- **Relic.** `solomon_ring`, the Ring of Solomon, is drawn from the clock's rim and an amethyst shard by `draw_relics.py`, and registered by `write_relics.py`.
+  - Re-running `draw_relics.py` also overwrote `decarabia_star.png`, which differs from what the script draws. It was restored from git: HEAD has the pre-run SHA-256. The script now writes only missing textures unless given `--all`.
+- **Lang**: 10 new keys in each of en_us and zh_cn: five entity names, three death messages for `corruption:solomon`, and the ring's name and line.
+- **Tags**: `bosses` (seal, dragon), `corrupted_remnants` (seal, dragon, hand, drake), `pierces_veil` (new; all five), and `boss_relics` (ring).
+
+### 59.6 Tests
+- **`SolomonRulesTest`** (7, new, pure Java):
+  - the numbers: eight dragons, 64 blocks, eight colours, the cap of three;
+  - the chain unwinds and keeps its spacing, turns corners after its head, faces the right way, tapers, and saves and loads;
+  - the eight orbits are distinct and go round;
+  - what a dragon chooses, seen and unseen, and Venus first;
+  - what the seal decrees, in and out of sight, and with no room for more summons;
+  - every new skill rule (burrow, ram, Venus, fireballs, hands, drakes, elites);
+  - `core/demon` and `core/demon/skill` import nothing but Java.
+- **`SolomonServerTest`** (12, new):
+  - **His rise**: the seal rises and calls up eight dragons (one per book, 30 links, serving it). They fly out, unwinding to more than 20 blocks, staying in the air and within the leash.
+  - **Damage**: a blade passes through a dragon, while a spell, on its head or on a link, reaches it through its armour. Nothing reaches the seal, and the bar's share follows the dragon's health.
+  - **The robe**: an Advanced robe hides its wearer from Amdusias but not from a dragon. His corruption hurt is `corruption:solomon`, which the robe doesn't cancel, and an unveiled remnant sees the wearer.
+  - **The cap**: three dragons at work and no fourth.
+  - **Five skills**: the beam, the deluge (at least 90 % of 160 bolts), the five fireballs (burst, hurt and burning), the lightning and the three hands (the first under the quarry, the slam lands, then they sink) each do what they say.
+  - **Burrow and ram**: both go underground and finish. The burrow catches its quarry as it bursts up, and the ram catches it where it stood.
+    - The first run caught a bug: a dragon that has just climbed out of a burrow is drifting straight up, and steering from that velocity sent its ram off into the sky.
+    - A nearly still dragon now sets off the way it faces.
+  - **Venus**: heals itself and kin within 40 and shields them, but not a dragon 200 away.
+  - **The edicts**: brainwashing, 3–4 unveiled elites, 8 unveiled remnants about the quarry, more than 50 dormant blocks around the quarry rather than the seal, a stun, and 8 drakes from eight directions that strike and vanish; then an upheaval under another quarry.
+  - **His fall**: with seven dragons down he lives; the eighth's death kills him and drops the ring. He is removed after his death, and his ledger page is cleared.
+  - **The ledger** tells the seal of a dragon that fell out of its sight.
+  - **Measured**: his hardest single blows on a 20-health stand-in, bare and in full netherite (below); armour takes part of each, as it should.
+  - **The rite**: it reads as an octagram rite of the Echo Sanctum with the eight books, not consuming them. Run for real on a built sanctum, with the books and a corruption-18 fake player, it calls Solomon up and leaves every book on its pillar (since §60 with no player at all).
+- **`SolomonModelTest`** (4, new):
+  - every bone the renderers move exists;
+  - the head's snout and nape are 2 blocks from its middle, matching the server's mouth;
+  - a link is longer than the spacing, so they overlap, and about as wide as its hitbox;
+  - with the arm swung down, the hand's palm lands within 1.5 blocks of the hand's own position, on the ground;
+  - every texture, model, name and tag he needs exists.
+- **`BossRelicsServerTest`** (updated): Solomon leaves the ring. His dragons are lords too (in `corruption:bosses`, so they block the corrupted arcane sword's curse as other lords do), but leave no relic of their own: their seal leaves it.
+  - The first full run failed this test's 3 checks, because it listed the eight relics and the eight lords.
+- Two first-run test failures came from the tests themselves:
+  - an exact-health assertion ignored the dragons' armour;
+  - an orbit check compared x alone, which repeats for one dragon a quarter turn later.
+
+### 59.7 Run
+- The new tests: 23 of 23 pass (`SolomonRulesTest` 7, `SolomonServerTest` 12, `SolomonModelTest` 4).
+- **Measured** (`measureHisBlowsAgainstArmour`), the health a 20-health villager stand-in loses to one blow, bare / in full netherite (ticked once so its armour counts): a beam pulse 9.0 / 2.45 (the beam lands every 0.2 s for 4 s, ignoring hurt cooldowns, so standing in it is deadly; it turns 2° a tick after its quarry); a deluge bolt 6.0 / 1.49; a fireball at its heart 18.0 / 6.19; the burrow 20 (all of it: 22) / 8.27; the ram 20.0 / 7.20; a lightning bolt 14.0 / 4.37; a hand 20 (all of it: 24) / 9.41; a drake 10.0 / 2.80. Not tuned against these: set by comparison with the other lords (Seere's dive 24, Amdusias's spikes 12, his fanfare bolts 7).
+- **The full suite**: 802 tests in 120 classes, all pass (none failed, none skipped). That is 779 before, plus 23 new.
+- **Not checked in game**: none of it has been seen running in a client. In particular:
+  - the dragons' flight, the sight of eight 64-block bodies at once, and the frame rate with them;
+  - every skill's visuals and sounds;
+  - the boss bar on screen;
+  - the poses of the jaw, whiskers, hands and drakes as they render;
+  - the models seen from a player's height;
+  - balance against real players: health, damage and cooldowns were set by comparison with the other lords, not measured.
+
+## 60. A crash drawing Solomon's dragons, and a rite with no one at it
+
+**Why.** The user's report: "It crashed! Then The summoning ritual does not require the player to be inside the ritual, and there is no corruption value requirement."
+
+### 60.1 The crash
+- **What crashed**: the client, while drawing a dragon (`run/crash-reports/crash-2026-10-18_04.53.08-client.txt`, "Rendering entity in world"). The error was `IllegalStateException: Not building!` from `ModelPart.render` in `SolomonWyrmRenderer.drawHead`.
+- **Why**: `SolomonWyrmRenderer.render` fetched the skin buffer (`entityCutoutNoCull`) and then the glow buffer (`eyes`) up front, and then drew into both.
+  - The game's buffers share one builder among kinds that are not kept apart. Fetching another kind closes the one fetched before it, so the first skin draw went into a closed buffer.
+  - It crashed on the first frame a dragon was drawn.
+- **The fix**: a new helper, `SolomonWyrmRenderer.draw(shape, ...)`, draws a shape in its skin and then in its glow. It fetches each buffer just before drawing into it.
+  - The head, every body link, the legs and the tail all go through it. No buffer is held any more.
+- **The other renderers**: checked by hand. Every other place in the mod that holds a buffer is finished with it before it fetches another. That covers the block renderers, the remnants' wrapped buffers, the shared skill visuals and Solomon's seal rings.
+  - His crown, hands and drakes fetch each buffer as they draw. His fireballs use vanilla's thrown-item renderer.
+  - None of them needed changing.
+
+### 60.2 Solomon's rite needs no one at it
+- `altar/solomon.json` no longer has `"corruption": 18`. Left out, it is 0: the rite asks for no corruption and no player inside the altar.
+  - It begins once the Echo Sanctum stands and the eight books lie on their pillars.
+  - The rite rule already allowed this (`RitualMatch.corruption`: asking for 0 passes with no one there). The README's altar section already says so.
+- README (Chinese): the summoning bullet in the Solomon section says so. The dragon renderer's paragraph says when its buffers are fetched, and why.
+- The other rites still ask for the players they asked for.
+
+### 60.3 Tests
+- **`SolomonServerTest.theRiteOfTheEightBooksCallsHimUpAndLeavesTheBooks`** (updated):
+  - it asserts the rite asks for corruption 0;
+  - it no longer places the corruption-18 fake player;
+  - it asserts no player is within 64 blocks of the altar, then runs the rite.
+  - He is still called up, and every book stays on its pillar.
+- **`SolomonModelTest.aDragonIsDrawnWithoutHoldingOneBufferWhileItFetchesAnother`** (new). Its buffer source is a stand-in that behaves as the game's does: fetching another kind of buffer closes the last one, and drawing into a closed buffer throws `Not building!`.
+  - The old pattern (skin fetched, glow fetched, skin drawn) throws, as the crash did.
+  - `draw` draws all four of the dragon's shapes, head, body, legs and tail, in skin and glow, without throwing. It fetches 8 buffers and writes vertices.
+
+### 60.4 Run
+- The Solomon tests: 24 of 24 pass (`SolomonRulesTest` 7, `SolomonServerTest` 12, `SolomonModelTest` 5).
+- **The full suite**: 803 tests in 120 classes, all pass (none failed, none skipped). That is 802 before, plus the 1 new.
+- **Not checked in game**: the fix has not been seen running in a client. The stand-in buffers follow the game's rule, but a real client is where the crash was.
+  - The dragons may still have other problems on screen that the crash hid. Nothing past their first frame has been seen yet.
+
+## 61. Solomon's dragons break and hurt what they pass, move as they work, and swoop; one rite calls one Solomon; his hurt reaches an Ender Dragon
+
+**Why.** Five messages from the user, in order:
+- "Adjust the flood dragons so that they can destroy blocks in their path while flying, just like the Ender Dragon. Also, their bodies should have corresponding animations when attacking, rather than remaining completely static."
+- "Solomon has a really hard time fighting an Ender Dragon. Is it because our current skill set lacks hitboxes? The Ender Dragon's health didn't drop at all."
+- "I'm not sure why the Solomon Core spawns an extra batch of Solomon's Wyrms, causing me to have to deal with 16 dragons in a single Solomon fight."
+- "Solomon's aggression feels a bit weak, because the Solomon's Wyrms fly high in the sky and rarely attack enemies on the ground."
+- "The Solomon's Wyrms should not only destroy blocks along their path, but also continuously deal massive damage to any creatures they pass by."
+
+### 61.1 Sixteen dragons: the rite ran again
+- **Cause**: after a rite the offering goes back to `formed` (`AltarRules.afterRite`), and `formed` still performs rites.
+  - Solomon's rite leaves the eight books on their pillars (`"consumes": false`, §59), so the same rite matched again at once.
+  - A second seal came 20 s later, and another every 20 s after that while the books lay there. Each seal calls its own eight dragons.
+  - The second seal rose to the same place as the first, so it looked like one seal calling two batches.
+- **Fix**: `AltarOfferingBlockEntity` remembers a rite it completed that consumed nothing (`spent`, saved with the block as `Spent`).
+  - It does not run that rite again until something on the altar changes, for example a book lifted and put back. The README says how to call him again.
+  - Rites that consume their items are unaffected: their items are gone.
+- The §59 rite test ran the offering for one rite's length and 60 ticks, so it never saw the second seal. It now runs more than twice as long.
+
+### 61.2 The Ender Dragon took none of his hurt
+- **Not hitboxes.** His skills find the Ender Dragon by its own box (16×8). Vanilla then throws the damage away. In `EnderDragon.hurt` (1.21.1):
+  - `if (source.getEntity() instanceof Player || source.is(DamageTypeTags.ALWAYS_HURTS_ENDER_DRAGONS)) { ... this.reallyHurt(source, damage);`
+  - Vanilla's `#minecraft:always_hurts_ender_dragons` holds only `#minecraft:is_explosion`. His hurt is `corruption:solomon`, dealt by a dragon, so it was discarded.
+- **Fix**: `data/minecraft/tags/damage_type/always_hurts_ender_dragons.json` (new, `"replace": false`) adds `corruption:solomon`.
+  - As in vanilla, a blow not on its head counts a quarter and 1 (20 becomes 6). All of his blows strike its main entity, which vanilla counts as its body.
+  - The other lords' corruption damage (`corruption:corruption`) is not added: they still cannot hurt an Ender Dragon.
+- **Not checked**: which of his skills reach an Ender Dragon flying high. Several aim at the ground under their quarry.
+
+### 61.3 They break what they fly through
+- **`SolomonWyrm.smash`**, on the server every tick while the dragon lives, follows vanilla's `EnderDragon.checkWalls`:
+  - a block is removed without drops (`removeBlock`);
+  - `#minecraft:dragon_transparent` (fire, light) is passed through;
+  - NeoForge's `CommonHooks.canEntityDestroy` is asked for each block;
+  - nothing breaks where mobGriefing is off.
+- **Which parts**: the head's box, stretched along this tick's movement so a fast ram leaves nothing between ticks; and every link's box.
+  - Vanilla checks only its head, neck and body. A 64-block body cuts inside the head's path on turns and, now, writhes (61.6), so the whole body breaks its way.
+- **Spared**: a new block tag `corruption:solomon_wyrm_immune`: `#minecraft:dragon_immune` (bedrock, obsidian, end stone and the rest), `corruption:altar_offering` and `corruption:altar_pillar`.
+  - It passes through these, as before. Unlike vanilla, they do not slow it.
+  - The Echo Sanctum's other blocks (quartz, bricks, slabs, stairs, echo alloy blocks) are not spared, as his burrow, ram and fireballs already did not spare them.
+- **Burrowing, it swims through the earth.**
+  - While its head goes underground on purpose, nothing breaks. `BurrowSkill.tunnelling()` covers dive, tunnel, warn and rise until the burst; `RamSkill.tunnelling()` covers plunge, under and out until the burst.
+  - So it is still buried and cannot be struck there, as §59 designed.
+- **The body follows the head's way**: `core/demon/WyrmWake` (new) records how far the head has come and which stretches of that it swam.
+  - A link on a swum stretch breaks nothing, however long the body takes to follow the head out.
+  - A link counts as on a stretch if any of the way from `link × 2 − 1` to `(link + 1) × 2 × 1.25 + 1` blocks behind the neck was swum. The slack is because a curling chain cuts corners.
+  - A timer after the burrow would not do: a dragon that stops to cast with half its body underground outlives it, and its writhing body would carve out the rest of the tunnel.
+- **Cost**, measured twice (`measureWhatItsBodyCostsATick`): 36.6 µs and 16.6 µs a dragon a tick, breaking and touching with its whole body in open air; 0.29 ms and 0.13 ms a tick for eight, of a tick's 50 ms. Breaking through terrain costs more; not measured.
+
+### 61.4 They hurt what they pass through
+- **`SolomonWyrm.touch`**: one search over the whole body's reach, then each creature found is tested against the head box and each link box.
+- **How much**:
+  - the head 14, throwing the creature along the head's facing (1.0);
+  - a link 10, throwing it to the side (0.5);
+  - both lift it 0.25.
+  - The damage is `corruption:solomon`: no robe turns it aside, and armour counts.
+- **How often**: vanilla's hurt cooldown sets it. A creature left inside the body is hit again every half second.
+- **Whom**: anything it may attack (`canAttack`); not its own side (the corruption faction, its kin and his summons), nor creative or spectator players.
+- **Measured** on the 20-health stand-in, bare / full netherite: the head 14.0 / 4.37; the body 10.0 / 2.80.
+  - His single blows are 20 to 24 once (ram, burrow, hands). The touch repeats twice a second for as long as one stays in it: 28 a second at the head, bare.
+
+### 61.5 Lower, closer, and swooping
+- **The ring they circle on** (`SolomonRules.orbit`):
+
+| | Before | Now |
+| --- | --- | --- |
+| Out from the quarry | 24–40 | 16–28 |
+| Up over the quarry | 12–24, ±3 | 8–17, ±2 |
+| Once round | 30 s | 15 s |
+| Least over the ground | 8 | 5 (`CLEARANCE`) |
+
+- **The swoop** (`SwoopRules`, new; `SolomonRules.SWOOP`): between its spells a dragon dives through its quarry.
+  - It needs the quarry within 64 blocks and the dragon not casting. It rests 6–11 s between swoops, and 6 s after it appears.
+  - It dives on the quarry's middle at 1.25 a tick, homing but turning at most 6° a tick, so a quarry that steps aside in time is passed.
+  - It pulls up within 2 blocks of the quarry, once it has gone by (the quarry behind its head and within 8), or after 5 s.
+  - It climbs forward and up for 1.5 s, turning half as sharply again, then returns to its ring.
+  - On the way it breaks and hurts as always, so a swoop on a quarry on the ground ploughs a trench.
+- **Not one of its eight.** It does not count against the three at work. At most two of a seal's dragons swoop at once (`Solomon.maySwoop`).
+  - A dragon held back by the three-at-work limit can still swoop, so more of them attack at once. Spells, their weights, rests and cooldowns are unchanged.
+- **Plumbing**:
+  - `Wyrm.SWOOP` (new enum value, not in `WYRM_SKILLS`) is its synced skill while it swoops, so clients pose it (61.6) and open its jaw.
+  - A spell begun directly ends a swoop under way.
+  - `steer` gained an `ease` flag, so a swoop keeps its speed through its quarry.
+
+### 61.6 Their bodies move as they work
+- **What it did**: the dragon hangs where it is to cast beam, deluge, fireballs, lightning, hands and Venus (`hold`). Its body follows only its head's movement, so the body hung completely still.
+- **`core/demon/WyrmPose`** (new) poses the body about where its chain lies. Each motion is made of:
+  - a wave down it, side to side and up and down, running towards the tail or the head, or standing and breathing;
+  - its middle arched up or bowed down;
+  - a shudder.
+  - Each skill has one motion as it winds up and another as it works:
+
+| Skill | Winding up | At work |
+| --- | --- | --- |
+| Beam | an S gathering towards its head, back arched | braced in a stiff S, breathing, shuddering |
+| Deluge | gathering itself | swells running up it to its mouth, a bolt with each |
+| Fireballs | rearing | a heave up it to its mouth every 0.4 s, one per fireball |
+| Burrow | rearing, arched | swimming through the earth |
+| Ram | coiled in a straining, shuddering S | straight as a spear, a ripple |
+| Venus | a slow corkscrew | a slow, graceful corkscrew |
+| Lightning | rising in a corkscrew | thrashing |
+| Hands | heaving, sagging towards the ground | pounding down with the hands |
+| Swoop | none | swimming hard |
+
+- **How it moves**:
+  - Its neck stays on its head, and each link keeps its length, so a curving body draws its tail in.
+  - The motion takes hold over 0.5 s, flows from wind-up into work over 0.4 s, and dies away over 0.8 s after the skill ends.
+- **The same on both sides.** Server and client each pose it from the synced skill and from when it began and ended, counting their own ticks.
+  - `onSyncedDataUpdated` runs on both, so `posedSkill`/`skillTicks` now hold on the server too.
+  - The links' hitboxes, the breaking, the touch, the crumbling dust and the culling box all use the posed body, so what is struck and what strikes is what is drawn.
+  - The renderer is unchanged: it draws `joint()`, which now answers the posed body between ticks.
+- **Measured** (`WyrmPoseTest`, a straight body): the farthest a joint lies from its chain, winding up / at work:
+  - beam 3.9 / 2.0; deluge 3.1 / 2.9; fireballs 3.1 / 3.5; burrow 2.5 / 3.1;
+  - ram 4.3 / 1.1; venus 2.0 / 2.6; lightning 3.5 / 4.7; hands 3.2 / 3.5; swoop – / 2.3.
+
+### 61.7 A burrow that began in the air (found by the new tests)
+- **The bug**: `BurrowSkill` found the ground where it goes in with `SpellEffects.groundAt`, which looks only 12 blocks below the point it is given. It was given the dragon's own height.
+  - A dragon more than 12 blocks up found no ground, and the "ground" was its own height. Its dive counted as underground in mid-air.
+  - It then flew down through the air to its depth under the quarry. Before today it hung 12–27 up, so this was the usual case.
+- **Fix**: the entry's ground comes from the heightmap (`MOTION_BLOCKING_NO_LEAVES`): the surface however high the dragon hangs, through any trees.
+- §59's burrow test only checked that the head went below the ground somewhere, which it did either way.
+
+### 61.8 Tests
+- **`WyrmPoseTest`** (5, new):
+  - at nothing, the body lies on its chain; likewise the moment it begins and once its motion has died away;
+  - every skill and the swoop move it more than a block, late in the wind-up and well into the work, and never more than 12;
+    - the neck stays put, and every link keeps its length to 1e-9;
+    - it is still moving at work, even the beam's braced S; the beam and the hands differ;
+  - it takes hold and dies away, and no joint moves more than half a block on the first or last tick;
+  - a body hanging straight down, or all in a heap, poses without fail;
+  - the wake: a link swims where its head swam and not elsewhere; this survives saving; the stretch is forgotten once the body has passed.
+- **`SolomonRulesTest`** (8; 1 new, 1 updated):
+  - the swoop's rules (range, at most two, rests, when it is done) and the touch's numbers;
+  - the ring's new bounds.
+- **`SolomonServerTest`** (19; 7 new, 3 updated):
+  - **New**:
+    - it breaks the stone through its head and a link, but not obsidian, an altar pillar or an offering; nothing with mobGriefing off; no drops;
+    - on a 10-block stone platform it burrows buried for more than 10 ticks, bursts up through its quarry, and 120 ticks later at least 90% of its tunnel is still stone;
+    - its head and body hurt a stand-in (exactly 14 and 10, thrown), not one aside nor a creative player, not again at once, and again half a second on;
+    - its hurt reaches an Ender Dragon (20 becomes 6), and so does its touch;
+    - it swoops through its quarry (within 3), hurts it, and climbs away. A seal lets two swoop and no third, and a swoop is none of the three at work;
+    - its body writhes more than a block off its chain while it casts lightning, keeps moving, and the links' hitboxes sit on the posed body;
+    - a measurement of what breaking and touching cost a tick.
+  - **Updated**:
+    - the rite calls him up once in more than twice its time; a book lifted and laid back calls him again;
+    - the measurement now includes the touch;
+    - the dragons bursting from the seal are checked as unwinding (links drawn out more than half their length) instead of by head-to-tail distance. A dragon circling the new, tighter ring curls; dragon 0 had 49 of 60 blocks drawn after 8 s.
+- **First runs**: three failures, all fixed before the final run.
+  - The swoop has no wind-up, so the test's "winding up" sample fell in its fade-in. The test now samples the work only.
+  - The unwinding check above.
+  - The tunnel check found 17 of 24 points open. They had never been earth: the burrow was "underground" in mid-air (61.7).
+
+### 61.9 Run
+- The Solomon and pose tests: 37 of 37 pass (`WyrmPoseTest` 5, `SolomonRulesTest` 8, `SolomonServerTest` 19, `SolomonModelTest` 5). The altar tests pass unchanged (`AltarServerTest` 13, `AltarStructureServerTest` 7, `AltarTest` 12, `AltarRulesTest` 14, `AltarStructureMapTest` 5).
+- **The full suite**: 816 tests in 121 classes, all pass (none failed, none skipped). That is 803 before, plus 13 new (`WyrmPoseTest` 5, `SolomonRulesTest` 1, `SolomonServerTest` 7).
+- **Not checked in game**:
+  - the dragons breaking terrain: how much of a battlefield is left, and the server's frame time while they plough through it;
+  - how hard the touch and the swoops are on real players, and whether 14/10 twice a second with two swoopers at once is too much. All of it was set by comparison, not tuned;
+  - how the body motions look, and whether the hitboxes' moving with them feels fair;
+  - the fixed burrow, and the single summon, in a real world;
+  - Solomon against an Ender Dragon: only that his hurt now reaches it was checked.
+
+## 62. Solomon's rite takes the eight books
+
+**Why.** The user's request: "Adjust it so that after summoning Solomon at the altar, all The Key of Solomon books on the pillars are consumed."
+
+### 62.1 The rite
+- `altar/solomon.json` no longer has `"consumes": false`. Left out, it is `true`: when the rite completes, all eight books on the pillars are taken, and summoning him again takes eight more.
+- **What it costs a player**: the books are also where the lectern copies spells from; every lord's summoning parchment is copied from book VIII. The README now says to copy what is needed before the rite.
+  - The books are found again only as structure loot, one a structure, drawn from twelve.
+- With the books gone the rite no longer matches, so it calls one Solomon at a time on its own. §61's guard against a rite repeating is no longer what stops it.
+
+### 62.2 What stays
+- **The `consumes` field and §61's guard stay.** A rite that reads without taking is not done again until something on the altar changes.
+  - No rite of the mod's own reads any more; a data pack may write one.
+  - The `AltarRecipe` and `AltarOfferingBlockEntity` comments no longer name Solomon's rite as the example.
+- **README (Chinese)**:
+  - the Solomon summoning bullets: the books are taken, and copy spells first;
+  - the altar's `consumes` entry: no shipped rite uses it.
+
+### 62.3 Tests
+- **`SolomonServerTest`** (20; 1 new, 1 rewritten):
+  - **Rewritten**: `theRiteOfTheEightBooksCallsHimUpAndTakesTheBooks` (was `...AndLeavesTheBooks`):
+    - the rite consumes;
+    - run for more than twice its time it calls him once and leaves all eight pillars empty;
+    - eight more books call him a second time, and are taken too.
+  - **New**: `aRiteThatOnlyReadsIsNotDoneAgainUntilWhatLiesThereChanges` keeps §61's guard tested.
+    - For the length of the test it swaps his rite for a reading copy (`RecipeManager.replaceRecipes`), and restores the original after.
+    - It checks the guard as before: one summon with the books left in place, and another once a book is lifted and laid back.
+  - The two tests share new helpers that build the sanctum, lay the books and run the offering.
+
+### 62.4 Run
+- The Solomon and altar tests: `SolomonServerTest` 20, `AltarServerTest` 13, `AltarStructureServerTest` 7, `AltarTest` 12, `AltarRulesTest` 14, `AltarStructureMapTest` 5; all pass.
+- **The full suite**: 817 tests in 121 classes, all pass (none failed, none skipped). That is 816 before, plus the 1 new.
+- **Not checked in game**: the books vanishing from the pillars when he appears.
+
+## 63. Solomon's dragons hunt and are hunted at any height; his coming brings a thunderstorm and the Ender Dragon's fog
+
+**Why.** The user's report and request: "other types of enemies have a very low willingness to attack the dragons, and the dragons behave the same way. They should actively attack non-corrupted creatures and draw aggro from each other, just like the other Corruption bosses. Also, when Solomon appears, it should alter the environment like the Ender Dragon, and force the weather to change to a thunderstorm."
+
+### 63.1 Why nothing fought them
+- Both sides look for each other with vanilla's `NearestAttackableTargetGoal`. For creatures (not players) it searches only `inflate(range, 4, range)`: four blocks up or down.
+  - The dragons circle 8–17 blocks over their quarry, and the seal hangs 16 over the altar. So they found players (vanilla searches for players by distance alone) but never a creature on the ground.
+  - A monster or golem (`CorruptionEnemyTargetGoal`, given to them by `CorruptionEnemyEvents`) never found a dragon overhead.
+  - The other lords walk on the ground, within those four blocks, which is why only Solomon showed it.
+
+### 63.2 The fix
+- **His dragons and his seal look as far below and above as about them** (`GoeticDemon.huntTheUncorruptedFromOnHigh`, new; their follow range is 112).
+  - The order is as before: what hurt it first (the dragons), then players, then any creature not of the corruption.
+  - The seal still hands its quarry to dragons that have none.
+- **Monsters and golems see a lord of the corruption** (`corruption:bosses`) at any height within their follow range. `CorruptionEnemyTargetGoal` now searches a cube of its range.
+  - Everything else of the corruption it still looks for only within four blocks up or down, as vanilla looks for any creature.
+  - Ground fights between monsters and remnants are unchanged.
+  - Most of these creatures cannot hurt a dragon (only the arcane does), but they turn on it. When a dragon hurts them they turn on it anyway, as before.
+- **Nothing hunts his seal**: `Solomon.canBeSeenAsEnemy()` is false. Nothing can hurt it, so a creature that would fight him turns on his dragons instead of staring at his crown.
+- **Cost**: a target search's taller box costs little. The game looks up entities by column, so empty height costs almost nothing, but more entities are offered and filtered. Not measured.
+
+### 63.3 The thunderstorm, the fog and the dark sky
+- **The thunderstorm** (`Solomon.storm`):
+  - The tick his seal first stirs, the weather turns to a thunderstorm with a clap of thunder.
+  - While he lives it is held 30 s ahead, renewed every 5 s (`SolomonRules.STORM_HOLD`, `STORM_RENEW`). Cleared by any other hand, it breaks again the next tick.
+  - It ends about 30 s after he falls.
+  - Weather belongs to the world, so the whole Overworld storms. A dimension without a sky (the Nether, the End) is left alone.
+- **His bar**: the Ender Dragon's `setCreateWorldFog`, the Wither's `setDarkenScreen`, and `setPlayBossMusic`. Vanilla plays boss music only in the End.
+  - These apply to whoever sees his bar, as theirs do, and lift when his bar goes.
+  - `GoeticDemon.bossEvent()` (new, protected) lets a demon set them; the existing `bossBar()` is the bar's id for clients.
+- README (Chinese):
+  - a "他到来时天地变色" entry in the Solomon section;
+  - the dragons' targeting;
+  - the faction section: a creature looks four blocks up or down, but sees the lords at any height.
+
+### 63.4 Tests
+- **`SolomonServerTest`** (22; 2 new):
+  - **`itHuntsCreaturesFarBelowItAndTheyHuntIt`**:
+    - an iron golem on the ground turns on a dragon 12 blocks over it, and the dragon on the golem;
+    - a remnant 12 blocks over the golem is not its enemy, but a remnant level with it is;
+    - nothing sees his seal as an enemy.
+    - By the four-block search the golem and the dragon could not have found each other, but the test was not run against the old code.
+  - **`hisComingBringsAThunderstormAndHisBarFogsTheWorldAndDarkensTheSky`**:
+    - his bar fogs and darkens;
+    - from clear weather, one tick of his seal brings a thunderstorm held 600 ticks ahead;
+    - cleared by hand, it is back the next tick.
+  - **An `@AfterEach` clears the sky after every test in the class.** The test world never ticks its weather away, and several tests tick a seal, so their storm would otherwise stay for every later test.
+
+### 63.5 Run
+- `SolomonServerTest`: 22 of 22 pass.
+- **The full suite**: 819 tests in 121 classes, all pass (none failed, none skipped). That is 817 before, plus the 2 new. The other faction tests pass unchanged with the monsters' wider search.
+- **Not checked in game**:
+  - the storm, the fog and the darkened sky on screen, and how far the fog lets one see 64-block dragons;
+  - monsters turning on dragons overhead in a real fight, and what melee monsters do under a target they cannot reach;
+  - the dragons spending spells on animals and villagers when no player is near.
+
+## 64. Beams out of a circle in the sky: one, a pentagram's, a hexagram's, an octagram's
+
+> Superseded in part by §65: every beam now pours from a circle of its own, and a star's beams start at its points and close in.
+
+**Why.** The user's request (pasted): "New Boss Skill: Implement a new skill that combines lightning and beam visual effects. A magic/ritual circle spawns in the sky and fires energy beams vertically downward." It asked for four variants: a single vertical beam, a pentagram array (5 beams on the vertices), a hexagram array (6) and an octagram array (8). "Application: Assign and equip the Solomon's Wyrms with all these skill variants."
+
+### 64.1 The skill
+- **Rules**: `core/demon/skill/SkyBeamRules` (new, pure Java). Its fields are `timing`, the range, `beams` (only 1, 5, 6 or 8; anything else is refused), `spread`, `altitude`, `width`, `damage` and `every`.
+- **How it goes**:
+  - **The warning**, the wind-up, a third of the whole: a circle opens `altitude` blocks over the ground where the quarry stood, fixed there, and each beam's first strike is marked on the ground. The rules make the whole three times the wind-up.
+  - **The pour**, the other two thirds: the beams come straight down. Every `every` ticks a pulse hurts whatever stands within `width` of a beam's middle, from the ground up to the circle, through any roof.
+  - Each creature is hurt once a pulse however many beams it stands in, and its hurt cooldown is reset, as the dragon's own beam does.
+- **Where the beams are**:
+  - A single beam strikes the mark.
+  - A star's beams strike its points. They strike first at 15% of the spread (`FROM`), close enough to catch whoever stayed on the mark.
+  - As they pour, the star turns 2° a tick (`SPIN`) and opens out to its full spread. At their widest there is at least 4.8 blocks between two beams to slip through.
+- **One function for both sides**: `SkyBeamRules.points` gives the beams' places at each moment. The server hurts with it and the client draws with it, so what is seen is what strikes.
+- **`SkyBeamSkill`** (new, `common/entity/skill`) carries it out for any boss (`BossSkill<Mob>`).
+  - Sounds: an evoker's call and a beacon opening as it begins; a lightning impact and a beacon as the beams strike.
+  - Each pulse throws electric sparks at every beam's foot.
+- **`BossSkillApi.skyBeams(rules, colour, accent)`** (new) for add-ons, made by `BossSkillMaker`.
+
+### 64.2 What it looks like
+- **Four new built-in effects**: `corruption:sky_beam`, `pentagram_beams`, `hexagram_beams`, `octagram_beams` (`SpellVisuals`, now 33). One class draws all four: `common/client/visual/SkyBeamsVisual`.
+  - Its height is the circle's altitude; its radius is a star's spread, or a single beam's reach; its yaw is where the star's first point begins.
+  - Spell effects never move once placed (`updateInterval(Integer.MAX_VALUE)`). So everything the effect shows follows from where and when it was placed, the turning star included.
+- **The warning**:
+  - A circle of runes opens in the sky, an inner ring turning against the outer.
+  - Inside it the star's figure is drawn in light: a pentagram (every second point), a hexagram's two triangles, or an octagram (every third point).
+  - The star's points draw in to just over the marks.
+  - Lightning crackles between the points, or round the rim for a single beam, more and more.
+  - The ground marks pulse faster as the warning runs out.
+- **The pour**: each beam reaches down from the circle over three ticks.
+  - It is a white-hot thread in a broad glow, with lightning coiling down it, struck afresh every other tick.
+  - Where it strikes: a pool of light, a ring racing out every quarter second, sparks flying up. Where it leaves the circle: a glow.
+  - A star's figure turns and opens with its beams.
+  - Everything fades over the last six ticks.
+- **Not seen in game.** It has only been drawn into the test's stand-in buffers.
+
+### 64.3 Solomon's dragons carry all four
+- **`SolomonRules`**:
+  - `Wyrm` gained `SKY_BEAM`, `PENTAGRAM`, `HEXAGRAM`, `OCTAGRAM`, and `WYRM_SKILLS` lists twelve.
+  - `chooseWyrm` weighs each 2, seen or unseen, within 80. The four together come up about a quarter of the time for a quarry in sight.
+  - The three-at-work limit is unchanged.
+
+| Preset | Beams | Warning / pour | Spread | Reach | A pulse (every 0.25 s) | Cooldown |
+| --- | --- | --- | --- | --- | --- | --- |
+| `SKY_BEAM` | 1 | 1.2 s / 2.4 s | – | 2.5 | 10 | 15 s |
+| `PENTAGRAM` | 5 | 1.5 s / 3 s | 7 | 1.4 | 8 | 18 s |
+| `HEXAGRAM` | 6 | 1.5 s / 3 s | 8 | 1.4 | 8 | 18 s |
+| `OCTAGRAM` | 8 | 1.8 s / 3.6 s | 10 | 1.4 | 8 | 21 s |
+
+- All four hang their circle 24 over the ground where the quarry stood (the dragons circle 8–17 over it).
+- **Measured** on the 20-health stand-in, bare / full netherite: a single beam's pulse 10.0 / 2.80, a star's 8.0 / 2.11.
+- **`SolomonWyrm`** carries them (`sky_beam`, `pentagram`, `hexagram`, `octagram`) in its book's colour and gold. It hangs where it is while they work, as for its other spells.
+- **Body motions** (`WyrmPose`):
+  - the single beam: rearing at the sky with its back arched, then braced and shuddering;
+  - the stars: coiling slowly with swells running up to the head, then turning as the star turns.
+  - Measured farthest from the chain, winding up / at work: sky beam 3.2 / 2.3; pentagram 2.8 / 2.7; hexagram 3.2 / 2.9; octagram 3.3 / 3.3.
+- README (Chinese):
+  - skills 9–12 in Solomon's section: the process, the four presets, how to dodge, the measurements and the look;
+  - the four effects in the spell effects table, and the count, now 33;
+  - `skyBeams` in the `BossSkillApi` list;
+  - the layering lists.
+
+### 64.4 Tests
+- **`SkyBeamRulesTest`** (3, new):
+  - only 1, 5, 6 or 8 beams;
+  - the warning is a third of the whole, then pulses every `every` ticks;
+  - a single beam strikes its mark;
+  - a star's points:
+    - start at 15% of the spread, evenly round, the first turned as asked, and the same before the pour;
+    - are halfway open halfway through, and at the end fully open and turned 2° a tick;
+    - catch whoever stayed on the mark at the first strike;
+    - leave more than 1.2 blocks between two beams at their widest.
+- **`SolomonServerTest.itsBeamsOutOfTheSkyStrikeWhereTheirStarsSay`** (new; 23 in all): a dragon runs each of the four. For each:
+  - the right effect appears;
+  - a stand-in that stayed on the mark is struck;
+  - for a star, one standing where the first beam will be 30 ticks into the pour is struck too;
+  - one clear of the spread is never struck.
+- **Updated**:
+  - `SolomonRulesTest`: twelve skills; the seen and unseen choices include the four;
+  - `SpellVisualsDrawTest`: 33 effects. Its existing check draws every effect through its whole life at five sizes, whole faces at real places within its reach.
+  - the measurement includes the two pulses.
+- **First runs**: one failure. At a radius of 0.5 the sky circle's corner, turned, overshot the effect's reach box (6.9 against 6.3), because of a fixed 2.5-block margin. Cut to 1.5, every size fits.
+
+### 64.5 Run
+- The new and touched tests pass: `SkyBeamRulesTest` 3, `SolomonServerTest` 23, `SolomonRulesTest` 8, `WyrmPoseTest` 5, `SpellVisualsDrawTest` 4, `BooksAndWandsTest` 14.
+- **The full suite**: 823 tests in 122 classes, all pass (none failed, none skipped). That is 819 before, plus the 4 new (`SkyBeamRulesTest` 3, `SolomonServerTest` 1).
+- **Not checked in game**:
+  - how the circle, the stars, the lightning and the beams look;
+  - whether a star's warning and gaps are fair to dodge;
+  - how the four sit among his other spells in a real fight.
+
+## 65. Every beam its own magic circle; a star's close in
+
+**Why.** The user's correction of §64: "The pentagram, hexagram, and octagram vertical beams mean there are 5, 6, and 8 separate magic circles respectively, not just one single magic circle."
+
+### 65.1 What changed
+- **One circle per beam.** `SkyBeamsVisual` no longer draws one large circle with a star figure inside it.
+  - A single beam has one circle over its mark.
+  - A pentagram, hexagram or octagram has 5, 6 or 8 separate magic circles, one at each of the star's points, each pouring its own beam. Each circle has an outer ring of runes and an inner one turning against it.
+  - The circles open one after another round the star.
+  - The star's figure is drawn faintly from circle to circle (a pentagram's every second point, a hexagram's two triangles, an octagram's every third), so the shape reads.
+  - During the warning, lightning crackles between neighbouring circles (round the rim, for the single beam's), and a mark pulses on the ground under every circle.
+- **A star now begins at its points and closes in** (`SkyBeamRules.points`). §64's motion was the reverse: start within 15% of the spread of the mark and open out. With a circle over every beam, that would have started all the circles piled on the mark.
+  - Now each circle hangs at the star's point, `spread` from the mark, through the warning, so the five, six or eight circles read as a star.
+  - As they pour, the star turns 2° a tick (as before) and closes in evenly, circles and beams together, to meet on the mark at the end.
+- **How it plays now**:
+  - At first there are at least 4.8 blocks between two beams to get out through, the same figure as §64's widest.
+  - The gaps narrow as the star closes. Whoever stays on the mark is caught by the last pulses as the beams meet; §64 caught them at the first.
+  - The presets, numbers and choice weights are unchanged. The single beam is unchanged.
+- **Code**:
+  - `SkyBeamRules.FROM` is gone;
+  - the comments of `SkyBeamRules`, `SkyBeamSkill`, `SpellVisuals`, `BossSkillApi`, `SolomonRules` and `SolomonWyrm` say "circles";
+  - each circle's radius is 1.5 times its beam's reach plus 0.8, so neighbouring circles do not overlap at the star's points.
+- README (Chinese):
+  - skills 9–12: one circle per beam, the closing star, how to dodge;
+  - the four rows of the spell effects table;
+  - the counts' wording.
+
+### 65.2 Tests
+- **`SkyBeamRulesTest.aSingleBeamStrikesItsMarkAndAStarsBeamsItsPointsTurningAndClosingIn`** (rewritten):
+  - a star's points start at the full spread, evenly round, the same before the pour;
+  - halfway they are at half the spread; they turn 2° a tick; at the end they have met on the mark;
+  - there is more than 1.2 blocks between two beams at first;
+  - the last pulse catches whoever stayed on the mark.
+- **`SolomonServerTest.itsBeamsOutOfTheSkyStrikeWhereTheirStarsSay`** passes unchanged:
+  - the stand-in on the mark is now caught as the beams meet;
+  - one 30 ticks along the first beam's path is caught;
+  - one clear of the spread is not.
+- **`SpellVisualsDrawTest`** passes unchanged: every effect at five sizes through its whole life, within its reach.
+
+### 65.3 Run
+- `SkyBeamRulesTest` 3, `SpellVisualsDrawTest` 4 and the sky-beam server test pass.
+- **The full suite**: 823 tests in 122 classes, all pass (none failed, none skipped); the same count as §64, one test rewritten.
+- **Not checked in game**:
+  - how the separate circles, the faint figure between them, the lightning and the closing beams look;
+  - whether the closing star is fair to escape.
+
+## 66. The single sky beam as wide as a chunk
+
+> Superseded in part by §67: every beam of the pentagram, hexagram and octagram is now as wide as a chunk too.
+
+**Why.** The user's request: "The vertical beam is not big enough. A single vertical beam should be the size of one chunk in area."
+
+### 66.1 The beam
+- **`SolomonRules.SKY_BEAM`** reaches `CHUNK_BEAM` = √(256/π) = 9.03 blocks round: a round beam with a chunk's area (16 × 16 = 256 blocks). It was 2.5, so it is 3.6 times as wide and 13 times the area.
+- **Its warning is 2.25 s** (was 1.2 s), so that it can still be left.
+  - From the mark a player needs 9.33 blocks to be clear (its reach and their own half-width). That is 1.7 s at a sprint (5.6 blocks a second) or 2.2 s at a walk (4.3).
+  - The pour stays twice the warning, as the effect draws it: 4.5 s (was 2.4 s).
+- **Unchanged**: 10 a pulse every quarter second (2.80 in full netherite), the 15 s cooldown, the weight, and the stars.
+  - Anyone who does not get out takes up to 18 pulses: 180 bare.
+- **Sparks** at its foot each pulse scale with its width (46 for this beam).
+
+### 66.2 How it looks
+- **A wide beam is a column.** A beam reaching more than 3 blocks is drawn as a column of light pouring down, as the light pillar effect is: walls within walls (at its reach, 0.7 and 0.3 of it) round a white-hot heart.
+  - Before, every beam was a flat strip turned to face the viewer. At 18 blocks across that would show its edge from the side and look wrong from inside.
+  - Lightning strikes within it, 7 bolts at once for this beam (as many as 0.8 of its reach, 3 to 10), struck afresh every other tick.
+  - Its pool of light at the ground reaches 1.25 times its reach, not 2.2. Its sparks scale with it.
+  - A star's narrow beams are drawn as before.
+- **The edge of every beam's strike is drawn through the warning**: a ring on the ground at its reach, pulsing with the mark. For this beam it shows the 18-block circle to get out of; the stars get one round each mark.
+- **Every circle is 1.25 times its beam's reach and 0.8** (was 1.5): 12.1 round over this beam, 2.55 over a star's.
+- README (Chinese): the single beam (a chunk's area, the longer warning, how long it takes to get out), how to dodge it, how it looks, and its row in the spell effects table.
+
+### 66.3 Tests
+- **`SkyBeamRulesTest`**: π × reach² is 256 to 1e-6, a chunk's area. From the mark, a sprint gets out with half a second of the warning to spare, and a walk just does.
+- **`SolomonServerTest.itsBeamsOutOfTheSkyStrikeWhereTheirStarsSay`** passes unchanged. The stand-in that stayed on the mark is struck; the one clear of it, now 13 blocks off, is not.
+- **`SpellVisualsDrawTest`** passes: the column, the edge rings and the circles stay within the effect's reach at all five sizes.
+
+### 66.4 Run
+- `SkyBeamRulesTest` 3, `SpellVisualsDrawTest` 4, `WyrmPoseTest` 5, and the sky-beam and measurement server tests pass.
+- **The full suite**: 823 tests in 122 classes, all pass (none added; `SkyBeamRulesTest`'s assertions extended), 8 min 19 s.
+- **Not checked in game**:
+  - how an 18-block column of light looks, from outside and from inside;
+  - whether the 2.25 s warning is fair from the middle of it.
+
+## 67. Every beam of the stars as wide as a chunk
+
+**Why.** The user's correction of §66: "each single vertical beam needs to be the size of one full chunk. In the pentagram, hexagram, and octagram arrangements, every individual vertical beam must be one chunk in size. Therefore, the overall area will be much, much larger than just one chunk."
+
+### 67.1 The stars
+- **Every beam of every star now reaches `CHUNK_BEAM`** (9.03 blocks), a chunk's 256 blocks, as the single beam does. They reached 1.4.
+- **A star's spread now follows from its beams' width** (`SkyBeamRules.spread(beams, width)`).
+  - Its points stand far enough out that between two neighbouring beams there is as much again as one beam reaches, plus 1.6: 10.6 blocks here. Their circles stand apart.
+  - Pentagram: points 24.4 out, 67 blocks across in all (was 7 and 17).
+  - Hexagram: 28.7 out, 75 across (was 8 and 19).
+  - Octagram: 37.5 out, 93 across (was 10 and 23).
+- **`spread` is no longer a component of `SkyBeamRules`.**
+  - The record is now `(timing, minRange, maxRange, beams, altitude, width, damage, every)`, and `spread()` works it out. An add-on that builds the rules drops that argument.
+  - `SkyBeamRules.width(beams, spread)` undoes it. The effect is told only the spread, so this is how it draws the beams as wide as they strike.
+  - An add-on's star with narrower beams stands closer in.
+- **The star turns slower**: `SPIN` is now 0.25° a tick (was 2).
+  - At 2° the octagram's points would have moved round at 26 blocks a second, sweeping a chunk-wide beam across any gap far faster than a sprint (5.6).
+  - At 0.25° they move at 2.1 to 3.3 blocks a second as the pour begins.
+- **Longer warnings, so a star can still be outrun**: pentagram 2.4 s (was 1.5), hexagram 3 s (was 1.5), octagram 4.8 s (was 1.8).
+  - The pour stays twice the warning: 4.8, 6 and 9.6 s.
+  - Cooldowns are unchanged: 18, 18 and 21 s, counted from the end.
+  - The warnings were chosen by simulating a run straight out from the mark against every pulse, at every heading 1° apart.
+    - A sprint set off half a second late gets out through a gap within 10–12° of heading.
+    - A walk set off at once gets out within 6–7°.
+  - The octagram's is longest because eight beams round leave narrower gaps by angle.
+- **Unchanged**: 8 a pulse every quarter second (2.11 in full netherite), the weights, and the single beam.
+  - Whoever stays on the mark takes the last 8, 7 or 10 pulses as the star closes on them (64, 56 or 80 bare).
+- **Sparks**: each pulse now throws the single beam's sparks (46) at every star beam, so up to 368 a pulse for an octagram.
+
+### 67.2 How it looks
+- **Each star beam is drawn as a column of light**, as the single beam is: walls within walls, 7 bolts of lightning in each, its pool, rings and sparks scaled to it.
+- **Each circle is 12.1 round**: 1.25 times its beam's reach plus 0.8, now `SkyBeamRules.circle`, shared by the rules and the effect. There are 4.5 blocks between two neighbouring circles at the points.
+- **The edge ring under each circle in the warning** now marks an 18-block circle for each beam.
+- **The star's faint figure has wider lines** (0.45 + 0.08 × reach: 1.17 here), to read at this size.
+- **Docs**: the `SpellVisuals` comment of the star effects.
+- **README (Chinese)**:
+  - every beam a chunk, the three stars' size and timing;
+  - how the spread follows from the width;
+  - how to get out, with the heading windows;
+  - how it looks, and the pentagram effect's row.
+
+### 67.3 Tests
+- **`SkyBeamRulesTest`** (4, one added):
+  - `oneBeamOrAStarOfFiveSixOrEight`: a star leaves its beams' reach plus 1.6 between two beams, and its circles do not overlap. `width` undoes `spread`, and a single beam's width is its own.
+  - New, `everyOneOfSolomonsBeamsIsAsWideAsAChunkAndEveryStarCanBeOutrun`:
+    - π × reach² is 256 for all four;
+    - every star is more than 66 blocks across;
+    - from the mark, a sprint set off half a second late and a walk set off at once each get out at some heading;
+    - a crawl at a block a second does not.
+  - `aSingleBeamStrikesItsMarkAndAStarsBeamsItsPointsTurningAndClosingIn`: the room between two beams at first is now more than a beam's reach.
+- **`SolomonServerTest.itsBeamsOutOfTheSkyStrikeWhereTheirStarsSay`** passes unchanged. The stand-in kept clear is now 50.5 blocks off for the octagram.
+- **`SpellVisualsDrawTest`** passes: at five sizes the stars' wide columns stay within the effect's reach.
+
+### 67.4 Run
+- `SkyBeamRulesTest` 4, `SpellVisualsDrawTest` 4, `WyrmPoseTest` 5, `SolomonRulesTest` 8 and the sky-beam server test pass.
+- **The full suite**: 824 tests in 122 classes, all pass (one added), 10 min 27 s.
+- **Not checked in game**:
+  - how five to eight chunk-wide columns look at once, and what they cost a frame;
+  - whether the heading windows feel fair in a fight;
+  - the dragons' poses for the stars, which follow the warning, so they now last longer.

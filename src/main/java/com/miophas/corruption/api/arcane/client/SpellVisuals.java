@@ -69,10 +69,27 @@ public final class SpellVisuals {
     public static final ResourceLocation NOVA = id("nova");
     /** A staff of music racing out over the ground at an even pace, notes riding it and lifting off it: one ring of a crescendo. */
     public static final ResourceLocation CRESCENDO = id("crescendo");
+    /**
+     * A magic circle of runes opening high over the spot ({@code height} up), lightning crackling round its rim and a mark
+     * pulsing on the ground under it; then, after the first third of its life, a beam driven straight down out of it onto the
+     * mark, {@code radius} round, lightning coiling down it (SkyBeamRules).
+     */
+    public static final ResourceLocation SKY_BEAM = id("sky_beam");
+    /**
+     * Five magic circles opening one after another at the points of a pentagram {@code radius} round the spot, the figure
+     * drawn faintly between them, lightning crackling from circle to circle, a mark under each; then each pours a beam down,
+     * as wide as the star leaves room for (SkyBeamRules.width), and the star turns and closes in, circles and beams together,
+     * to meet over the spot.
+     */
+    public static final ResourceLocation PENTAGRAM_BEAMS = id("pentagram_beams");
+    /** As {@link #PENTAGRAM_BEAMS}, six circles at the points of a hexagram (two triangles). */
+    public static final ResourceLocation HEXAGRAM_BEAMS = id("hexagram_beams");
+    /** As {@link #PENTAGRAM_BEAMS}, eight circles at the points of an octagram. */
+    public static final ResourceLocation OCTAGRAM_BEAMS = id("octagram_beams");
     /** The mod's own, in the order above. */
     public static final List<ResourceLocation> BUILT_IN = List.of(MAGIC_CIRCLE, SHOCKWAVE, LIGHT_PILLAR, VORTEX, DOME, RUNE_RING,
             HELLFIRE, WINGS, FEATHERS, LIGHTNING, FISSURE, SPIKES, BLADES, SOULS, EYE, CONSTELLATION, SIGIL, TIDAL_WAVE, BLOOM, CHAINS, RESONANCE,
-            RIFT, MIASMA, CROWN, ALCHEMY, SHARDS, RAYS, NOVA, CRESCENDO);
+            RIFT, MIASMA, CROWN, ALCHEMY, SHARDS, RAYS, NOVA, CRESCENDO, SKY_BEAM, PENTAGRAM_BEAMS, HEXAGRAM_BEAMS, OCTAGRAM_BEAMS);
 
     private static final Map<ResourceLocation, SpellVisual> VISUALS = new ConcurrentHashMap<>();
 

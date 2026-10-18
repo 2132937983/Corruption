@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "corruption:solomon",
+    "corruption:solomon_wyrm",
+    "corruption:solomon_hand",
+    "corruption:solomon_drake",
+    "corruption:solomon_fireball"
+  ]
+}

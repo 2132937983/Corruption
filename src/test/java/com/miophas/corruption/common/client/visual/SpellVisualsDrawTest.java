@@ -30,7 +30,7 @@ class SpellVisualsDrawTest {
 
     @Test void theModDrawsEveryEffectItNames() {
         assertEquals(SpellVisuals.BUILT_IN, List.copyOf(SpellVisualRenderer.builtIn().keySet()), "every one of its own, in order, and no other");
-        assertEquals(29, SpellVisuals.BUILT_IN.size());
+        assertEquals(33, SpellVisuals.BUILT_IN.size());
     }
 
     @Test void everyEffectDrawsWithinItsReachThroughItsWholeLife() {

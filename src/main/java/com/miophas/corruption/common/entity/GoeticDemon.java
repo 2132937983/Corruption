@@ -94,6 +94,20 @@ public abstract class GoeticDemon extends Monster implements DemonBoss {
         targetSelector.addGoal(priority + 1, new NearestAttackableTargetGoal<>(this, LivingEntity.class, true, prey -> !CorruptionFactionApi.isRemnant(prey)));
     }
 
+    /**
+     * As {@link #huntTheUncorrupted}, for one that hangs high over its prey: it looks for prey as far below and above it as
+     * about it. (A creature looks for other creatures only four blocks up or down; for players, as far as it can see.)
+     */
+    protected void huntTheUncorruptedFromOnHigh(int priority) {
+        targetSelector.addGoal(priority, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        targetSelector.addGoal(priority + 1, new NearestAttackableTargetGoal<>(this, LivingEntity.class, true, prey -> !CorruptionFactionApi.isRemnant(prey)) {
+            @Override protected net.minecraft.world.phys.AABB getTargetSearchArea(double range) { return mob.getBoundingBox().inflate(range); }
+        });
+    }
+
+    /** Its boss bar, for a demon to set how it changes the world about those who see it (its fog, its darkened sky). */
+    protected ServerBossEvent bossEvent() { return boss; }
+
     /** Its own side is its allies, but for one marked as its prey, or hunting it (see PreyMarks). */
     @Override public boolean isAlliedTo(Entity entity) {
         return CorruptionFactionApi.isRemnant(entity) && !com.miophas.corruption.common.arcane.PreyMarks.feuding(this, entity) || super.isAlliedTo(entity);
@@ -140,8 +154,11 @@ public abstract class GoeticDemon extends Monster implements DemonBoss {
 
     @Override protected void customServerAiStep() {
         super.customServerAiStep();
-        boss.setProgress(getHealth() / getMaxHealth());
+        boss.setProgress(barProgress());
     }
+
+    /** How full its bar is: its own health, as a share of its greatest; a demon whose life is elsewhere says otherwise. */
+    protected float barProgress() { return getHealth() / getMaxHealth(); }
 
     @Override public Optional<UUID> bossBar() { return entityData.get(BOSS_BAR); }
 

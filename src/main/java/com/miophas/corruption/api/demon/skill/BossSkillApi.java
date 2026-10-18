@@ -25,6 +25,7 @@ import com.miophas.corruption.core.demon.skill.SpikeFieldRules;
 import com.miophas.corruption.core.demon.skill.SpinRules;
 import com.miophas.corruption.core.demon.skill.SpinVolleyRules;
 import com.miophas.corruption.core.demon.skill.SpitRules;
+import com.miophas.corruption.core.demon.skill.SkyBeamRules;
 import com.miophas.corruption.core.demon.skill.StrikeRules;
 import com.miophas.corruption.core.demon.skill.SummonRules;
 import com.miophas.corruption.core.demon.skill.UpheavalRules;
@@ -78,6 +79,9 @@ import net.minecraft.world.entity.Mob;
  *       (from wherever a {@link SpitCaster} says).</li>
  *   <li>{@link #crescendo}: rings of music swelling out from the caster one after another, each hurting and throwing off
  *       what it passes.</li>
+ *   <li>{@link #skyBeams}: magic circles opening in the sky over the quarry, every beam's strike marked under its circle;
+ *       then beams driven straight down out of them, lightning coiling down them: one circle over the mark, or a pentagram,
+ *       a hexagram or an octagram of circles round it, the star turning and closing in on the mark as they pour.</li>
  * </ul>
  * Colours are 0xRRGGBB: a skill's colour, and its accent, for its brightest parts.
  */
@@ -113,6 +117,7 @@ public final class BossSkillApi {
         BossSkill<Mob> upheaval(UpheavalRules rules, int colour, int accent);
         BossSkill<Mob> fanfare(FanfareRules rules, int colour, int accent);
         BossSkill<Mob> crescendo(CrescendoRules rules, int colour, int accent);
+        BossSkill<Mob> skyBeams(SkyBeamRules rules, int colour, int accent);
     }
 
     private static Maker maker;
@@ -159,6 +164,7 @@ public final class BossSkillApi {
     public static BossSkill<Mob> upheaval(UpheavalRules rules, int colour, int accent) { return maker().upheaval(rules, colour, accent); }
     public static BossSkill<Mob> fanfare(FanfareRules rules, int colour, int accent) { return maker().fanfare(rules, colour, accent); }
     public static BossSkill<Mob> crescendo(CrescendoRules rules, int colour, int accent) { return maker().crescendo(rules, colour, accent); }
+    public static BossSkill<Mob> skyBeams(SkyBeamRules rules, int colour, int accent) { return maker().skyBeams(rules, colour, accent); }
 
     private BossSkillApi() {}
 }
