@@ -24,5 +24,13 @@ public final class ModAttachments {
      */
     public static final DeferredHolder<AttachmentType<?>,AttachmentType<Integer>> CORRUPTION_HELD=TYPES.register("corruption_held",
         ()->AttachmentType.builder(()->com.miophas.corruption.core.corruption.CorruptedRobeRules.NOTHING_KEPT).serialize(Codec.intRange(-1,PlayerCorruptionApi.max())).build());
+    /**
+     * The corrupted ground of a chunk that is dormant: positions the infection took that never spread on from there
+     * (DormantGround). Saved with the chunk itself, so a save writes only the chunks whose marks changed; nothing is
+     * written for a chunk whose set is empty.
+     */
+    public static final DeferredHolder<AttachmentType<?>,AttachmentType<com.miophas.corruption.common.infection.DormantGround.Marks>> DORMANT_GROUND=
+        TYPES.register("dormant_ground",()->AttachmentType.builder(com.miophas.corruption.common.infection.DormantGround.Marks::new)
+            .serialize(com.miophas.corruption.common.infection.DormantGround.Marks.CODEC,marks->!marks.isEmpty()).build());
     private ModAttachments(){}
 }

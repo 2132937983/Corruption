@@ -8,10 +8,18 @@ package com.miophas.corruption.core.demon.skill;
  * {@code spread} ticks later: the top block of the ground at each place turns as the blight reaches it, the nearest
  * first, {@code most} blocks at the most. Dormant, it turns to the corruption's dormant form, which spreads no further
  * but hurts whatever stands on it; otherwise the infection takes it, as it takes any block, and spreads on from there.
- * Turning the ground needs the world's leave (the mobGriefing rule); without it the ground stays as it was.
+ * Still ({@link #still}), it takes the ground as the infection does but leaves every block it takes dormant: that block's
+ * own corrupted variant, which spreads no further (never the one block of the dormant corruption). Turning the ground
+ * needs the world's leave (the mobGriefing rule); without it the ground stays as it was.
  */
-public record BlightRules(SkillTiming timing, double within, double radius, int most, int spread, boolean dormant, double damage, double knockback,
-                          double lift) {
+public record BlightRules(SkillTiming timing, double within, double radius, int most, int spread, boolean dormant,
+                          boolean still, double damage, double knockback, double lift) {
+    /** The blight as it was: not still, the ground it takes spreads on as the infection does. */
+    public BlightRules(SkillTiming timing, double within, double radius, int most, int spread, boolean dormant,
+                       double damage, double knockback, double lift) {
+        this(timing, within, radius, most, spread, dormant, false, damage, knockback, lift);
+    }
+
     public BlightRules {
         within = Math.max(0, within);
         radius = Math.max(0, radius);

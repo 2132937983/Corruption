@@ -27,8 +27,9 @@ import net.neoforged.neoforge.event.EventHooks;
  * the ground: everything within reach that is not of its side (players in creative or spectator aside) is hurt with the
  * corruption's hurt and thrown off; a ring of force runs out. Then, if the world gives leave (the mobGriefing rule), the
  * blight runs out over the ground, the top block of each place within reach turning as it comes to it, the nearest
- * first: to the dormant corruption, or taken by the infection, as the rules say. What cannot be turned (a block that
- * holds anything, a liquid, an ore for the dormant corruption, what the infection never takes) is passed over.
+ * first: to the dormant corruption, or taken by the infection, as the rules say - and, still, taken by it and left
+ * dormant there, the block's own variant that spreads no further. What cannot be turned (a block that holds anything, a
+ * liquid, an ore for the dormant corruption, what the infection never takes) is passed over.
  */
 public final class BlightSkill implements BossSkill<Mob> {
     /** How far above and below the caster's feet it looks for the top of the ground. */
@@ -75,7 +76,7 @@ public final class BlightSkill implements BossSkill<Mob> {
         if (rules.timing().strikes(elapsed)) strike(level, boss);
         while (next < ground.size() && rules.reaching(along(ground.get(next))) <= elapsed) {
             BlockPos at = ground.get(next++);
-            if (rules.dormant() ? GroundBlight.dormant(level, at) : GroundBlight.infect(level, at)) {
+            if (blight(level, at)) {
                 turned++;
                 level.sendParticles(ModParticles.CORRUPTION_PARTICLE.get(), at.getX() + .5, at.getY() + 1.1, at.getZ() + .5, 3, .3, .1, .3, .02);
             }
@@ -116,6 +117,12 @@ public final class BlightSkill implements BossSkill<Mob> {
             }
         ground.sort(Comparator.comparingDouble(this::along));
         while (ground.size() > rules.most()) ground.removeLast();
+    }
+
+    /** Turns one block as the rules say: to the dormant corruption, taken by the infection, or taken and kept still. */
+    private boolean blight(ServerLevel level, BlockPos at) {
+        if (rules.dormant()) return GroundBlight.dormant(level, at);
+        return GroundBlight.infect(level, at, rules.still());
     }
 
     /** How far a block is from where the blight runs out from, along the ground. */

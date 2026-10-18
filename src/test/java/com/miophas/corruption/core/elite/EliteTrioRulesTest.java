@@ -62,7 +62,8 @@ class EliteTrioRulesTest {
 
     @Test void theSowerTakesTheGroundAFewBlocksATick() {
         assertTrue(SowerRules.SOW_MOST > 0 && SowerRules.SOW_MOST <= 4);
-        assertFalse(SowerRules.SEED.dormant(), "what it sows spreads, as the infection does");
+        assertFalse(SowerRules.SEED.dormant(), "it is not turned to the one dormant corruption");
+        assertTrue(SowerRules.SEED.still(), "what it sows keeps its own variant and spreads no further");
         assertTrue(SowerRules.SEED.most() > 0);
         assertTrue(SowerRules.SNARE.holds(true) > SowerRules.SNARE.holds(false), "its roots hold longer on the corruption's ground");
         assertTrue(SowerRules.REGEN > 0);

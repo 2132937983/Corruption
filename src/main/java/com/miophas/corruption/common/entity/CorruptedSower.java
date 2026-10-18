@@ -1,6 +1,7 @@
 package com.miophas.corruption.common.entity;
 
 import com.miophas.corruption.api.demon.skill.SkillSet;
+import com.miophas.corruption.common.config.InfectionConfig;
 import com.miophas.corruption.common.entity.skill.BlightSkill;
 import com.miophas.corruption.common.entity.skill.SnareSkill;
 import com.miophas.corruption.common.infection.CorruptionConversions;
@@ -30,9 +31,11 @@ import net.neoforged.neoforge.event.EventHooks;
  * The corrupted sower, a land elite (SowerRules): a walking mound of the corruption's flesh on legs like roots, a heart
  * throbbing in its breast and pods of the corruption on its back. The ground under its feet is taken by the infection as
  * it walks, as though the corruption had spread there (the blocks it stands on, a few a tick, where the world gives leave:
- * the mobGriefing rule), and spreads on from there by itself; and it mends on the corruption's own ground. It roots itself
- * and sows the ground all about it, throwing back whatever is near; and it sends roots up out of the ground under a quarry
- * further off, holding it fast, the longer on the corruption's own ground.
+ * the mobGriefing rule). That ground is dormant unless the configuration says otherwise: an ordinary corrupted variant that
+ * never spreads on from there. And it mends on the corruption's own ground. It roots itself
+ * and sows the ground all about it, throwing back whatever is near; every block that sowing takes keeps its own corrupted
+ * variant and is left dormant, spreading no further (as the ground under its feet). And it sends roots up out of the ground
+ * under a quarry further off, holding it fast, the longer on the corruption's own ground.
  */
 public final class CorruptedSower extends WalkingElite<CorruptedSower> {
     /** Its colours: the corruption's rose, and a pale rose. */
@@ -95,9 +98,11 @@ public final class CorruptedSower extends WalkingElite<CorruptedSower> {
         for (double east : new double[]{-half, half})
             for (double south : new double[]{-half, half}) under.add(BlockPos.containing(getX() + east, below, getZ() + south));
         int took = 0;
+        boolean dormant = InfectionConfig.sowerGroundDormant();
         for (BlockPos at : under) {
             if (took >= SowerRules.SOW_MOST) break;
-            if (GroundBlight.unbreakable(level, at) || !GroundBlight.infectable(level, at) || !GroundBlight.infect(level, at)) continue;
+            if (GroundBlight.unbreakable(level, at) || !GroundBlight.infectable(level, at)
+                    || !GroundBlight.infect(level, at, dormant)) continue;
             took++;
             level.sendParticles(ModParticles.CORRUPTION_PARTICLE.get(), at.getX() + .5, at.getY() + 1.05, at.getZ() + .5, 3, .3, .05, .3, .01);
         }

@@ -69,6 +69,8 @@
   "corruption.configuration.infection.maxSpreadMultiplier": "最大传播预算倍率",
   "corruption.configuration.infection.scanIntervalTicks": "空闲时发现腐化源的间隔（tick）",
   "corruption.configuration.infection.scanBlocksPerBatch": "每 tick 发现扫描量",
+  "corruption.configuration.infection.sowerGroundDormant": "播种者脚下地面失活",
+  "corruption.configuration.infection.sowerGroundDormant.tooltip": "默认开启：腐化播种者脚下被腐化的方块保留原方块的外形，照常造成接触伤害，但不会从该处继续传染。关闭后它们像普通腐化方块一样向外传播。失活按坐标记录，不会为每种方块额外生成失活变体。",
   "corruption.configuration.blocks.corruptedBlocksFlammable": "被腐化方块可燃",
   "corruption.configuration.blocks.corruptedBlocksFlammable.tooltip": "默认关闭。开启后动态生成的被腐化固体方块可燃并传播火焰；腐化、缠念、特殊矿物、流体和花草仍使用各自的可燃规则。",
   "corruption.configuration.ecology.maliceChance": "缠念转化概率",

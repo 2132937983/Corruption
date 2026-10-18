@@ -11,12 +11,28 @@ import net.minecraft.world.level.block.state.BlockState;
 /**
  * The ground turned to the corruption from without its own spread: by a spell, by one of its creatures underfoot, by a
  * lord's blow. Either it is taken as the infection takes any block ({@link #infect}: now and then malice, now and then the
- * corruption itself, mostly the block's own corrupted form; it spreads on from there), or it is turned to the dormant
- * corruption ({@link #dormant}), which spreads no further but hurts whatever stands on it as any corruption does.
+ * corruption itself, mostly the block's own corrupted form; it spreads on from there, unless taken dormant, which keeps
+ * the variant but marks it still), or it is turned to the dormant corruption ({@link #dormant}), which spreads no further
+ * but hurts whatever stands on it as any corruption does.
  */
 public final class GroundBlight {
     /** Lets the infection take a block, as it takes any, if it can; whether it did. It spreads on from there. */
-    public static boolean infect(ServerLevel level, BlockPos at) { return new ServerInfectionWorld(level).tryInfect(at); }
+    public static boolean infect(ServerLevel level, BlockPos at) { return infect(level, at, false); }
+
+    /**
+     * Lets the infection take a block, as it takes any, if it can; whether it did. Dormant ({@code still}), the block
+     * taken is an ordinary corrupted variant that never spreads on from there ({@link DormantGround}) - no second,
+     * dormant twin of it is generated for the sake of it.
+     */
+    public static boolean infect(ServerLevel level, BlockPos at, boolean still) {
+        if (!still) return new ServerInfectionWorld(level).tryInfect(at);
+        if (!level.isLoaded(at)) return false;
+        // Mark first: the taken block wakes the infection on placement, and a batch in the same tick may look at it.
+        DormantGround.still(level, at);
+        if (new ServerInfectionWorld(level).tryInfect(at)) return true;
+        DormantGround.release(level, at);
+        return false;
+    }
 
     /** Whether the infection could take this block now. */
     public static boolean infectable(ServerLevel level, BlockPos at) { return new ServerInfectionWorld(level).canInfect(at); }

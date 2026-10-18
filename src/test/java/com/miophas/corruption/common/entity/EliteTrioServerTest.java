@@ -6,6 +6,7 @@ import com.miophas.corruption.api.corruption.CorruptionFactionApi;
 import com.miophas.corruption.api.corruption.CorruptionVeilApi;
 import com.miophas.corruption.api.plant.MaliceVineApi;
 import com.miophas.corruption.common.infection.CorruptionConversions;
+import com.miophas.corruption.common.infection.ServerInfectionWorld;
 import com.miophas.corruption.common.item.CorruptedRobeArmorItem;
 import com.miophas.corruption.common.registry.ModDamageTypes;
 import com.miophas.corruption.common.registry.ModEffects;
@@ -302,6 +303,7 @@ class EliteTrioServerTest {
                 sower.setOnGround(true);
                 assertTrue(sower.sow(level) > 0, "where it stands, the ground is taken");
                 assertTrue(CorruptionConversions.isCorrupted(level.getBlockState(sower.getOnPos())), "the block under it is the corruption's now");
+                assertFalse(new ServerInfectionWorld(level).isSource(sower.getOnPos()), "and it spreads no further");
                 assertEquals(0, sower.sow(level), "once, while it stands there");
                 sower.moveTo(400_603.5, -60, Z + .5, 0, 0);
                 sower.setOnGround(true);
@@ -340,9 +342,14 @@ class EliteTrioServerTest {
                 assertTrue(sower.seed().struck().contains(close) && close.getHealth() < close.getMaxHealth(), "and throws back what is near");
                 assertFalse(sower.seed().struck().contains(ally), "but not its own side");
                 int corrupted = 0;
+                ServerInfectionWorld world = new ServerInfectionWorld(level);
                 for (int east = -3; east <= 3; east++)
-                    for (int south = -3; south <= 3; south++)
-                        if (CorruptionConversions.isCorrupted(level.getBlockState(new BlockPos(400_700 + east, -61, Z + south)))) corrupted++;
+                    for (int south = -3; south <= 3; south++) {
+                        BlockPos at = new BlockPos(400_700 + east, -61, Z + south);
+                        if (!CorruptionConversions.isCorrupted(level.getBlockState(at))) continue;
+                        corrupted++;
+                        assertFalse(world.isSource(at), "the ground it sows spreads no further: " + at);
+                    }
                 assertTrue(corrupted > 8, "the ground about it is the corruption's: " + corrupted);
                 run(sower, SowerRules.Skill.SNARE.ordinal(), further);
                 assertTrue(sower.snare().caught().contains(further), "its roots catch the quarry where it stood");

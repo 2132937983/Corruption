@@ -3,7 +3,6 @@ package com.miophas.corruption.common.registry;
 import com.miophas.corruption.Corruption;
 import com.miophas.corruption.api.energy.CorruptionEnergyApi;
 import com.miophas.corruption.api.energy.CorruptionEnergyCarrier;
-import com.miophas.corruption.common.item.InfectedBlockItem;
 import com.miophas.corruption.api.arcane.ArcaneApi;
 import com.miophas.corruption.api.arcane.ArcaneString;
 import java.util.LinkedHashSet;
@@ -13,7 +12,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -86,24 +84,10 @@ public final class ModCreativeModeTabs {
                         output.accept(ModItems.ARCUNUM_END.get());
                         output.accept(ModItems.SPIRIT.get());
                         output.accept(ModItems.SPIRIT_DEEPSLATE.get());
-                        output.accept(ModItems.CORRUPTED_WATER_BUCKET.get());
-                        output.accept(ModItems.CORRUPTED_LAVA_BUCKET.get());
-                        output.accept(ModItems.FLOWING_CORRUPTION_BUCKET.get());
                         for (var container : new net.minecraft.world.item.Item[] {net.minecraft.world.item.Items.POTION, net.minecraft.world.item.Items.SPLASH_POTION,
                                 net.minecraft.world.item.Items.LINGERING_POTION, net.minecraft.world.item.Items.TIPPED_ARROW})
                             for (var potion : ModPotions.CORRUPTION_CURSE)
                                 output.accept(net.minecraft.world.item.alchemy.PotionContents.createItemStack(container, potion));
-                        output.accept(InfectedBlockItem.of(Blocks.TUFF.defaultBlockState()));
-                        output.accept(InfectedBlockItem.of(Blocks.DEEPSLATE.defaultBlockState()));
-                        output.accept(InfectedBlockItem.of(Blocks.STONE.defaultBlockState()));
-                        output.accept(InfectedBlockItem.of(Blocks.DIORITE.defaultBlockState()));
-                        output.accept(InfectedBlockItem.of(Blocks.OAK_LOG.defaultBlockState()));
-                        output.accept(InfectedBlockItem.of(Blocks.GRASS_BLOCK.defaultBlockState()));
-                        output.accept(InfectedBlockItem.of(Blocks.SOUL_SAND.defaultBlockState()));
-                        output.accept(InfectedBlockItem.of(Blocks.DIRT_PATH.defaultBlockState()));
-                        output.accept(InfectedBlockItem.of(Blocks.LADDER.defaultBlockState()));
-                        output.accept(InfectedBlockItem.of(Blocks.OAK_STAIRS.defaultBlockState()));
-                        output.accept(InfectedBlockItem.of(Blocks.STONE_STAIRS.defaultBlockState()));
                     })
                     .build());
 

@@ -1,6 +1,7 @@
 package com.miophas.corruption.common.block;
 
 import com.miophas.corruption.api.corruption.CorruptionFactionApi;
+import com.miophas.corruption.common.infection.DormantGround;
 import com.miophas.corruption.common.infection.InfectionEvents;
 import com.miophas.corruption.common.particle.CorruptionFootsteps;
 import com.miophas.corruption.common.registry.ModParticles;
@@ -32,7 +33,8 @@ public class CorruptionBlock extends Block {
 
     /**
      * Whether this corruption spreads: whether it is a source of the infection, which takes the blocks next to it in
-     * turn. Every corrupted block does, but the dormant corruption ({@link DeactivatedCorruptionBlock}).
+     * turn. Every corrupted block does, but the dormant corruption ({@link DeactivatedCorruptionBlock}) and ground the
+     * infection is told to leave still ({@link DormantGround}), which keeps its ordinary variant and spreads nothing.
      */
     public boolean spreads() { return true; }
     @Override public int getFlammability(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos, Direction face) {
@@ -80,7 +82,8 @@ public class CorruptionBlock extends Block {
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean moved) {
         super.onPlace(state, level, pos, oldState, moved);
-        if (spreads() && level instanceof ServerLevel serverLevel && !oldState.is(state.getBlock())) {
+        if (spreads() && level instanceof ServerLevel serverLevel && !oldState.is(state.getBlock())
+                && !DormantGround.isDormant(serverLevel, pos)) {
             InfectionEvents.activate(serverLevel, pos);
         }
     }
@@ -88,6 +91,8 @@ public class CorruptionBlock extends Block {
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved) {
         super.onRemove(state, level, pos, newState, moved);
+        // The block is gone, so the ground here is no longer dormant: what is put here next spreads as any corruption.
+        if (level instanceof ServerLevel serverLevel) DormantGround.release(serverLevel, pos);
         if (spreads() && level instanceof ServerLevel serverLevel && !newState.is(state.getBlock())) {
             InfectionEvents.deactivate(serverLevel, pos);
         }
@@ -97,7 +102,7 @@ public class CorruptionBlock extends Block {
     protected void neighborChanged(BlockState state, Level level, BlockPos pos,
             Block neighbor, BlockPos neighborPos, boolean moved) {
         super.neighborChanged(state, level, pos, neighbor, neighborPos, moved);
-        if (spreads() && level instanceof ServerLevel serverLevel) {
+        if (spreads() && level instanceof ServerLevel serverLevel && !DormantGround.isDormant(serverLevel, pos)) {
             InfectionEvents.neighborChanged(serverLevel, pos, neighborPos);
         }
     }

@@ -69,6 +69,8 @@
   "corruption.configuration.infection.maxSpreadMultiplier": "Maximum Spread Budget Multiplier",
   "corruption.configuration.infection.scanIntervalTicks": "Idle Discovery Interval (ticks)",
   "corruption.configuration.infection.scanBlocksPerBatch": "Discovery Work per Tick",
+  "corruption.configuration.infection.sowerGroundDormant": "Sower's Ground Dormant",
+  "corruption.configuration.infection.sowerGroundDormant.tooltip": "Enabled by default: the ground the corrupted sower takes underfoot keeps the block's own corrupted variant and hurts as any corruption does, but never spreads the infection on from there. Disabled, it spreads as ordinary corruption does. Dormant ground is marked by position, so no second variant is generated for each block.",
   "corruption.configuration.blocks.corruptedBlocksFlammable": "Corrupted Blocks Flammable",
   "corruption.configuration.blocks.corruptedBlocksFlammable.tooltip": "Disabled by default. When enabled, generated corrupted solid variants burn and spread fire. Corruption, malice, special ores, fluids and plants retain their own fire rules.",
   "corruption.configuration.ecology.maliceChance": "Malice Conversion Chance",

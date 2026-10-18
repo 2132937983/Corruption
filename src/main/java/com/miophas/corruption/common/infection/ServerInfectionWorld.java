@@ -5,6 +5,7 @@ import com.miophas.corruption.common.config.InfectionConfig;
 import com.miophas.corruption.common.registry.ModBlocks;
 import com.miophas.corruption.common.block.CorruptionBlock;
 import com.miophas.corruption.common.blockentity.InfectedBlockEntity;
+import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -47,7 +48,7 @@ public final class ServerInfectionWorld implements InfectionWorld {
     @Override
     public boolean isSource(BlockPos pos) {
         LevelChunk chunk = loadedChunk(pos);
-        return chunk != null && isSourceState(chunk.getBlockState(pos));
+        return chunk != null && isSourceState(chunk.getBlockState(pos)) && !DormantGround.isDormant(chunk, pos);
     }
 
     @Override
@@ -129,9 +130,15 @@ public final class ServerInfectionWorld implements InfectionWorld {
             // The load event can precede FULL promotion. Retry later without loading the chunk.
             return new ScanResult(List.of(), cursor, 0, false);
         }
-        return ChunkFrontierScan.scan(chunk.getSections(), chunk.getMinSection(), pos, cursor, maxBlocks, level, outside -> {
+        ScanResult result = ChunkFrontierScan.scan(chunk.getSections(), chunk.getMinSection(), pos, cursor, maxBlocks, level, outside -> {
             LevelChunk other = loadedChunk(outside);
             return other == null ? null : other.getBlockState(outside);
         });
+        // The scan reads states alone; dormant ground looks like any corruption in a section, so leave it out here.
+        if (!DormantGround.hasMarks(chunk)) return result;
+        List<BlockPos> sources = new ArrayList<>(result.sources().size());
+        for (BlockPos source : result.sources()) if (!DormantGround.isDormant(chunk, source)) sources.add(source);
+        return sources.size() == result.sources().size() ? result
+                : new ScanResult(sources, result.nextCursor(), result.inspectedBlocks(), result.complete());
     }
 }
