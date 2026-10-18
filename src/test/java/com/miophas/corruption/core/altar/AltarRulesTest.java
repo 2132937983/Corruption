@@ -159,6 +159,56 @@ class AltarRulesTest {
         throw new AssertionError("Cannot find " + folder);
     }
 
+    @Test void anOctagramAltarHasEightPillarsRoundTheOfferingAtTheCornersOfAStar() {
+        AltarForm octagram = AltarForm.OCTAGRAM;
+        assertEquals(8, octagram.slots());
+        assertEquals(AltarForm.MOST_SLOTS, octagram.slots());
+        assertEquals(List.of(0, 4), List.of(octagram.east(0), octagram.north(0)), "pillar 1 stands where the hexagram's does");
+        Set<List<Integer>> places = new HashSet<>();
+        for (int slot = 0; slot < octagram.slots(); slot++) {
+            int east = octagram.east(slot), north = octagram.north(slot), next = (slot + 1) % octagram.slots();
+            assertEquals(slot, octagram.slotAt(east, north));
+            assertTrue(AltarLayout.onGround(east, north), "on the ground: " + slot);
+            assertTrue(east * octagram.north(next) - north * octagram.east(next) < 0, "clockwise from " + slot);
+            assertEquals(slot * 45.0, (Math.toDegrees(Math.atan2(east, north)) + 360) % 360, 1e-9, "an eighth of a turn apart");
+            double radius = Math.hypot(east, north);
+            assertTrue(radius >= 4 && radius < 4.25, "about four blocks out: " + radius);
+            places.add(List.of(east, north));
+        }
+        assertEquals(8, places.size());
+        Set<Integer> star = new HashSet<>();
+        int slot = 0;
+        do { star.add(slot); slot = (slot + octagram.step()) % octagram.slots(); } while (slot != 0);
+        assertEquals(8, star.size(), "joined each to the third after it, one line runs through all eight");
+        assertEquals(2, AltarForm.HEXAGRAM.step(), "the hexagram's two triangles");
+        for (int hexagram = 0; hexagram < AltarLayout.SLOTS; hexagram++)
+            assertEquals(List.of(AltarLayout.east(hexagram), AltarLayout.north(hexagram)), List.of(AltarForm.HEXAGRAM.east(hexagram), AltarForm.HEXAGRAM.north(hexagram)), "the hexagram as it was");
+    }
+
+    @Test void theShapeStandingIsFoundTheOctagramFirst() {
+        AltarLayout.Place octagram = (east, north) -> AltarForm.OCTAGRAM.slotAt(east, north) >= 0;
+        AltarLayout.Place hexagram = (east, north) -> AltarForm.HEXAGRAM.slotAt(east, north) >= 0;
+        assertEquals(AltarForm.OCTAGRAM, AltarForm.standing(octagram));
+        assertEquals(AltarForm.HEXAGRAM, AltarForm.standing(hexagram));
+        assertEquals(AltarForm.OCTAGRAM, AltarForm.standing((east, north) -> octagram.pillarAt(east, north) || hexagram.pillarAt(east, north)), "both: the octagram");
+        assertNull(AltarForm.standing((east, north) -> octagram.pillarAt(east, north) && !(east == 3 && north == -3)), "one missing");
+        assertNull(AltarForm.standing((east, north) -> false));
+        assertFalse(AltarForm.OCTAGRAM.formed(hexagram), "the hexagram's pillars are not an octagram's");
+        assertEquals(AltarForm.HEXAGRAM, AltarForm.withSlots(6));
+        assertEquals(AltarForm.OCTAGRAM, AltarForm.withSlots(8));
+        assertNull(AltarForm.withSlots(7));
+        assertTrue(AltarForm.OCTAGRAM.isAltar(3, 3) && !AltarForm.OCTAGRAM.isAltar(4, 2));
+        assertTrue(AltarForm.HEXAGRAM.isAltar(4, 2) && !AltarForm.HEXAGRAM.isAltar(3, 3));
+        // The ground round an octagram: its own pillars aside, a hexagram's place is ground like any other.
+        RitualMatch.Place nothing = (east, north) -> false, asked = (east, north) -> false;
+        RitualMatch.Place clearButFourTwo = (east, north) -> !(east == 4 && north == 2);
+        assertFalse(RitualMatch.ground(AltarForm.OCTAGRAM, asked, nothing, clearButFourTwo), "something at 4, 2 round an octagram");
+        assertTrue(RitualMatch.ground(AltarForm.HEXAGRAM, asked, nothing, clearButFourTwo), "where a hexagram's pillar stands");
+        RitualMatch.Place clearButThreeThree = (east, north) -> !(east == 3 && north == 3);
+        assertTrue(RitualMatch.ground(AltarForm.OCTAGRAM, asked, nothing, clearButThreeThree));
+        assertFalse(RitualMatch.ground(asked, nothing, clearButThreeThree), "left unsaid, the ground is a hexagram's");
+    }
+
     @Test void theRulesAreGameFree() throws Exception {
         try (Stream<Path> files = Files.list(source("src/main/java/com/miophas/corruption/core/altar"))) {
             List<String> imports = files.filter(file -> file.toString().endsWith(".java")).flatMap(file -> {

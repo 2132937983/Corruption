@@ -6,7 +6,7 @@ import com.miophas.corruption.common.altar.AltarPillarBlockEntity;
 import com.miophas.corruption.common.entity.CorruptLightning;
 import com.miophas.corruption.common.registry.ModBlockEntities;
 import com.miophas.corruption.common.registry.ModEntities;
-import com.miophas.corruption.core.altar.AltarLayout;
+import com.miophas.corruption.core.altar.AltarForm;
 import com.miophas.corruption.core.altar.AltarState;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -36,14 +36,22 @@ import org.joml.Matrix4f;
 public final class AltarRenderers {
     /** The hexagram circle drawn beneath a formed altar: textures/misc/altar_circle.png, CIRCLE_BLOCKS blocks across, centred on the offering. */
     public static final ResourceLocation CIRCLE = ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "textures/misc/altar_circle.png");
+    /** The octagram's, as large: textures/misc/altar_circle_octagram.png. */
+    public static final ResourceLocation OCTAGRAM_CIRCLE = ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "textures/misc/altar_circle_octagram.png");
     public static final float CIRCLE_BLOCKS = 10;
 
+    /** The circle drawn beneath an altar of this shape. */
+    public static ResourceLocation circle(AltarForm form) { return form == AltarForm.OCTAGRAM ? OCTAGRAM_CIRCLE : CIRCLE; }
+
+    /** Where a pillar's corner of the hexagram lies in its circle's picture (see {@link #circlePoint(AltarForm, int)}). */
+    public static float[] circlePoint(int slot) { return circlePoint(AltarForm.HEXAGRAM, slot); }
+
     /**
-     * Where a pillar's corner of the hexagram lies in the circle's picture, as a share of its width: across, then
+     * Where a pillar's corner of its star lies in the circle's picture, as a share of its width: across, then
      * down. Up is the way the altar faces; the circle is turned with it.
      */
-    public static float[] circlePoint(int slot) {
-        return new float[]{.5F + AltarLayout.east(slot) / CIRCLE_BLOCKS, .5F - AltarLayout.north(slot) / CIRCLE_BLOCKS};
+    public static float[] circlePoint(AltarForm form, int slot) {
+        return new float[]{.5F + form.east(slot) / CIRCLE_BLOCKS, .5F - form.north(slot) / CIRCLE_BLOCKS};
     }
 
     /** What a pillar holds, floating over it and slowly turning. */
@@ -63,8 +71,9 @@ public final class AltarRenderers {
     }
 
     /**
-     * The magic circle beneath a formed altar, glowing; brighter, and pulsing, while it binds. It is turned the way
-     * the altar faces, so that its six points lie under the six pillars, the first marked by a second ring.
+     * The magic circle beneath a formed altar, glowing; brighter, and pulsing, while it binds: the hexagram's or the
+     * octagram's, by the shape the offering last found. It is turned the way the altar faces, so that its points lie
+     * under the pillars, the first marked by a second ring.
      */
     public static final class Offering implements BlockEntityRenderer<AltarOfferingBlockEntity> {
         public Offering(BlockEntityRendererProvider.Context context) {}
@@ -76,7 +85,7 @@ public final class AltarRenderers {
             float glow = state.binds() ? .8F + .2F * (float) Math.sin(time / 8) : .55F;
             int colour = 0xFF000000 | Math.round(255 * glow) << 16 | Math.round(255 * glow) << 8 | Math.round(255 * glow);
             float half = CIRCLE_BLOCKS / 2, min = .5F - half, max = .5F + half, y = .02F;
-            VertexConsumer buffer = buffers.getBuffer(RenderType.eyes(CIRCLE));
+            VertexConsumer buffer = buffers.getBuffer(RenderType.eyes(circle(offering.form())));
             pose.pushPose();
             pose.translate(.5, 0, .5);
             pose.mulPose(Axis.YP.rotationDegrees(-90F * offering.facing().quarterTurns()));

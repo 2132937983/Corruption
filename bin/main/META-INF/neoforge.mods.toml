@@ -24,7 +24,7 @@ license="All Rights Reserved"
 modId="corruption" #mandatory
 
 # The version number of the mod
-version="0.0.0.11" #mandatory
+version="0.0.0.13" #mandatory
 
 # A display name for the mod
 displayName="Corruption" #mandatory

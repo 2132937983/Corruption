@@ -1,0 +1,22 @@
+{
+  "type": "corruption:brass_cooking",
+  "ingredients": [
+    {
+      "item": "minecraft:amethyst_shard",
+      "count": 2
+    },
+    {
+      "item": "corruption:void_ash",
+      "count": 1
+    }
+  ],
+  "fluid": {
+    "fluid": "corruption:flowing_corruption",
+    "amount": 100
+  },
+  "energy": "1KCE",
+  "result": {
+    "id": "corruption:void_tainted_shard",
+    "count": 2
+  }
+}

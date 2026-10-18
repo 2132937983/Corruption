@@ -1,0 +1,24 @@
+{
+  "type": "corruption:alchemy_shapeless",
+  "ingredients": [
+    {
+      "item": "corruption:corruption_echo_alloy",
+      "count": 1
+    },
+    {
+      "item": "corruption:chitin_plate",
+      "count": 2
+    },
+    {
+      "item": "corruption:bile_sac",
+      "count": 2
+    },
+    {
+      "item": "corruption:bloodstone",
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "corruption:echo_cell"
+  }
+}

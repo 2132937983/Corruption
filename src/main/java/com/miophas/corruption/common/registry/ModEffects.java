@@ -19,7 +19,7 @@ public final class ModEffects {
                             && (!(target instanceof Player player) || !player.isCreative() && !player.isSpectator())) {
                         if(target instanceof Player player)com.miophas.corruption.common.entity.PlayerCorruption.cursePulse(player);
                         if(target.isAlive())
-                        target.hurt(ModDamageTypes.corruption(target.level()), target.getMaxHealth() * CorruptionBlock.CONTACT_DAMAGE_FRACTION
+                        target.hurt(com.miophas.corruption.api.corruption.CorruptionCurseApi.damage(target.level()), target.getMaxHealth() * CorruptionBlock.CONTACT_DAMAGE_FRACTION
                                 * com.miophas.corruption.api.corruption.CorruptionCurseApi.damageScale(amplifier));
                     }
                     return true;

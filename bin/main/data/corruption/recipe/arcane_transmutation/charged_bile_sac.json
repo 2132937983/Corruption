@@ -1,0 +1,13 @@
+{
+  "type": "corruption:arcane_transmutation",
+  "ingredient": {
+    "item": "corruption:bile_sac"
+  },
+  "energy": "15KCE",
+  "result": {
+    "id": "corruption:charged_bile_sac",
+    "components": {
+      "corruption:corruption_energy": "15KCE"
+    }
+  }
+}

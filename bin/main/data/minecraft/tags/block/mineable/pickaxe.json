@@ -17,6 +17,10 @@
     "corruption:altar_pillar",
     "corruption:altar_offering",
     "corruption:corruption_arcane_pedestal",
-    "corruption:corruption_arcane_charger"
+    "corruption:corruption_arcane_charger",
+    "corruption:corruption_echo_alloy_block",
+    "corruption:corruption_arcane_brick_stairs",
+    "corruption:corruption_arcane_brick_slab",
+    "corruption:corruption_arcane_brick_wall"
   ]
 }

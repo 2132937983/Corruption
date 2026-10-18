@@ -1,6 +1,8 @@
 package com.miophas.corruption.common.block;
 
 import com.miophas.corruption.common.altar.AltarMode;
+import com.miophas.corruption.common.altar.AltarStar;
+import com.miophas.corruption.core.altar.AltarForm;
 import com.miophas.corruption.common.altar.AltarOfferingBlockEntity;
 import com.miophas.corruption.common.registry.ModBlockEntities;
 import com.miophas.corruption.core.altar.AltarFacing;
@@ -35,9 +37,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * The Altar Offering: a slab of corruption arcane bricks under a red cloth trimmed in gold
- * (gamemodels/altar/altar_offering.bbmodel), the middle of an altar of six Altar Pillars. Its state, "altar",
- * is dormant while its pillars do not all stand; formed, its magic circle drawn beneath it, once they do; and
- * binding, holding a creature on it, its model changed to show it, from when they first all stand. Used by hand,
+ * (gamemodels/altar/altar_offering.bbmodel), the middle of an altar of six Altar Pillars, or eight (AltarForm).
+ * Its state, "altar", is dormant while its pillars do not all stand; formed, its magic circle drawn beneath it,
+ * once they do; and binding, holding a creature on it, its model changed to show it, from when they first all
+ * stand. "star" is the shape it last found standing, hexagram or octagram, whose circle is drawn. Used by hand,
  * at any time, it looks over its altar at once and, if it stands, starts binding or stops; if it does not, the
  * player is told where its first pillar goes.
  *
@@ -49,11 +52,13 @@ public final class AltarOfferingBlock extends BaseEntityBlock {
     public static final MapCodec<AltarOfferingBlock> CODEC = simpleCodec(AltarOfferingBlock::new);
     public static final EnumProperty<AltarMode> ALTAR = EnumProperty.create("altar", AltarMode.class);
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    /** The shape of the altar it last found standing round it, which decides the magic circle drawn beneath it. */
+    public static final EnumProperty<AltarStar> STAR = EnumProperty.create("star", AltarStar.class);
     private static final VoxelShape SHAPE = box(0, 0, 0, 16, 8, 16);
 
     public AltarOfferingBlock(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(ALTAR, AltarMode.DORMANT).setValue(FACING, Direction.NORTH));
+        registerDefaultState(stateDefinition.any().setValue(ALTAR, AltarMode.DORMANT).setValue(FACING, Direction.NORTH).setValue(STAR, AltarStar.HEXAGRAM));
     }
 
     /** Which way an offering's altar faces. */
@@ -67,7 +72,10 @@ public final class AltarOfferingBlock extends BaseEntityBlock {
     }
 
     @Override protected MapCodec<AltarOfferingBlock> codec() { return CODEC; }
-    @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) { builder.add(ALTAR, FACING); }
+    /** The shape of an offering's altar, as it last found it standing. */
+    public static AltarForm form(BlockState state) { return state.getValue(STAR).form(); }
+
+    @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) { builder.add(ALTAR, FACING, STAR); }
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) { return SHAPE; }
     @Override protected boolean useShapeForLightOcclusion(BlockState state) { return true; }

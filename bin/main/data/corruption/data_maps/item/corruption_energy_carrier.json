@@ -3,6 +3,14 @@
     "corruption:corruption_candle": {
       "capacity": "10KCE",
       "consumed": true
+    },
+    "corruption:charged_bile_sac": {
+      "capacity": "15KCE",
+      "consumed": true
+    },
+    "corruption:echo_cell": {
+      "capacity": "100KCE",
+      "consumed": false
     }
   }
 }

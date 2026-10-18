@@ -1,0 +1,94 @@
+{
+  "form": "octagram",
+  "key": {
+    "Q": {"block": "minecraft:quartz_block"},
+    "E": {"block": "corruption:corruption_echo_alloy_block"},
+    "B": {"block": "corruption:corruption_arcane_brick"},
+    "_": {"block": "corruption:corruption_arcane_brick_slab", "state": {"type": "bottom"}},
+    "^": {"block": "corruption:corruption_arcane_brick_stairs", "state": {"facing": "north", "half": "bottom"}},
+    ">": {"block": "corruption:corruption_arcane_brick_stairs", "state": {"facing": "east", "half": "bottom"}},
+    "<": {"block": "corruption:corruption_arcane_brick_stairs", "state": {"facing": "west", "half": "bottom"}}
+  },
+  "layers": [
+    {
+      "y": -1,
+      "rows": [
+        "BQQQQQQQQQB",
+        "QQQQQBQQQQQ",
+        "QQB_Q_Q_BQQ",
+        "QQ_Q___Q_QQ",
+        "QQQ__Q__QQQ",
+        ">B__QBQ__B<",
+        "QQQ__Q__QQQ",
+        "QQ_Q___Q_QQ",
+        "QQB_Q_Q_BQQ",
+        "QQQQQBQQQQQ",
+        "BQQQQ^QQQQB"
+      ]
+    },
+    {
+      "y": 0,
+      "rows": [
+        "Q...>B<...Q",
+        ".....P.....",
+        "..P.....P..",
+        "...........",
+        "...........",
+        ".P...@...P.",
+        "...........",
+        "...........",
+        "..P.....P..",
+        ".....P.....",
+        "Q.........Q"
+      ]
+    },
+    {
+      "y": 1,
+      "rows": [
+        "Q....E....Q",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "Q.........Q"
+      ]
+    },
+    {
+      "y": 2,
+      "rows": [
+        "E...._....E",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "E.........E"
+      ]
+    },
+    {
+      "y": 3,
+      "rows": [
+        "_........._",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "...........",
+        "_........._"
+      ]
+    }
+  ]
+}

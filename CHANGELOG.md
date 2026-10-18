@@ -3717,3 +3717,439 @@ Measured on the test server, against a villager stand-in with a player's 20 heal
   - the AI in a real world: the hound's chase and its trail, the mindweaver holding its thread, the sower's walk over real terrain, Amdusias's gallop and his choices;
   - how the fanfare's 138 bolts, the crescendo's rings and the upheaval look and feel, and whether the balance is right;
   - the rite in a real world.
+
+## 52. A data pack: one Key of Solomon in every stronghold, fortress, end city and bastion
+
+**Why.** The user's request: "Write a datapack that adds exactly one random book from the entire Key of Solomon collection to the loot tables of Strongholds, Nether Fortresses, End Cities, and Bastion Remnants, limiting it to a single generation each." Asked what "a single generation each" should limit, they chose **once per structure**: every stronghold, fortress, end city and bastion holds exactly one book. Loot tables roll each chest on its own, so a data pack alone cannot see across a structure's chests. The mod gained one loot condition for this; everything else is the data pack.
+
+### 52.1 The data pack (`datapacks/key_of_solomon_loot/`)
+- **What it does.** Each of those structures holds exactly one random book of the twelve, each with a 1/12 chance: the Prologue, Arcana of Corruption, I–VIII, Ascension and the Lesser Key.
+  - The book goes in the first chest of the structure whose loot is generated: the first opened, broken or emptied by a hopper.
+  - The structure's other chests get none, and vanilla loot is unchanged.
+- **Install.** Copy the folder into a world's `datapacks` folder, then `/reload`. It shows as `file/key_of_solomon_loot`.
+- **Files.**
+  - `pack.mcmeta`: `pack_format` 48. The description is a translation key with an English fallback, now in en_us and zh_cn.
+  - `data/neoforge/loot_modifiers/global_loot_modifiers.json`: four entries, `"replace": false`.
+  - `data/key_of_solomon_loot/loot_modifiers/{stronghold,fortress,end_city,bastion_remnant}.json`: each a `neoforge:add_table`. Its conditions are `neoforge:loot_table_id` (that structure's vanilla chest tables) and then `corruption:once_per_structure`.
+    - Stronghold: `stronghold_corridor`, `stronghold_crossing`, `stronghold_library`.
+    - Fortress: `nether_bridge`.
+    - End city: `end_city_treasure`.
+    - Bastion: `bastion_bridge`, `bastion_hoglin_stable`, `bastion_other`, `bastion_treasure`.
+  - `data/key_of_solomon_loot/loot_table/key_of_solomon.json`: one pool, one roll, the twelve books at equal weight.
+- **Edge cases.**
+  - Existing worlds count: the first chest opened after installing gets the book. A structure whose chests were all opened before gets none.
+  - The book can only go in a loot chest. A structure without any gets none; fortress chests are random, so a small fortress may have none.
+  - A structure placed with `/place structure` is not recorded in its chunks, so it is not found and gets no book. Neither does a chest with these tables that stands outside the structure.
+  - What was taken is saved with each dimension. Removing and re-adding the pack does not refill structures.
+
+### 52.2 The loot condition `corruption:once_per_structure`
+- **What it does.** `{"condition": "corruption:once_per_structure", "structures": ..., "prize": ...}`. Inside a piece of one of `structures` (one, a list or a tag), it holds once for each structure and prize, and never again. Outside them it never holds.
+  - Structures are found by their pieces, as vanilla finds a fortress for its spawns.
+  - Listed structures are matched by name, so the result does not depend on which registry lookup parsed the file.
+  - It takes the prize whenever it holds, so it goes last in a condition list.
+- **Code.**
+  - `core/loot/StructurePrizes` (plain Java): one prize per structure, a structure named by its type and start chunk.
+  - `common/loot/OncePerStructure`: the condition, with its codec and the claims' codec.
+  - `common/registry/ModLootConditions` registers it, wired up in `Corruption`.
+  - `ModAttachments.STRUCTURE_PRIZES`: a level attachment, written only when not empty.
+
+### 52.3 Docs
+- README (Chinese):
+  - a new section, “数据包：所罗门之钥的战利品”;
+  - the books' line now says how to get them;
+  - `core/loot` and `common/loot` in the project tree.
+- Fixed a stale line in the README: `ModItems.KEYS` holds twelve books, not eleven.
+
+### 52.4 Tests
+- **`StructurePrizesTest`** (4, new):
+  - a prize comes out of a structure once;
+  - other structures, kinds and prizes are counted apart;
+  - the claims survive saving;
+  - `core/loot` is plain Java.
+- **`KeyOfSolomonLootServerTest`** (3, new, test server).
+  - **The pack as written.** Its `pack_format` is this version's. Its four modifiers parse as `add_table` and point at the book table. The table gives exactly one book per roll, and all twelve books of the `arcane_key` data map came up in 1,200 rolls.
+  - **Installed** the way a player installs it: copied into the test world's `datapacks` folder, found by the pack repository as compatible, and enabled with a data reload.
+    - A real bastion remnant, generated and placed as the world does, had 15 chests (hoglin stable and other). Opening them all gave books per chest `[1, 0, 0, …]`: exactly one, in the first.
+    - Two each of stronghold, fortress and end city, standing as starts with two pieces each: one book in whichever chest was opened first, whatever its table.
+    - All nine tables outside any structure: no book.
+    - A fortress table inside a bastion: no book. The bastion's own table then gave its book.
+    - The pack is disabled and removed afterwards.
+  - **The condition alone.**
+    - It works whether the structures are given as a tag, a list or a single name.
+    - It holds once, and not again in another room of the same structure.
+    - A second prize is counted apart.
+    - A point in the gap between two pieces is outside, and so is a structure of the wrong kind.
+    - A second stronghold has its own.
+    - The claims are in the level's saved attachments.
+
+### 52.5 Run
+- The new tests: 7 of 7 pass. Only warnings that were there before appeared in the log; there was nothing about the pack or its modifiers.
+- **The full suite**: 744 tests in 112 classes, all pass (none failed, none skipped). That is 737 before, plus 7 new. It ran on the tree with 0.0.0.13 pulled in.
+- **Not checked in game.** The pack was not tried in a running client or a real world: real strongholds, fortresses and end cities, and the data pack screen.
+
+## 53. The Key of Solomon data pack: where the book goes
+
+**Why.** The user's request: "I checked a few structures but couldn't find The Key of Solomon. Let's modify its loot generation to spawn in Stronghold libraries, a specific chest in Nether Fortresses, alongside smithing templates in Bastion Remnants, and in End Ships."
+
+### 53.1 Why no book was found
+- None of the user's worlds had the pack installed: every `run/saves/*/datapacks` folder was empty.
+- The data pack is not part of the mod. It has to be copied into each world's `datapacks` folder.
+- The README now says so first, under “安装”.
+
+### 53.2 Where the book goes now
+Still one random book of the twelve per structure, in the first qualifying chest whose loot is generated.
+- **Strongholds**: only the library's chests (`chests/stronghold_library`), not corridors or crossings. A stronghold without a library gets none.
+- **Nether fortresses**: every fortress chest uses `chests/nether_bridge`, and all of them stand in the corridor turns. No chest can be told apart, so the specific chest is the first one opened, as before.
+- **Bastion remnants**: only a chest that already rolled a smithing template, the netherite upgrade or the snout trim (new modifier `corruption:add_table_alongside`).
+  - The treasure chest always holds the netherite upgrade template, so a treasure bastion always has its book.
+  - Other bastion chests roll the upgrade 10% of the time and the snout trim 1 in 12. A bastion where none did gets no book.
+  - Which items count is the pack's item tag `key_of_solomon_loot:smithing_templates`: `#minecraft:trim_templates` plus the netherite upgrade template.
+- **End cities**: only the ship's two chests (new condition `corruption:structure_piece`, template `minecraft:end_city/ship`). Ship and tower chests share `chests/end_city_treasure`, so the ship is told by the piece the chest stands in. A city without a ship gets none.
+- **Prize name kept.** The pack keeps the prize `key_of_solomon_loot:key_of_solomon`, so a structure that already gave a book under the old placement gives no second one.
+
+### 53.3 The pack's files
+- `global_loot_modifiers.json`: `stronghold_library`, `fortress`, `bastion_remnant`, `end_ship`. The old `stronghold.json` and `end_city.json` are gone.
+- New tag `data/key_of_solomon_loot/tags/item/smithing_templates.json`.
+- The description (lang key and fallback, en_us and zh_cn) names the four places.
+
+### 53.4 New in the mod
+- **`corruption:structure_piece`** (`common/loot/InStructurePiece`). `{"structures": ..., "templates": [...]}`: it holds inside a piece of those structures built from one of those templates.
+  - A piece's template is a template piece's own (end city, woodland mansion, igloo) or a jigsaw piece's single pool element (bastion, village). Pieces built in code have none.
+  - It takes nothing.
+- **`corruption:add_table_alongside`** (`common/loot/AddTableAlongside`, a global loot modifier). `{"alongside": items, "conditions": [...], "table": ...}`: it adds the table's rolls only to loot that already holds one of the items.
+  - It tests `alongside` first and its conditions after. So `corruption:once_per_structure` takes its prize only when the book is really added.
+- **`common/loot/StructureLookup`**: finding a structure by its pieces, now shared by both conditions.
+- **`common/registry/ModLoot`** replaces `ModLootConditions`. It has two registers, `CONDITIONS` and `MODIFIERS`, both wired up in `Corruption`.
+- **Access transformer.** It now opens `TemplateStructurePiece.makeTemplateLocation()`, with its overrides in `EndCityPieces$EndCityPiece` and `WoodlandMansionPieces$WoodlandMansionPiece` (so the recompiled overrides stay as visible), and `SinglePoolElement.template`.
+  - The first build afterwards re-ran Minecraft's source transform.
+  - An IDE may need a Gradle refresh to see the opened members.
+
+### 53.5 Tests
+- **`KeyOfSolomonLootServerTest`** (4, was 3). The pack is installed as a player installs it.
+  - **A real bastion**, generated and placed: 15 chests, 5 of them holding a smithing template. Opening them all gave books `[0, 0, 1, 0, …]`: one, in the first chest opened that held a template.
+  - **A real end city** tower top and ship, placed from their templates, 2 chests each. The tower's chests were opened first and gave none; the ship's first gave the book, its second none.
+  - **A stronghold** opened corridor, crossing, library, library: books `[0, 0, 1, 0]`.
+  - **Two fortresses**, each opened in a different order: the first chest opened holds it.
+  - **Bastion loot without a template** gets no book and takes no prize: the treasure chest after it still gets the book. A fortress table in a bastion gets none.
+  - **Outside any structure**, all nine tables: no book.
+  - The modifiers are parsed after the pack is enabled, since the bastion one names the pack's own item tag.
+  - **New `aPieceIsKnownByTheTemplateItWasBuiltFrom`**: `structure_piece` holds on an end ship and not in the tower, and again on asking (it takes nothing). It knows a bastion's jigsaw piece by its template, rejects a template it doesn't have, and a piece built in code has none.
+- `StructurePrizesTest` (4) unchanged.
+
+### 53.6 Run
+- The loot tests: 8 of 8 pass.
+- **The full suite**: 745 tests in 112 classes, all pass (none failed, none skipped). That is 744 before, plus 1 new.
+- **Not checked in game.** The pack was not tried in a real world: a real stronghold library, fortress, bastion or end ship opened by a player.
+
+## 54. The Key of Solomon in the mod's own loot tables
+
+**Why.** The user's request: "I meant for you to directly modify the loot tables under the data directory within our project, rather than creating a standalone datapack. Please adjust the loot generation for The Key of Solomon to spawn in Stronghold libraries, Nether Fortress chests, Bastion Remnants (alongside smithing templates), and End Ships." This replaces the standalone pack of §52–53: the book now ships with the mod.
+
+### 54.1 What the mod's data holds now
+- **`data/minecraft/loot_table/chests/`**: seven vanilla chest tables, each vanilla's own with the book added, replacing vanilla's as any data pack's copy would.
+  - `stronghold_library`, `nether_bridge`: one more pool, the book once per structure.
+  - `end_city_treasure`: one more pool that holds only in the ship's piece (`corruption:structure_piece`, `minecraft:end_city/ship`), once per city.
+  - `bastion_treasure`, `bastion_other`, `bastion_bridge`, `bastion_hoglin_stable`: each smithing template entry (netherite upgrade, snout trim) becomes an inline `minecraft:loot_table` entry. That inner table rolls the template and, with it, the book, once per bastion. The entry keeps the template's weight, so vanilla's odds are unchanged.
+- **`data/corruption/loot_table/chests/key_of_solomon.json`**: one of the twelve books, each 1/12.
+- **Where it goes**, once in each structure, in the first qualifying chest whose loot is generated:
+  - stronghold: the library;
+  - nether fortress: the first chest opened (all its chests are alike);
+  - bastion remnant: only a chest that rolled a smithing template;
+  - end city: the ship.
+- **The generator.** `gamemodels/key_of_solomon_loot/write_loot_tables.py` writes the seven tables from vanilla's in `source/`. Run it again when vanilla's tables change. `source/`'s tables were checked identical to the running game's (21.1.256).
+- **Compatibility.** No installed mod in `run/mods` replaces these tables. Goety and Touhou Little Maid add loot through global loot modifiers, which still apply on top. A mod or pack that replaces the same table would win or lose by load order.
+
+### 54.2 Removed
+- `datapacks/key_of_solomon_loot/` (the standalone pack) and its description's lang keys (en_us, zh_cn).
+- `corruption:add_table_alongside` (`AddTableAlongside`, `ModLoot.MODIFIERS`). The bastion tables now put the book beside the templates themselves.
+- **Kept:** `corruption:once_per_structure`, `corruption:structure_piece`, `ModLoot.CONDITIONS` and the access transformer lines that `structure_piece` needs. The prize is now `corruption:key_of_solomon`.
+
+### 54.3 Docs
+- README:
+  - the section is now “所罗门之钥的战利品”, built in, with no install step;
+  - the books' line says where they are found;
+  - the project tree is updated.
+
+### 54.4 Tests
+- **`KeyOfSolomonLootServerTest`** (5), against the mod's own data as the server loads it.
+  - **`eachTableIsVanillasWithTheBookAddedAndNothingElse`**: vanilla's table is read from the server's own resource stack. With the book taken back out, each of the seven tables equals vanilla's. The pooled tables end in the book's pool, asked once per structure last. Each bastion table has its two template entries carrying the book.
+  - **`theBookTableGivesOneBookOfTheWholeCollection`**: 1,200 rolls, one book each, all twelve seen.
+  - **`eachStructureHoldsOneBookWhereItBelongs`**:
+    - A real bastion, generated and placed: 15 chests, 3 holding a smithing template. Books `[0, 0, 0, 0, 0, 1, 0, …]`: one, in the first chest opened that held a template.
+    - `bastion_other` rolled repeatedly in one bastion: no template, no book and no prize taken; the first roll with a template brings the book, none after.
+    - The treasure chest holds its template and the book; a second treasure chest does not. A fortress table in a bastion gives none.
+    - A real end city tower top and ship: the tower's chests, opened first, give none; the ship's first gives the book.
+    - Stronghold `[0, 0, 1, 0]` (corridor, crossing, library, library). Two fortresses: the first chest opened.
+    - All nine tables outside any structure: none.
+  - **`onceForEachStructureAndPrizeAndOnlyInItsPieces`** and **`aPieceIsKnownByTheTemplateItWasBuiltFrom`**: unchanged.
+- `StructurePrizesTest` (4) unchanged.
+
+### 54.5 Run
+- The loot tests: 9 of 9 pass.
+- **The full suite**: 746 tests in 112 classes, all pass (none failed, none skipped). That is 745 before, plus 1 new (the loot test now has 5).
+- **Not checked in game.** No real stronghold library, fortress, bastion or end ship was opened by a player.
+
+## 55. The corruption echo alloy, new materials and devices that run on a charge
+
+**Why.** The user's request:
+- New crafting-focused raw materials (dusts, ingots, or mob drops, not bosses), after vanilla, Scape and Run: Parasites and Fungal Infection: Spore, and a few chargeable items using the Corruption Energy data system.
+- A new alloy line: an intermediate made from Corruption Crystals and Ancient Corruption Crystals. With the Netherite recipe's materials, it makes Corruption Echo Alloy at the Alchemy Table (the Corruption Bench).
+- At the Altar, the alloy + a Diamond Sword + a specific raw material (e.g. a Void-Tainted Shard) make a sword stronger than netherite's that inherently applies the Corruption Curse. Also a pickaxe, an axe and an armour set.
+- The armour reduces the Corruption Curse's damage, but not other skill or ability damage from bosses, elites and remnants.
+- A block of the alloy.
+
+### 55.1 New materials (`ModItems.MATERIALS`, now 27)
+Each concept is drawn from Spore's and SRP's monster parts; the items are the mod's own.
+
+| Material | id | Source |
+| --- | --- | --- |
+| Mutated Sinew | `mutated_sinew` | Player kills of the brute, howler, blighthound and aberration: 1–2 (+1 per Looting level, at most) |
+| Bile Sac | `bile_sac` | Player kills of the bloater and mortar: the same |
+| Neural Cluster | `neural_cluster` | Player kills of the mindweaver, screecher and gazer: the same |
+| Chitin Plate | `chitin_plate` | Player kills of the crawler, hivemother, lurker and stalker: the same |
+| Remnant Marrow | `remnant_marrow` | Player kills of a corrupted remnant: 10% (Looting I 12%, +2% a level after) |
+| Void-Tainted Shard | `void_tainted_shard` | Cauldron: 2 amethyst shards + 1 void ash + 100 mB flowing corruption, 1 KCE → 2 |
+| Resonant Corruption Crystal | `resonant_corruption_crystal` | Bench (shapeless): 4 corruption crystals + 2 ancient corruption crystals |
+
+- Every elite keeps its remnant's remains. Each new pool needs `minecraft:killed_by_player`.
+
+### 55.2 The alloy line
+- **Corruption Echo Alloy** (`corruption_echo_alloy`). Bench (shapeless): 1 resonant crystal + 4 netherite scrap + 4 gold ingots (`c:ingots/gold`). It is fireproof, a beacon payment, and in `c:ingots/corruption_echo_alloy`.
+- **Block of Corruption Echo Alloy**. Crafting table: 9 alloys make the block, and the block gives 9 back. Its storage-block tags are set.
+  - It is as hard and blast-proof as netherite's block, mined with diamond or better.
+  - It is a beacon base, and the infection never takes it.
+- **The gear**: at the altar (shaped, 5 s).
+  - Pillar 1 holds the diamond piece and is kept (`"keep": "1"`), so the enchantments, wear and name carry over.
+  - Pillar 3 holds the alloy. Pillar 5 holds a void-tainted shard (sword, pickaxe, axe) or a chitin plate (armour).
+  - All of it is fireproof and mended with the alloy.
+- **The tools**: a tier past netherite's. 2531 uses (2031), speed 10 (9), +5 (+4), enchantability 18, the same blocks as netherite.
+  - Sword 9 (netherite 8) at 1.6 swings a second; pickaxe 7 (6); axe 11 (10).
+  - The sword is in `corruption:cursed_weapons`: its blows lay 1.5 s of Curse I on anything not of the corruption. Like the arcane sword, the corruption's lords turn its blows aside, and it bears no arcane mark.
+- **The armour**: netherite's defence (3/8/6/3), toughness 3, knockback resistance 0.1, enchantability 18, durability multiplier 40 (netherite 37). It is in the vanilla armour tags and `minecraft:trimmable_armor`.
+- **The curse ward**:
+  - Each piece turns aside a share of the curse's own hurt, by its share of the defence: 15/40/30/15%. The whole set turns aside all of it.
+  - The ward is applied in `LivingIncomingDamageEvent`, before armour.
+  - Nothing else is touched: creatures' attacks, skills and spells, and the ground's and fluids' contact damage are reduced only by armour, as netherite would.
+  - The curse is still applied, and a player's pulses still raise corruption.
+
+### 55.3 Telling the curse apart
+- Each pulse of the curse now hurts with `api/corruption/CurseDamageSource`: the same damage type, `corruption:corruption`, as a distinct source.
+  - Every rule about the corruption's damage holds unchanged: robes, immunities, tags, death messages, no knockback and no panic.
+  - New: `CorruptionCurseApi.damage(level)` and `isCurse(source)`.
+- **`CurseWardItem`** (api) with `worn` and `taken`, and **`core/corruption/CurseWard`**: shares added up and held between 0 and 1. An add-on's armour can implement the interface.
+
+### 55.4 Chargeable items
+- **Batteries** (the `corruption_energy_carrier` data map):
+  - **Charged Bile Sac**: the transmuter charges a bile sac to 15 KCE for 15 KCE. It is consumed once spent.
+  - **Echo Cell**: bench, alloy + 2 chitin + 2 bile sacs + bloodstone; made empty. 100 KCE, a 5 KCE step, stacks to 16, fireproof.
+    - It is kept when empty and filled again in the transmuter's input (`echo_cell_filling`, 100 KCE whatever it held).
+- **Devices** (`CorruptionEnergyTool`): charged on the arcane charger, or by pouring with a battery in the off hand.
+  - **Corrupted Lantern**: bench, soul lantern + 2 neural clusters + sinew + 2 cursed iron. 20 KCE.
+    - Held in either hand, it spends 25 CE a second, so a full one lasts 800 s.
+    - While lit, its holder has night vision, renewed before it can flicker. The corruption's creatures within 24 blocks glow for 2 s, renewed.
+  - **Ichor Injector**: bench, corrupted ichor + 2 marrow + sinew + 2 cursed iron. 30 KCE.
+    - Use: 6 KCE takes the curse off you and heals 6. Then it rests 10 s.
+    - Without enough charge, it says how much a dose needs. It is free in creative.
+  - Shared base `ChargedDeviceItem`: the charge bar, `pay`, and no re-equip animation when the charge changes.
+- **Rules**: `core/energy/EnergyDeviceRules`.
+
+### 55.5 Assets and data
+- **Textures**: `gamemodels/echo_alloy/draw_echo.py`. Every texture is a vanilla copy (checksums in `vanilla_sources.md`), recoloured into the corruption's palette with a touch of echo teal.
+  - The shard comes from the amethyst shard, the resonant crystal from the echo shard.
+  - The sacs come from the glow ink sac, the sinew from the lead, the cluster from brain coral, the plate from the turtle scute, the marrow from the bone.
+  - The cell comes from the bottle o' enchanting, the lantern from the soul lantern, the injector from the spyglass.
+  - The alloy, its block, the tools, the armour items and the worn layers come from netherite's. The sword carries two rose runes.
+- **Data**: `gamemodels/echo_alloy/write_echo.py` writes:
+  - the models, the blockstate and the 17 recipes;
+  - the block's loot;
+  - the lang lines, in both languages: names, material lines, tooltips and the injector's message.
+- **Added to, never rewritten**: 14 entity loot tables, 20 tags and the carrier data map. Files are written with the repo's CRLF line endings.
+- **Code**:
+  - `ModItems`: the materials, `CHARGED_BILE_SAC`, `ECHO_CELL`, `CORRUPTED_LANTERN`, `ICHOR_INJECTOR`, the alloy, its block item, the gear, and the lists `ECHO_ALLOY_GEAR` and `ECHO_ALLOY_ARMOUR`.
+  - `ModBlocks.CORRUPTION_ECHO_ALLOY_BLOCK`, `ModArmorMaterials.ECHO_ALLOY`, the creative tab (batteries and devices shown full).
+- **README (Chinese)**:
+  - a new section “腐化回响合金”;
+  - seven rows in the materials table, and its count is now 27;
+  - `core/alloy` in the project tree.
+
+### 55.6 Tests
+- **`EchoAlloyRulesTest`** (5, new):
+  - the tools beat netherite;
+  - the armour equals netherite, and the shares sum to 1;
+  - `CurseWard` clamps and computes;
+  - the lantern's 800 s and the injector's five doses;
+  - `core/alloy` is plain Java.
+- **`EchoAlloyServerTest`** (7, new):
+  - the bench recipes match, with the right counts and not without the resonant crystal; the block and the shard recipes;
+  - all seven altar recipes keep Unbreaking III and 40 wear, and fail without the alloy;
+  - the tools' damage, durability, fireproofing and repair; the sword curses a villager and is refused by Andromalius;
+  - the armour against the curse and other damage, measured below;
+  - the drops: every elite gives its material to a player and not otherwise. Remnant marrow came out at 0.097 over 4000 kills.
+  - the batteries' data, the transmuter recipes, the lantern and the injector, and the charger accepting them;
+  - the block: tags, hardness, needs diamond, drops itself, beacon base and payment, immune to infection, fireproof.
+- **`CorruptionMaterialsServerTest`**: the new creature drops were added to its drop table.
+
+### 55.7 Measured
+On the test server, against a villager with a player's 20 health, dressed and ticked once so its armour counts.
+
+One pulse of Curse I (3):
+
+| Armour | Health lost |
+| --- | --- |
+| none | 3.00 |
+| full diamond | 0.69 |
+| full netherite | 0.67 |
+| full echo alloy | 0.00 |
+
+A creature's 8 corruption damage: netherite 2.11, echo alloy 2.11.
+
+### 55.8 Run
+- **The full suite**: 758 tests in 114 classes, all pass (none failed, none skipped). That is 746 before, plus 12 new.
+- **Not checked in game.** Not tried in a running client:
+  - how the textures look in hand and worn, and the trims on the new armour;
+  - the lantern's glow and night vision as they render;
+  - the injector's feel;
+  - the drops in real fights.
+
+## 56. Stairs, a slab and a wall of the corruption arcane bricks
+
+**Why.** The user's request: "using Corrupted Arcane Bricks as the base material, let's create the corresponding stairs, walls, slabs, etc., just like vanilla bricks." Vanilla's bricks have exactly these three, so the arcane bricks (`corruption:corruption_arcane_brick`, four arcane bricks crafted together) now have them too.
+
+### 56.1 The blocks
+| Block | id | Crafting (arcane bricks) | Stonecutter (1 block) |
+| --- | --- | --- | --- |
+| Corruption Arcane Brick Stairs (腐术砖楼梯) | `corruption_arcane_brick_stairs` | 6 → 4 | 1 |
+| Corruption Arcane Brick Slab (腐术砖台阶) | `corruption_arcane_brick_slab` | 3 → 6 | 2 |
+| Corruption Arcane Brick Wall (腐术砖墙) | `corruption_arcane_brick_wall` | 6 → 6 | 1 |
+
+- **Made of the bricks' own stuff.** A new helper, `ModBlocks.arcaneBricks()`, is shared by the bricks and all three: hardness 1.5, blast resistance 6, stone sounds, any pickaxe.
+  - The stairs take the bricks' own state; the wall is solid as vanilla's.
+- **Vanilla's behaviour**: the block and item tags `stairs`, `slabs` and `walls`, and `mineable/pickaxe`. A double slab drops two, and walls join each other and vanilla's.
+- **Corrupted twins**: `GeneratedCorruption` gives each a twin that keeps its properties, as it does for every block.
+- **Items** are registered and put in the creative tab after the bricks.
+
+### 56.2 Data
+- `gamemodels/arcane_bricks/write_brick_family.py` writes 24 files from vanilla's own brick stairs, slab and wall in `source/`:
+  - 3 blockstates, 9 block models and 3 item models;
+  - 3 loot tables, 3 crafting recipes and 3 stonecutting recipes.
+- It renames only the names. `minecraft:block/bricks` becomes the bricks' texture in a block model, but the bricks' block model in the slab's double state.
+- It refuses to write if any vanilla brick name survives. The names in both languages and the tags are added to, never rewritten. The texture is the bricks' own.
+- README (Chinese): a subsection, “腐术砖块的楼梯、台阶与墙”.
+
+### 56.3 Tests
+- **`ArcaneBrickFamilyServerTest`** (5, new):
+  - each block matches the bricks' hardness, blast resistance, sound and tool, and is in its vanilla tags;
+  - the crafting and stonecutting recipes give vanilla's counts from the arcane bricks, and stonecutting does not take vanilla's bricks;
+  - the drops: one each, a double slab two. Any pickaxe is the right tool and a bare hand is not, as with vanilla's brick stairs.
+    - The first run asserted that a bare hand gets no drops. A loot table never checks the tool (the harvest does), so the test now checks the tool instead.
+  - a placed wall joins its own kind and vanilla's, and nothing where there is nothing;
+  - each has a corrupted twin with its properties, and an east-facing stair's twin faces east;
+  - every model and texture reference resolves, and the blocks are named in both languages.
+
+### 56.4 Run
+- The new test: 5 of 5 pass.
+- **The full suite**: 763 tests in 115 classes, all pass (none failed, none skipped). That is 758 before, plus 5 new.
+- **Not checked in game**: how the blocks look and connect in a world.
+
+## 57. Altar structures, and the Echo Sanctum
+
+**Why.** The user's request: "design a multiblock structure using Corrupted Arcane Bricks/Stairs/Slabs, Blocks of Corruption Echo Alloy, vanilla quartz blocks, Altar Pillars, and the Altar Offering. This structure will be used to summon a new Boss in the future."
+- The boss does not exist yet, so the structure is built so that a rite can ask for it.
+- No rite asks for it yet. Building it does nothing in game for now.
+
+### 57.1 The Echo Sanctum (回响圣所)
+`data/corruption/corruption/altar_structure/echo_sanctum.json`. It is 11 × 11 and runs from one block under the offering to three above it. The layout is given with the altar facing north.
+- **Platform** (y -1): quartz blocks.
+  - Under the offering and each of the six pillars is an arcane brick block.
+  - The hexagram joining the pillars is laid in bottom slabs, a groove half a block deep.
+  - Single stairs in the middle of the east, west and south edges climb inwards.
+- **Obelisks** at the four corners: an arcane brick base (y -1), three quartz blocks (y 0 to 2) and a slab cap (y 3).
+- **Echo stele** at the head, behind pillar 1. An arcane brick base (y 0) has a stair on each side climbing towards it. On it sit the Block of Corruption Echo Alloy (y 1) and a slab cap (y 2).
+  - The alloy sits higher than the pillar, so it shows from anywhere at the altar.
+  - The first draft hid it under the offering, where nothing of it showed. The preview caught this.
+- **Not part of the structure**: the altar's own 9 × 9 ground at y 0. It is still the rite's, so it is clear unless the rite asks for blocks.
+- **What it takes**:
+
+  | Block | Count |
+  | --- | --- |
+  | Quartz block | 91 |
+  | Arcane brick block | 12 |
+  | Arcane brick slab (bottom) | 33 |
+  | Arcane brick stairs (bottom) | 5 |
+  | Block of Corruption Echo Alloy | 1 |
+
+  - **Arcane bricks**: 34 in all with the stonecutter.
+  - **Cursed bricks**: 136, which cost 2,720 KCE. That is about 27,200 corruption dust.
+  - **Time**: one transmuter fed only dust earns 0.01 KCE a tick against the 0.1 a tick it spends, so it takes about 3.8 hours. The transmutations alone take about 23 minutes.
+  - **Kept small on purpose.** Earlier drafts cost far more. A 13 × 13 one with a brick floor came to about 196 arcane bricks' worth, about 15.7 MCE. One with a slab rim and three-wide stairs came to about 56, about 4.5 MCE. The bricks are now accents on a quartz body.
+
+### 57.2 Structures as data
+- **The registry.** A new datapack registry, `corruption:altar_structure` (`common/altar/AltarStructure`), is registered in `ModRegistries` and sent to clients.
+  - A **key** maps one-character symbols to a block or `#tag`, with an optional `state`.
+  - **Layers** are given by `y`, with rows north to south, each row west to east.
+- **The map rules** are in `core/altar/AltarStructureMap`, which is pure Java.
+  - Each layer has odd dimensions and is centred on the offering.
+  - `.` and space mean anything. `@` and `P` may mark the offering and the pillars, at their real places only.
+  - Every symbol must be keyed, and every key used.
+  - No layer may repeat a height or reach past 16.
+  - Nothing may be asked on the altar's ground at y 0.
+  - The structure must ask for at least one block.
+- **Load-time checks.** A single block's state names are checked when the data loads. A tag's blocks are only known later, so a bad state there simply never matches.
+- **Turning.** A structure turns with the altar's facing, and so do the states it asks for.
+  - `AltarStructure.around` turns each world block back into the north frame with the level-aware `BlockState.rotate`.
+  - A stair facing west in an east-facing altar reads as facing south.
+- **Corruption.** A corrupted twin (`StaticCorruptedBlock`) counts as the block it was, so corruption spreading over a sanctum leaves it standing. The echo alloy, the offering and the pillars are immune anyway.
+- **Rites.** `AltarRecipe` gains `Optional<Holder<AltarStructure>> structure`.
+  - JSON: `"structure": "corruption:echo_sanctum"`, in shaped and shapeless rites.
+  - It is read through `RegistryFixedCodec`, so a rite naming a missing structure fails to load. It is sent to clients by registry id.
+  - The old constructors are kept.
+  - `matches` checks the structure last, after the cheaper conditions.
+- **The offering.** `AltarInput` gains `AltarSpace space`, and the old constructors give `AltarSpace.EMPTY`. The offering hands rites `space(level)`.
+- **JEI.**
+  - A rite that asks for a structure gets a purple line, "Within the Echo Sanctum". Hovering it shows the block count and the two commands.
+  - The category is now 136 tall, up from 128, to fit a fourth line.
+
+### 57.3 Commands
+Both commands are under `/corruption`, permission level 2, in `common/command/AltarStructureCommands`.
+- **`/corruption altar build <structure> <pos> [north|east|south|west]`** raises the structure, clears the 9 × 9 ground and sets the offering and six pillars.
+  - With no facing given, it uses the way the runner looks, as a hand-placed offering does.
+  - Places marked `.` are left alone.
+- **`/corruption altar check <structure> <pos>`** says whether the structure stands round the offering at that place. If not, it names the first 8 wrong places with what each wants, and how many more there are.
+- **Bug found by the tests.** The first version passed the unknown id to the error message as a `ResourceLocation`. Translatable text refuses that, so an unknown structure crashed the command instead of reporting it. The id is now passed as a string.
+
+### 57.4 Preview and docs
+- **The renderer.** `gamemodels/altar_structures/render_altar_structure.py <structure.json>` draws a structure from the real blockstates, models and textures, the mod's and vanilla's under `source/`.
+  - It draws element by element with a depth buffer.
+  - It writes `preview_<name>.png`, an isometric view from the south-east, and `plan_<name>.png`, each layer from above with stair directions and slab marks.
+  - It prints the block counts.
+- **Lang**: 12 new keys in each of en_us and zh_cn. The build message reuses `corruption.altar.towards.*`.
+- **README** (Chinese): a subsection, “祭坛结构：回响圣所”.
+  - It has both pictures, the layer maps generated from the JSON, the materials and cost, the rules, the commands and the data format.
+  - The two commands are also added to the command list.
+
+### 57.5 Tests
+- **`AltarStructureMapTest`** (4, new, pure Java):
+  - rows are read north to south and west to east;
+  - odd dimensions and centring;
+  - every symbol is keyed and every key used;
+  - the altar's ground is off limits at y 0 but free above and below;
+  - the `@` and `P` markers must be at their real places.
+- **`AltarStructureServerTest`** (6, new):
+  - **The data.** The sanctum is in the data with the counts above, all slabs and stairs bottom, and nothing on the ground.
+  - **Facings.** Built facing each of the four ways, it stands and the east stair climbs inwards in the world. With the offering turned a quarter, it no longer stands.
+  - **Wrong blocks.** A missing slab, a top slab, a stair turned round and iron in place of the alloy are each named, alone. With every block that can be corrupted swapped for its twin (over 100), it still stands.
+  - **A real rite.** A rite asking for the sanctum is read from JSON. A missing structure id fails to load, and the structure survives the network codec.
+    - The rite was added to the server's recipes for the test, and restored afterwards.
+    - Inside a built sanctum, the offering performed it: a diamond, and the stick taken.
+    - With one obelisk cap missing, nothing happened and the stick stayed.
+  - **Bad data refused**: a slab "sideways", a slab with a facing, a block on the ground, a two-character symbol, an unkeyed symbol.
+  - **The commands.** `build ... west` faces the offering west. `check` passes, then names the place of a removed alloy block. An unknown structure, or no offering at the place, is a command error.
+
+### 57.6 Run
+- The new tests: 10 of 10 pass. The altar's earlier tests (`AltarTest`, `AltarServerTest`, `AltarRulesTest`) still pass with the new recipe field.
+- **The full suite**: 773 tests in 117 classes, all pass (none failed, none skipped). That is 763 before, plus 10 new. That run came just before the last rule (a structure must ask for at least one block). With it, the five altar test classes were run again: 45 of 45 pass.
+- **Not checked in game**:
+  - how the sanctum looks built in a world;
+  - the JEI line (no rite shows it yet);
+  - the commands typed in a client;
+  - the registry's sync to a real client.

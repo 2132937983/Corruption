@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/wall_inventory",
+  "textures": {
+    "wall": "corruption:block/block_corruption_arcane_brick"
+  }
+}

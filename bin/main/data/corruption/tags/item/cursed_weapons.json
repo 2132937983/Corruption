@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "corruption:corrupted_arcane_sword"
+    "corruption:corrupted_arcane_sword",
+    "corruption:corruption_echo_alloy_sword"
   ]
 }

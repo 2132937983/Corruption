@@ -9,6 +9,7 @@ import com.miophas.corruption.common.registry.ModEntities;
 import com.miophas.corruption.common.registry.ModParticles;
 import com.miophas.corruption.common.registry.ModRecipes;
 import com.miophas.corruption.core.altar.AltarFacing;
+import com.miophas.corruption.core.altar.AltarForm;
 import com.miophas.corruption.core.altar.AltarLayout;
 import com.miophas.corruption.core.altar.AltarRules;
 import com.miophas.corruption.core.altar.AltarState;
@@ -41,8 +42,9 @@ import net.minecraft.world.phys.Vec3;
 /**
  * An Altar Offering's work: watching over its altar, binding creatures on it, and performing rites.
  *
- * Every {@link AltarRules#CHECK_TICKS} ticks it looks over its altar, the six Altar Pillars of
- * {@link AltarLayout} turned the way it faces, and changes its state as {@link AltarRules} says. While binding,
+ * Every {@link AltarRules#CHECK_TICKS} ticks it looks over its altar, the Altar Pillars of a hexagram or an
+ * octagram ({@link AltarForm}) turned the way it faces, and changes its state as {@link AltarRules} says, keeping
+ * the shape it finds in its block state. While binding,
  * the first creature to step onto it is held at its middle, the only one it holds: any other is pushed off. That
  * one is what rites asking for a creature take. While its altar
  * stands, it looks for a rite in what lies on the pillars, what is bound on it, the ground round it and the
@@ -65,6 +67,8 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
 
     public AltarState state() { return getBlockState().getValue(AltarOfferingBlock.ALTAR).state(); }
     public AltarFacing facing() { return AltarOfferingBlock.facing(getBlockState()); }
+    /** The shape of its altar, as it last found it standing. */
+    public AltarForm form() { return AltarOfferingBlock.form(getBlockState()); }
     public Mob bound() { return bound; }
     public int elapsed() { return elapsed; }
 
@@ -77,16 +81,19 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
         return worldPosition.offset(at[0], 0, -at[1]);
     }
 
-    /** Where a pillar of its altar stands. */
-    private BlockPos pillarPos(int slot) { return place(AltarLayout.east(slot), AltarLayout.north(slot)); }
+    /** Where a pillar of its altar stands, in the shape it last found. */
+    private BlockPos pillarPos(int slot) { return place(form().east(slot), form().north(slot)); }
 
-    /** Whether all six pillars stand where they should, the way it faces. */
-    public boolean formed(Level level) { return AltarLayout.formed((east, north) -> level.getBlockState(place(east, north)).is(ModBlocks.ALTAR_PILLAR.get())); }
+    /** The shape of the altar whose pillars all stand round it, the way it faces: an octagram before a hexagram; or null. */
+    public AltarForm standing(Level level) { return AltarForm.standing((east, north) -> level.getBlockState(place(east, north)).is(ModBlocks.ALTAR_PILLAR.get())); }
+
+    /** Whether all the pillars of either shape stand where they should, the way it faces. */
+    public boolean formed(Level level) { return standing(level) != null; }
 
     /** The pillars, slot 1 first; null where one is missing. */
     private List<AltarPillarBlockEntity> pillars(Level level) {
         List<AltarPillarBlockEntity> pillars = new ArrayList<>();
-        for (int slot = 0; slot < AltarLayout.SLOTS; slot++)
+        for (int slot = 0; slot < form().slots(); slot++)
             pillars.add(level.getBlockEntity(pillarPos(slot)) instanceof AltarPillarBlockEntity pillar ? pillar : null);
         return pillars;
     }
@@ -101,7 +108,8 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
     private void tick(Level level) {
         if (++sinceCheck >= AltarRules.CHECK_TICKS) {
             sinceCheck = 0;
-            become(AltarRules.checked(state(), formed(level)));
+            AltarForm standing = standing(level);
+            become(AltarRules.checked(state(), standing != null), standing);
         }
         AltarState state = state();
         if (state.binds()) hold(level); else release();
@@ -111,13 +119,19 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
     /** Used by hand: it looks over its altar at once and, if it stands, starts binding, or stops. Answers what it becomes. */
     public AltarState use(Level level) {
         sinceCheck = 0;
-        become(AltarRules.used(state(), formed(level)));
+        AltarForm standing = standing(level);
+        become(AltarRules.used(state(), standing != null), standing);
         return state();
     }
 
-    private void become(AltarState next) {
-        if (level == null || next == state()) return;
-        level.setBlock(worldPosition, getBlockState().setValue(AltarOfferingBlock.ALTAR, AltarMode.of(next)), 3);
+    /** Takes a state, and the shape found standing, if any; a rite under way in another shape comes to nothing. */
+    private void become(AltarState next, AltarForm standing) {
+        if (level == null) return;
+        BlockState now = getBlockState(), then = now.setValue(AltarOfferingBlock.ALTAR, AltarMode.of(next));
+        if (standing != null) then = then.setValue(AltarOfferingBlock.STAR, AltarStar.of(standing));
+        if (then == now) return;
+        if (standing != null && standing != form()) stop();
+        level.setBlock(worldPosition, then, 3);
         if (!next.binds()) release();
         setChanged();
     }
@@ -183,8 +197,11 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
             items.add(pillar.item());
         }
         AltarGround ground = (east, north) -> level.getBlockState(place(east, north));
-        return new AltarInput(items, state.binds() && bound != null ? bound.getType() : null, ground, corruptionAt(level));
+        return new AltarInput(items, state.binds() && bound != null ? bound.getType() : null, ground, corruptionAt(level), space(level));
     }
+
+    /** What stands round it, as a structure built round its altar sees it, turned the way it faces. */
+    public AltarSpace space(Level level) { return AltarStructure.around(level, worldPosition, facing()); }
 
     /** The altar's whole square, from its ground four blocks up. */
     private AABB square() {
@@ -226,7 +243,7 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
     private void gather(Level level) {
         if (!(level instanceof ServerLevel server)) return;
         Vec3 top = top().add(0, .4, 0);
-        for (int slot = 0; slot < AltarLayout.SLOTS; slot++) {
+        for (int slot = 0; slot < form().slots(); slot++) {
             BlockPos at = pillarPos(slot);
             if (!(level.getBlockEntity(at) instanceof AltarPillarBlockEntity pillar) || pillar.isEmpty()) continue;
             Vec3 from = Vec3.atCenterOf(at).add(0, .9, 0), towards = top.subtract(from).scale(.06);
@@ -267,7 +284,7 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
         recipe.result().creature().ifPresent(type -> summon(level, type, top));
         level.playSound(null, worldPosition, SoundEvents.EVOKER_CAST_SPELL, SoundSource.BLOCKS, 1, .8F);
         stop();
-        become(AltarRules.afterRite(state()));
+        become(AltarRules.afterRite(state()), null);
     }
 
     private static void summon(Level level, EntityType<?> type, Vec3 at) {

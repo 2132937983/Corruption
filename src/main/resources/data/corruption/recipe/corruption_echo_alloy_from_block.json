@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:storage_blocks/corruption_echo_alloy"
+    }
+  ],
+  "result": {
+    "id": "corruption:corruption_echo_alloy",
+    "count": 9
+  }
+}

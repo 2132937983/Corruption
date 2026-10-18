@@ -1,0 +1,58 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "corruption:clavicula_salomonis"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "corruption:clavicula_salomonis_corruption"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "corruption:clavicula_salomonis_i"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "corruption:clavicula_salomonis_ii"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "corruption:clavicula_salomonis_iii"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "corruption:clavicula_salomonis_iv"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "corruption:clavicula_salomonis_v"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "corruption:clavicula_salomonis_vi"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "corruption:clavicula_salomonis_vii"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "corruption:clavicula_salomonis_viii"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "corruption:clavicula_salomonis_ascension"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "corruption:lemegeton"
+        }
+      ]
+    }
+  ]
+}

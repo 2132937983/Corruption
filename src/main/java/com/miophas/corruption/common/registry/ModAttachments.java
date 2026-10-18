@@ -32,5 +32,12 @@ public final class ModAttachments {
     public static final DeferredHolder<AttachmentType<?>,AttachmentType<com.miophas.corruption.common.infection.DormantGround.Marks>> DORMANT_GROUND=
         TYPES.register("dormant_ground",()->AttachmentType.builder(com.miophas.corruption.common.infection.DormantGround.Marks::new)
             .serialize(com.miophas.corruption.common.infection.DormantGround.Marks.CODEC,marks->!marks.isEmpty()).build());
+    /**
+     * The prizes taken from a level's structures, each from each structure once (the loot condition
+     * corruption:once_per_structure). Saved with the level; nothing is written while none has been taken.
+     */
+    public static final DeferredHolder<AttachmentType<?>,AttachmentType<com.miophas.corruption.core.loot.StructurePrizes>> STRUCTURE_PRIZES=
+        TYPES.register("structure_prizes",()->AttachmentType.builder(()->new com.miophas.corruption.core.loot.StructurePrizes())
+            .serialize(com.miophas.corruption.common.loot.OncePerStructure.PRIZES_CODEC,prizes->!prizes.isEmpty()).build());
     private ModAttachments(){}
 }

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.miophas.corruption.common.client.AltarRenderers;
 import com.miophas.corruption.common.registry.ModItems;
+import com.miophas.corruption.core.altar.AltarForm;
 import com.miophas.corruption.core.altar.AltarLayout;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
@@ -15,6 +16,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -227,7 +229,8 @@ class AltarTest {
                     "corruption.jei.altar_numbering", "corruption.jei.altar_ground_clear", "corruption.jei.altar_ground_rest", "corruption.jei.altar_ground_range",
                     "corruption.jei.altar_ground_count", "corruption.jei.altar_clear", "corruption.jei.altar_corruption", "corruption.jei.altar_corruption_tip",
                     "corruption.altar.unformed", "corruption.altar.towards.north", "corruption.altar.towards.east", "corruption.altar.towards.south",
-                    "corruption.altar.towards.west", "corruption.altar.binding", "corruption.altar.released"})
+                    "corruption.altar.towards.west", "corruption.altar.binding", "corruption.altar.released", "corruption.jei.altar_shaped_octagram",
+                    "corruption.jei.altar_shapeless_octagram", "corruption.jei.altar_octagram_tip"})
                 assertTrue(lang.has(key), language + " is missing " + key);
         }
     }
@@ -244,4 +247,58 @@ class AltarTest {
         }
         assertEquals(0, circle.getRGB(2, 2) >>> 24, "nothing outside the circle");
     }
+
+    @Test void theOctagramCirclesEightPointsLieUnderItsEightPillars() throws Exception {
+        assertEquals("textures/misc/altar_circle_octagram.png", AltarRenderers.circle(AltarForm.OCTAGRAM).getPath());
+        assertEquals(AltarRenderers.CIRCLE, AltarRenderers.circle(AltarForm.HEXAGRAM));
+        BufferedImage circle;
+        try (InputStream in = resource("/assets/corruption/textures/misc/altar_circle_octagram.png")) { circle = ImageIO.read(in); }
+        for (int slot = 0; slot < AltarForm.OCTAGRAM.slots(); slot++) {
+            float[] point = AltarRenderers.circlePoint(AltarForm.OCTAGRAM, slot);
+            int x = Math.round(point[0] * circle.getWidth()), y = Math.round(point[1] * circle.getHeight());
+            int brightest = 0;
+            for (int dy = -2; dy <= 2; dy++) for (int dx = -2; dx <= 2; dx++) brightest = Math.max(brightest, circle.getRGB(x + dx, y + dy) >>> 24);
+            assertTrue(brightest > 150, "the octagram reaches pillar " + (slot + 1));
+        }
+        assertEquals(0, circle.getRGB(2, 2) >>> 24, "nothing outside the circle");
+        // Its star's lines cross the way to each pillar halfway out; the hexagram's do not between its own.
+        float[] halfway = {.5F + 1.5F / AltarRenderers.CIRCLE_BLOCKS, .5F - 1.5F / AltarRenderers.CIRCLE_BLOCKS};
+        assertTrue(circle.getRGB(Math.round(halfway[0] * circle.getWidth()), Math.round(halfway[1] * circle.getHeight())) >>> 24 > 0, "something drawn on the way to 3, 3");
+    }
+
+    @Test void anOctagramRiteIsPerformedOnlyAtAnAltarOfEightPillars() {
+        AltarRecipe octagram = read(AltarRecipe.SHAPED_CODEC, "{\"form\": \"octagram\", \"pillars\": {\"1\": {\"item\": \"minecraft:stick\"}, \"8\": {\"item\": \"minecraft:stone\"}},"
+                + " \"keep\": \"8\", \"result\": {\"id\": \"minecraft:torch\"}}");
+        assertEquals(AltarForm.OCTAGRAM, octagram.form());
+        assertEquals(8, octagram.pillars().size());
+        List<ItemStack> eight = new ArrayList<>(Collections.nCopies(8, ItemStack.EMPTY));
+        eight.set(0, new ItemStack(Items.STICK));
+        eight.set(7, new ItemStack(Items.STONE));
+        assertTrue(octagram.matches(new AltarInput(eight, null), null), "a stick on 1 and stone on 8");
+        List<ItemStack> six = new ArrayList<>(Collections.nCopies(6, ItemStack.EMPTY));
+        six.set(0, new ItemStack(Items.STICK));
+        assertFalse(octagram.matches(new AltarInput(six, null), null), "not at a hexagram");
+
+        AltarRecipe hexagram = read(AltarRecipe.SHAPED_CODEC, "{\"pillars\": {\"1\": {\"item\": \"minecraft:stick\"}}, \"result\": {\"id\": \"minecraft:torch\"}}");
+        assertEquals(AltarForm.HEXAGRAM, hexagram.form(), "left unsaid, a hexagram's");
+        assertTrue(hexagram.matches(new AltarInput(six, null), null));
+        List<ItemStack> stickOfEight = new ArrayList<>(Collections.nCopies(8, ItemStack.EMPTY));
+        stickOfEight.set(0, new ItemStack(Items.STICK));
+        assertFalse(hexagram.matches(new AltarInput(stickOfEight, null), null), "not at an octagram, though the same lies on its pillar 1");
+
+        String seven = "[" + String.join(", ", Collections.nCopies(7, "{\"item\": \"minecraft:stick\"}")) + "]";
+        String nine = "[" + String.join(", ", Collections.nCopies(9, "{\"item\": \"minecraft:stick\"}")) + "]";
+        assertEquals(7, read(AltarRecipe.SHAPELESS_CODEC, "{\"form\": \"octagram\", \"pillars\": " + seven + ", \"result\": {\"id\": \"minecraft:torch\"}}").pillars().size());
+        assertTrue(unparsed(AltarRecipe.SHAPELESS_CODEC, "{\"pillars\": " + seven + ", \"result\": {\"id\": \"minecraft:torch\"}}"), "seven on a hexagram's six");
+        assertTrue(unparsed(AltarRecipe.SHAPELESS_CODEC, "{\"form\": \"octagram\", \"pillars\": " + nine + ", \"result\": {\"id\": \"minecraft:torch\"}}"), "nine on eight");
+        assertTrue(unparsed(AltarRecipe.SHAPED_CODEC, "{\"pillars\": {\"8\": {\"item\": \"minecraft:stick\"}}, \"result\": {\"id\": \"minecraft:torch\"}}"), "a hexagram has no pillar 8");
+        assertTrue(unparsed(AltarRecipe.SHAPED_CODEC, "{\"form\": \"pentagram\", \"pillars\": {\"1\": {\"item\": \"minecraft:stick\"}}, \"result\": {\"id\": \"minecraft:torch\"}}"));
+        String block = "{\"form\": \"%s\", \"pillars\": {\"1\": {\"item\": \"minecraft:stick\"}}, \"blocks\": [{\"at\": [%s], \"block\": \"minecraft:stone\"}], \"result\": {\"id\": \"minecraft:torch\"}}";
+        assertTrue(unparsed(AltarRecipe.SHAPED_CODEC, block.formatted("octagram", "3, 3")), "an octagram's pillar stands at 3, 3");
+        assertFalse(unparsed(AltarRecipe.SHAPED_CODEC, block.formatted("octagram", "4, 2")), "where a hexagram's would, it is ground");
+        assertFalse(unparsed(AltarRecipe.SHAPED_CODEC, block.formatted("hexagram", "3, 3")));
+        assertTrue(unparsed(AltarRecipe.SHAPED_CODEC, block.formatted("hexagram", "4, 2")));
+    }
+
+    private static boolean unparsed(MapCodec<AltarRecipe> codec, String json) { return codec.codec().parse(JsonOps.INSTANCE, JsonParser.parseString(json)).isError(); }
 }

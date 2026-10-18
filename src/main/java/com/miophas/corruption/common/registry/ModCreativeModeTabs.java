@@ -48,6 +48,9 @@ public final class ModCreativeModeTabs {
                         output.accept(ModItems.DEACTIVATED_CORRUPTION.get());
                         output.accept(ModItems.MALICE.get());
                         output.accept(ModItems.CORRUPTION_ARCANE_BRICK.get());
+                        output.accept(ModItems.CORRUPTION_ARCANE_BRICK_STAIRS.get());
+                        output.accept(ModItems.CORRUPTION_ARCANE_BRICK_SLAB.get());
+                        output.accept(ModItems.CORRUPTION_ARCANE_BRICK_WALL.get());
                         output.accept(ModItems.CURSED_BRICK.get());
                         output.accept(ModItems.CORRUPTION_ARCANE_TRANSMUTER.get());
                         // A candle as the transmuter makes it, carrying all it can.
@@ -66,6 +69,18 @@ public final class ModCreativeModeTabs {
                         output.accept(ModItems.PARCHMENT.get());
                         output.accept(ModItems.INK.get());
                         for (var material : ModItems.MATERIALS) output.accept(material.get());
+                        // The batteries as the transmuter makes them, carrying all they can; the devices, full.
+                        for (var battery : java.util.List.of(ModItems.CHARGED_BILE_SAC, ModItems.ECHO_CELL)) {
+                            net.minecraft.world.item.ItemStack full = new net.minecraft.world.item.ItemStack(battery.get());
+                            CorruptionEnergyCarrier holds = CorruptionEnergyCarrier.of(full);
+                            output.accept(holds == null ? full : CorruptionEnergyCarrier.charged(full, holds.capacity()));
+                        }
+                        for (var device : java.util.List.of(ModItems.CORRUPTED_LANTERN.get(), ModItems.ICHOR_INJECTOR.get()))
+                            output.accept(com.miophas.corruption.api.energy.CorruptionEnergyTool.charged(new net.minecraft.world.item.ItemStack(device),
+                                    device.tool().capacity()));
+                        output.accept(ModItems.CORRUPTION_ECHO_ALLOY.get());
+                        output.accept(ModItems.CORRUPTION_ECHO_ALLOY_BLOCK.get());
+                        for (var piece : ModItems.ECHO_ALLOY_GEAR) output.accept(piece.get());
                         for (var relic : ModItems.RELICS) output.accept(relic.get());
                         for (var egg : ModItems.ELITE_EGGS) output.accept(egg.get());
                         output.accept(ModItems.CORRUPTED_BREAD.get());

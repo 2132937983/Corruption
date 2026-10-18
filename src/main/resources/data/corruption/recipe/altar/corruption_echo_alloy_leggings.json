@@ -1,0 +1,19 @@
+{
+  "type": "corruption:altar_shaped",
+  "pillars": {
+    "1": {
+      "item": "minecraft:diamond_leggings"
+    },
+    "3": {
+      "item": "corruption:corruption_echo_alloy"
+    },
+    "5": {
+      "item": "corruption:chitin_plate"
+    }
+  },
+  "time": 100,
+  "result": {
+    "id": "corruption:corruption_echo_alloy_leggings"
+  },
+  "keep": "1"
+}

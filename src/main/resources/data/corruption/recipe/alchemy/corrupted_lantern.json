@@ -1,0 +1,24 @@
+{
+  "type": "corruption:alchemy_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:soul_lantern",
+      "count": 1
+    },
+    {
+      "item": "corruption:neural_cluster",
+      "count": 2
+    },
+    {
+      "item": "corruption:mutated_sinew",
+      "count": 1
+    },
+    {
+      "item": "corruption:cursed_iron_ingot",
+      "count": 2
+    }
+  ],
+  "result": {
+    "id": "corruption:corrupted_lantern"
+  }
+}

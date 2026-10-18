@@ -116,10 +116,67 @@ public final class ModItems {
             () -> new CorruptionMaterialItem(new Item.Properties().rarity(Rarity.RARE)));
     public static final DeferredItem<CorruptionMaterialItem> CORRUPTION_ENERGY_BRICK = ITEMS.register("corruption_energy_brick",
             () -> new CorruptionMaterialItem(new Item.Properties().rarity(Rarity.EPIC)));
+    /**
+     * The materials added with the corruption echo alloy (gamemodels/echo_alloy/write_echo.py): what the corruption's
+     * elites and remnants leave when a player kills them (after Fungal Infection: Spore's tendons, cerebrum, sacs and armour
+     * fragments, and Scape and Run: Parasites' lure parts), the void-tainted shard the alloy's gear is made with, and the
+     * resonant crystal the alloy is made from.
+     */
+    public static final DeferredItem<CorruptionMaterialItem> MUTATED_SINEW = material("mutated_sinew");
+    public static final DeferredItem<CorruptionMaterialItem> BILE_SAC = material("bile_sac");
+    public static final DeferredItem<CorruptionMaterialItem> NEURAL_CLUSTER = material("neural_cluster");
+    public static final DeferredItem<CorruptionMaterialItem> CHITIN_PLATE = material("chitin_plate");
+    public static final DeferredItem<CorruptionMaterialItem> REMNANT_MARROW = material("remnant_marrow");
+    public static final DeferredItem<CorruptionMaterialItem> VOID_TAINTED_SHARD = material("void_tainted_shard");
+    public static final DeferredItem<CorruptionMaterialItem> RESONANT_CORRUPTION_CRYSTAL = ITEMS.register("resonant_corruption_crystal",
+            () -> new CorruptionMaterialItem(new Item.Properties().rarity(Rarity.UNCOMMON)));
     /** The materials, rawest first. */
     public static final List<DeferredItem<CorruptionMaterialItem>> MATERIALS = List.of(VOID_ASH, CURSED_IRON_INGOT, BLIGHTED_BONE, TAINTED_FLESH,
             CORRUPTED_ICHOR, MALICE_FIBER, SOUL_RESIN, SHADOW_SILK, BLOODSTONE, RUNE_SLATE, ELDRITCH_MEMBRANE, ABYSSAL_PEARL, CORRUPTED_HEARTSTONE, CHAOS_CATALYST,
-            MALICE_TENDRIL, GREED_HEARTWOOD, RESENTMENT, MEMORY_FRAGMENT, CORRUPTED_MEMORY_GEM, CORRUPTION_ENERGY_BRICK);
+            MALICE_TENDRIL, GREED_HEARTWOOD, RESENTMENT, MEMORY_FRAGMENT, CORRUPTED_MEMORY_GEM, CORRUPTION_ENERGY_BRICK,
+            MUTATED_SINEW, BILE_SAC, NEURAL_CLUSTER, CHITIN_PLATE, REMNANT_MARROW, VOID_TAINTED_SHARD, RESONANT_CORRUPTION_CRYSTAL);
+    /**
+     * What carries Corruption Energy, added with the alloy: the charged bile sac, spent once (as a candle is), and the
+     * echo cell, kept when empty and filled again at the transmuter (data_maps/item/corruption_energy_carrier.json).
+     */
+    public static final DeferredItem<BasicCorruptionEnergyItem> CHARGED_BILE_SAC = ITEMS.register("charged_bile_sac",
+            () -> new BasicCorruptionEnergyItem(new Item.Properties(), com.miophas.corruption.api.energy.CorruptionEnergyApi.kilo(1)));
+    public static final DeferredItem<BasicCorruptionEnergyItem> ECHO_CELL = ITEMS.register("echo_cell",
+            () -> new BasicCorruptionEnergyItem(new Item.Properties().stacksTo(16).fireResistant(), com.miophas.corruption.api.energy.CorruptionEnergyApi.kilo(5)));
+    /** The devices that run on a charge (EnergyDeviceRules), filled on the arcane charger: the lantern and the injector. */
+    public static final DeferredItem<com.miophas.corruption.common.item.CorruptedLanternItem> CORRUPTED_LANTERN = ITEMS.register("corrupted_lantern",
+            () -> new com.miophas.corruption.common.item.CorruptedLanternItem(new Item.Properties()));
+    public static final DeferredItem<com.miophas.corruption.common.item.IchorInjectorItem> ICHOR_INJECTOR = ITEMS.register("ichor_injector",
+            () -> new com.miophas.corruption.common.item.IchorInjectorItem(new Item.Properties()));
+    /**
+     * The corruption echo alloy (EchoAlloyRules): a resonant corruption crystal with netherite's scrap and gold, made at the
+     * bench; its block; and its gear, each made at the altar from its diamond counterpart, keeping that piece's
+     * enchantments. None of it burns.
+     */
+    public static final DeferredItem<Item> CORRUPTION_ECHO_ALLOY = ITEMS.register("corruption_echo_alloy",
+            () -> new Item(new Item.Properties().fireResistant()));
+    public static final DeferredItem<BlockItem> CORRUPTION_ECHO_ALLOY_BLOCK = ITEMS.register("corruption_echo_alloy_block",
+            () -> new BlockItem(ModBlocks.CORRUPTION_ECHO_ALLOY_BLOCK.get(), new Item.Properties().fireResistant()));
+    public static final DeferredItem<net.minecraft.world.item.SwordItem> CORRUPTION_ECHO_ALLOY_SWORD = ITEMS.register("corruption_echo_alloy_sword",
+            com.miophas.corruption.common.item.EchoAlloyGear::sword);
+    public static final DeferredItem<net.minecraft.world.item.PickaxeItem> CORRUPTION_ECHO_ALLOY_PICKAXE = ITEMS.register("corruption_echo_alloy_pickaxe",
+            com.miophas.corruption.common.item.EchoAlloyGear::pickaxe);
+    public static final DeferredItem<net.minecraft.world.item.AxeItem> CORRUPTION_ECHO_ALLOY_AXE = ITEMS.register("corruption_echo_alloy_axe",
+            com.miophas.corruption.common.item.EchoAlloyGear::axe);
+    public static final DeferredItem<com.miophas.corruption.common.item.EchoAlloyArmorItem> CORRUPTION_ECHO_ALLOY_HELMET = echoArmour("helmet",
+            net.minecraft.world.item.ArmorItem.Type.HELMET);
+    public static final DeferredItem<com.miophas.corruption.common.item.EchoAlloyArmorItem> CORRUPTION_ECHO_ALLOY_CHESTPLATE = echoArmour("chestplate",
+            net.minecraft.world.item.ArmorItem.Type.CHESTPLATE);
+    public static final DeferredItem<com.miophas.corruption.common.item.EchoAlloyArmorItem> CORRUPTION_ECHO_ALLOY_LEGGINGS = echoArmour("leggings",
+            net.minecraft.world.item.ArmorItem.Type.LEGGINGS);
+    public static final DeferredItem<com.miophas.corruption.common.item.EchoAlloyArmorItem> CORRUPTION_ECHO_ALLOY_BOOTS = echoArmour("boots",
+            net.minecraft.world.item.ArmorItem.Type.BOOTS);
+    /** The alloy's gear: its three tools, then its armour head to foot. */
+    public static final List<DeferredItem<? extends Item>> ECHO_ALLOY_GEAR = List.of(CORRUPTION_ECHO_ALLOY_SWORD, CORRUPTION_ECHO_ALLOY_PICKAXE,
+            CORRUPTION_ECHO_ALLOY_AXE, CORRUPTION_ECHO_ALLOY_HELMET, CORRUPTION_ECHO_ALLOY_CHESTPLATE, CORRUPTION_ECHO_ALLOY_LEGGINGS, CORRUPTION_ECHO_ALLOY_BOOTS);
+    /** The alloy's armour, head to foot. */
+    public static final List<DeferredItem<com.miophas.corruption.common.item.EchoAlloyArmorItem>> ECHO_ALLOY_ARMOUR = List.of(CORRUPTION_ECHO_ALLOY_HELMET,
+            CORRUPTION_ECHO_ALLOY_CHESTPLATE, CORRUPTION_ECHO_ALLOY_LEGGINGS, CORRUPTION_ECHO_ALLOY_BOOTS);
     /**
      * What each of the corruption's lords leaves when it falls (its loot table), its own: kept for what may one day be
      * called up with them all (gamemodels/boss_relics writes their data and draws them).
@@ -185,6 +242,12 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> MALICE = ITEMS.registerSimpleBlockItem("malice", ModBlocks.MALICE);
     public static final DeferredItem<BlockItem> CORRUPTION_ARCANE_BRICK =
             ITEMS.registerSimpleBlockItem("corruption_arcane_brick", ModBlocks.CORRUPTION_ARCANE_BRICK);
+    public static final DeferredItem<BlockItem> CORRUPTION_ARCANE_BRICK_STAIRS =
+            ITEMS.registerSimpleBlockItem("corruption_arcane_brick_stairs", ModBlocks.CORRUPTION_ARCANE_BRICK_STAIRS);
+    public static final DeferredItem<BlockItem> CORRUPTION_ARCANE_BRICK_SLAB =
+            ITEMS.registerSimpleBlockItem("corruption_arcane_brick_slab", ModBlocks.CORRUPTION_ARCANE_BRICK_SLAB);
+    public static final DeferredItem<BlockItem> CORRUPTION_ARCANE_BRICK_WALL =
+            ITEMS.registerSimpleBlockItem("corruption_arcane_brick_wall", ModBlocks.CORRUPTION_ARCANE_BRICK_WALL);
     /** Fired from clay bricks in the arcane transmuter, 20 KCE apiece; four build a corruption arcane brick. */
     public static final DeferredItem<Item> CURSED_BRICK = ITEMS.register("cursed_brick", () -> new Item(new Item.Properties()));
     /** Copper, transmuted in the arcane transmuter: c:ingots/corrupted_brass. */
@@ -287,6 +350,10 @@ public final class ModItems {
     private static DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> egg(String id,
             java.util.function.Supplier<? extends net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Mob>> type) {
         return ITEMS.register(id, () -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(type, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
+    }
+
+    private static DeferredItem<com.miophas.corruption.common.item.EchoAlloyArmorItem> echoArmour(String piece, net.minecraft.world.item.ArmorItem.Type type) {
+        return ITEMS.register("corruption_echo_alloy_" + piece, () -> new com.miophas.corruption.common.item.EchoAlloyArmorItem(type));
     }
 
     private static DeferredItem<CorruptionMaterialItem> material(String id) {

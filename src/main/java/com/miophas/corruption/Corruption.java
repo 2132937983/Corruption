@@ -38,6 +38,7 @@ public final class Corruption {
         ModParticles.TYPES.register(modEventBus);
         ModEntities.TYPES.register(modEventBus);
         com.miophas.corruption.common.registry.ModAttachments.TYPES.register(modEventBus);
+        com.miophas.corruption.common.registry.ModLoot.CONDITIONS.register(modEventBus);
         com.miophas.corruption.common.registry.ModEffects.EFFECTS.register(modEventBus);
         com.miophas.corruption.common.registry.ModPotions.POTIONS.register(modEventBus);
         com.miophas.corruption.common.registry.ModSounds.SOUNDS.register(modEventBus);

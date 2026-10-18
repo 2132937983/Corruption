@@ -15,6 +15,7 @@
     "corruption:corrupted_brass_block",
     "corruption:brass_cauldron",
     "corruption:altar_pillar",
-    "corruption:altar_offering"
+    "corruption:altar_offering",
+    "corruption:corruption_echo_alloy_block"
   ]
 }

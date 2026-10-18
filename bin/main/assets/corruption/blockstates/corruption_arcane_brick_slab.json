@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "corruption:block/corruption_arcane_brick_slab"
+    },
+    "type=double": {
+      "model": "corruption:block/corruption_arcane_brick"
+    },
+    "type=top": {
+      "model": "corruption:block/corruption_arcane_brick_slab_top"
+    }
+  }
+}

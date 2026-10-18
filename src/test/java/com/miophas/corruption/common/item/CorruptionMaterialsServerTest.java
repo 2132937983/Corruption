@@ -42,9 +42,14 @@ class CorruptionMaterialsServerTest {
             "brass_cooking", Set.of("corruption:brass_cooking"),
             "alchemy", Set.of("corruption:alchemy_shaped", "corruption:alchemy_shapeless"),
             "altar", Set.of("corruption:altar_shaped", "corruption:altar_shapeless"));
-    /** What only the living plants leave, by the loot table that leaves it. */
+    /** What only the living plants, the elites and the remnants leave, by a loot table that leaves it. */
     private static final Map<String, String> DROPS = Map.of("corruption:malice_tendril", "/data/corruption/loot_table/entities/malice_vine.json",
-            "corruption:greed_heartwood", "/data/corruption/loot_table/entities/greed.json");
+            "corruption:greed_heartwood", "/data/corruption/loot_table/entities/greed.json",
+            "corruption:mutated_sinew", "/data/corruption/loot_table/entities/corrupted_brute.json",
+            "corruption:bile_sac", "/data/corruption/loot_table/entities/corrupted_bloater.json",
+            "corruption:neural_cluster", "/data/corruption/loot_table/entities/corrupted_mindweaver.json",
+            "corruption:chitin_plate", "/data/corruption/loot_table/entities/corrupted_crawler.json",
+            "corruption:remnant_marrow", "/data/corruption/loot_table/entities/corrupted_remnant.json");
 
     private static JsonElement json(String path) throws Exception {
         try (InputStream in = CorruptionMaterialsServerTest.class.getResourceAsStream(path)) {
@@ -103,7 +108,7 @@ class CorruptionMaterialsServerTest {
             List<String> making = new ArrayList<>();
             for (var recipe : recipes.entrySet()) if (made(recipe.getValue()).equals(id)) making.add(recipe.getKey());
             if (DROPS.containsKey(id)) {
-                assertEquals(List.of(), making, id + " is left by a living plant, and made by nothing");
+                assertEquals(List.of(), making, id + " is left by a creature of the corruption, and made by nothing");
                 assertTrue(json(DROPS.get(id)).toString().contains("\"" + id + "\""), id + " is in " + DROPS.get(id));
                 continue;
             }

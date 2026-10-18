@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "corruption:corruption_echo_alloy_helmet",
+    "corruption:corruption_echo_alloy_chestplate",
+    "corruption:corruption_echo_alloy_leggings",
+    "corruption:corruption_echo_alloy_boots"
+  ]
+}

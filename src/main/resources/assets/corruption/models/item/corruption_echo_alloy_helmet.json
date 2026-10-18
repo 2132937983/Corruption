@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "corruption:item/corruption_echo_alloy_helmet"
+  }
+}

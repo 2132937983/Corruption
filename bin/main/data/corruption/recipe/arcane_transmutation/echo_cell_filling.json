@@ -1,0 +1,13 @@
+{
+  "type": "corruption:arcane_transmutation",
+  "ingredient": {
+    "item": "corruption:echo_cell"
+  },
+  "energy": "100KCE",
+  "result": {
+    "id": "corruption:echo_cell",
+    "components": {
+      "corruption:corruption_energy": "100KCE"
+    }
+  }
+}

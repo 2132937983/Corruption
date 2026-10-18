@@ -3,6 +3,7 @@ package com.miophas.corruption.common.registry;
 import com.miophas.corruption.Corruption;
 import com.miophas.corruption.api.arcane.ArcaneSpell;
 import com.miophas.corruption.api.arcane.ArcaneString;
+import com.miophas.corruption.common.altar.AltarStructure;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
@@ -14,6 +15,8 @@ public final class ModRegistries {
     @SubscribeEvent public static void register(DataPackRegistryEvent.NewRegistry event) {
         event.dataPackRegistry(ArcaneString.REGISTRY, ArcaneString.CODEC, ArcaneString.CODEC);
         event.dataPackRegistry(ArcaneSpell.REGISTRY, ArcaneSpell.CODEC, ArcaneSpell.CODEC);
+        // Structures built round altars: clients have them too, for the rites JEI shows.
+        event.dataPackRegistry(AltarStructure.REGISTRY, AltarStructure.CODEC, AltarStructure.CODEC);
     }
 
     private ModRegistries() {}

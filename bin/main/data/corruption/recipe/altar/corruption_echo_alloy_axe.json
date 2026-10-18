@@ -1,0 +1,19 @@
+{
+  "type": "corruption:altar_shaped",
+  "pillars": {
+    "1": {
+      "item": "minecraft:diamond_axe"
+    },
+    "3": {
+      "item": "corruption:corruption_echo_alloy"
+    },
+    "5": {
+      "item": "corruption:void_tainted_shard"
+    }
+  },
+  "time": 100,
+  "result": {
+    "id": "corruption:corruption_echo_alloy_axe"
+  },
+  "keep": "1"
+}

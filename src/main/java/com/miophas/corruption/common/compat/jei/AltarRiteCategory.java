@@ -2,10 +2,12 @@ package com.miophas.corruption.common.compat.jei;
 
 import com.miophas.corruption.Corruption;
 import com.miophas.corruption.common.altar.AltarRecipe;
+import com.miophas.corruption.common.altar.AltarStructure;
 import com.miophas.corruption.common.altar.GroundBlock;
 import com.miophas.corruption.common.client.ArcaneTransmuterScreen;
 import com.miophas.corruption.common.client.GuiTiles;
 import com.miophas.corruption.common.registry.ModBlocks;
+import com.miophas.corruption.core.altar.AltarForm;
 import com.miophas.corruption.core.altar.AltarLayout;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -48,18 +50,20 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 /**
- * Shows an altar rite laid out as the altar is: the six pillars round the offering, slot 1 at the top (the way
- * the altar faces), the rest clockwise, with the creature to be bound on the offering standing in the middle; and what the rite
- * brings forth, an item, or a creature standing there. Below, the altar's ground is mapped, the way it faces up: the
- * offering, its pillars, and the blocks the rite asks for, which are shown beside it, lighting up on the map
- * when looked at; then how the pillars are filled, that the rest of the ground is clear, and the corruption the
- * rite asks of a player there. Shaped, each ingredient sits on its own pillar; shapeless, they fill the first
- * pillars, as they may lie on any. Creatures are drawn as they are, slowly turning; JEI finds the rite by their
- * spawn eggs, unseen.
+ * Shows an altar rite laid out as the altar is: the six pillars round the offering, or the eight of an octagram
+ * altar's rite, slot 1 at the top (the way the altar faces), the rest clockwise, with the creature to be bound on
+ * the offering standing in the middle; and what the rite brings forth, an item, or a creature standing there.
+ * Below, the altar's ground is mapped, the way it faces up: the offering, its pillars, and the blocks the rite asks
+ * for, which are shown beside it, lighting up on the map when looked at; then how the pillars are filled (and, for
+ * an octagram's rite, that it is one), that the rest of the ground is clear, the corruption the rite asks of a
+ * player there, and the structure it asks to stand round the altar, if any. Shaped, each ingredient sits on its own
+ * pillar; shapeless, they fill the first pillars, as they may lie on any. Creatures are drawn as they are, slowly
+ * turning; JEI finds the rite by their spawn eggs, unseen.
  */
 public final class AltarRiteCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>> {
     public static final RecipeType<RecipeHolder<AltarRecipe>> TYPE = RecipeType.createRecipeHolderType(ResourceLocation.fromNamespaceAndPath(Corruption.MOD_ID, "altar"));
-    private static final int WIDTH = 176, HEIGHT = 128;
+    /** Tall enough for four lines of text below a row of blocks asked for. */
+    private static final int WIDTH = 176, HEIGHT = 136;
     /** The pillars round the offering, six pixels a block, and the box the creature bound on it stands in. */
     private static final int MIDDLE_X = 25, MIDDLE_Y = 25, SPREAD = 6, BOUND_X = MIDDLE_X - 4, BOUND_Y = MIDDLE_Y - 4, BOUND_SIZE = 24;
     private static final int ARROW_X = 72, ARROW_Y = 25, OUTPUT_X = 100, OUTPUT_Y = 20;
@@ -85,9 +89,9 @@ public final class AltarRiteCategory implements IRecipeCategory<RecipeHolder<Alt
         output = gui.getOutputSlot();
     }
 
-    /** Where a pillar's slot lies: its place round the offering, six pixels a block. */
-    private static int[] pillarAt(int slot) {
-        return new int[]{MIDDLE_X + AltarLayout.east(slot) * SPREAD, MIDDLE_Y - AltarLayout.north(slot) * SPREAD};
+    /** Where a pillar's slot lies: its place round the offering, in an altar of the rite's shape, six pixels a block. */
+    private static int[] pillarAt(AltarForm form, int slot) {
+        return new int[]{MIDDLE_X + form.east(slot) * SPREAD, MIDDLE_Y - form.north(slot) * SPREAD};
     }
 
     /** A creature, as an item: its spawn egg, or a name tag bearing its name if it has none. */
@@ -117,12 +121,17 @@ public final class AltarRiteCategory implements IRecipeCategory<RecipeHolder<Alt
 
     private static List<Line> lines(AltarRecipe recipe) {
         List<Line> lines = new ArrayList<>();
-        lines.add(recipe.shaped() ? new Line(Component.translatable("corruption.jei.altar_shaped"), GREY, Component.translatable("corruption.jei.altar_numbering"))
-                : new Line(Component.translatable("corruption.jei.altar_shapeless"), GREY, null));
+        boolean octagram = recipe.form() == AltarForm.OCTAGRAM;
+        String placing = recipe.shaped() ? "corruption.jei.altar_shaped" : "corruption.jei.altar_shapeless";
+        Component numbering = recipe.shaped() ? Component.translatable("corruption.jei.altar_numbering") : null;
+        lines.add(octagram ? new Line(Component.translatable(placing + "_octagram"), PURPLE, Component.translatable("corruption.jei.altar_octagram_tip"))
+                : new Line(Component.translatable(placing), GREY, numbering));
         lines.add(new Line(Component.translatable(recipe.blocks().isEmpty() ? "corruption.jei.altar_ground_clear" : "corruption.jei.altar_ground_rest"), GREY,
                 Component.translatable("corruption.jei.altar_ground_range", -AltarLayout.REACH, AltarLayout.REACH)));
         if (recipe.corruption() > 0)
             lines.add(new Line(Component.translatable("corruption.jei.altar_corruption", recipe.corruption()), PURPLE, Component.translatable("corruption.jei.altar_corruption_tip")));
+        recipe.structure().ifPresent(structure -> lines.add(new Line(Component.translatable("corruption.jei.altar_structure", AltarStructure.name(structure)), PURPLE,
+                Component.translatable("corruption.jei.altar_structure_tip", structure.value().cells().size()))));
         return lines;
     }
 
@@ -155,7 +164,7 @@ public final class AltarRiteCategory implements IRecipeCategory<RecipeHolder<Alt
         for (int index = 0; index < recipe.pillars().size(); index++) {
             if (recipe.pillars().get(index).isEmpty()) continue;
             int pillar = recipe.shaped() ? index : next++;
-            int[] at = pillarAt(pillar);
+            int[] at = pillarAt(recipe.form(), pillar);
             var slotBuilder = builder.addInputSlot(at[0], at[1]).addItemStacks(List.of(recipe.pillars().get(index).getItems()));
             if (recipe.shaped()) slotBuilder.addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("corruption.jei.altar_slot", pillar + 1).withStyle(ChatFormatting.GRAY)));
         }
@@ -175,8 +184,8 @@ public final class AltarRiteCategory implements IRecipeCategory<RecipeHolder<Alt
     @Override public void draw(RecipeHolder<AltarRecipe> holder, IRecipeSlotsView slots, GuiGraphics gui, double mouseX, double mouseY) {
         AltarRecipe recipe = holder.value();
         var font = Minecraft.getInstance().font;
-        for (int pillar = 0; pillar < AltarLayout.SLOTS; pillar++) {
-            int[] at = pillarAt(pillar);
+        for (int pillar = 0; pillar < recipe.form().slots(); pillar++) {
+            int[] at = pillarAt(recipe.form(), pillar);
             slot.draw(gui, at[0] - 1, at[1] - 1);
         }
         sunken(gui, BOUND_X, BOUND_Y, BOUND_SIZE, BOUND_SIZE);
@@ -215,7 +224,7 @@ public final class AltarRiteCategory implements IRecipeCategory<RecipeHolder<Alt
         for (int east = -AltarLayout.REACH; east <= AltarLayout.REACH; east++)
             for (int north = -AltarLayout.REACH; north <= AltarLayout.REACH; north++) {
                 GroundBlock asked = recipe.blockAt(east, north);
-                int colour = east == 0 && north == 0 ? OFFERING : AltarLayout.slotAt(east, north) >= 0 ? PILLAR : asked == null ? CLEAR : lit.contains(asked) ? LIT : ASKED;
+                int colour = east == 0 && north == 0 ? OFFERING : recipe.form().slotAt(east, north) >= 0 ? PILLAR : asked == null ? CLEAR : lit.contains(asked) ? LIT : ASKED;
                 int x = MAP_X + (east + AltarLayout.REACH) * CELL, y = MAP_Y + (AltarLayout.REACH - north) * CELL;
                 gui.fill(x, y, x + CELL - 1, y + CELL - 1, colour);
                 if (hovered != null && hovered[0] == east && hovered[1] == north) gui.fill(x, y, x + CELL - 1, y + CELL - 1, 0x80FFFFFF);
@@ -309,7 +318,7 @@ public final class AltarRiteCategory implements IRecipeCategory<RecipeHolder<Alt
     /** What stands at a place on the altar's ground, as the rite asks. */
     private static Component standing(AltarRecipe recipe, int east, int north) {
         if (east == 0 && north == 0) return ModBlocks.ALTAR_OFFERING.get().getName().withStyle(ChatFormatting.RED);
-        int pillar = AltarLayout.slotAt(east, north);
+        int pillar = recipe.form().slotAt(east, north);
         if (pillar >= 0) return Component.translatable("corruption.jei.altar_slot", pillar + 1);
         GroundBlock asked = recipe.blockAt(east, north);
         return asked != null ? asked.name().copy().withStyle(ChatFormatting.GOLD) : Component.translatable("corruption.jei.altar_clear").withStyle(ChatFormatting.GRAY);

@@ -52,13 +52,26 @@ public final class ModBlocks {
     public static final DeferredBlock<MaliceBlock> MALICE = BLOCKS.registerBlock("malice", MaliceBlock::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(1.5F, 6.0F)
                     .sound(SoundType.SCULK).requiresCorrectToolForDrops());
-    public static final DeferredBlock<Block> CORRUPTION_ARCANE_BRICK = BLOCKS.registerBlock("corruption_arcane_brick",
-            Block::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(1.5F, 6.0F)
-                    .sound(SoundType.STONE).requiresCorrectToolForDrops());
+    public static final DeferredBlock<Block> CORRUPTION_ARCANE_BRICK = BLOCKS.registerBlock("corruption_arcane_brick", Block::new, arcaneBricks());
+    /**
+     * The corruption arcane bricks' stairs, slab and wall, as vanilla's bricks have theirs: made of the same, as hard and
+     * as quiet, mined with any pickaxe (gamemodels/arcane_bricks/write_brick_family.py writes their data from vanilla's).
+     */
+    public static final DeferredBlock<net.minecraft.world.level.block.StairBlock> CORRUPTION_ARCANE_BRICK_STAIRS = BLOCKS.registerBlock(
+            "corruption_arcane_brick_stairs", properties -> new net.minecraft.world.level.block.StairBlock(CORRUPTION_ARCANE_BRICK.get().defaultBlockState(), properties),
+            arcaneBricks());
+    public static final DeferredBlock<net.minecraft.world.level.block.SlabBlock> CORRUPTION_ARCANE_BRICK_SLAB = BLOCKS.registerBlock(
+            "corruption_arcane_brick_slab", net.minecraft.world.level.block.SlabBlock::new, arcaneBricks());
+    public static final DeferredBlock<net.minecraft.world.level.block.WallBlock> CORRUPTION_ARCANE_BRICK_WALL = BLOCKS.registerBlock(
+            "corruption_arcane_brick_wall", net.minecraft.world.level.block.WallBlock::new, arcaneBricks().forceSolidOn());
     /** Nine corrupted brass, stored. */
     public static final DeferredBlock<Block> CORRUPTED_BRASS_BLOCK = BLOCKS.registerBlock("corrupted_brass_block",
             Block::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(3.0F, 6.0F)
                     .sound(SoundType.COPPER).requiresCorrectToolForDrops());
+    /** Nine ingots of the corruption echo alloy: as hard and as proof against blasts as a block of netherite, mined with diamond or better. */
+    public static final DeferredBlock<Block> CORRUPTION_ECHO_ALLOY_BLOCK = BLOCKS.registerBlock("corruption_echo_alloy_block",
+            Block::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_CYAN).strength(50.0F, 1200.0F)
+                    .sound(SoundType.NETHERITE_BLOCK).requiresCorrectToolForDrops());
     /** Cooks up to seven things together with a fluid and Corruption Energy; see BrassCauldronBlockEntity. */
     public static final DeferredBlock<com.miophas.corruption.common.block.BrassCauldronBlock> BRASS_CAULDRON = BLOCKS.registerBlock("brass_cauldron",
             com.miophas.corruption.common.block.BrassCauldronBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(2.0F)
@@ -108,6 +121,11 @@ public final class ModBlocks {
                 .mapColor(MapColor.COLOR_RED).strength(hardness, 6.0F).sound(sound)
                 .requiresCorrectToolForDrops());
     }
+    /** What the corruption arcane bricks and their stairs, slab and wall are made of: each a new set, alike. */
+    private static BlockBehaviour.Properties arcaneBricks() {
+        return BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(1.5F, 6.0F).sound(SoundType.STONE).requiresCorrectToolForDrops();
+    }
+
     private static BlockBehaviour.Properties plantProperties() {
         return BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).noCollission().noOcclusion()
                 .instabreak().sound(SoundType.ROOTS).pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY);

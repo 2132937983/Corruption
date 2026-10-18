@@ -24,8 +24,8 @@ import net.neoforged.neoforge.common.Tags;
 
 /**
  * A block a rite asks for on the altar's ground: where, in blocks east and north of the offering on its level
- * as though the altar faced north, turned with it otherwise (from -4 to 4, neither the offering nor a pillar),
- * and what, a block or any block of a tag:
+ * as though the altar faced north, turned with it otherwise (from -4 to 4, not the offering; nor one of the
+ * pillars, which the rite checks, knowing its altar's shape), and what, a block or any block of a tag:
  * <pre>{"at": [1, 1], "block": "#minecraft:candles"}</pre>
  */
 public record GroundBlock(int east, int north, Either<TagKey<Block>, Block> block) {
@@ -36,8 +36,8 @@ public record GroundBlock(int east, int north, Either<TagKey<Block>, Block> bloc
             BLOCK.fieldOf("block").forGetter(GroundBlock::block)).apply(instance, (at, block) -> new GroundBlock(at.get(0), at.get(1), block)))
             .validate(ground -> !AltarLayout.onGround(ground.east(), ground.north())
                     ? DataResult.error(() -> "The altar's ground runs from -" + AltarLayout.REACH + " to " + AltarLayout.REACH + ", not " + ground.east() + ", " + ground.north())
-                    : AltarLayout.isAltar(ground.east(), ground.north())
-                    ? DataResult.error(() -> "The altar itself stands at " + ground.east() + ", " + ground.north())
+                    : ground.east() == 0 && ground.north() == 0
+                    ? DataResult.error(() -> "The offering itself stands at 0, 0")
                     : DataResult.success(ground));
     private static final StreamCodec<ByteBuf, TagKey<Block>> TAG = ResourceLocation.STREAM_CODEC.map(id -> TagKey.create(Registries.BLOCK, id), TagKey::location);
     public static final StreamCodec<RegistryFriendlyByteBuf, GroundBlock> STREAM_CODEC = StreamCodec.composite(

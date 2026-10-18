@@ -45,10 +45,13 @@ public final class RitualMatch {
      * @param met whether the block asked for there stands there
      * @param empty whether nothing stands at a place
      */
-    public static boolean ground(Place asks, Place met, Place empty) {
+    public static boolean ground(Place asks, Place met, Place empty) { return ground(AltarForm.HEXAGRAM, asks, met, empty); }
+
+    /** As {@link #ground(Place, Place, Place)}, round an altar of this shape: its own offering and pillars aside. */
+    public static boolean ground(AltarForm form, Place asks, Place met, Place empty) {
         for (int east = -AltarLayout.REACH; east <= AltarLayout.REACH; east++)
             for (int north = -AltarLayout.REACH; north <= AltarLayout.REACH; north++) {
-                if (AltarLayout.isAltar(east, north)) continue;
+                if (form.isAltar(east, north)) continue;
                 if (asks.test(east, north) ? !met.test(east, north) : !empty.test(east, north)) return false;
             }
         return true;

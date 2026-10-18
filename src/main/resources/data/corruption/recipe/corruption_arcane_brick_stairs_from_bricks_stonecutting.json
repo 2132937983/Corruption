@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "corruption:corruption_arcane_brick"
+  },
+  "result": {
+    "count": 1,
+    "id": "corruption:corruption_arcane_brick_stairs"
+  }
+}

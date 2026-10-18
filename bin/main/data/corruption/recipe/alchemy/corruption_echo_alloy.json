@@ -1,0 +1,20 @@
+{
+  "type": "corruption:alchemy_shapeless",
+  "ingredients": [
+    {
+      "item": "corruption:resonant_corruption_crystal",
+      "count": 1
+    },
+    {
+      "item": "minecraft:netherite_scrap",
+      "count": 4
+    },
+    {
+      "tag": "c:ingots/gold",
+      "count": 4
+    }
+  ],
+  "result": {
+    "id": "corruption:corruption_echo_alloy"
+  }
+}

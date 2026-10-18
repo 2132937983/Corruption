@@ -61,7 +61,8 @@ public final class CorruptionCommands {
                                         settings.spreadChance(), settings.scanIntervalTicks(), settings.scanBlocksPerBatch(),
                                         settings.baseCorruptionChance(), IntegerArgumentType.getInteger(context, "multiplier"), settings.enabled())))))
                 .then(Commands.literal("reset")
-                        .executes(context -> change(context.getSource(), ignored -> InfectionConfig.DEFAULT))));
+                        .executes(context -> change(context.getSource(), ignored -> InfectionConfig.DEFAULT)))
+                .then(AltarStructureCommands.altar()));
     }
 
     private static int change(CommandSourceStack source, UnaryOperator<InfectionSettings> update) {
