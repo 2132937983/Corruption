@@ -1,12 +1,15 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.infection.GroundBlight;
 import com.miophas.corruption.common.registry.ModBlocks;
 import com.miophas.corruption.common.registry.ModDamageTypes;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
-import com.miophas.corruption.core.demon.skill.UpheavalRules;
 import com.miophas.corruption.core.demon.skill.UpheavalRules.Form;
+import com.miophas.corruption.core.demon.skill.UpheavalRules;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +46,7 @@ import net.neoforged.neoforge.event.EventHooks;
  * Everything not of the caster's side (players in creative or spectator aside) is caught; the earth bursts with a ring
  * of force and the sound of it.
  */
-public final class UpheavalSkill implements BossSkill<Mob> {
+public final class UpheavalSkill implements RegisteredSkill<UpheavalRules> {
     /** How far above and below the mark it looks for the top of the ground in each column. */
     private static final int ABOVE = 2, BELOW = 3;
     /** How fast the ground a pit throws out flies, out and up, in blocks a tick. */
@@ -200,4 +203,7 @@ public final class UpheavalSkill implements BossSkill<Mob> {
     }
 
     private static long columnKey(int x, int z) { return ((long) x << 32) ^ (z & 0xFFFFFFFFL); }
+    @Override public BossSkillRegistry.Type<UpheavalRules> type() { return BossSkillApi.UPHEAVAL; }
+    @Override public UpheavalRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

@@ -2,6 +2,9 @@ package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BeamCaster;
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.entity.DemonBeamEntity;
 import com.miophas.corruption.common.registry.ModDamageTypes;
 import com.miophas.corruption.common.registry.ModEntities;
@@ -29,7 +32,7 @@ import net.minecraft.world.phys.Vec3;
  * faces, each circle a rune ring turning in the air. Each beam gathers, fires and follows the quarry as a single beam
  * does ({@link BeamSkill}), and each hurts what it catches on its own: two beams on a quarry, two blows each pulse.
  */
-public final class BeamVolleySkill implements BossSkill<Mob> {
+public final class BeamVolleySkill implements RegisteredSkill<BeamVolleyRules> {
     /** How far before the boss a lone beam leaves from, when it says nothing of it. */
     private static final double BEFORE = 1.2;
 
@@ -146,4 +149,7 @@ public final class BeamVolleySkill implements BossSkill<Mob> {
 
     private static float yawOf(Vec3 way) { return (float) (Mth.atan2(way.z, way.x) * Mth.RAD_TO_DEG) - 90; }
     private static float pitchOf(Vec3 way) { return (float) -(Mth.atan2(way.y, way.horizontalDistance()) * Mth.RAD_TO_DEG); }
+    @Override public BossSkillRegistry.Type<BeamVolleyRules> type() { return BossSkillApi.BEAM_VOLLEY; }
+    @Override public BeamVolleyRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, count, false); }
 }

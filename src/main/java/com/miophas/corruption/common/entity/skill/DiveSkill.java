@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.core.demon.skill.DiveRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
 import javax.annotation.Nullable;
@@ -19,7 +22,7 @@ import net.minecraft.world.phys.Vec3;
  * it is there) everything near is hurt and thrown off, the ground is torn up ({@link Debris}), and a ring of force runs
  * out over it. A boss diving holds its own gravity off; what lands it afterwards is its own to say.
  */
-public final class DiveSkill implements BossSkill<Mob> {
+public final class DiveSkill implements RegisteredSkill<DiveRules> {
     /** How near the mark the boss must come for the dive to strike there, in blocks. */
     private static final double THERE = 1.2;
 
@@ -125,4 +128,7 @@ public final class DiveSkill implements BossSkill<Mob> {
         SkillShows.sound(boss, SoundEvents.GENERIC_EXPLODE.value(), 3, .7F);
         return torn;
     }
+    @Override public BossSkillRegistry.Type<DiveRules> type() { return BossSkillApi.DIVE; }
+    @Override public DiveRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, upAtOnce); }
 }

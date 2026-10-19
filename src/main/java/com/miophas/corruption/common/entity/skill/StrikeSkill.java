@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.entity.CorruptLightning;
 import com.miophas.corruption.common.registry.ModDamageTypes;
 import com.miophas.corruption.common.registry.ModEntities;
@@ -24,7 +27,7 @@ import net.minecraft.world.phys.Vec3;
  * out of the way. Then, one after another, the corruption's violet bolts fall on the marks, each hurting everything
  * within its reach with the corruption's own hurt, and splashing a ring of light.
  */
-public final class StrikeSkill implements BossSkill<Mob> {
+public final class StrikeSkill implements RegisteredSkill<StrikeRules> {
     private final StrikeRules rules;
     private final int colour, accent;
     private final List<Vec3> marks = new ArrayList<>();
@@ -81,4 +84,7 @@ public final class StrikeSkill implements BossSkill<Mob> {
             struck.hurt(hurt, (float) rules.damage());
         SkillShows.show(level, at, "shockwave", rules.radius() + 1, 1.2, 14, colour, accent, .25, 0, false);
     }
+    @Override public BossSkillRegistry.Type<StrikeRules> type() { return BossSkillApi.STRIKE; }
+    @Override public StrikeRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

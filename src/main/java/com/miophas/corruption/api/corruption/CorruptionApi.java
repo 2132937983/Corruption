@@ -10,11 +10,12 @@ public final class CorruptionApi {
     public static final String SOURCE_STATE_KEY = "SourceState";
 
     public static ResourceLocation variantId(BlockState source) {
-        return CorruptionVariants.variantId(source);
+        var id = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(source.getBlock());
+        return ResourceLocation.parse(CorruptionVariants.variantId(id.getNamespace(), id.getPath()));
     }
 
     public static BlockState readSource(CompoundTag tag) {
-        return CorruptionVariants.readSource(tag);
+        return SourceBlockStates.read(tag);
     }
 
     public static int blendOverlayTexel(int source, int overlay) {

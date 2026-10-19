@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.entity.SolomonHand;
 import com.miophas.corruption.core.demon.skill.HandRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
@@ -20,7 +23,7 @@ import net.minecraft.world.phys.Vec3;
  * ({@link SolomonHand}): the first under its quarry, the others round it, each over a circle of runes where it will fall, all
  * facing in on the first.
  */
-public final class HandSkill implements BossSkill<Mob> {
+public final class HandSkill implements RegisteredSkill<HandRules> {
     private final HandRules rules;
     private final int colour, accent;
     private final List<SolomonHand> raised = new ArrayList<>();
@@ -59,4 +62,7 @@ public final class HandSkill implements BossSkill<Mob> {
         }
         SkillShows.sound(level, middle, SoundEvents.WARDEN_DIG, 4, .4F);
     }
+    @Override public BossSkillRegistry.Type<HandRules> type() { return BossSkillApi.HANDS; }
+    @Override public HandRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

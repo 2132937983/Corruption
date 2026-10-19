@@ -2,11 +2,12 @@ package com.miophas.corruption.common.entity;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
 import com.miophas.corruption.api.demon.skill.SkillSet;
+import com.miophas.corruption.api.elite.CorruptionElite;
 import com.miophas.corruption.common.entity.skill.PounceSkill;
 import com.miophas.corruption.common.entity.skill.SkillShows;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
-import com.miophas.corruption.core.elite.BlighthoundRules;
 import com.miophas.corruption.core.elite.BlighthoundRules.Skill;
+import com.miophas.corruption.core.elite.BlighthoundRules;
 import java.util.EnumSet;
 import java.util.Set;
 import javax.annotation.Nullable;

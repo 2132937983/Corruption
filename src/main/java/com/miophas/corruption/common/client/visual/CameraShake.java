@@ -1,8 +1,8 @@
 package com.miophas.corruption.common.client.visual;
 
 import com.miophas.corruption.Corruption;
-import com.miophas.corruption.common.entity.BossDeath;
-import com.miophas.corruption.common.entity.DemonBoss;
+import com.miophas.corruption.api.demon.BossDeath;
+import com.miophas.corruption.api.demon.DemonBoss;
 import com.miophas.corruption.common.entity.SpellBeamEntity;
 import com.miophas.corruption.common.entity.SpellVisualEntity;
 import net.minecraft.client.Minecraft;

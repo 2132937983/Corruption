@@ -1,9 +1,9 @@
 package com.miophas.corruption.common.entity;
 
-import com.miophas.corruption.api.corruption.RemnantCombatApi;
 import com.miophas.corruption.api.corruption.RemnantAbility;
 import com.miophas.corruption.api.corruption.RemnantAbilityApi;
 import com.miophas.corruption.api.corruption.RemnantAnimationApi;
+import com.miophas.corruption.api.corruption.RemnantCombatApi;
 import com.miophas.corruption.common.registry.ModDamageTypes;
 import com.miophas.corruption.common.registry.ModSounds;
 import net.minecraft.nbt.CompoundTag;
@@ -76,6 +76,16 @@ public class CorruptedRemnant extends Monster implements net.minecraft.world.ent
         remnant.moveTo(at.x, at.y, at.z, yaw, 0);
         source.discard();
         return remnant;
+    }
+
+    public static java.util.Optional<Mob> copyOf(LivingEntity source) {
+        if (!(source.level() instanceof net.minecraft.server.level.ServerLevel level)) return java.util.Optional.empty();
+        var appearance = RemnantAppearance.capture(source, true);
+        var remnant = com.miophas.corruption.common.registry.ModEntities.createRemnant(level, appearance);
+        if (remnant == null) return java.util.Optional.empty();
+        remnant.initialize(appearance, source.getMaxHealth());
+        remnant.moveTo(source.getX(), source.getY(), source.getZ(), source.getYRot(), 0);
+        return java.util.Optional.of(remnant);
     }
 
     public static AttributeSupplier.Builder attributes() {
@@ -292,6 +302,17 @@ public class CorruptedRemnant extends Monster implements net.minecraft.world.ent
     /** When it crumbles away, as game time; 0 if it stays. */
     public long crumblesAt() { return crumblesAt; }
 
+    private java.util.List<com.miophas.corruption.api.corruption.RemnantExtensions.Ability> extensionAbilities;
+    private void tickExtensions() {
+        if (!isAlive()) return;
+        if (extensionAbilities == null) {
+            var source = net.minecraft.resources.ResourceLocation.tryParse(appearance().getString("Type"));
+            if (source == null) return;
+            extensionAbilities = com.miophas.corruption.api.corruption.RemnantExtensions.create(this, source, appearance());
+        }
+        for (var ability : extensionAbilities) ability.tick();
+    }
+
     @Override public void tick() {
         if (!level().isClientSide && crumblesAt > 0 && level().getGameTime() >= crumblesAt && level() instanceof net.minecraft.server.level.ServerLevel server) {
             // Its time up, it falls to dust and souls: no death, and nothing dropped.
@@ -302,7 +323,7 @@ public class CorruptedRemnant extends Monster implements net.minecraft.world.ent
             discard();
             return;
         }
-        if (!level().isClientSide) abilities();
+        if (!level().isClientSide) { abilities(); tickExtensions(); }
         boolean phase = hasAbility(RemnantAbility.PHASE_WALLS) || hasAbility(RemnantAbility.DRAGON_COMBAT);
         if (phase) noPhysics = true;
         super.tick();
@@ -324,6 +345,11 @@ public class CorruptedRemnant extends Monster implements net.minecraft.world.ent
         return !hasAbility(RemnantAbility.FLIGHT) && !hasAbility(RemnantAbility.SHULKER_COMBAT) && super.causeFallDamage(distance, multiplier, source);
     }
     @Override public void remove(RemovalReason reason) {
+        if (extensionAbilities != null) {
+            var removed = extensionAbilities;
+            extensionAbilities = null;
+            for (var ability : removed) ability.removed();
+        }
         if (dragon != null) dragon.close(reason.shouldDestroy());
         if (reason.shouldDestroy() && abilities != null && abilities.summoner != null
                 && level() instanceof net.minecraft.server.level.ServerLevel server

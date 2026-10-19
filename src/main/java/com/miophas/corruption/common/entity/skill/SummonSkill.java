@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.entity.CorruptedRemnant;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
 import com.miophas.corruption.core.demon.skill.SummonRules;
@@ -22,7 +25,7 @@ import net.minecraft.world.phys.Vec3;
  * as such creatures come), at once set on the boss's quarry. Each is marked as the boss's, so that only those still
  * about count against how many it may keep.
  */
-public final class SummonSkill implements BossSkill<Mob> {
+public final class SummonSkill implements RegisteredSkill<SummonRules> {
     /** Where a called remnant keeps who called it up. */
     public static final String CALLER = "corruption:called_by";
     /** How far round its caller a remnant still counts as about. */
@@ -95,4 +98,7 @@ public final class SummonSkill implements BossSkill<Mob> {
         return boss.level().getEntitiesOfClass(CorruptedRemnant.class, boss.getBoundingBox().inflate(within), remnant -> remnant.isAlive()
                 && remnant.getPersistentData().hasUUID(CALLER) && caller.equals(remnant.getPersistentData().getUUID(CALLER))).size();
     }
+    @Override public BossSkillRegistry.Type<SummonRules> type() { return BossSkillApi.SUMMON; }
+    @Override public SummonRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> called(mob, about), false); }
 }

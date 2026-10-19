@@ -1,0 +1,1122 @@
+enum com.miophas.corruption.core.altar.AltarFacing.EAST
+enum com.miophas.corruption.core.altar.AltarFacing.NORTH
+enum com.miophas.corruption.core.altar.AltarFacing.SOUTH
+enum com.miophas.corruption.core.altar.AltarFacing.WEST
+enum com.miophas.corruption.core.altar.AltarForm.HEXAGRAM
+enum com.miophas.corruption.core.altar.AltarForm.OCTAGRAM
+enum com.miophas.corruption.core.altar.AltarState.BINDING
+enum com.miophas.corruption.core.altar.AltarState.DORMANT
+enum com.miophas.corruption.core.altar.AltarState.FORMED
+enum com.miophas.corruption.core.arcane.ArcaneReading$Sight.GLYPHS
+enum com.miophas.corruption.core.arcane.ArcaneReading$Sight.MEANING
+enum com.miophas.corruption.core.arcane.Grimoire$Inscribe.ALREADY_KNOWN
+enum com.miophas.corruption.core.arcane.Grimoire$Inscribe.FULL
+enum com.miophas.corruption.core.arcane.Grimoire$Inscribe.READY
+enum com.miophas.corruption.core.arcane.SpellAction$Push$From.CASTER
+enum com.miophas.corruption.core.arcane.SpellAction$Push$From.ORIGIN
+enum com.miophas.corruption.core.arcane.SpellAction$Shape.BURST
+enum com.miophas.corruption.core.arcane.SpellAction$Shape.COLUMN
+enum com.miophas.corruption.core.arcane.SpellAction$Shape.RING
+enum com.miophas.corruption.core.arcane.SpellAction$Shape.SPHERE
+enum com.miophas.corruption.core.arcane.SpellAction$Shape.SPIRAL
+enum com.miophas.corruption.core.arcane.SpellAction$Sky.CLEAR
+enum com.miophas.corruption.core.arcane.SpellAction$Sky.RAIN
+enum com.miophas.corruption.core.arcane.SpellAction$Sky.THUNDER
+enum com.miophas.corruption.core.arcane.SpellAction$Source.CASTER
+enum com.miophas.corruption.core.arcane.SpellAction$Source.SKY
+enum com.miophas.corruption.core.arcane.SpellAction$Target.NEARBY
+enum com.miophas.corruption.core.arcane.SpellAction$Target.SELF
+enum com.miophas.corruption.core.arcane.SpellCasting$Check.COOLING
+enum com.miophas.corruption.core.arcane.SpellCasting$Check.NOT_CORRUPTED_ENOUGH
+enum com.miophas.corruption.core.arcane.SpellCasting$Check.NO_ENERGY
+enum com.miophas.corruption.core.arcane.SpellCasting$Check.NO_PARCHMENT
+enum com.miophas.corruption.core.arcane.SpellCasting$Check.READY
+enum com.miophas.corruption.core.arcane.SpellCasting$Check.TOO_CORRUPTED
+enum com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier.ADVANCED
+enum com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier.INTERMEDIATE
+enum com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier.NOVICE
+enum com.miophas.corruption.core.demon.skill.SpitRules$Look.BOLT
+enum com.miophas.corruption.core.demon.skill.SpitRules$Look.FEATHER
+enum com.miophas.corruption.core.demon.skill.SpitRules$Look.GLOB
+enum com.miophas.corruption.core.demon.skill.SpitRules$Look.WATER
+enum com.miophas.corruption.core.demon.skill.UpheavalRules$Form.RISE
+enum com.miophas.corruption.core.demon.skill.UpheavalRules$Form.SINK
+enum com.miophas.corruption.core.demon.skill.UpheavalRules$Form.SPIKES
+public abstract boolean com.miophas.corruption.core.altar.AltarLayout$Place.pillarAt(int,int)
+public abstract boolean com.miophas.corruption.core.arcane.SpellCasting$Caster.cooling()
+public abstract int com.miophas.corruption.core.arcane.SpellCasting$Caster.corruption()
+public abstract int com.miophas.corruption.core.arcane.SpellCasting$Caster.parchment()
+public abstract long com.miophas.corruption.core.arcane.SpellCasting$Caster.energy()
+public abstract void com.miophas.corruption.core.arcane.CastingUnit$Payment.pay(long,int,int)
+public abstract void com.miophas.corruption.core.arcane.SpellCasting$Caster.pay(long,int,int)
+public boolean com.miophas.corruption.core.altar.AltarForm.formed(com.miophas.corruption.core.altar.AltarLayout$Place)
+public boolean com.miophas.corruption.core.altar.AltarForm.isAltar(int,int)
+public boolean com.miophas.corruption.core.altar.AltarState.binds()
+public boolean com.miophas.corruption.core.altar.AltarState.performs()
+public boolean com.miophas.corruption.core.altar.AltarState.showsCircle()
+public boolean com.miophas.corruption.core.arcane.CastingUnit$Situation.cooling()
+public boolean com.miophas.corruption.core.arcane.CastingUnit$Situation.free()
+public boolean com.miophas.corruption.core.arcane.CastingUnit.isEmpty()
+public boolean com.miophas.corruption.core.arcane.Codex.isEmpty()
+public boolean com.miophas.corruption.core.arcane.Codex.reveals(java.lang.String)
+public boolean com.miophas.corruption.core.arcane.Grimoire.isEmpty()
+public boolean com.miophas.corruption.core.arcane.Grimoire.knows(java.lang.String)
+public boolean com.miophas.corruption.core.arcane.SpellRule.corrupts()
+public boolean com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier.hiddenFromBosses()
+public boolean com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier.hiddenFromElites()
+public boolean com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier.hiddenFromRemnants()
+public boolean com.miophas.corruption.core.demon.skill.BarrageRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.BeamRules.firing(int)
+public boolean com.miophas.corruption.core.demon.skill.BeamRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.BeamRules.pulses(int)
+public boolean com.miophas.corruption.core.demon.skill.BlightRules.dormant()
+public boolean com.miophas.corruption.core.demon.skill.BlightRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.BlightRules.reaches(double)
+public boolean com.miophas.corruption.core.demon.skill.BlightRules.still()
+public boolean com.miophas.corruption.core.demon.skill.BlinkRules$Danger.playerClose()
+public boolean com.miophas.corruption.core.demon.skill.BlinkRules$Danger.standingInHarm()
+public boolean com.miophas.corruption.core.demon.skill.BlinkRules.unsafe(com.miophas.corruption.core.demon.skill.BlinkRules$Danger)
+public boolean com.miophas.corruption.core.demon.skill.BurrowRules.catches(double,double)
+public boolean com.miophas.corruption.core.demon.skill.BurrowRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.BurrowRules.under(double)
+public boolean com.miophas.corruption.core.demon.skill.ChargeRules.breaks(float)
+public boolean com.miophas.corruption.core.demon.skill.ChargeRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.ChargeRules.rushing(int)
+public boolean com.miophas.corruption.core.demon.skill.ChariotRules.breaks(float)
+public boolean com.miophas.corruption.core.demon.skill.ChariotRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.CrescendoRules.catches(int,double,double)
+public boolean com.miophas.corruption.core.demon.skill.CrescendoRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.DiveChainRules.serves(double,double)
+public boolean com.miophas.corruption.core.demon.skill.DiveRules.diving(int)
+public boolean com.miophas.corruption.core.demon.skill.DiveRules.serves(double,double)
+public boolean com.miophas.corruption.core.demon.skill.DrakeRushRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.EliteCallRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.EliteCallRules.wanted(int)
+public boolean com.miophas.corruption.core.demon.skill.FanfareRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.FanfareRules.playing(int)
+public boolean com.miophas.corruption.core.demon.skill.FanfareRules.volleys(int)
+public boolean com.miophas.corruption.core.demon.skill.FireballRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.GazeRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.GazeRules.withers()
+public boolean com.miophas.corruption.core.demon.skill.GrabRules.drawnIn(double)
+public boolean com.miophas.corruption.core.demon.skill.GrabRules.holding(int)
+public boolean com.miophas.corruption.core.demon.skill.GrabRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.HandRules.catches(double,double)
+public boolean com.miophas.corruption.core.demon.skill.HandRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.MeleeRules.catches(double,double)
+public boolean com.miophas.corruption.core.demon.skill.MeleeRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.MindControlRules.moves()
+public boolean com.miophas.corruption.core.demon.skill.PhaseDashRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.PounceRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.PounceRules.leaping(int)
+public boolean com.miophas.corruption.core.demon.skill.PsychicRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.PsychicRules.reaches(double)
+public boolean com.miophas.corruption.core.demon.skill.PsychicStreamRules.holds(double)
+public boolean com.miophas.corruption.core.demon.skill.PsychicStreamRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.PsychicStreamRules.pulses(int)
+public boolean com.miophas.corruption.core.demon.skill.RamRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.ScreechRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.ScreechRules.reaches(double)
+public boolean com.miophas.corruption.core.demon.skill.ScreechRules.slows()
+public boolean com.miophas.corruption.core.demon.skill.SkillTiming.over(int)
+public boolean com.miophas.corruption.core.demon.skill.SkillTiming.strikes(int)
+public boolean com.miophas.corruption.core.demon.skill.SkillTiming.windingUp(int)
+public boolean com.miophas.corruption.core.demon.skill.SkyBeamRules.catches(double,double)
+public boolean com.miophas.corruption.core.demon.skill.SkyBeamRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.SkyBeamRules.pours(int)
+public boolean com.miophas.corruption.core.demon.skill.SkyBeamRules.pulses(int)
+public boolean com.miophas.corruption.core.demon.skill.SnareRules.catches(double)
+public boolean com.miophas.corruption.core.demon.skill.SnareRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.SpikeFieldRules.covers(double,double)
+public boolean com.miophas.corruption.core.demon.skill.SpikeFieldRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.SpinRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.SpinRules.strikes(int)
+public boolean com.miophas.corruption.core.demon.skill.SpinVolleyRules.firing(int)
+public boolean com.miophas.corruption.core.demon.skill.SpinVolleyRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.SpitRules$Pool.any()
+public boolean com.miophas.corruption.core.demon.skill.SpitRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.SpitRules.lob()
+public boolean com.miophas.corruption.core.demon.skill.StrikeRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.SummonRules.atQuarry()
+public boolean com.miophas.corruption.core.demon.skill.SummonRules.passes()
+public boolean com.miophas.corruption.core.demon.skill.SummonRules.wanted(int)
+public boolean com.miophas.corruption.core.demon.skill.UpheavalRules.catches(double,double)
+public boolean com.miophas.corruption.core.demon.skill.UpheavalRules.inRange(double)
+public boolean com.miophas.corruption.core.demon.skill.VenusRules.reaches(double)
+public boolean com.miophas.corruption.core.demon.skill.VenusRules.wanted(double)
+public boolean com.miophas.corruption.core.energy.EnergyTool.isTool()
+public boolean com.miophas.corruption.core.energy.EnergyTool.takes(long,long)
+public com.miophas.corruption.core.arcane.CastingUnit com.miophas.corruption.core.arcane.CastingUnit.cycling()
+public com.miophas.corruption.core.arcane.CastingUnit com.miophas.corruption.core.arcane.CastingUnit.inscribing(java.lang.String)
+public com.miophas.corruption.core.arcane.CastingUnit com.miophas.corruption.core.arcane.CastingUnit.selecting(int)
+public com.miophas.corruption.core.arcane.CastingUnit com.miophas.corruption.core.arcane.CastingUnit.spending(long)
+public com.miophas.corruption.core.arcane.CastingUnit com.miophas.corruption.core.arcane.CastingUnit.withEnergy(long)
+public com.miophas.corruption.core.arcane.CastingUnit com.miophas.corruption.core.arcane.CastingUnit.writingAt(int,java.lang.String)
+public com.miophas.corruption.core.arcane.CastingUnit$Situation(int,int,int,boolean,boolean)
+public com.miophas.corruption.core.arcane.CastingUnit(com.miophas.corruption.core.arcane.Grimoire,long)
+public com.miophas.corruption.core.arcane.CastingUnit(com.miophas.corruption.core.arcane.Grimoire,long,int)
+public com.miophas.corruption.core.arcane.Codex(java.util.List<java.lang.String>)
+public com.miophas.corruption.core.arcane.Grimoire com.miophas.corruption.core.arcane.CastingUnit.grimoire()
+public com.miophas.corruption.core.arcane.Grimoire com.miophas.corruption.core.arcane.Grimoire.cycled()
+public com.miophas.corruption.core.arcane.Grimoire com.miophas.corruption.core.arcane.Grimoire.inscribed(java.lang.String)
+public com.miophas.corruption.core.arcane.Grimoire com.miophas.corruption.core.arcane.Grimoire.inscribed(java.lang.String,int)
+public com.miophas.corruption.core.arcane.Grimoire com.miophas.corruption.core.arcane.Grimoire.selecting(int)
+public com.miophas.corruption.core.arcane.Grimoire com.miophas.corruption.core.arcane.Grimoire.writtenAt(int,java.lang.String,int)
+public com.miophas.corruption.core.arcane.Grimoire$Inscribe com.miophas.corruption.core.arcane.CastingUnit.check(java.lang.String)
+public com.miophas.corruption.core.arcane.Grimoire$Inscribe com.miophas.corruption.core.arcane.CastingUnit.checkAt(int,java.lang.String)
+public com.miophas.corruption.core.arcane.Grimoire$Inscribe com.miophas.corruption.core.arcane.Grimoire.check(java.lang.String)
+public com.miophas.corruption.core.arcane.Grimoire$Inscribe com.miophas.corruption.core.arcane.Grimoire.check(java.lang.String,int)
+public com.miophas.corruption.core.arcane.Grimoire$Inscribe com.miophas.corruption.core.arcane.Grimoire.checkAt(int,java.lang.String,int)
+public com.miophas.corruption.core.arcane.Grimoire(java.util.List<java.lang.String>,int)
+public com.miophas.corruption.core.arcane.SpellAction$Custom(java.lang.String,java.util.Map<java.lang.String, java.lang.String>)
+public com.miophas.corruption.core.arcane.SpellAction$Particles(java.lang.String,int,double,double)
+public com.miophas.corruption.core.arcane.SpellAction$Particles(java.lang.String,int,double,double,int)
+public com.miophas.corruption.core.arcane.SpellAction$Visual(java.lang.String,double,double,int,int,int,double,java.lang.String)
+public com.miophas.corruption.core.arcane.SpellCasting$Caster com.miophas.corruption.core.arcane.CastingUnit.caster(com.miophas.corruption.core.arcane.CastingUnit$Situation,com.miophas.corruption.core.arcane.CastingUnit$Payment)
+public com.miophas.corruption.core.arcane.SpellCasting$Caster com.miophas.corruption.core.arcane.CastingUnit.caster(int,int,boolean,com.miophas.corruption.core.arcane.CastingUnit$Payment)
+public com.miophas.corruption.core.arcane.SpellRule(long,int,int,int,java.util.List<com.miophas.corruption.core.arcane.SpellAction>)
+public com.miophas.corruption.core.corruption.CorruptionPurifier(int)
+public com.miophas.corruption.core.corruption.CorruptionWard(double)
+public com.miophas.corruption.core.corruption.CurseWard(double)
+public com.miophas.corruption.core.corruption.RemnantCombatProfile(double,double)
+public com.miophas.corruption.core.demon.BodyPart(java.lang.String,double,double,double,double,double)
+public com.miophas.corruption.core.demon.skill.BarrageRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,int,double,int,double,double)
+public com.miophas.corruption.core.demon.skill.BeamRules com.miophas.corruption.core.demon.skill.BeamVolleyRules.beam()
+public com.miophas.corruption.core.demon.skill.BeamRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,double,int,double,float)
+public com.miophas.corruption.core.demon.skill.BeamVolleyRules(com.miophas.corruption.core.demon.skill.BeamRules,int,double)
+public com.miophas.corruption.core.demon.skill.BlightRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,int,boolean,boolean,double,double,double)
+public com.miophas.corruption.core.demon.skill.BlightRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,int,boolean,double,double,double)
+public com.miophas.corruption.core.demon.skill.BlinkRules$Danger(boolean,float,int,boolean,double)
+public com.miophas.corruption.core.demon.skill.BlinkRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,double,int,double,int,int,float,double)
+public com.miophas.corruption.core.demon.skill.BurrowRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,double,int,double,double,double,double,double,double,int)
+public com.miophas.corruption.core.demon.skill.ChargeRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,double,double,float)
+public com.miophas.corruption.core.demon.skill.ChariotRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,double,double,double,double,double,int,float)
+public com.miophas.corruption.core.demon.skill.CountedSummonRules(com.miophas.corruption.core.demon.skill.SummonRules,double)
+public com.miophas.corruption.core.demon.skill.CrescendoRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,int,double,double,double,double,double,double,double)
+public com.miophas.corruption.core.demon.skill.DebrisRules com.miophas.corruption.core.demon.skill.BurrowRules.debris()
+public com.miophas.corruption.core.demon.skill.DebrisRules com.miophas.corruption.core.demon.skill.DiveRules.debris()
+public com.miophas.corruption.core.demon.skill.DebrisRules com.miophas.corruption.core.demon.skill.RamRules.debris()
+public com.miophas.corruption.core.demon.skill.DebrisRules(double,double)
+public com.miophas.corruption.core.demon.skill.DiveChainRules(com.miophas.corruption.core.demon.skill.DiveRules,int,int,int,int)
+public com.miophas.corruption.core.demon.skill.DiveRules com.miophas.corruption.core.demon.skill.DiveChainRules.dive()
+public com.miophas.corruption.core.demon.skill.DiveRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,double,double,double,double,double,int,double)
+public com.miophas.corruption.core.demon.skill.DrakeRushRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,double,double,int,double,double,double,double)
+public com.miophas.corruption.core.demon.skill.EliteCallRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,int,double)
+public com.miophas.corruption.core.demon.skill.FanfareRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,double,int,int,int,double,double,double,double)
+public com.miophas.corruption.core.demon.skill.FireballRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,int,double,int,double,double,int,double,int,float)
+public com.miophas.corruption.core.demon.skill.FlyingStrikeRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double)
+public com.miophas.corruption.core.demon.skill.GazeRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,int,int,int,int,int)
+public com.miophas.corruption.core.demon.skill.GrabRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,double,double)
+public com.miophas.corruption.core.demon.skill.HandRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,double,int,int,int,int,double,double,double)
+public com.miophas.corruption.core.demon.skill.MeleeRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,double,double)
+public com.miophas.corruption.core.demon.skill.MindControlRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,int,boolean,float)
+public com.miophas.corruption.core.demon.skill.PhaseDashRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,int,double,double,double,double,int,int,int)
+public com.miophas.corruption.core.demon.skill.PounceRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,int,double,double,double)
+public com.miophas.corruption.core.demon.skill.PsychicRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,double,int,int,int,int)
+public com.miophas.corruption.core.demon.skill.PsychicStreamRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,int,double,double,int)
+public com.miophas.corruption.core.demon.skill.RamRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,double,double,double,double,double,double,double,double)
+public com.miophas.corruption.core.demon.skill.ScreechRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,int)
+public com.miophas.corruption.core.demon.skill.ScreechRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,int,int,int)
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.BarrageRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.BeamRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.BlightRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.BlinkRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.BurrowRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.ChargeRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.ChariotRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.CrescendoRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.DiveChainRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.DiveRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.DrakeRushRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.EliteCallRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.FanfareRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.FireballRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.FlyingStrikeRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.GazeRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.GrabRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.HandRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.MeleeRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.MindControlRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.PhaseDashRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.PounceRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.PsychicRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.PsychicStreamRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.RamRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.ScreechRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.SkyBeamRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.SnareRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.SpikeFieldRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.SpinRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.SpinVolleyRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.SpitRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.StrikeRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.SummonRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.UpheavalRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming com.miophas.corruption.core.demon.skill.VenusRules.timing()
+public com.miophas.corruption.core.demon.skill.SkillTiming(int,int,int)
+public com.miophas.corruption.core.demon.skill.SkyBeamRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,double,double,double,int)
+public com.miophas.corruption.core.demon.skill.SnareRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,double,int,int,double)
+public com.miophas.corruption.core.demon.skill.SpikeFieldRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,double,double,double,double,double,int,int)
+public com.miophas.corruption.core.demon.skill.SpinRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,double,double,int,double)
+public com.miophas.corruption.core.demon.skill.SpinVolleyRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,int,double,double,double,double)
+public com.miophas.corruption.core.demon.skill.SpitRules com.miophas.corruption.core.demon.skill.SpitRules.looking(com.miophas.corruption.core.demon.skill.SpitRules$Look)
+public com.miophas.corruption.core.demon.skill.SpitRules com.miophas.corruption.core.demon.skill.SpitRules.pooling(com.miophas.corruption.core.demon.skill.SpitRules$Pool)
+public com.miophas.corruption.core.demon.skill.SpitRules com.miophas.corruption.core.demon.skill.SpitRules.pushing(double)
+public com.miophas.corruption.core.demon.skill.SpitRules$Look com.miophas.corruption.core.demon.skill.SpitRules.look()
+public com.miophas.corruption.core.demon.skill.SpitRules$Pool com.miophas.corruption.core.demon.skill.SpitRules.pool()
+public com.miophas.corruption.core.demon.skill.SpitRules$Pool(float,int,int)
+public com.miophas.corruption.core.demon.skill.SpitRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,int,double,double,double,double,boolean,int)
+public com.miophas.corruption.core.demon.skill.SpitRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,int,double,double,double,double,boolean,int,com.miophas.corruption.core.demon.skill.SpitRules$Look,double,com.miophas.corruption.core.demon.skill.SpitRules$Pool)
+public com.miophas.corruption.core.demon.skill.StrikeRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,double,int,double,double)
+public com.miophas.corruption.core.demon.skill.SummonRules com.miophas.corruption.core.demon.skill.CountedSummonRules.rules()
+public com.miophas.corruption.core.demon.skill.SummonRules(com.miophas.corruption.core.demon.skill.SkillTiming,int,int,double,java.util.List<java.lang.String>)
+public com.miophas.corruption.core.demon.skill.SummonRules(com.miophas.corruption.core.demon.skill.SkillTiming,int,int,double,java.util.List<java.lang.String>,boolean)
+public com.miophas.corruption.core.demon.skill.SummonRules(com.miophas.corruption.core.demon.skill.SkillTiming,int,int,double,java.util.List<java.lang.String>,boolean,int)
+public com.miophas.corruption.core.demon.skill.UpheavalRules$Form com.miophas.corruption.core.demon.skill.UpheavalRules.form(boolean,double)
+public com.miophas.corruption.core.demon.skill.UpheavalRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,double,int,int,double,double,double,double)
+public com.miophas.corruption.core.demon.skill.VenusRules(com.miophas.corruption.core.demon.skill.SkillTiming,double,double,int,int,int,int,double)
+public com.miophas.corruption.core.energy.EnergyTool(long,long)
+public default boolean com.miophas.corruption.core.arcane.SpellCasting$Caster.free()
+public default int com.miophas.corruption.core.arcane.SpellCasting$Caster.corruptionLimit()
+public double com.miophas.corruption.core.arcane.SpellAction$Particles.speed()
+public double com.miophas.corruption.core.arcane.SpellAction$Particles.spread()
+public double com.miophas.corruption.core.arcane.SpellAction$Visual.height()
+public double com.miophas.corruption.core.arcane.SpellAction$Visual.radius()
+public double com.miophas.corruption.core.arcane.SpellAction$Visual.shake()
+public double com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier.corruptionDamageTaken()
+public double com.miophas.corruption.core.corruption.CorruptionWard.share()
+public double com.miophas.corruption.core.corruption.CurseWard.share()
+public double com.miophas.corruption.core.corruption.RemnantCombatProfile.attackDamage()
+public double com.miophas.corruption.core.corruption.RemnantCombatProfile.maxHealth()
+public double com.miophas.corruption.core.demon.BodyPart.forward()
+public double com.miophas.corruption.core.demon.BodyPart.height()
+public double com.miophas.corruption.core.demon.BodyPart.left()
+public double com.miophas.corruption.core.demon.BodyPart.up()
+public double com.miophas.corruption.core.demon.BodyPart.width()
+public double com.miophas.corruption.core.demon.skill.BarrageRules.damage()
+public double com.miophas.corruption.core.demon.skill.BarrageRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.BarrageRules.minRange()
+public double com.miophas.corruption.core.demon.skill.BarrageRules.radius()
+public double com.miophas.corruption.core.demon.skill.BarrageRules.splash()
+public double com.miophas.corruption.core.demon.skill.BeamRules.damage()
+public double com.miophas.corruption.core.demon.skill.BeamRules.length()
+public double com.miophas.corruption.core.demon.skill.BeamRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.BeamRules.minRange()
+public double com.miophas.corruption.core.demon.skill.BeamRules.width()
+public double com.miophas.corruption.core.demon.skill.BeamVolleyRules.spread()
+public double com.miophas.corruption.core.demon.skill.BlightRules.damage()
+public double com.miophas.corruption.core.demon.skill.BlightRules.knockback()
+public double com.miophas.corruption.core.demon.skill.BlightRules.lift()
+public double com.miophas.corruption.core.demon.skill.BlightRules.radius()
+public double com.miophas.corruption.core.demon.skill.BlightRules.within()
+public double com.miophas.corruption.core.demon.skill.BlinkRules$Danger.quarryDistance()
+public double com.miophas.corruption.core.demon.skill.BlinkRules.crowdRadius()
+public double com.miophas.corruption.core.demon.skill.BlinkRules.farthest()
+public double com.miophas.corruption.core.demon.skill.BlinkRules.highest()
+public double com.miophas.corruption.core.demon.skill.BlinkRules.lowest()
+public double com.miophas.corruption.core.demon.skill.BlinkRules.nearest()
+public double com.miophas.corruption.core.demon.skill.BlinkRules.score(double,double)
+public double com.miophas.corruption.core.demon.skill.BlinkRules.tooNear()
+public double com.miophas.corruption.core.demon.skill.BurrowRules.climb()
+public double com.miophas.corruption.core.demon.skill.BurrowRules.damage()
+public double com.miophas.corruption.core.demon.skill.BurrowRules.debrisRadius()
+public double com.miophas.corruption.core.demon.skill.BurrowRules.depth()
+public double com.miophas.corruption.core.demon.skill.BurrowRules.launch()
+public double com.miophas.corruption.core.demon.skill.BurrowRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.BurrowRules.minRange()
+public double com.miophas.corruption.core.demon.skill.BurrowRules.radius()
+public double com.miophas.corruption.core.demon.skill.BurrowRules.rise()
+public double com.miophas.corruption.core.demon.skill.BurrowRules.speed()
+public double com.miophas.corruption.core.demon.skill.ChargeRules.damage()
+public double com.miophas.corruption.core.demon.skill.ChargeRules.knockback()
+public double com.miophas.corruption.core.demon.skill.ChargeRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.ChargeRules.minRange()
+public double com.miophas.corruption.core.demon.skill.ChargeRules.reach()
+public double com.miophas.corruption.core.demon.skill.ChargeRules.speed()
+public double com.miophas.corruption.core.demon.skill.ChariotRules.along(double)
+public double com.miophas.corruption.core.demon.skill.ChariotRules.damage()
+public double com.miophas.corruption.core.demon.skill.ChariotRules.from()
+public double com.miophas.corruption.core.demon.skill.ChariotRules.knockback()
+public double com.miophas.corruption.core.demon.skill.ChariotRules.length()
+public double com.miophas.corruption.core.demon.skill.ChariotRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.ChariotRules.minRange()
+public double com.miophas.corruption.core.demon.skill.ChariotRules.past()
+public double com.miophas.corruption.core.demon.skill.ChariotRules.reach()
+public double com.miophas.corruption.core.demon.skill.ChariotRules.speed()
+public double com.miophas.corruption.core.demon.skill.CountedSummonRules.radius()
+public double com.miophas.corruption.core.demon.skill.CrescendoRules.damage()
+public double com.miophas.corruption.core.demon.skill.CrescendoRules.front(int,double)
+public double com.miophas.corruption.core.demon.skill.CrescendoRules.height()
+public double com.miophas.corruption.core.demon.skill.CrescendoRules.knockback()
+public double com.miophas.corruption.core.demon.skill.CrescendoRules.lift()
+public double com.miophas.corruption.core.demon.skill.CrescendoRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.CrescendoRules.minRange()
+public double com.miophas.corruption.core.demon.skill.CrescendoRules.most()
+public double com.miophas.corruption.core.demon.skill.CrescendoRules.radius()
+public double com.miophas.corruption.core.demon.skill.CrescendoRules.speed()
+public double com.miophas.corruption.core.demon.skill.CrescendoRules.width()
+public double com.miophas.corruption.core.demon.skill.DebrisRules.radius()
+public double com.miophas.corruption.core.demon.skill.DebrisRules.speed()
+public double com.miophas.corruption.core.demon.skill.DiveRules.damage()
+public double com.miophas.corruption.core.demon.skill.DiveRules.debrisRadius()
+public double com.miophas.corruption.core.demon.skill.DiveRules.debrisSpeed()
+public double com.miophas.corruption.core.demon.skill.DiveRules.knockback()
+public double com.miophas.corruption.core.demon.skill.DiveRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.DiveRules.minHeight()
+public double com.miophas.corruption.core.demon.skill.DiveRules.minRange()
+public double com.miophas.corruption.core.demon.skill.DiveRules.radius()
+public double com.miophas.corruption.core.demon.skill.DiveRules.speed()
+public double com.miophas.corruption.core.demon.skill.DrakeRushRules.damage()
+public double com.miophas.corruption.core.demon.skill.DrakeRushRules.distance()
+public double com.miophas.corruption.core.demon.skill.DrakeRushRules.height()
+public double com.miophas.corruption.core.demon.skill.DrakeRushRules.knockback()
+public double com.miophas.corruption.core.demon.skill.DrakeRushRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.DrakeRushRules.minRange()
+public double com.miophas.corruption.core.demon.skill.DrakeRushRules.speed()
+public double com.miophas.corruption.core.demon.skill.DrakeRushRules.width()
+public double com.miophas.corruption.core.demon.skill.EliteCallRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.EliteCallRules.minRange()
+public double com.miophas.corruption.core.demon.skill.EliteCallRules.radius()
+public double com.miophas.corruption.core.demon.skill.FanfareRules.aimedSpread()
+public double com.miophas.corruption.core.demon.skill.FanfareRules.damage()
+public double com.miophas.corruption.core.demon.skill.FanfareRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.FanfareRules.minRange()
+public double com.miophas.corruption.core.demon.skill.FanfareRules.speed()
+public double com.miophas.corruption.core.demon.skill.FanfareRules.splash()
+public double com.miophas.corruption.core.demon.skill.FanfareRules.sweep()
+public double com.miophas.corruption.core.demon.skill.FanfareRules.volleyAcross(int)
+public double com.miophas.corruption.core.demon.skill.FireballRules.at(double)
+public double com.miophas.corruption.core.demon.skill.FireballRules.crushRadius()
+public double com.miophas.corruption.core.demon.skill.FireballRules.damage()
+public double com.miophas.corruption.core.demon.skill.FireballRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.FireballRules.minRange()
+public double com.miophas.corruption.core.demon.skill.FireballRules.radius()
+public double com.miophas.corruption.core.demon.skill.FireballRules.speed()
+public double com.miophas.corruption.core.demon.skill.FlyingStrikeRules.range()
+public double com.miophas.corruption.core.demon.skill.FlyingStrikeRules.speed()
+public double com.miophas.corruption.core.demon.skill.GazeRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.GazeRules.minRange()
+public double com.miophas.corruption.core.demon.skill.GazeRules.ringAngle(int,double)
+public double com.miophas.corruption.core.demon.skill.GrabRules.damage()
+public double com.miophas.corruption.core.demon.skill.GrabRules.down()
+public double com.miophas.corruption.core.demon.skill.GrabRules.near()
+public double com.miophas.corruption.core.demon.skill.GrabRules.pull()
+public double com.miophas.corruption.core.demon.skill.GrabRules.reach()
+public double com.miophas.corruption.core.demon.skill.GrabRules.reaching(double)
+public double com.miophas.corruption.core.demon.skill.HandRules.damage()
+public double com.miophas.corruption.core.demon.skill.HandRules.grown(double)
+public double com.miophas.corruption.core.demon.skill.HandRules.launch()
+public double com.miophas.corruption.core.demon.skill.HandRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.HandRules.minRange()
+public double com.miophas.corruption.core.demon.skill.HandRules.radius()
+public double com.miophas.corruption.core.demon.skill.HandRules.reared(double)
+public double com.miophas.corruption.core.demon.skill.HandRules.spread()
+public double com.miophas.corruption.core.demon.skill.MeleeRules.arc()
+public double com.miophas.corruption.core.demon.skill.MeleeRules.damage()
+public double com.miophas.corruption.core.demon.skill.MeleeRules.knockback()
+public double com.miophas.corruption.core.demon.skill.MeleeRules.lift()
+public double com.miophas.corruption.core.demon.skill.MeleeRules.reach()
+public double com.miophas.corruption.core.demon.skill.MindControlRules.range()
+public double com.miophas.corruption.core.demon.skill.PhaseDashRules.damage()
+public double com.miophas.corruption.core.demon.skill.PhaseDashRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.PhaseDashRules.minRange()
+public double com.miophas.corruption.core.demon.skill.PhaseDashRules.pass()
+public double com.miophas.corruption.core.demon.skill.PhaseDashRules.swerve()
+public double com.miophas.corruption.core.demon.skill.PhaseDashRules.width()
+public double com.miophas.corruption.core.demon.skill.PounceRules.along(int)
+public double com.miophas.corruption.core.demon.skill.PounceRules.damage()
+public double com.miophas.corruption.core.demon.skill.PounceRules.height()
+public double com.miophas.corruption.core.demon.skill.PounceRules.knockback()
+public double com.miophas.corruption.core.demon.skill.PounceRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.PounceRules.minRange()
+public double com.miophas.corruption.core.demon.skill.PounceRules.over(int)
+public double com.miophas.corruption.core.demon.skill.PounceRules.reach()
+public double com.miophas.corruption.core.demon.skill.PsychicRules.damage()
+public double com.miophas.corruption.core.demon.skill.PsychicRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.PsychicRules.minRange()
+public double com.miophas.corruption.core.demon.skill.PsychicRules.radius()
+public double com.miophas.corruption.core.demon.skill.PsychicStreamRules.damage()
+public double com.miophas.corruption.core.demon.skill.PsychicStreamRules.heal()
+public double com.miophas.corruption.core.demon.skill.PsychicStreamRules.holdRange()
+public double com.miophas.corruption.core.demon.skill.PsychicStreamRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.PsychicStreamRules.minRange()
+public double com.miophas.corruption.core.demon.skill.PsychicStreamRules.most()
+public double com.miophas.corruption.core.demon.skill.RamRules.away()
+public double com.miophas.corruption.core.demon.skill.RamRules.burst()
+public double com.miophas.corruption.core.demon.skill.RamRules.burstDamage()
+public double com.miophas.corruption.core.demon.skill.RamRules.climb()
+public double com.miophas.corruption.core.demon.skill.RamRules.damage()
+public double com.miophas.corruption.core.demon.skill.RamRules.depth()
+public double com.miophas.corruption.core.demon.skill.RamRules.knockback()
+public double com.miophas.corruption.core.demon.skill.RamRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.RamRules.minRange()
+public double com.miophas.corruption.core.demon.skill.RamRules.speed()
+public double com.miophas.corruption.core.demon.skill.RamRules.through()
+public double com.miophas.corruption.core.demon.skill.RamRules.width()
+public double com.miophas.corruption.core.demon.skill.ScreechRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.ScreechRules.minRange()
+public double com.miophas.corruption.core.demon.skill.ScreechRules.radius()
+public double com.miophas.corruption.core.demon.skill.SkyBeamRules.altitude()
+public double com.miophas.corruption.core.demon.skill.SkyBeamRules.damage()
+public double com.miophas.corruption.core.demon.skill.SkyBeamRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.SkyBeamRules.minRange()
+public double com.miophas.corruption.core.demon.skill.SkyBeamRules.spread()
+public double com.miophas.corruption.core.demon.skill.SkyBeamRules.width()
+public double com.miophas.corruption.core.demon.skill.SnareRules.damage()
+public double com.miophas.corruption.core.demon.skill.SnareRules.lift()
+public double com.miophas.corruption.core.demon.skill.SnareRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.SnareRules.minRange()
+public double com.miophas.corruption.core.demon.skill.SnareRules.radius()
+public double com.miophas.corruption.core.demon.skill.SpikeFieldRules.damage()
+public double com.miophas.corruption.core.demon.skill.SpikeFieldRules.far()
+public double com.miophas.corruption.core.demon.skill.SpikeFieldRules.farWidth()
+public double com.miophas.corruption.core.demon.skill.SpikeFieldRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.SpikeFieldRules.minRange()
+public double com.miophas.corruption.core.demon.skill.SpikeFieldRules.near()
+public double com.miophas.corruption.core.demon.skill.SpikeFieldRules.nearWidth()
+public double com.miophas.corruption.core.demon.skill.SpikeFieldRules.spacing()
+public double com.miophas.corruption.core.demon.skill.SpikeFieldRules.widthAt(double)
+public double com.miophas.corruption.core.demon.skill.SpinRules.damage()
+public double com.miophas.corruption.core.demon.skill.SpinRules.knockback()
+public double com.miophas.corruption.core.demon.skill.SpinRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.SpinRules.minRange()
+public double com.miophas.corruption.core.demon.skill.SpinRules.reach()
+public double com.miophas.corruption.core.demon.skill.SpinRules.speed()
+public double com.miophas.corruption.core.demon.skill.SpinVolleyRules.damage()
+public double com.miophas.corruption.core.demon.skill.SpinVolleyRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.SpinVolleyRules.minRange()
+public double com.miophas.corruption.core.demon.skill.SpinVolleyRules.pointAt(int,double)
+public double com.miophas.corruption.core.demon.skill.SpinVolleyRules.speed()
+public double com.miophas.corruption.core.demon.skill.SpinVolleyRules.spin()
+public double com.miophas.corruption.core.demon.skill.SpinVolleyRules.spread()
+public double com.miophas.corruption.core.demon.skill.SpinVolleyRules.turned(double)
+public double com.miophas.corruption.core.demon.skill.SpitRules.across(int)
+public double com.miophas.corruption.core.demon.skill.SpitRules.damage()
+public double com.miophas.corruption.core.demon.skill.SpitRules.fan()
+public double com.miophas.corruption.core.demon.skill.SpitRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.SpitRules.minRange()
+public double com.miophas.corruption.core.demon.skill.SpitRules.push()
+public double com.miophas.corruption.core.demon.skill.SpitRules.speed()
+public double com.miophas.corruption.core.demon.skill.SpitRules.splash()
+public double com.miophas.corruption.core.demon.skill.StrikeRules.damage()
+public double com.miophas.corruption.core.demon.skill.StrikeRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.StrikeRules.minRange()
+public double com.miophas.corruption.core.demon.skill.StrikeRules.radius()
+public double com.miophas.corruption.core.demon.skill.StrikeRules.scatter()
+public double com.miophas.corruption.core.demon.skill.SummonRules.radius()
+public double com.miophas.corruption.core.demon.skill.UpheavalRules.damage()
+public double com.miophas.corruption.core.demon.skill.UpheavalRules.launch()
+public double com.miophas.corruption.core.demon.skill.UpheavalRules.maxRange()
+public double com.miophas.corruption.core.demon.skill.UpheavalRules.minRange()
+public double com.miophas.corruption.core.demon.skill.UpheavalRules.radius()
+public double com.miophas.corruption.core.demon.skill.UpheavalRules.spikeDamage()
+public double com.miophas.corruption.core.demon.skill.UpheavalRules.spikeLaunch()
+public double com.miophas.corruption.core.demon.skill.VenusRules.below()
+public double com.miophas.corruption.core.demon.skill.VenusRules.heal()
+public double com.miophas.corruption.core.demon.skill.VenusRules.healed(double)
+public double com.miophas.corruption.core.demon.skill.VenusRules.radius()
+public double[] com.miophas.corruption.core.demon.skill.BarrageRules.landing(int,double)
+public double[] com.miophas.corruption.core.demon.skill.BarrageRules.launch(double,double,double)
+public double[] com.miophas.corruption.core.demon.skill.BeamVolleyRules.circle(int,int)
+public double[] com.miophas.corruption.core.demon.skill.BlinkRules.trial(int,double,double)
+public double[] com.miophas.corruption.core.demon.skill.BurrowRules.entry(double,double)
+public double[] com.miophas.corruption.core.demon.skill.ChariotRules.path(double,double,double,double,double)
+public double[] com.miophas.corruption.core.demon.skill.DebrisRules.fling(double,double,double)
+public double[] com.miophas.corruption.core.demon.skill.DiveRules.fling(double,double,double)
+public double[] com.miophas.corruption.core.demon.skill.DrakeRushRules.start(int)
+public double[] com.miophas.corruption.core.demon.skill.EliteCallRules.place(int,int,double)
+public double[] com.miophas.corruption.core.demon.skill.FanfareRules.spray(int,int)
+public double[] com.miophas.corruption.core.demon.skill.HandRules.place(int,double)
+public double[] com.miophas.corruption.core.demon.skill.PhaseDashRules.landing(int,double,double)
+public double[] com.miophas.corruption.core.demon.skill.RamRules.outlet(double,double)
+public double[] com.miophas.corruption.core.demon.skill.RamRules.past(double,double,double)
+public double[] com.miophas.corruption.core.demon.skill.SpinVolleyRules.scatter(int,int)
+public double[] com.miophas.corruption.core.demon.skill.SpitRules.lobbed(double,double,double)
+public double[] com.miophas.corruption.core.demon.skill.StrikeRules.mark(int,double)
+public double[] com.miophas.corruption.core.demon.skill.SummonRules.place(int,int,double)
+public double[][] com.miophas.corruption.core.demon.skill.SkyBeamRules.points(double,double)
+public final boolean com.miophas.corruption.core.arcane.CastingUnit$Situation.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.arcane.Codex.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.arcane.Grimoire.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.arcane.SpellAction$Custom.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.arcane.SpellAction$Particles.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.arcane.SpellAction$Visual.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.arcane.SpellRule.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.corruption.CorruptionPurifier.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.corruption.CorruptionWard.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.corruption.CurseWard.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.corruption.RemnantCombatProfile.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.BodyPart.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.BarrageRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.BeamRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.BeamVolleyRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.BlightRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.BlinkRules$Danger.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.BlinkRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.BurrowRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.ChargeRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.ChariotRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.CountedSummonRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.CrescendoRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.DebrisRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.DiveChainRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.DiveRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.DrakeRushRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.EliteCallRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.FanfareRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.FireballRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.FlyingStrikeRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.GazeRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.GrabRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.HandRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.MeleeRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.MindControlRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.PhaseDashRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.PounceRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.PsychicRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.PsychicStreamRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.RamRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.ScreechRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.SkillTiming.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.SkyBeamRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.SnareRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.SpikeFieldRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.SpinRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.SpinVolleyRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.SpitRules$Pool.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.SpitRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.StrikeRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.SummonRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.UpheavalRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.demon.skill.VenusRules.equals(java.lang.Object)
+public final boolean com.miophas.corruption.core.energy.EnergyTool.equals(java.lang.Object)
+public final int com.miophas.corruption.core.arcane.CastingUnit$Situation.hashCode()
+public final int com.miophas.corruption.core.arcane.Codex.hashCode()
+public final int com.miophas.corruption.core.arcane.Grimoire.hashCode()
+public final int com.miophas.corruption.core.arcane.SpellAction$Custom.hashCode()
+public final int com.miophas.corruption.core.arcane.SpellAction$Particles.hashCode()
+public final int com.miophas.corruption.core.arcane.SpellAction$Visual.hashCode()
+public final int com.miophas.corruption.core.arcane.SpellRule.hashCode()
+public final int com.miophas.corruption.core.corruption.CorruptionPurifier.hashCode()
+public final int com.miophas.corruption.core.corruption.CorruptionWard.hashCode()
+public final int com.miophas.corruption.core.corruption.CurseWard.hashCode()
+public final int com.miophas.corruption.core.corruption.RemnantCombatProfile.hashCode()
+public final int com.miophas.corruption.core.demon.BodyPart.hashCode()
+public final int com.miophas.corruption.core.demon.skill.BarrageRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.BeamRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.BeamVolleyRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.BlightRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.BlinkRules$Danger.hashCode()
+public final int com.miophas.corruption.core.demon.skill.BlinkRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.BurrowRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.ChargeRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.ChariotRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.CountedSummonRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.CrescendoRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.DebrisRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.DiveChainRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.DiveRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.DrakeRushRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.EliteCallRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.FanfareRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.FireballRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.FlyingStrikeRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.GazeRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.GrabRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.HandRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.MeleeRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.MindControlRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.PhaseDashRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.PounceRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.PsychicRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.PsychicStreamRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.RamRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.ScreechRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.SkillTiming.hashCode()
+public final int com.miophas.corruption.core.demon.skill.SkyBeamRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.SnareRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.SpikeFieldRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.SpinRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.SpinVolleyRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.SpitRules$Pool.hashCode()
+public final int com.miophas.corruption.core.demon.skill.SpitRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.StrikeRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.SummonRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.UpheavalRules.hashCode()
+public final int com.miophas.corruption.core.demon.skill.VenusRules.hashCode()
+public final int com.miophas.corruption.core.energy.EnergyTool.hashCode()
+public final java.lang.String com.miophas.corruption.core.arcane.CastingUnit$Situation.toString()
+public final java.lang.String com.miophas.corruption.core.arcane.Codex.toString()
+public final java.lang.String com.miophas.corruption.core.arcane.Grimoire.toString()
+public final java.lang.String com.miophas.corruption.core.arcane.SpellAction$Custom.toString()
+public final java.lang.String com.miophas.corruption.core.arcane.SpellAction$Particles.toString()
+public final java.lang.String com.miophas.corruption.core.arcane.SpellAction$Visual.toString()
+public final java.lang.String com.miophas.corruption.core.arcane.SpellRule.toString()
+public final java.lang.String com.miophas.corruption.core.corruption.CorruptionPurifier.toString()
+public final java.lang.String com.miophas.corruption.core.corruption.CorruptionWard.toString()
+public final java.lang.String com.miophas.corruption.core.corruption.CurseWard.toString()
+public final java.lang.String com.miophas.corruption.core.corruption.RemnantCombatProfile.toString()
+public final java.lang.String com.miophas.corruption.core.demon.BodyPart.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.BarrageRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.BeamRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.BeamVolleyRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.BlightRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.BlinkRules$Danger.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.BlinkRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.BurrowRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.ChargeRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.ChariotRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.CountedSummonRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.CrescendoRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.DebrisRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.DiveChainRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.DiveRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.DrakeRushRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.EliteCallRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.FanfareRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.FireballRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.FlyingStrikeRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.GazeRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.GrabRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.HandRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.MeleeRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.MindControlRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.PhaseDashRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.PounceRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.PsychicRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.PsychicStreamRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.RamRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.ScreechRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.SkillTiming.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.SkyBeamRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.SnareRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.SpikeFieldRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.SpinRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.SpinVolleyRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.SpitRules$Pool.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.SpitRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.StrikeRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.SummonRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.UpheavalRules.toString()
+public final java.lang.String com.miophas.corruption.core.demon.skill.VenusRules.toString()
+public final java.lang.String com.miophas.corruption.core.energy.EnergyTool.toString()
+public float com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier.corruptionDamage(float)
+public float com.miophas.corruption.core.demon.skill.BeamRules.follow(float,float)
+public float com.miophas.corruption.core.demon.skill.BeamRules.turn()
+public float com.miophas.corruption.core.demon.skill.BlinkRules$Danger.hurtShare()
+public float com.miophas.corruption.core.demon.skill.BlinkRules.hurtShare()
+public float com.miophas.corruption.core.demon.skill.ChargeRules.hardest()
+public float com.miophas.corruption.core.demon.skill.ChariotRules.hardest()
+public float com.miophas.corruption.core.demon.skill.FireballRules.hardest()
+public float com.miophas.corruption.core.demon.skill.MindControlRules.grip()
+public float com.miophas.corruption.core.demon.skill.SkillTiming.wound(float)
+public float com.miophas.corruption.core.demon.skill.SpitRules$Pool.radius()
+public int com.miophas.corruption.core.altar.AltarFacing.quarterTurns()
+public int com.miophas.corruption.core.altar.AltarForm.east(int)
+public int com.miophas.corruption.core.altar.AltarForm.north(int)
+public int com.miophas.corruption.core.altar.AltarForm.slotAt(int,int)
+public int com.miophas.corruption.core.altar.AltarForm.slots()
+public int com.miophas.corruption.core.altar.AltarForm.step()
+public int com.miophas.corruption.core.arcane.CastingUnit$Situation.corruption()
+public int com.miophas.corruption.core.arcane.CastingUnit$Situation.corruptionLimit()
+public int com.miophas.corruption.core.arcane.CastingUnit$Situation.parchments()
+public int com.miophas.corruption.core.arcane.CastingUnit.capacity()
+public int com.miophas.corruption.core.arcane.Codex.indexOf(java.lang.String)
+public int com.miophas.corruption.core.arcane.Codex.size()
+public int com.miophas.corruption.core.arcane.Grimoire.indexOf(java.lang.String)
+public int com.miophas.corruption.core.arcane.Grimoire.selected()
+public int com.miophas.corruption.core.arcane.Grimoire.size()
+public int com.miophas.corruption.core.arcane.SpellAction$Particles.colour()
+public int com.miophas.corruption.core.arcane.SpellAction$Particles.count()
+public int com.miophas.corruption.core.arcane.SpellAction$Visual.accent()
+public int com.miophas.corruption.core.arcane.SpellAction$Visual.colour()
+public int com.miophas.corruption.core.arcane.SpellAction$Visual.ticks()
+public int com.miophas.corruption.core.arcane.SpellRule.cooldown()
+public int com.miophas.corruption.core.arcane.SpellRule.corruptionGain()
+public int com.miophas.corruption.core.arcane.SpellRule.minCorruption()
+public int com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier.threshold()
+public int com.miophas.corruption.core.corruption.CorruptionPurifier.amount()
+public int com.miophas.corruption.core.corruption.CorruptionPurifier.purify(int)
+public int com.miophas.corruption.core.demon.skill.BarrageRules.count()
+public int com.miophas.corruption.core.demon.skill.BarrageRules.flight()
+public int com.miophas.corruption.core.demon.skill.BarrageRules.perTick()
+public int com.miophas.corruption.core.demon.skill.BeamRules.interval()
+public int com.miophas.corruption.core.demon.skill.BeamVolleyRules.byHealth(float)
+public int com.miophas.corruption.core.demon.skill.BeamVolleyRules.most()
+public int com.miophas.corruption.core.demon.skill.BlightRules.most()
+public int com.miophas.corruption.core.demon.skill.BlightRules.reaching(double)
+public int com.miophas.corruption.core.demon.skill.BlightRules.spread()
+public int com.miophas.corruption.core.demon.skill.BlinkRules$Danger.crowding()
+public int com.miophas.corruption.core.demon.skill.BlinkRules.crowd()
+public int com.miophas.corruption.core.demon.skill.BlinkRules.hurtWindow()
+public int com.miophas.corruption.core.demon.skill.BlinkRules.tries()
+public int com.miophas.corruption.core.demon.skill.BurrowRules.debrisMost()
+public int com.miophas.corruption.core.demon.skill.BurrowRules.warn()
+public int com.miophas.corruption.core.demon.skill.ChargeRules.rushTicks()
+public int com.miophas.corruption.core.demon.skill.ChariotRules.burnSeconds()
+public int com.miophas.corruption.core.demon.skill.ChariotRules.runTicks()
+public int com.miophas.corruption.core.demon.skill.CrescendoRules.every()
+public int com.miophas.corruption.core.demon.skill.CrescendoRules.rings()
+public int com.miophas.corruption.core.demon.skill.CrescendoRules.starts(int)
+public int com.miophas.corruption.core.demon.skill.CrescendoRules.travel()
+public int com.miophas.corruption.core.demon.skill.DiveChainRules.climb()
+public int com.miophas.corruption.core.demon.skill.DiveChainRules.cooldown()
+public int com.miophas.corruption.core.demon.skill.DiveChainRules.dives()
+public int com.miophas.corruption.core.demon.skill.DiveChainRules.most()
+public int com.miophas.corruption.core.demon.skill.DiveRules.debrisMost()
+public int com.miophas.corruption.core.demon.skill.DrakeRushRules.drakes()
+public int com.miophas.corruption.core.demon.skill.DrakeRushRules.flight()
+public int com.miophas.corruption.core.demon.skill.DrakeRushRules.gather()
+public int com.miophas.corruption.core.demon.skill.DrakeRushRules.lasts()
+public int com.miophas.corruption.core.demon.skill.EliteCallRules.count(int,double)
+public int com.miophas.corruption.core.demon.skill.EliteCallRules.least()
+public int com.miophas.corruption.core.demon.skill.EliteCallRules.most()
+public int com.miophas.corruption.core.demon.skill.FanfareRules.aimed()
+public int com.miophas.corruption.core.demon.skill.FanfareRules.aimedEvery()
+public int com.miophas.corruption.core.demon.skill.FanfareRules.bolts()
+public int com.miophas.corruption.core.demon.skill.FanfareRules.perTick()
+public int com.miophas.corruption.core.demon.skill.FanfareRules.sweepTicks()
+public int com.miophas.corruption.core.demon.skill.FireballRules.burnSeconds()
+public int com.miophas.corruption.core.demon.skill.FireballRules.count()
+public int com.miophas.corruption.core.demon.skill.FireballRules.crushMost()
+public int com.miophas.corruption.core.demon.skill.FireballRules.every()
+public int com.miophas.corruption.core.demon.skill.FireballRules.lead()
+public int com.miophas.corruption.core.demon.skill.FireballRules.leading(double)
+public int com.miophas.corruption.core.demon.skill.FireballRules.shot(int)
+public int com.miophas.corruption.core.demon.skill.GazeRules.blindnessTicks()
+public int com.miophas.corruption.core.demon.skill.GazeRules.eyes()
+public int com.miophas.corruption.core.demon.skill.GazeRules.ringed()
+public int com.miophas.corruption.core.demon.skill.GazeRules.slownessLevel()
+public int com.miophas.corruption.core.demon.skill.GazeRules.slownessTicks()
+public int com.miophas.corruption.core.demon.skill.GazeRules.witherLevel()
+public int com.miophas.corruption.core.demon.skill.GazeRules.witherTicks()
+public int com.miophas.corruption.core.demon.skill.HandRules.hands()
+public int com.miophas.corruption.core.demon.skill.HandRules.hold()
+public int com.miophas.corruption.core.demon.skill.HandRules.impact()
+public int com.miophas.corruption.core.demon.skill.HandRules.lasts()
+public int com.miophas.corruption.core.demon.skill.HandRules.rise()
+public int com.miophas.corruption.core.demon.skill.HandRules.sink()
+public int com.miophas.corruption.core.demon.skill.HandRules.slam()
+public int com.miophas.corruption.core.demon.skill.MindControlRules.holds()
+public int com.miophas.corruption.core.demon.skill.PhaseDashRules.curseLevel()
+public int com.miophas.corruption.core.demon.skill.PhaseDashRules.curseTicks()
+public int com.miophas.corruption.core.demon.skill.PhaseDashRules.hitsEach()
+public int com.miophas.corruption.core.demon.skill.PhaseDashRules.hopping(int)
+public int com.miophas.corruption.core.demon.skill.PhaseDashRules.hops()
+public int com.miophas.corruption.core.demon.skill.PhaseDashRules.interval()
+public int com.miophas.corruption.core.demon.skill.PounceRules.flight()
+public int com.miophas.corruption.core.demon.skill.PsychicRules.darknessTicks()
+public int com.miophas.corruption.core.demon.skill.PsychicRules.nauseaTicks()
+public int com.miophas.corruption.core.demon.skill.PsychicRules.slowLevel()
+public int com.miophas.corruption.core.demon.skill.PsychicRules.slowTicks()
+public int com.miophas.corruption.core.demon.skill.PsychicStreamRules.breaksAfter()
+public int com.miophas.corruption.core.demon.skill.PsychicStreamRules.interval()
+public int com.miophas.corruption.core.demon.skill.PsychicStreamRules.pulses()
+public int com.miophas.corruption.core.demon.skill.ScreechRules.slowLevel()
+public int com.miophas.corruption.core.demon.skill.ScreechRules.slowTicks()
+public int com.miophas.corruption.core.demon.skill.ScreechRules.stunTicks()
+public int com.miophas.corruption.core.demon.skill.SkillTiming.cooldown()
+public int com.miophas.corruption.core.demon.skill.SkillTiming.ticks()
+public int com.miophas.corruption.core.demon.skill.SkillTiming.windup()
+public int com.miophas.corruption.core.demon.skill.SkyBeamRules.beams()
+public int com.miophas.corruption.core.demon.skill.SkyBeamRules.every()
+public int com.miophas.corruption.core.demon.skill.SkyBeamRules.pouring()
+public int com.miophas.corruption.core.demon.skill.SnareRules.holdLevel()
+public int com.miophas.corruption.core.demon.skill.SnareRules.holdTicks()
+public int com.miophas.corruption.core.demon.skill.SnareRules.holds(boolean)
+public int com.miophas.corruption.core.demon.skill.SpikeFieldRules.slownessLevel()
+public int com.miophas.corruption.core.demon.skill.SpikeFieldRules.slownessTicks()
+public int com.miophas.corruption.core.demon.skill.SpinRules.blows()
+public int com.miophas.corruption.core.demon.skill.SpinRules.every()
+public int com.miophas.corruption.core.demon.skill.SpinVolleyRules.bolts()
+public int com.miophas.corruption.core.demon.skill.SpinVolleyRules.interval()
+public int com.miophas.corruption.core.demon.skill.SpinVolleyRules.points()
+public int com.miophas.corruption.core.demon.skill.SpitRules$Pool.curseTicks()
+public int com.miophas.corruption.core.demon.skill.SpitRules$Pool.ticks()
+public int com.miophas.corruption.core.demon.skill.SpitRules.every()
+public int com.miophas.corruption.core.demon.skill.SpitRules.flight()
+public int com.miophas.corruption.core.demon.skill.SpitRules.shot(int)
+public int com.miophas.corruption.core.demon.skill.SpitRules.shots()
+public int com.miophas.corruption.core.demon.skill.StrikeRules.bolts()
+public int com.miophas.corruption.core.demon.skill.StrikeRules.falling(int)
+public int com.miophas.corruption.core.demon.skill.StrikeRules.fallsOn(int)
+public int com.miophas.corruption.core.demon.skill.StrikeRules.interval()
+public int com.miophas.corruption.core.demon.skill.SummonRules.count()
+public int com.miophas.corruption.core.demon.skill.SummonRules.lasts()
+public int com.miophas.corruption.core.demon.skill.SummonRules.most()
+public int com.miophas.corruption.core.demon.skill.SummonRules.toCall(int)
+public int com.miophas.corruption.core.demon.skill.UpheavalRules.rise()
+public int com.miophas.corruption.core.demon.skill.UpheavalRules.sink()
+public int com.miophas.corruption.core.demon.skill.VenusRules.absorptionLevel()
+public int com.miophas.corruption.core.demon.skill.VenusRules.absorptionTicks()
+public int com.miophas.corruption.core.demon.skill.VenusRules.regenerationLevel()
+public int com.miophas.corruption.core.demon.skill.VenusRules.regenerationTicks()
+public int[] com.miophas.corruption.core.altar.AltarFacing.inWorld(int,int)
+public int[] com.miophas.corruption.core.demon.skill.BarrageRules.loosed(int)
+public java.lang.String com.miophas.corruption.core.arcane.CastingUnit.current()
+public java.lang.String com.miophas.corruption.core.arcane.Codex.at(int)
+public java.lang.String com.miophas.corruption.core.arcane.Grimoire.at(int)
+public java.lang.String com.miophas.corruption.core.arcane.Grimoire.current()
+public java.lang.String com.miophas.corruption.core.arcane.SpellAction$Custom.id()
+public java.lang.String com.miophas.corruption.core.arcane.SpellAction$Particles.particle()
+public java.lang.String com.miophas.corruption.core.arcane.SpellAction$Visual.effect()
+public java.lang.String com.miophas.corruption.core.arcane.SpellAction$Visual.sound()
+public java.lang.String com.miophas.corruption.core.demon.BodyPart.name()
+public java.lang.String com.miophas.corruption.core.demon.skill.SummonRules.look(int,int)
+public java.util.List<com.miophas.corruption.core.arcane.SpellAction> com.miophas.corruption.core.arcane.SpellRule.actions()
+public java.util.List<double[]> com.miophas.corruption.core.demon.skill.SpikeFieldRules.clusters()
+public java.util.List<int[]> com.miophas.corruption.core.demon.skill.UpheavalRules.columns()
+public java.util.List<java.lang.String> com.miophas.corruption.core.arcane.Codex.strings()
+public java.util.List<java.lang.String> com.miophas.corruption.core.arcane.Grimoire.spells()
+public java.util.List<java.lang.String> com.miophas.corruption.core.demon.skill.SummonRules.looks()
+public java.util.Map<java.lang.String, java.lang.String> com.miophas.corruption.core.arcane.SpellAction$Custom.parameters()
+public long com.miophas.corruption.core.arcane.CastingUnit.energy()
+public long com.miophas.corruption.core.arcane.SpellRule.energy()
+public long com.miophas.corruption.core.energy.EnergyTool.capacity()
+public long com.miophas.corruption.core.energy.EnergyTool.held(long)
+public long com.miophas.corruption.core.energy.EnergyTool.step()
+public long com.miophas.corruption.core.energy.EnergyTool.taken(long,long)
+public static boolean com.miophas.corruption.core.demon.skill.DebrisRules.tears(double)
+public static boolean com.miophas.corruption.core.demon.skill.DiveRules.tears(double)
+public static com.miophas.corruption.core.altar.AltarFacing com.miophas.corruption.core.altar.AltarFacing.valueOf(java.lang.String)
+public static com.miophas.corruption.core.altar.AltarFacing[] com.miophas.corruption.core.altar.AltarFacing.values()
+public static com.miophas.corruption.core.altar.AltarForm com.miophas.corruption.core.altar.AltarForm.standing(com.miophas.corruption.core.altar.AltarLayout$Place)
+public static com.miophas.corruption.core.altar.AltarForm com.miophas.corruption.core.altar.AltarForm.valueOf(java.lang.String)
+public static com.miophas.corruption.core.altar.AltarForm com.miophas.corruption.core.altar.AltarForm.withSlots(int)
+public static com.miophas.corruption.core.altar.AltarForm[] com.miophas.corruption.core.altar.AltarForm.values()
+public static com.miophas.corruption.core.altar.AltarState com.miophas.corruption.core.altar.AltarState.valueOf(java.lang.String)
+public static com.miophas.corruption.core.altar.AltarState[] com.miophas.corruption.core.altar.AltarState.values()
+public static com.miophas.corruption.core.arcane.ArcaneReading$Sight com.miophas.corruption.core.arcane.ArcaneReading$Sight.valueOf(java.lang.String)
+public static com.miophas.corruption.core.arcane.ArcaneReading$Sight[] com.miophas.corruption.core.arcane.ArcaneReading$Sight.values()
+public static com.miophas.corruption.core.arcane.Grimoire$Inscribe com.miophas.corruption.core.arcane.Grimoire$Inscribe.valueOf(java.lang.String)
+public static com.miophas.corruption.core.arcane.Grimoire$Inscribe[] com.miophas.corruption.core.arcane.Grimoire$Inscribe.values()
+public static com.miophas.corruption.core.arcane.SpellAction$Push$From com.miophas.corruption.core.arcane.SpellAction$Push$From.valueOf(java.lang.String)
+public static com.miophas.corruption.core.arcane.SpellAction$Push$From[] com.miophas.corruption.core.arcane.SpellAction$Push$From.values()
+public static com.miophas.corruption.core.arcane.SpellAction$Shape com.miophas.corruption.core.arcane.SpellAction$Shape.valueOf(java.lang.String)
+public static com.miophas.corruption.core.arcane.SpellAction$Shape[] com.miophas.corruption.core.arcane.SpellAction$Shape.values()
+public static com.miophas.corruption.core.arcane.SpellAction$Sky com.miophas.corruption.core.arcane.SpellAction$Sky.valueOf(java.lang.String)
+public static com.miophas.corruption.core.arcane.SpellAction$Sky[] com.miophas.corruption.core.arcane.SpellAction$Sky.values()
+public static com.miophas.corruption.core.arcane.SpellAction$Source com.miophas.corruption.core.arcane.SpellAction$Source.valueOf(java.lang.String)
+public static com.miophas.corruption.core.arcane.SpellAction$Source[] com.miophas.corruption.core.arcane.SpellAction$Source.values()
+public static com.miophas.corruption.core.arcane.SpellAction$Target com.miophas.corruption.core.arcane.SpellAction$Target.valueOf(java.lang.String)
+public static com.miophas.corruption.core.arcane.SpellAction$Target[] com.miophas.corruption.core.arcane.SpellAction$Target.values()
+public static com.miophas.corruption.core.arcane.SpellCasting$Check com.miophas.corruption.core.arcane.SpellCasting$Check.valueOf(java.lang.String)
+public static com.miophas.corruption.core.arcane.SpellCasting$Check[] com.miophas.corruption.core.arcane.SpellCasting$Check.values()
+public static com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier.valueOf(java.lang.String)
+public static com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier[] com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier.values()
+public static com.miophas.corruption.core.corruption.RemnantCombatProfile com.miophas.corruption.core.corruption.RemnantCombatProfile.capture(double,double)
+public static com.miophas.corruption.core.demon.skill.SpitRules$Look com.miophas.corruption.core.demon.skill.SpitRules$Look.valueOf(java.lang.String)
+public static com.miophas.corruption.core.demon.skill.SpitRules$Look[] com.miophas.corruption.core.demon.skill.SpitRules$Look.values()
+public static com.miophas.corruption.core.demon.skill.UpheavalRules$Form com.miophas.corruption.core.demon.skill.UpheavalRules$Form.valueOf(java.lang.String)
+public static com.miophas.corruption.core.demon.skill.UpheavalRules$Form[] com.miophas.corruption.core.demon.skill.UpheavalRules$Form.values()
+public static double com.miophas.corruption.core.corruption.CorruptionWard.total(java.lang.Iterable<com.miophas.corruption.core.corruption.CorruptionWard>)
+public static double com.miophas.corruption.core.corruption.CurseWard.total(java.lang.Iterable<com.miophas.corruption.core.corruption.CurseWard>)
+public static double com.miophas.corruption.core.demon.skill.BeamRules.wrap(double)
+public static double com.miophas.corruption.core.demon.skill.ChariotRules.offLine(double,double,double,double,double,double)
+public static double com.miophas.corruption.core.demon.skill.PhaseDashRules.offLine(double,double,double,double,double,double,double,double,double)
+public static double com.miophas.corruption.core.demon.skill.SkyBeamRules.circle(double)
+public static double com.miophas.corruption.core.demon.skill.SkyBeamRules.spread(int,double)
+public static double com.miophas.corruption.core.demon.skill.SkyBeamRules.width(int,double)
+public static double[] com.miophas.corruption.core.demon.skill.SpinVolleyRules.tip(double)
+public static double[][] com.miophas.corruption.core.demon.skill.SkyBeamRules.points(int,double,double,double,double)
+public static final com.miophas.corruption.core.altar.AltarFacing com.miophas.corruption.core.altar.AltarFacing.EAST
+public static final com.miophas.corruption.core.altar.AltarFacing com.miophas.corruption.core.altar.AltarFacing.NORTH
+public static final com.miophas.corruption.core.altar.AltarFacing com.miophas.corruption.core.altar.AltarFacing.SOUTH
+public static final com.miophas.corruption.core.altar.AltarFacing com.miophas.corruption.core.altar.AltarFacing.WEST
+public static final com.miophas.corruption.core.altar.AltarForm com.miophas.corruption.core.altar.AltarForm.HEXAGRAM
+public static final com.miophas.corruption.core.altar.AltarForm com.miophas.corruption.core.altar.AltarForm.OCTAGRAM
+public static final com.miophas.corruption.core.altar.AltarState com.miophas.corruption.core.altar.AltarState.BINDING
+public static final com.miophas.corruption.core.altar.AltarState com.miophas.corruption.core.altar.AltarState.DORMANT
+public static final com.miophas.corruption.core.altar.AltarState com.miophas.corruption.core.altar.AltarState.FORMED
+public static final com.miophas.corruption.core.arcane.ArcaneReading$Sight com.miophas.corruption.core.arcane.ArcaneReading$Sight.GLYPHS
+public static final com.miophas.corruption.core.arcane.ArcaneReading$Sight com.miophas.corruption.core.arcane.ArcaneReading$Sight.MEANING
+public static final com.miophas.corruption.core.arcane.CastingUnit com.miophas.corruption.core.arcane.CastingUnit.EMPTY
+public static final com.miophas.corruption.core.arcane.Codex com.miophas.corruption.core.arcane.Codex.EMPTY
+public static final com.miophas.corruption.core.arcane.Grimoire com.miophas.corruption.core.arcane.Grimoire.EMPTY
+public static final com.miophas.corruption.core.arcane.Grimoire$Inscribe com.miophas.corruption.core.arcane.Grimoire$Inscribe.ALREADY_KNOWN
+public static final com.miophas.corruption.core.arcane.Grimoire$Inscribe com.miophas.corruption.core.arcane.Grimoire$Inscribe.FULL
+public static final com.miophas.corruption.core.arcane.Grimoire$Inscribe com.miophas.corruption.core.arcane.Grimoire$Inscribe.READY
+public static final com.miophas.corruption.core.arcane.SpellAction$Push$From com.miophas.corruption.core.arcane.SpellAction$Push$From.CASTER
+public static final com.miophas.corruption.core.arcane.SpellAction$Push$From com.miophas.corruption.core.arcane.SpellAction$Push$From.ORIGIN
+public static final com.miophas.corruption.core.arcane.SpellAction$Shape com.miophas.corruption.core.arcane.SpellAction$Shape.BURST
+public static final com.miophas.corruption.core.arcane.SpellAction$Shape com.miophas.corruption.core.arcane.SpellAction$Shape.COLUMN
+public static final com.miophas.corruption.core.arcane.SpellAction$Shape com.miophas.corruption.core.arcane.SpellAction$Shape.RING
+public static final com.miophas.corruption.core.arcane.SpellAction$Shape com.miophas.corruption.core.arcane.SpellAction$Shape.SPHERE
+public static final com.miophas.corruption.core.arcane.SpellAction$Shape com.miophas.corruption.core.arcane.SpellAction$Shape.SPIRAL
+public static final com.miophas.corruption.core.arcane.SpellAction$Sky com.miophas.corruption.core.arcane.SpellAction$Sky.CLEAR
+public static final com.miophas.corruption.core.arcane.SpellAction$Sky com.miophas.corruption.core.arcane.SpellAction$Sky.RAIN
+public static final com.miophas.corruption.core.arcane.SpellAction$Sky com.miophas.corruption.core.arcane.SpellAction$Sky.THUNDER
+public static final com.miophas.corruption.core.arcane.SpellAction$Source com.miophas.corruption.core.arcane.SpellAction$Source.CASTER
+public static final com.miophas.corruption.core.arcane.SpellAction$Source com.miophas.corruption.core.arcane.SpellAction$Source.SKY
+public static final com.miophas.corruption.core.arcane.SpellAction$Target com.miophas.corruption.core.arcane.SpellAction$Target.NEARBY
+public static final com.miophas.corruption.core.arcane.SpellAction$Target com.miophas.corruption.core.arcane.SpellAction$Target.SELF
+public static final com.miophas.corruption.core.arcane.SpellCasting$Check com.miophas.corruption.core.arcane.SpellCasting$Check.COOLING
+public static final com.miophas.corruption.core.arcane.SpellCasting$Check com.miophas.corruption.core.arcane.SpellCasting$Check.NOT_CORRUPTED_ENOUGH
+public static final com.miophas.corruption.core.arcane.SpellCasting$Check com.miophas.corruption.core.arcane.SpellCasting$Check.NO_ENERGY
+public static final com.miophas.corruption.core.arcane.SpellCasting$Check com.miophas.corruption.core.arcane.SpellCasting$Check.NO_PARCHMENT
+public static final com.miophas.corruption.core.arcane.SpellCasting$Check com.miophas.corruption.core.arcane.SpellCasting$Check.READY
+public static final com.miophas.corruption.core.arcane.SpellCasting$Check com.miophas.corruption.core.arcane.SpellCasting$Check.TOO_CORRUPTED
+public static final com.miophas.corruption.core.arcane.SpellRule com.miophas.corruption.core.arcane.SpellRule.NONE
+public static final com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier.ADVANCED
+public static final com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier.INTERMEDIATE
+public static final com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier.NOVICE
+public static final com.miophas.corruption.core.corruption.CorruptionWard com.miophas.corruption.core.corruption.CorruptionWard.NONE
+public static final com.miophas.corruption.core.corruption.CurseWard com.miophas.corruption.core.corruption.CurseWard.NONE
+public static final com.miophas.corruption.core.demon.skill.SpitRules$Look com.miophas.corruption.core.demon.skill.SpitRules$Look.BOLT
+public static final com.miophas.corruption.core.demon.skill.SpitRules$Look com.miophas.corruption.core.demon.skill.SpitRules$Look.FEATHER
+public static final com.miophas.corruption.core.demon.skill.SpitRules$Look com.miophas.corruption.core.demon.skill.SpitRules$Look.GLOB
+public static final com.miophas.corruption.core.demon.skill.SpitRules$Look com.miophas.corruption.core.demon.skill.SpitRules$Look.WATER
+public static final com.miophas.corruption.core.demon.skill.SpitRules$Pool com.miophas.corruption.core.demon.skill.SpitRules$Pool.NONE
+public static final com.miophas.corruption.core.demon.skill.UpheavalRules$Form com.miophas.corruption.core.demon.skill.UpheavalRules$Form.RISE
+public static final com.miophas.corruption.core.demon.skill.UpheavalRules$Form com.miophas.corruption.core.demon.skill.UpheavalRules$Form.SINK
+public static final com.miophas.corruption.core.demon.skill.UpheavalRules$Form com.miophas.corruption.core.demon.skill.UpheavalRules$Form.SPIKES
+public static final com.miophas.corruption.core.energy.EnergyTool com.miophas.corruption.core.energy.EnergyTool.NONE
+public static final double com.miophas.corruption.core.arcane.SpellAction.MAX_CORRUPTION_RADIUS
+public static final double com.miophas.corruption.core.arcane.SpellAction.MAX_RADIUS
+public static final double com.miophas.corruption.core.demon.skill.BarrageRules.GRAVITY
+public static final double com.miophas.corruption.core.demon.skill.BurrowRules.ENTRY
+public static final double com.miophas.corruption.core.demon.skill.FanfareRules.RISE
+public static final double com.miophas.corruption.core.demon.skill.GazeRules.RING
+public static final double com.miophas.corruption.core.demon.skill.GazeRules.RING_HEIGHT
+public static final double com.miophas.corruption.core.demon.skill.SkyBeamRules.SPIN
+public static final double com.miophas.corruption.core.demon.skill.SkyBeamRules.WARNING
+public static final double com.miophas.corruption.core.demon.skill.SpitRules.GRAVITY
+public static final float com.miophas.corruption.core.demon.skill.ChargeRules.OBSIDIAN
+public static final int com.miophas.corruption.core.altar.AltarForm.MOST_SLOTS
+public static final int com.miophas.corruption.core.arcane.Grimoire.CAPACITY
+public static final int com.miophas.corruption.core.arcane.SpellAction$Visual.GOLD
+public static final int com.miophas.corruption.core.arcane.SpellAction$Visual.ROSE
+public static float com.miophas.corruption.core.corruption.CurseWard.taken(float,double)
+public static float com.miophas.corruption.core.demon.skill.MindControlRules.pull(float,float,float)
+public static float com.miophas.corruption.core.demon.skill.MindControlRules.weave(float)
+public static int com.miophas.corruption.core.corruption.CorruptionWard.gain(int,double,java.util.function.DoubleSupplier)
+public static int com.miophas.corruption.core.demon.skill.PhaseDashRules.side(int)
+record com.miophas.corruption.core.arcane.CastingUnit$Situation[corruption:int, corruptionLimit:int, parchments:int, cooling:boolean, free:boolean]
+record com.miophas.corruption.core.arcane.Codex[strings:java.util.List<java.lang.String>]
+record com.miophas.corruption.core.arcane.Grimoire[spells:java.util.List<java.lang.String>, selected:int]
+record com.miophas.corruption.core.arcane.SpellAction$Custom[id:java.lang.String, parameters:java.util.Map<java.lang.String, java.lang.String>]
+record com.miophas.corruption.core.arcane.SpellAction$Particles[particle:java.lang.String, count:int, spread:double, speed:double, colour:int]
+record com.miophas.corruption.core.arcane.SpellAction$Visual[effect:java.lang.String, radius:double, height:double, ticks:int, colour:int, accent:int, shake:double, sound:java.lang.String]
+record com.miophas.corruption.core.arcane.SpellRule[energy:long, cooldown:int, minCorruption:int, corruptionGain:int, actions:java.util.List<com.miophas.corruption.core.arcane.SpellAction>]
+record com.miophas.corruption.core.corruption.CorruptionPurifier[amount:int]
+record com.miophas.corruption.core.corruption.CorruptionWard[share:double]
+record com.miophas.corruption.core.corruption.CurseWard[share:double]
+record com.miophas.corruption.core.corruption.RemnantCombatProfile[maxHealth:double, attackDamage:double]
+record com.miophas.corruption.core.demon.BodyPart[name:java.lang.String, forward:double, left:double, up:double, width:double, height:double]
+record com.miophas.corruption.core.demon.skill.BarrageRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, count:int, perTick:int, radius:double, flight:int, damage:double, splash:double]
+record com.miophas.corruption.core.demon.skill.BeamRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, length:double, width:double, interval:int, damage:double, turn:float]
+record com.miophas.corruption.core.demon.skill.BeamVolleyRules[beam:com.miophas.corruption.core.demon.skill.BeamRules, most:int, spread:double]
+record com.miophas.corruption.core.demon.skill.BlightRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, within:double, radius:double, most:int, spread:int, dormant:boolean, still:boolean, damage:double, knockback:double, lift:double]
+record com.miophas.corruption.core.demon.skill.BlinkRules$Danger[standingInHarm:boolean, hurtShare:float, crowding:int, playerClose:boolean, quarryDistance:double]
+record com.miophas.corruption.core.demon.skill.BlinkRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, nearest:double, farthest:double, lowest:double, highest:double, tries:int, crowdRadius:double, crowd:int, hurtWindow:int, hurtShare:float, tooNear:double]
+record com.miophas.corruption.core.demon.skill.BurrowRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, depth:double, speed:double, warn:int, rise:double, climb:double, radius:double, damage:double, launch:double, debrisRadius:double, debrisMost:int]
+record com.miophas.corruption.core.demon.skill.ChargeRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, speed:double, damage:double, knockback:double, hardest:float]
+record com.miophas.corruption.core.demon.skill.ChariotRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, from:double, past:double, speed:double, reach:double, damage:double, knockback:double, burnSeconds:int, hardest:float]
+record com.miophas.corruption.core.demon.skill.CountedSummonRules[rules:com.miophas.corruption.core.demon.skill.SummonRules, radius:double]
+record com.miophas.corruption.core.demon.skill.CrescendoRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, rings:int, every:int, speed:double, radius:double, width:double, height:double, damage:double, knockback:double, lift:double]
+record com.miophas.corruption.core.demon.skill.DebrisRules[radius:double, speed:double]
+record com.miophas.corruption.core.demon.skill.DiveChainRules[dive:com.miophas.corruption.core.demon.skill.DiveRules, dives:int, climb:int, most:int, cooldown:int]
+record com.miophas.corruption.core.demon.skill.DiveRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, minHeight:double, speed:double, radius:double, damage:double, knockback:double, debrisRadius:double, debrisMost:int, debrisSpeed:double]
+record com.miophas.corruption.core.demon.skill.DrakeRushRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, drakes:int, distance:double, height:double, gather:int, speed:double, width:double, damage:double, knockback:double]
+record com.miophas.corruption.core.demon.skill.EliteCallRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, least:int, most:int, radius:double]
+record com.miophas.corruption.core.demon.skill.FanfareRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, perTick:int, sweep:double, sweepTicks:int, aimedEvery:int, aimed:int, aimedSpread:double, speed:double, damage:double, splash:double]
+record com.miophas.corruption.core.demon.skill.FireballRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, count:int, every:int, speed:double, lead:int, damage:double, radius:double, burnSeconds:int, crushRadius:double, crushMost:int, hardest:float]
+record com.miophas.corruption.core.demon.skill.FlyingStrikeRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, range:double, speed:double]
+record com.miophas.corruption.core.demon.skill.GazeRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, slownessTicks:int, slownessLevel:int, blindnessTicks:int, witherTicks:int, witherLevel:int, eyes:int]
+record com.miophas.corruption.core.demon.skill.GrabRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, reach:double, near:double, pull:double, down:double, damage:double]
+record com.miophas.corruption.core.demon.skill.HandRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, hands:int, spread:double, rise:int, hold:int, slam:int, sink:int, radius:double, damage:double, launch:double]
+record com.miophas.corruption.core.demon.skill.MeleeRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, reach:double, arc:double, damage:double, knockback:double, lift:double]
+record com.miophas.corruption.core.demon.skill.MindControlRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, range:double, holds:int, moves:boolean, grip:float]
+record com.miophas.corruption.core.demon.skill.PhaseDashRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, hops:int, interval:int, pass:double, swerve:double, width:double, damage:double, curseTicks:int, curseLevel:int, hitsEach:int]
+record com.miophas.corruption.core.demon.skill.PounceRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, height:double, flight:int, reach:double, damage:double, knockback:double]
+record com.miophas.corruption.core.demon.skill.PsychicRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, radius:double, damage:double, nauseaTicks:int, darknessTicks:int, slowTicks:int, slowLevel:int]
+record com.miophas.corruption.core.demon.skill.PsychicStreamRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, holdRange:double, interval:int, damage:double, heal:double, breaksAfter:int]
+record com.miophas.corruption.core.demon.skill.RamRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, speed:double, width:double, damage:double, knockback:double, through:double, depth:double, away:double, burst:double, climb:double]
+record com.miophas.corruption.core.demon.skill.ScreechRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, radius:double, stunTicks:int, slowTicks:int, slowLevel:int]
+record com.miophas.corruption.core.demon.skill.SkillTiming[windup:int, ticks:int, cooldown:int]
+record com.miophas.corruption.core.demon.skill.SkyBeamRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, beams:int, altitude:double, width:double, damage:double, every:int]
+record com.miophas.corruption.core.demon.skill.SnareRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, radius:double, damage:double, holdTicks:int, holdLevel:int, lift:double]
+record com.miophas.corruption.core.demon.skill.SpikeFieldRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, near:double, far:double, nearWidth:double, farWidth:double, spacing:double, damage:double, slownessTicks:int, slownessLevel:int]
+record com.miophas.corruption.core.demon.skill.SpinRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, speed:double, reach:double, damage:double, every:int, knockback:double]
+record com.miophas.corruption.core.demon.skill.SpinVolleyRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, points:int, interval:int, spread:double, speed:double, damage:double, spin:double]
+record com.miophas.corruption.core.demon.skill.SpitRules$Pool[radius:float, ticks:int, curseTicks:int]
+record com.miophas.corruption.core.demon.skill.SpitRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, shots:int, every:int, fan:double, speed:double, damage:double, splash:double, lob:boolean, flight:int, look:com.miophas.corruption.core.demon.skill.SpitRules$Look, push:double, pool:com.miophas.corruption.core.demon.skill.SpitRules$Pool]
+record com.miophas.corruption.core.demon.skill.StrikeRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, bolts:int, scatter:double, interval:int, radius:double, damage:double]
+record com.miophas.corruption.core.demon.skill.SummonRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, count:int, most:int, radius:double, looks:java.util.List<java.lang.String>, atQuarry:boolean, lasts:int]
+record com.miophas.corruption.core.demon.skill.UpheavalRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, minRange:double, maxRange:double, radius:double, rise:int, sink:int, damage:double, launch:double, spikeDamage:double, spikeLaunch:double]
+record com.miophas.corruption.core.demon.skill.VenusRules[timing:com.miophas.corruption.core.demon.skill.SkillTiming, radius:double, heal:double, absorptionTicks:int, absorptionLevel:int, regenerationTicks:int, regenerationLevel:int, below:double]
+record com.miophas.corruption.core.energy.EnergyTool[capacity:long, step:long]
+type com.miophas.corruption.core.altar.AltarFacing
+type com.miophas.corruption.core.altar.AltarForm
+type com.miophas.corruption.core.altar.AltarLayout$Place
+type com.miophas.corruption.core.altar.AltarState
+type com.miophas.corruption.core.arcane.ArcaneReading$Sight
+type com.miophas.corruption.core.arcane.CastingUnit
+type com.miophas.corruption.core.arcane.CastingUnit$Payment
+type com.miophas.corruption.core.arcane.CastingUnit$Situation
+type com.miophas.corruption.core.arcane.Codex
+type com.miophas.corruption.core.arcane.Grimoire
+type com.miophas.corruption.core.arcane.Grimoire$Inscribe
+type com.miophas.corruption.core.arcane.SpellAction
+type com.miophas.corruption.core.arcane.SpellAction$Custom
+type com.miophas.corruption.core.arcane.SpellAction$Particles
+type com.miophas.corruption.core.arcane.SpellAction$Push$From
+type com.miophas.corruption.core.arcane.SpellAction$Shape
+type com.miophas.corruption.core.arcane.SpellAction$Sky
+type com.miophas.corruption.core.arcane.SpellAction$Source
+type com.miophas.corruption.core.arcane.SpellAction$Target
+type com.miophas.corruption.core.arcane.SpellAction$Visual
+type com.miophas.corruption.core.arcane.SpellCasting$Caster
+type com.miophas.corruption.core.arcane.SpellCasting$Check
+type com.miophas.corruption.core.arcane.SpellRule
+type com.miophas.corruption.core.corruption.CorruptedRobeRules$Tier
+type com.miophas.corruption.core.corruption.CorruptionPurifier
+type com.miophas.corruption.core.corruption.CorruptionWard
+type com.miophas.corruption.core.corruption.CurseWard
+type com.miophas.corruption.core.corruption.RemnantCombatProfile
+type com.miophas.corruption.core.demon.BodyPart
+type com.miophas.corruption.core.demon.skill.BarrageRules
+type com.miophas.corruption.core.demon.skill.BeamRules
+type com.miophas.corruption.core.demon.skill.BeamVolleyRules
+type com.miophas.corruption.core.demon.skill.BlightRules
+type com.miophas.corruption.core.demon.skill.BlinkRules
+type com.miophas.corruption.core.demon.skill.BlinkRules$Danger
+type com.miophas.corruption.core.demon.skill.BurrowRules
+type com.miophas.corruption.core.demon.skill.ChargeRules
+type com.miophas.corruption.core.demon.skill.ChariotRules
+type com.miophas.corruption.core.demon.skill.CountedSummonRules
+type com.miophas.corruption.core.demon.skill.CrescendoRules
+type com.miophas.corruption.core.demon.skill.DebrisRules
+type com.miophas.corruption.core.demon.skill.DiveChainRules
+type com.miophas.corruption.core.demon.skill.DiveRules
+type com.miophas.corruption.core.demon.skill.DrakeRushRules
+type com.miophas.corruption.core.demon.skill.EliteCallRules
+type com.miophas.corruption.core.demon.skill.FanfareRules
+type com.miophas.corruption.core.demon.skill.FireballRules
+type com.miophas.corruption.core.demon.skill.FlyingStrikeRules
+type com.miophas.corruption.core.demon.skill.GazeRules
+type com.miophas.corruption.core.demon.skill.GrabRules
+type com.miophas.corruption.core.demon.skill.HandRules
+type com.miophas.corruption.core.demon.skill.MeleeRules
+type com.miophas.corruption.core.demon.skill.MindControlRules
+type com.miophas.corruption.core.demon.skill.PhaseDashRules
+type com.miophas.corruption.core.demon.skill.PounceRules
+type com.miophas.corruption.core.demon.skill.PsychicRules
+type com.miophas.corruption.core.demon.skill.PsychicStreamRules
+type com.miophas.corruption.core.demon.skill.RamRules
+type com.miophas.corruption.core.demon.skill.ScreechRules
+type com.miophas.corruption.core.demon.skill.SkillTiming
+type com.miophas.corruption.core.demon.skill.SkyBeamRules
+type com.miophas.corruption.core.demon.skill.SnareRules
+type com.miophas.corruption.core.demon.skill.SpikeFieldRules
+type com.miophas.corruption.core.demon.skill.SpinRules
+type com.miophas.corruption.core.demon.skill.SpinVolleyRules
+type com.miophas.corruption.core.demon.skill.SpitRules
+type com.miophas.corruption.core.demon.skill.SpitRules$Look
+type com.miophas.corruption.core.demon.skill.SpitRules$Pool
+type com.miophas.corruption.core.demon.skill.StrikeRules
+type com.miophas.corruption.core.demon.skill.SummonRules
+type com.miophas.corruption.core.demon.skill.UpheavalRules
+type com.miophas.corruption.core.demon.skill.UpheavalRules$Form
+type com.miophas.corruption.core.demon.skill.VenusRules
+type com.miophas.corruption.core.energy.EnergyTool

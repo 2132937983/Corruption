@@ -27,19 +27,13 @@ public record DiveRules(SkillTiming timing, double minRange, double maxRange, do
     public boolean diving(int elapsed) { return elapsed >= timing.windup() && elapsed < timing.ticks(); }
 
     /** Whether a block this hard is torn up: one that can be broken at all. Bedrock, barriers and the like have no hardness at all (below none). */
-    public static boolean tears(double hardness) { return hardness >= 0; }
+    public static boolean tears(double hardness) { return DebrisRules.tears(hardness); }
 
     /**
      * How a block torn up this far from where the boss struck (dx, dy, dz: from there to the block's middle) is flung,
      * {x, y, z} in blocks a tick: out from there along the ground and always up, the nearer the harder, up to
      * {@code debrisSpeed}.
      */
-    public double[] fling(double dx, double dy, double dz) {
-        double out = Math.hypot(dx, dz), distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        double share = debrisRadius <= 0 ? 1 : Math.max(.35, 1 - distance / (debrisRadius + 1));
-        double wayX = out < 1e-6 ? 0 : dx / out, wayZ = out < 1e-6 ? 0 : dz / out;
-        // Out along the ground at most as fast as up; up the more the nearer the middle, as a blast throws what is under it.
-        double up = debrisSpeed * share, along = debrisSpeed * share * Math.min(1, .35 + out / Math.max(1, debrisRadius));
-        return new double[]{wayX * along, up, wayZ * along};
-    }
+    public DebrisRules debris() { return new DebrisRules(debrisRadius, debrisSpeed); }
+    public double[] fling(double dx, double dy, double dz) { return debris().fling(dx, dy, dz); }
 }

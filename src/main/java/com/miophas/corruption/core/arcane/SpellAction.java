@@ -17,6 +17,10 @@ import java.util.List;
  * their own.
  */
 public sealed interface SpellAction {
+    /** An add-on action, dispatched by its namespaced id; its payload remains game-independent. */
+    record Custom(String id, java.util.Map<String, String> parameters) implements SpellAction {
+        public Custom { java.util.Objects.requireNonNull(id); parameters = java.util.Map.copyOf(parameters); }
+    }
     /**
      * How far round its origin any action may reach, in blocks: what the data may ask for and what the spell then
      * reaches are both this at most, so a radius is either honoured or refused as the data loads, never quietly

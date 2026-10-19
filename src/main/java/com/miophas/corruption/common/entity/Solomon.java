@@ -1,5 +1,7 @@
 package com.miophas.corruption.common.entity;
 
+import com.miophas.corruption.api.demon.BossDeath;
+import com.miophas.corruption.api.demon.GoeticDemon;
 import com.miophas.corruption.api.demon.skill.SkillSet;
 import com.miophas.corruption.common.entity.skill.BlightSkill;
 import com.miophas.corruption.common.entity.skill.DrakeRushSkill;
@@ -9,8 +11,8 @@ import com.miophas.corruption.common.entity.skill.ScreechSkill;
 import com.miophas.corruption.common.entity.skill.SummonSkill;
 import com.miophas.corruption.common.entity.skill.UpheavalSkill;
 import com.miophas.corruption.common.registry.ModEntities;
-import com.miophas.corruption.core.demon.SolomonRules;
 import com.miophas.corruption.core.demon.SolomonRules.Edict;
+import com.miophas.corruption.core.demon.SolomonRules;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;

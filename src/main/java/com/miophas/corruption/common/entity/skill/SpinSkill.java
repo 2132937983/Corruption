@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
 import com.miophas.corruption.core.demon.skill.SpinRules;
 import javax.annotation.Nullable;
@@ -17,7 +20,7 @@ import net.minecraft.world.phys.Vec3;
  * every beat everything within its reach is struck and thrown away from it, in a sweep of light. While it runs, it
  * moves the boss itself.
  */
-public final class SpinSkill implements BossSkill<Mob> {
+public final class SpinSkill implements RegisteredSkill<SpinRules> {
     private final SpinRules rules;
     private int blows;
 
@@ -65,4 +68,7 @@ public final class SpinSkill implements BossSkill<Mob> {
         level.sendParticles(ParticleTypes.SWEEP_ATTACK, heart.x, heart.y, heart.z, 3, rules.reach() / 2, .3, rules.reach() / 2, 0);
         SkillShows.sound(boss, SoundEvents.PLAYER_ATTACK_SWEEP, 1.5F, .7F);
     }
+    @Override public BossSkillRegistry.Type<SpinRules> type() { return BossSkillApi.SPIN; }
+    @Override public SpinRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(0, 0, mob -> Integer.MAX_VALUE, false); }
 }

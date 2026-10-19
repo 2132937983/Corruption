@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.registry.ModDamageTypes;
 import com.miophas.corruption.common.registry.ModEffects;
 import com.miophas.corruption.common.registry.ModParticles;
@@ -28,7 +31,7 @@ import net.minecraft.world.phys.Vec3;
  * blinks of a run as the rules let and no more. A blink with nowhere to land is tried the other way round, then half as
  * far, and else not made.
  */
-public final class PhaseDashSkill implements BossSkill<Mob> {
+public final class PhaseDashSkill implements RegisteredSkill<PhaseDashRules> {
     private final PhaseDashRules rules;
     private final int colour, accent;
     private int made;
@@ -117,4 +120,7 @@ public final class PhaseDashSkill implements BossSkill<Mob> {
         }
         return null;
     }
+    @Override public BossSkillRegistry.Type<PhaseDashRules> type() { return BossSkillApi.PHASE_DASH; }
+    @Override public PhaseDashRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

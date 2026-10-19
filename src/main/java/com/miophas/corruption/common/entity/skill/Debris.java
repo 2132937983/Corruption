@@ -1,5 +1,6 @@
 package com.miophas.corruption.common.entity.skill;
 
+import com.miophas.corruption.core.demon.skill.DebrisRules;
 import com.miophas.corruption.core.demon.skill.DiveRules;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -28,6 +29,10 @@ public final class Debris {
 
     /** As {@link #tear(ServerLevel, Entity, Vec3, DiveRules)}, within this reach and as many as this. */
     public static int tear(ServerLevel level, Entity by, Vec3 at, double radius, int most, DiveRules rules) {
+        return tear(level, by, at, radius, most, rules.debris());
+    }
+
+    public static int tear(ServerLevel level, Entity by, Vec3 at, double radius, int most, DebrisRules rules) {
         if (most <= 0 || radius <= 0 || !EventHooks.canEntityGrief(level, by)) return 0;
         int reach = (int) Math.ceil(radius);
         BlockPos middle = BlockPos.containing(at);
@@ -70,7 +75,7 @@ public final class Debris {
     public static boolean tearable(ServerLevel level, BlockPos pos, BlockState state) {
         if (state.isAir() || !state.getFluidState().isEmpty() || state.hasBlockEntity() || state.canBeReplaced()) return false;
         if (state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF) || state.hasProperty(BlockStateProperties.BED_PART)) return false;
-        return DiveRules.tears(state.getDestroySpeed(level, pos));
+        return DebrisRules.tears(state.getDestroySpeed(level, pos));
     }
 
     private Debris() {}

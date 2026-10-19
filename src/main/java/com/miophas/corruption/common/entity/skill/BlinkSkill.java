@@ -2,6 +2,9 @@ package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.corruption.CorruptionFactionApi;
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.core.demon.skill.BlinkRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
 import java.util.List;
@@ -23,7 +26,7 @@ import net.minecraft.world.phys.Vec3;
  * rift where it stood, and is there: at the best of the places it tried round its quarry, where it fits, out of
  * anything that hurts, in sight of its quarry and furthest from what crowded it. Finding nowhere, it stays.
  */
-public final class BlinkSkill implements BossSkill<Mob> {
+public final class BlinkSkill implements RegisteredSkill<BlinkRules> {
     private final BlinkRules rules;
     private final BlinkRules.Wounds wounds;
     private final int colour, accent;
@@ -107,4 +110,7 @@ public final class BlinkSkill implements BossSkill<Mob> {
         }
         return chosen;
     }
+    @Override public BossSkillRegistry.Type<BlinkRules> type() { return BossSkillApi.BLINK; }
+    @Override public BlinkRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

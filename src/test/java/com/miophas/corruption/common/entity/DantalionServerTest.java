@@ -1,5 +1,9 @@
 package com.miophas.corruption.common.entity;
 
+import com.miophas.corruption.api.demon.GoeticDemon;
+
+import com.miophas.corruption.api.demon.BossDeath;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.miophas.corruption.api.arcane.ArcaneDamage;

@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.api.demon.skill.SpitCaster;
 import com.miophas.corruption.common.entity.SolomonFireball;
 import com.miophas.corruption.core.demon.skill.FireballRules;
@@ -20,7 +23,7 @@ import net.minecraft.world.phys.Vec3;
  * turned on its quarry, fire gathering at its mouth (its {@link SpitCaster} point, or its eyes); then it looses its fireballs
  * one after another ({@link SolomonFireball}), each aimed where its quarry will be when it gets there.
  */
-public final class FireballSkill implements BossSkill<Mob> {
+public final class FireballSkill implements RegisteredSkill<FireballRules> {
     private final FireballRules rules;
     private final int colour, accent;
     private final List<SolomonFireball> loosed = new ArrayList<>();
@@ -63,4 +66,7 @@ public final class FireballSkill implements BossSkill<Mob> {
     }
 
     private static Vec3 mouth(Mob boss) { return boss instanceof SpitCaster caster ? caster.spitFrom(0) : boss.getEyePosition(); }
+    @Override public BossSkillRegistry.Type<FireballRules> type() { return BossSkillApi.FIREBALL; }
+    @Override public FireballRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

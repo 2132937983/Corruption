@@ -1,6 +1,6 @@
 package com.miophas.corruption.common.client.entity;
 
-import com.miophas.corruption.common.entity.CorruptionElite;
+import com.miophas.corruption.api.elite.CorruptionElite;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.util.Mth;
 

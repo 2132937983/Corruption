@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.infection.GroundBlight;
 import com.miophas.corruption.common.registry.ModDamageTypes;
 import com.miophas.corruption.common.registry.ModParticles;
@@ -34,7 +37,7 @@ import net.neoforged.neoforge.event.EventHooks;
  * <p>Worked at the quarry ({@link #BlightSkill(BlightRules, int, int, boolean)}), it is all the same, but about where the
  * quarry stood when it began, not about the caster: so a caster far off may blight the ground under its quarry.
  */
-public final class BlightSkill implements BossSkill<Mob> {
+public final class BlightSkill implements RegisteredSkill<BlightRules> {
     /** How far above and below the caster's feet it looks for the top of the ground. */
     private static final int ABOVE = 2, BELOW = 4;
 
@@ -135,4 +138,7 @@ public final class BlightSkill implements BossSkill<Mob> {
 
     /** How far a block is from where the blight runs out from, along the ground. */
     private double along(BlockPos at) { return origin == null ? 0 : Math.hypot(at.getX() + .5 - origin.x, at.getZ() + .5 - origin.z); }
+    @Override public BossSkillRegistry.Type<BlightRules> type() { return atQuarry ? BossSkillApi.TARGET_BLIGHT : BossSkillApi.BLIGHT; }
+    @Override public BlightRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

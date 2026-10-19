@@ -2,37 +2,37 @@ package com.miophas.corruption.common.client;
 
 import com.miophas.corruption.Corruption;
 import com.miophas.corruption.common.block.InfectedBlock;
+import com.miophas.corruption.common.client.entity.CorruptedCreeperModel;
+import com.miophas.corruption.common.client.entity.CorruptedEndermanModel;
+import com.miophas.corruption.common.client.entity.CorruptedRemnantRenderer;
+import com.miophas.corruption.common.client.entity.CorruptedSkeletonArmorModel;
+import com.miophas.corruption.common.client.entity.CorruptedSkeletonModel;
+import com.miophas.corruption.common.client.entity.CorruptedSpiderModel;
+import com.miophas.corruption.common.client.entity.CorruptedZombieArmorModel;
+import com.miophas.corruption.common.client.entity.CorruptedZombieModel;
+import com.miophas.corruption.common.client.entity.CrimsonTextures;
 import com.miophas.corruption.common.client.model.CorruptionModelLoader;
 import com.miophas.corruption.common.client.model.SourceRenderView;
 import com.miophas.corruption.common.client.particle.CorruptionScreamParticle;
 import com.miophas.corruption.common.item.InfectedBlockItem;
-import com.miophas.corruption.common.registry.ModBlocks;
 import com.miophas.corruption.common.registry.ModBlockEntities;
+import com.miophas.corruption.common.registry.ModBlocks;
+import com.miophas.corruption.common.registry.ModEntities;
 import com.miophas.corruption.common.registry.ModItems;
 import com.miophas.corruption.common.registry.ModParticles;
-import com.miophas.corruption.common.registry.ModEntities;
-import com.miophas.corruption.common.client.entity.CorruptedRemnantRenderer;
-import com.miophas.corruption.common.client.entity.CrimsonTextures;
-import com.miophas.corruption.common.client.entity.CorruptedZombieModel;
-import com.miophas.corruption.common.client.entity.CorruptedZombieArmorModel;
-import com.miophas.corruption.common.client.entity.CorruptedSkeletonModel;
-import com.miophas.corruption.common.client.entity.CorruptedSkeletonArmorModel;
-import com.miophas.corruption.common.client.entity.CorruptedSpiderModel;
-import com.miophas.corruption.common.client.entity.CorruptedEndermanModel;
-import com.miophas.corruption.common.client.entity.CorruptedCreeperModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 @EventBusSubscriber(modid = Corruption.MOD_ID, value = Dist.CLIENT)
 public final class CorruptionClient {
@@ -46,8 +46,19 @@ public final class CorruptionClient {
                 .registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         event.enqueueWork(ArcaneTooltip::registerItemProperties);
         com.miophas.corruption.common.client.visual.SpellVisualRenderer.registerBuiltIn();
+        com.miophas.corruption.api.corruption.client.CorruptedTextures.install(new com.miophas.corruption.api.corruption.client.CorruptedTextures.Provider() {
+            public net.minecraft.resources.ResourceLocation texture(net.minecraft.resources.ResourceLocation source) { return CrimsonTextures.INSTANCE.texture(source); }
+            public net.minecraft.resources.ResourceLocation playerTexture(net.minecraft.resources.ResourceLocation source, int progress) { return CrimsonTextures.INSTANCE.texture(source, progress); }
+            public net.minecraft.client.renderer.RenderType layer(net.minecraft.client.renderer.RenderType source, net.minecraft.resources.ResourceLocation playerSkin, int progress) { return CrimsonTextures.INSTANCE.layer(source, playerSkin, progress); }
+        });
+        com.miophas.corruption.api.demon.client.BossDeathVisuals.install((boss, partial, camera, pose, buffers, far) -> {
+            if (boss instanceof com.miophas.corruption.api.demon.DemonBoss descriptor)
+                com.miophas.corruption.common.client.visual.DeathVisual.draw(
+                        com.miophas.corruption.common.client.visual.DeathVisual.Dying.of(boss, descriptor, partial, camera), pose, buffers, far);
+        });
         com.miophas.corruption.common.entity.SpellBeamEntity.firing = com.miophas.corruption.common.client.visual.CameraShake::rumble;
         MindControlClient.install();
+        com.miophas.corruption.api.corruption.RemnantAnimationApi.installPlayback(new com.miophas.corruption.common.client.entity.SourceAnimationPlayback());
     }
 
     @SubscribeEvent

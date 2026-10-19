@@ -4940,3 +4940,80 @@ What existing modules needed:
   - how five to eight chunk-wide columns look at once, and what they cost a frame;
   - whether the heading windows feel fair in a fight;
   - the dragons' poses for the stars, which follow the warning, so they now last longer.
+
+
+## 68. Separating rules, extension contracts and game adapters
+
+**Why.** The user asked to resolve the coupling found in the architecture review, before adding more content. The mod version stays 0.0.0.16. Existing item/entity ids, recipes, saved data, boss presets and public facade calls stay in place.
+
+### 68.1 Independent debris and movement policies
+- New pure-Java `DebrisRules` holds the velocity and falloff of thrown ground. `DiveRules` delegates to it; its existing constructor and `fling` remain available.
+- `BurrowSkill` and `RamSkill` no longer import `SeereRules.DIVE`. Their independent default velocity policy is 3.5 / 0.9, preserving what they previously borrowed. Each accepts an explicit `DebrisRules` in an additional constructor.
+- `BurrowState` and `RamState` in core own per-use phases, warning progress, tunnelling status, distance/height transitions and the once-only surface burst. Common owns world positions, steering, damage, particles and sounds.
+- Both movement skills accept any `Mob` implementing the API's `BurrowingCaster`; neither references `SolomonWyrm`. Unsupported hosts are rejected by `usable`. Area attacks explicitly exclude their host, so hosts need not reproduce a particular boss's alliance implementation.
+- `VenusSkill` accepts any mob. `BlessingCaster` can select candidates and the visual origin; otherwise the blessing selects the caster and its allies. Solomon implements the ports and retains the previous dragon-only selection.
+- Existing common phase views and facade methods remain available.
+
+### 68.2 Extensions register one implementation at a time
+- `BossSkillRegistry` uses a namespaced `Type<R>` carrying its rule class and a factory receiving rules plus options. Every creation receives fresh skill state from its factory.
+- Separate default and custom registries make setup order irrelevant: common installs defaults without replacing add-ons. Duplicate custom registrations fail; `replace` explicitly overrides, and `unregister` reveals the default again. The same id cannot carry different rule classes.
+- `BossSkillMaker` installs 32 default skill factories. Existing `BossSkillApi` methods delegate to them; the API also exposes `burrow`, `ram`, `venus` and the typed keys. New skill types require no new abstract method in the legacy `Maker` interface.
+- Legacy whole-maker `install` is deprecated but still registers replacements for its existing methods.
+- `ArcaneCasting.registerHandler` changes one built-in action kind without replacing the world's corruption bookkeeping. `registerAction` registers an add-on action by id; duplicate registrations fail, with explicit replace/unregister operations.
+- New `SpellAction.Custom(id, parameters)` carries immutable string parameters without game dependencies. Its codec is `{type: custom, id: addon:action, parameters: {...}}`; it works in spell, bolt and beam action lists. Existing action data is unchanged.
+- Common installs the default spell world without replacing an explicit add-on world. Legacy whole-world `install` remains deprecated and supports restoring a captured world. Missing initialization now throws when the casting tool obtains its adapter, before payment, instead of silently charging for no effect.
+
+### 68.3 Core policy does not execute source entities
+- `RemnantAnimationRules<T>` stores opaque driver values, explicit disables and the existing vanilla/modded selection policy. It has no dependency on an animation driver or game entity.
+- API exposes `RemnantAnimationApi.Playback`; client setup installs `SourceAnimationPlayback`, which performs the original entity event and parked proxy tick with pose restoration. Dedicated servers do not load the client implementation.
+- `CorruptionVariants` contains only stable string naming and source eligibility. Registry lookup and NBT decoding moved to the package-private API adapter `SourceBlockStates`; callers continue using `CorruptionApi`.
+
+### 68.4 Enforced boundaries and published contracts
+- `LayerDependenciesTest` checks compiled references for core and API, including nested/anonymous classes, method descriptors, lambdas and fully qualified calls. Neither layer may reach common.
+- Core rules may not reach game code through an API type either. The infection scheduler's existing coordinate-only references are an explicit, narrow exception.
+- Reusable movement/blessing adapters may not depend on concrete entities or another boss's presets.
+- The existing core rule/value types exposed by the API are explicitly published contracts, preserving their packages. `PublishedCoreContractTest` records the exposed types, public/protected signatures and record structure in `src/test/resources/architecture/published-core-contracts.txt`. Existing signatures must remain; additions are allowed, while a new exposed core type requires an explicit baseline decision.
+- README and API package documentation describe registration, host ports and compatibility expectations.
+
+### 68.5 Verification
+- Focused rules, extension/codec and architecture checks pass.
+- All 23 existing `SolomonServerTest` tests pass: routes, surface bursts, allied healing, skills, multipart damage, the rite, weather and existing behaviour remain covered.
+- A real server test uses an unrelated zombie-based host implementing the API ports, obtains all three skills through the public factories, completes both movement routes and heals a cow selected by its blessing port.
+- Full `build`: 837 tests in 128 classes pass, none failed or skipped; 8m 57s. The previous suite had 824 tests; 13 were added.
+- The compatibility baseline covers 62 published core types (948 entries).
+- The 0.0.0.16 jar contains the new rules, ports, factories and client adapter; tests and the compatibility baseline are excluded. No game client was started for this refactor.
+
+## 69. 附属模组扩展入口与本体实现解耦
+
+### 69.1 技能与表现
+- 补齐火球、地面巨手、精英召唤、小龙冲袭、飞行扑击的公开技能工厂；加上目标位置枯萎、目标位置尖啸、自定义召唤计数半径，共提供 40 个默认工厂，覆盖 37 种技能实现。
+- 新增纯规则值 `FlyingStrikeRules`、`CountedSummonRules`，保留原先蛟龙 `SwoopRules` 及既有公开规则的结构。
+- `RegisteredSkill` 公开技能类型、配置和选项；本体 `SkillSet` 装配时解析附属注册的替换工厂。安杜马利恩直接驱动的两个技能同样使用这一入口。未注册替换时保留原生实例和状态，已解析的运行实例不热替换。
+- `WorldVisuals` 将服务端特效生成从玩家施法上下文中独立出来，技能与法术复用同一生成服务，保留声音、颜色、朝向、地面定位和同步。
+- `GoeticDemon`、`DemonBoss`、`BossDeath` 作为公开契约迁入 `api/demon`；血条、震屏和死亡演出识别公开接口。附属可提供独立徽章纹理，通过 `BossDeathVisuals` 复用死亡绘制。
+- 通用精英基类迁入 `api/elite`；配置、宿主阵营冲突判断和原生死亡粒子由 common 安装运行服务。
+- 客户端 `CorruptedTextures` 暴露本体的有限纹理缓存与渲染层转换，继续由本体处理 GPU 资源和资源重载清理。
+
+### 69.2 感染与活性植物
+- `InfectionExtensions` 允许按 ID 注册感染源、传播条件和有优先级的状态转换。相同优先级按 ID 排序，免疫标签优先；本体方块判断、区块前沿扫描和世界转换均读取这些扩展。
+- `WorldInfection` 操作本体实际的世界调度器，提供识别、激活、停用和即时感染；不要求附属建立第二套调度器。新增源的方块更新会唤醒现有调度；没有扩展源时直接跳过新增通知处理。
+- 扩展的门、床等成对方块转换也会先对两部分应用同一规则，再通知邻居，避免一半落入原生自动生成转换或提前消失。
+- `LivingPlantRegistry` 用开放 ID 注册物种，纯核心生长算法接受物种定义和空间策略；原有两个枚举入口保留。
+- 锚定植物基类与空间适配器迁入 `api/plant`。附属植物复用阶段、空间预检、自然生长、骨粉、倒挂、同步与保存；`living_plant_supports` 方块标签默认包含缠念，允许数据包扩展。
+- 缠念的骨粉查找覆盖新植物和它们的最大尺寸；`PlantSprouts` 可注册自然生长候选，原生生成在没有附属候选成功时继续执行。
+
+### 69.3 残躯、玩家与祭坛
+- `RemnantSpawns` 公开按来源类型创建或捕获现有生物的残躯，返回尚未加入世界的实体，不自动修改来源。
+- `RemnantExtensions` 支持自定义能力执行器，每个残躯使用独立实例和持久化状态，并在移除时清理；原枚举能力选择入口继续保留。
+- `PlayerCorruptionChanges.raise` 提供装备减免和满值转化的完整结算，与直接设置附件区分；法术腐化消耗使用这一服务。
+- `AltarApi` 提供原生祭坛查询及数据包结构枚举、建造；拒绝对未加载的目标位置进行建造。
+- `AltarRituals` 按配方 ID 注册开始、推进、完成与结束回调，支持消耗前拒绝，以及保留正常材料消耗、替换产物。回调接收供品副本，普通数据包配方格式不变。没有回调时跳过供品快照。
+- 运行服务统一由 `common/extension/ExtensionServices` 安装。资源 ID、存档键、模组版本和现有配方保持不变；过去直接引用 common 内部基类的源码应改用对应 API 包。
+
+### 69.4 附属边界验证
+- 新增独立附属示例源集 `src/addonFixture/java`，使用发行 JAR 编译；不打入本体发行包。
+- 编译后检查示例及内部类不得引用 common 或未公开核心类型，防止测试悄悄依赖本体实现。
+- 服务端验证覆盖原生技能实体和无玩家特效、自定义感染源与成对转换、第三种活性植物的正反向骨粉生长与保存、公开首领契约、残躯能力状态与移除、本体首领技能替换，以及祭坛替换产物与消耗前拒绝。
+- README 补充接入表、初始化和线程约定；既有公开核心契约基线保留并增加新公开类型。
+- 全量 `build` 通过：130 个测试类、846 项测试，失败、错误和跳过均为 0，耗时 9 分 1 秒。最后补充成对扩展转换后，重新打包并通过 7 个测试类的 34 项定向检查。
+- 公开核心契约基线包含 74 个类型、1122 条记录。当前工作区版本为 `0.0.0.17`；发行 JAR 已确认包含新公开类，不含附属示例、测试类或迁移前的内部基类。没有启动游戏客户端。

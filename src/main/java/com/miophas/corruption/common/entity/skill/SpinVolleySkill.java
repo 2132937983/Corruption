@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.entity.DemonBolt;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
 import com.miophas.corruption.core.demon.skill.SpinVolleyRules;
@@ -18,7 +21,7 @@ import net.minecraft.world.phys.Vec3;
  * corruption ({@link DemonBolt}) from its tip at the quarry, as the points wheel round. The points stand evenly round a
  * circle as wide as the boss, in the plane square to the line from its heart to its quarry's.
  */
-public final class SpinVolleySkill implements BossSkill<Mob> {
+public final class SpinVolleySkill implements RegisteredSkill<SpinVolleyRules> {
     private final SpinVolleyRules rules;
     private final int colour, accent;
     private int beat, loosed;
@@ -71,4 +74,7 @@ public final class SpinVolleySkill implements BossSkill<Mob> {
         beat++;
         SkillShows.sound(boss, SoundEvents.AMETHYST_BLOCK_CHIME, 1.6F, 1.3F + boss.getRandom().nextFloat() * .4F);
     }
+    @Override public BossSkillRegistry.Type<SpinVolleyRules> type() { return BossSkillApi.SPIN_VOLLEY; }
+    @Override public SpinVolleyRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

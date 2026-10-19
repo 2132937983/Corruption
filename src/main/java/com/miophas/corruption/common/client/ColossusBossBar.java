@@ -1,7 +1,7 @@
 package com.miophas.corruption.common.client;
 
 import com.miophas.corruption.Corruption;
-import com.miophas.corruption.common.entity.DemonBoss;
+import com.miophas.corruption.api.demon.DemonBoss;
 import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +56,8 @@ public final class ColossusBossBar {
         gui.blit(TEXTURE, left + HEALTH_X, top + HEALTH_Y, 0, LOST_V, Mth.ceil(HEALTH_WIDTH * shown), HEALTH_HEIGHT, SHEET_WIDTH, SHEET_HEIGHT);
         gui.blit(TEXTURE, left + HEALTH_X, top + HEALTH_Y, 0, HEALTH_V, Mth.ceil(HEALTH_WIDTH * health), HEALTH_HEIGHT, SHEET_WIDTH, SHEET_HEIGHT);
         gui.blit(TEXTURE, left + HEALTH_X, top + HEALTH_Y, 0, NOTCH_V, HEALTH_WIDTH, HEALTH_HEIGHT, SHEET_WIDTH, SHEET_HEIGHT);
-        gui.blit(TEXTURE, left + EMBLEM_X, top + EMBLEM_Y, owner.emblem() * EMBLEM_STEP, EMBLEM_V, EMBLEM_SIZE, EMBLEM_SIZE, SHEET_WIDTH, SHEET_HEIGHT);
+        if (owner.emblemTexture().isPresent()) gui.blit(owner.emblemTexture().get(), left + EMBLEM_X, top + EMBLEM_Y, 0, 0, EMBLEM_SIZE, EMBLEM_SIZE, EMBLEM_SIZE, EMBLEM_SIZE);
+        else gui.blit(TEXTURE, left + EMBLEM_X, top + EMBLEM_Y, owner.emblem() * EMBLEM_STEP, EMBLEM_V, EMBLEM_SIZE, EMBLEM_SIZE, SHEET_WIDTH, SHEET_HEIGHT);
         RenderSystem.disableBlend();
 
         Component name = event.getBossEvent().getName();

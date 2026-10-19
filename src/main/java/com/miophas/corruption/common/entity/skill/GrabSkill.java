@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.core.demon.skill.GrabRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
 import javax.annotation.Nullable;
@@ -19,7 +22,7 @@ import net.minecraft.world.phys.Vec3;
  * down under the water once it is in it, until the quarry is close or the skill's time is up. A creature in creative or
  * spectator slips its hold.
  */
-public final class GrabSkill implements BossSkill<Mob> {
+public final class GrabSkill implements RegisteredSkill<GrabRules> {
     /** How much further than its reach a quarry may be as it takes hold (it moved through the wind-up), and before it lets go. */
     private static final double SLACK = 1.25, SNAP = 1.6;
 
@@ -107,4 +110,7 @@ public final class GrabSkill implements BossSkill<Mob> {
     @Override public void end(Mob boss, boolean broken) {
         quarry = held = null;
     }
+    @Override public BossSkillRegistry.Type<GrabRules> type() { return BossSkillApi.GRAB; }
+    @Override public GrabRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

@@ -1,6 +1,10 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
+import com.miophas.corruption.core.demon.skill.FlyingStrikeRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
 import javax.annotation.Nullable;
 import net.minecraft.sounds.SoundEvents;
@@ -14,7 +18,7 @@ import net.minecraft.world.phys.Vec3;
  * {@code speed} blocks a tick and strikes it as it meets it (its own melee blow), and is away again at once, up and back.
  * It swoops only at a quarry within {@code range} that it can see.
  */
-public final class SwoopSkill implements BossSkill<Mob> {
+public final class SwoopSkill implements RegisteredSkill<FlyingStrikeRules> {
     private final SkillTiming timing;
     private final double range, speed;
     private boolean struck;
@@ -58,4 +62,7 @@ public final class SwoopSkill implements BossSkill<Mob> {
 
     @Override public boolean finished(Mob flier) { return struck; }
     @Override public void end(Mob flier, boolean broken) { flier.setXRot(0); }
+    @Override public BossSkillRegistry.Type<FlyingStrikeRules> type() { return BossSkillApi.SWOOP; }
+    @Override public FlyingStrikeRules configuration() { return new FlyingStrikeRules(timing, range, speed); }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(0, 0, mob -> Integer.MAX_VALUE, false); }
 }

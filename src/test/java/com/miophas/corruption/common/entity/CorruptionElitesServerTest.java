@@ -1,5 +1,7 @@
 package com.miophas.corruption.common.entity;
 
+import com.miophas.corruption.api.elite.CorruptionElite;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.miophas.corruption.api.corruption.CorruptionFactionApi;
@@ -100,7 +102,7 @@ class CorruptionElitesServerTest {
         assertTrue(elite.begin(skill, target), "skill " + skill + " begins");
         int ticks = 0;
         for (; ticks < 400 && elite.skills().busy(); ticks++) {
-            elite.skills().tick(elite.elite(), target, cooldown -> cooldown);
+            elite.skills().tick(elite.host(), target, cooldown -> cooldown);
             elite.travel(Vec3.ZERO);
         }
         assertFalse(elite.skills().busy(), "skill " + skill + " runs its course");

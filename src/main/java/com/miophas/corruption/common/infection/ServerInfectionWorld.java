@@ -1,10 +1,10 @@
 package com.miophas.corruption.common.infection;
 
 import com.miophas.corruption.api.infection.InfectionWorld;
-import com.miophas.corruption.common.config.InfectionConfig;
-import com.miophas.corruption.common.registry.ModBlocks;
 import com.miophas.corruption.common.block.CorruptionBlock;
 import com.miophas.corruption.common.blockentity.InfectedBlockEntity;
+import com.miophas.corruption.common.config.InfectionConfig;
+import com.miophas.corruption.common.registry.ModBlocks;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
@@ -72,7 +72,9 @@ public final class ServerInfectionWorld implements InfectionWorld {
         if (!CorruptionConversions.canConvert(previous, level, pos)) {
             return false;
         }
-        BlockState ore = CorruptionOreConversions.convert(previous, level, pos);
+        var custom = com.miophas.corruption.api.infection.InfectionExtensions.conversion(level, pos, previous);
+        BlockState ore = custom.isPresent() ? java.util.Objects.requireNonNull(custom.get().convert(level, pos, previous), "Conversion returned null")
+                : CorruptionOreConversions.convert(previous, level, pos);
         boolean fullSolid = previous.getFluidState().isEmpty() && !previous.hasBlockEntity()
                 && !(previous.getBlock() instanceof net.minecraft.world.level.block.SlabBlock)
                 && previous.canOcclude() && previous.isCollisionShapeFullBlock(level, pos);
@@ -87,8 +89,13 @@ public final class ServerInfectionWorld implements InfectionWorld {
         BlockPos partnerPos = pairedPosition(previous, pos);
         if (partnerPos != null && loadedChunk(partnerPos) == null) return false;
         BlockState partner = partnerPos != null && loadedChunk(partnerPos) != null ? level.getBlockState(partnerPos) : null;
-        BlockState paired = partner != null && partner.getBlock() == previous.getBlock()
-                ? com.miophas.corruption.common.registry.GeneratedCorruption.convert(partner) : null;
+        BlockState paired = null;
+        if (partner != null && partner.getBlock() == previous.getBlock()) {
+            if (custom.isPresent()) {
+                if (custom.get().matches(level, partnerPos, partner))
+                    paired = java.util.Objects.requireNonNull(custom.get().convert(level, partnerPos, partner), "Conversion returned null");
+            } else paired = com.miophas.corruption.common.registry.GeneratedCorruption.convert(partner);
+        }
         if (paired != null) {
             if (!level.setBlock(pos, replacement, Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE)) return false;
             level.setBlock(partnerPos, paired, Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
@@ -97,6 +104,10 @@ public final class ServerInfectionWorld implements InfectionWorld {
             level.updateNeighborsAt(pos, replacement.getBlock());
             level.updateNeighborsAt(partnerPos, paired.getBlock());
         } else if (!level.setBlock(pos, replacement, Block.UPDATE_ALL)) return false;
+        if (custom.isPresent()) {
+            com.miophas.corruption.api.infection.WorldInfection.activate(level, pos);
+            if (paired != null) com.miophas.corruption.api.infection.WorldInfection.activate(level, partnerPos);
+        }
         CorruptionEcology.decorate(level, pos, level.random);
         return true;
     }

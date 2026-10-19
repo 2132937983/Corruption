@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.api.demon.skill.SpitCaster;
 import com.miophas.corruption.common.entity.DemonBolt;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
@@ -20,7 +23,7 @@ import net.minecraft.world.phys.Vec3;
  * as it is loosed, swept across it as the fan goes; or lobbed high to come down on it, each a little off the last, as a
  * spray of acid falls.
  */
-public final class SpitSkill implements BossSkill<Mob> {
+public final class SpitSkill implements RegisteredSkill<SpitRules> {
     /** How far apart lobbed shots come down about their quarry, in blocks, one after another. */
     private static final double SCATTER = 1.3;
 
@@ -98,4 +101,7 @@ public final class SpitSkill implements BossSkill<Mob> {
             default -> SoundEvents.BLAZE_SHOOT;
         };
     }
+    @Override public BossSkillRegistry.Type<SpitRules> type() { return BossSkillApi.SPIT; }
+    @Override public SpitRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

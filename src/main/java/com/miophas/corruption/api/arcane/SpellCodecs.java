@@ -130,7 +130,7 @@ public final class SpellCodecs {
 
     /** What an action of each kind is called in data. */
     private enum Kind implements StringRepresentable {
-        APPLY_EFFECT("apply_effect"), DAMAGE("damage"), IGNITE_AREA("ignite_area"), FREEZE_AREA("freeze_area"),
+        CUSTOM("custom"), APPLY_EFFECT("apply_effect"), DAMAGE("damage"), IGNITE_AREA("ignite_area"), FREEZE_AREA("freeze_area"),
         CORRUPT_AREA("corrupt_area"), CORRUPT_CREATURES("corrupt_creatures"), SUMMON("summon"), LIGHTNING("lightning"), EXPLODE("explode"),
         TELEPORT("teleport"), WEATHER("weather"), PACIFY("pacify"), GIVE_ITEM("give_item"), PUSH("push"), PARTICLES("particles"),
         VISUAL("visual"), LAUNCH_BOLT("launch_bolt"), BEAM("beam"), QUELL_CORRUPTION("quell_corruption"), RAISE_REMNANTS("raise_remnants"),
@@ -264,6 +264,7 @@ public final class SpellCodecs {
 
     /** What an action is, as data names it. */
     private static Kind kindOf(SpellAction action) {
+        if (action instanceof SpellAction.Custom) return Kind.CUSTOM;
         if (action instanceof SpellAction.ApplyEffect) return Kind.APPLY_EFFECT;
         if (action instanceof SpellAction.Damage) return Kind.DAMAGE;
         if (action instanceof SpellAction.Ignite) return Kind.IGNITE_AREA;
@@ -291,6 +292,10 @@ public final class SpellCodecs {
     /** How an action of this kind is read; a bolt's "on_hit" holds more actions. */
     private static MapCodec<? extends SpellAction> codecFor(Kind kind, Codec<SpellAction> action) {
         return switch (kind) {
+            case CUSTOM -> RecordCodecBuilder.<SpellAction.Custom>mapCodec(instance -> instance.group(
+                    ID.fieldOf("id").forGetter(SpellAction.Custom::id),
+                    Codec.unboundedMap(Codec.STRING, Codec.STRING).optionalFieldOf("parameters", java.util.Map.of()).forGetter(SpellAction.Custom::parameters)
+                    ).apply(instance, SpellAction.Custom::new));
             case APPLY_EFFECT -> APPLY_EFFECT;
             case DAMAGE -> DAMAGE;
             case IGNITE_AREA -> IGNITE_AREA;

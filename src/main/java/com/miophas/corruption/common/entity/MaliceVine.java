@@ -3,6 +3,8 @@ package com.miophas.corruption.common.entity;
 import com.miophas.corruption.api.corruption.CorruptionFactionApi;
 import com.miophas.corruption.api.corruption.CorruptionVeilApi;
 import com.miophas.corruption.api.plant.*;
+import com.miophas.corruption.api.plant.AnchoredLivingPlant;
+import com.miophas.corruption.api.plant.LevelLivingPlantSpace;
 import com.miophas.corruption.common.config.InfectionConfig;
 import com.miophas.corruption.common.entity.skill.SkillShows;
 import com.miophas.corruption.common.registry.ModBlocks;

@@ -4,6 +4,7 @@ import com.miophas.corruption.api.corruption.BaalApi;
 import com.miophas.corruption.api.corruption.BaalAttack;
 import com.miophas.corruption.api.corruption.ColossusGait;
 import com.miophas.corruption.api.corruption.ColossusLegs;
+import com.miophas.corruption.api.demon.BossDeath;
 import java.util.List;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;

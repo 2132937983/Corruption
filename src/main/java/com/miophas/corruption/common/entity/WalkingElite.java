@@ -1,6 +1,7 @@
 package com.miophas.corruption.common.entity;
 
 import com.miophas.corruption.api.demon.skill.SpitCaster;
+import com.miophas.corruption.api.elite.CorruptionElite;
 import com.miophas.corruption.common.registry.ModSounds;
 import javax.annotation.Nullable;
 import net.minecraft.sounds.SoundEvent;

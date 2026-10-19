@@ -33,7 +33,7 @@ public final class SkillSet<E extends Mob> {
         if (names.contains(name)) throw new IllegalArgumentException("Two skills are named " + name);
         if (book.busy()) throw new IllegalStateException("A skill is added while another runs");
         names.add(name);
-        skills.add(skill);
+        skills.add(skill.configured());
         int[] cooling = book.save();
         book = new SkillBook(skills.size());
         book.load(cooling);

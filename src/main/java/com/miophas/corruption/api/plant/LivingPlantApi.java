@@ -19,5 +19,18 @@ public final class LivingPlantApi {
     public static int advanceGrowthTicks(int elapsed, int interval, int step) {
         return LivingPlantRules.advanceGrowthTicks(elapsed, interval, step);
     }
+    public static LivingPlantDefinition definition(net.minecraft.resources.ResourceLocation id) { return LivingPlantRegistry.species(id).definition(); }
+    public static boolean hasRoom(net.minecraft.resources.ResourceLocation id, int stage, int direction, LivingPlantSpace space) {
+        var species = LivingPlantRegistry.species(id);
+        return LivingPlantRules.hasRoom(species.definition(), species.reserveCanopy(), stage, direction, space);
+    }
+    public static boolean canGrow(net.minecraft.resources.ResourceLocation id, int stage, boolean alive, boolean supported, int direction, LivingPlantSpace space) {
+        var species = LivingPlantRegistry.species(id);
+        return LivingPlantRules.canGrow(species.definition(), species.reserveCanopy(), stage, alive, supported, direction, space);
+    }
+    public static boolean prepareGrowth(net.minecraft.resources.ResourceLocation id, int stage, int direction, LivingPlantSpace space) {
+        var species = LivingPlantRegistry.species(id);
+        return LivingPlantRules.prepareGrowth(species.definition(), species.reserveCanopy(), stage, direction, space);
+    }
     private LivingPlantApi() {}
 }

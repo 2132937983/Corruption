@@ -1,11 +1,14 @@
 package com.miophas.corruption.common.entity;
 
+import com.miophas.corruption.api.corruption.CorruptionFactionApi;
 import com.miophas.corruption.api.corruption.GreedApi;
 import com.miophas.corruption.api.plant.*;
-import com.miophas.corruption.api.corruption.CorruptionFactionApi;
+import com.miophas.corruption.api.plant.AnchoredLivingPlant;
+import com.miophas.corruption.api.plant.LevelLivingPlantSpace;
 import com.miophas.corruption.common.config.InfectionConfig;
 import com.miophas.corruption.common.registry.ModBlocks;
 import com.miophas.corruption.common.registry.ModEntities;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.*;
 import net.minecraft.server.level.ServerLevel;
@@ -15,7 +18,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.*;
 import net.minecraft.world.phys.*;
-import java.util.UUID;
 
 /** A rooted chimera tree; its only combat movement is firing from its three heads. */
 public final class Greed extends AnchoredLivingPlant {

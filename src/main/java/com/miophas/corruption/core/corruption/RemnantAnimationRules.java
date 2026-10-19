@@ -1,27 +1,22 @@
 package com.miophas.corruption.core.corruption;
 
-import com.miophas.corruption.api.corruption.RemnantAnimationDriver;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** Which source types replay their own attack animation, and how. */
-public final class RemnantAnimationRules {
-    /** Vanilla's conventional "mob attacked" entity event, which many native and modded mobs animate from. */
+/** Pure selection policy; drivers are opaque values supplied by the client-facing adapter. */
+public final class RemnantAnimationRules<T> {
     public static final byte ATTACK_EVENT = 4;
     public static final int DEFAULT_DURATION = 40;
-    private static final RemnantAnimationDriver DEFAULT = (source, event) -> source.handleEntityEvent(event);
-    private static final RemnantAnimationDriver DISABLED = (source, event) -> {};
-    private static final Map<String, RemnantAnimationDriver> DRIVERS = new ConcurrentHashMap<>();
-
-    /** Registered drivers win; unregistered modded sources use the default event driver; vanilla sources keep their dedicated models. */
-    public static RemnantAnimationDriver driver(String source) {
-        var registered = DRIVERS.get(source);
-        if (registered != null) return registered == DISABLED ? null : registered;
-        return source.startsWith("minecraft:") ? null : DEFAULT;
+    private final T fallback;
+    private final Map<String, Optional<T>> drivers = new ConcurrentHashMap<>();
+    public RemnantAnimationRules(T fallback) { this.fallback = Objects.requireNonNull(fallback); }
+    public T driver(String source) {
+        Optional<T> registered = drivers.get(source);
+        return registered != null ? registered.orElse(null) : source.startsWith("minecraft:") ? null : fallback;
     }
-    public static void register(String source, RemnantAnimationDriver driver) { DRIVERS.put(source, driver); }
-    public static void disable(String source) { DRIVERS.put(source, DISABLED); }
-    public static void unregister(String source) { DRIVERS.remove(source); }
-
-    private RemnantAnimationRules() {}
+    public void register(String source, T driver) { drivers.put(source, Optional.of(driver)); }
+    public void disable(String source) { drivers.put(source, Optional.empty()); }
+    public void unregister(String source) { drivers.remove(source); }
 }

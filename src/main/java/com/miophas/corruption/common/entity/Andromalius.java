@@ -1,10 +1,12 @@
 package com.miophas.corruption.common.entity;
 
+import com.miophas.corruption.api.demon.BossDeath;
+import com.miophas.corruption.api.demon.GoeticDemon;
 import com.miophas.corruption.common.entity.skill.ChargeSkill;
 import com.miophas.corruption.common.entity.skill.GazeSkill;
-import com.miophas.corruption.core.demon.AndromaliusRules;
 import com.miophas.corruption.core.demon.AndromaliusRules.Attack;
 import com.miophas.corruption.core.demon.AndromaliusRules.Intent;
+import com.miophas.corruption.core.demon.AndromaliusRules;
 import java.util.EnumSet;
 import java.util.List;
 import net.minecraft.core.particles.ParticleTypes;
@@ -83,6 +85,16 @@ public final class Andromalius extends GoeticDemon {
 
     private final GazeSkill gazing = new GazeSkill(AndromaliusRules.GAZE, 0xC01010, 0xFF6060);
     private final ChargeSkill charging = new ChargeSkill(AndromaliusRules.CHARGE);
+    private com.miophas.corruption.api.demon.skill.BossSkill<net.minecraft.world.entity.Mob> activeGaze, activeCharge;
+    private com.miophas.corruption.api.demon.skill.BossSkill<net.minecraft.world.entity.Mob> gazeSkill() {
+        if (activeGaze == null) activeGaze = gazing.configured();
+        return activeGaze;
+    }
+    private com.miophas.corruption.api.demon.skill.BossSkill<net.minecraft.world.entity.Mob> chargeSkill() {
+        if (activeCharge == null) activeCharge = charging.configured();
+        return activeCharge;
+    }
+
     private final AndromaliusRules.Approach approach = new AndromaliusRules.Approach();
     private final AndromaliusRules.Shield shield = new AndromaliusRules.Shield();
     private int gazeCooldown = 30, volleyCooldown = 20, biteCooldown, tailCooldown, dodgeCooldown, huntCooldown = AndromaliusRules.HUNT_EVERY / 2, chargeCooldown = 60;
@@ -181,14 +193,14 @@ public final class Andromalius extends GoeticDemon {
                 if (next != Attack.NONE) begin(next, target);
             }
             case GAZE -> {
-                gazing.tick(this, target, attackTicks++);
-                if (!gazing.timing().over(attackTicks)) return;
+                gazeSkill().tick(this, target, attackTicks++);
+                if (!gazeSkill().timing().over(attackTicks)) return;
                 gazeCooldown = AndromaliusRules.cooldown(AndromaliusRules.GAZE_COOLDOWN, enraged);
                 end();
             }
             case CHARGE -> {
-                charging.tick(this, target, attackTicks++);
-                if (!charging.timing().over(attackTicks)) return;
+                chargeSkill().tick(this, target, attackTicks++);
+                if (!chargeSkill().timing().over(attackTicks)) return;
                 chargeCooldown = AndromaliusRules.cooldown(AndromaliusRules.CHARGE.timing().cooldown(), enraged);
                 end();
             }
@@ -239,13 +251,13 @@ public final class Andromalius extends GoeticDemon {
     private void begin(Attack attack, LivingEntity target) {
         attackTicks = 0;
         entityData.set(ATTACK, (byte) attack.ordinal());
-        if (attack == Attack.GAZE) gazing.begin(this, target);
-        else if (attack == Attack.CHARGE) charging.begin(this, target);
+        if (attack == Attack.GAZE) gazeSkill().begin(this, target);
+        else if (attack == Attack.CHARGE) chargeSkill().begin(this, target);
         else if (attack == Attack.VOLLEY) playSound(SoundEvents.CREEPER_PRIMED, 2, .5F);
     }
 
     private void end() {
-        if (attack() == Attack.CHARGE) charging.end(this, attackTicks < charging.timing().ticks());
+        if (attack() == Attack.CHARGE) chargeSkill().end(this, attackTicks < chargeSkill().timing().ticks());
         attackTicks = 0;
         entityData.set(ATTACK, (byte) 0);
     }

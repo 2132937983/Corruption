@@ -1,5 +1,7 @@
 package com.miophas.corruption.common.entity;
 
+import com.miophas.corruption.api.demon.BossDeath;
+import com.miophas.corruption.api.demon.GoeticDemon;
 import com.miophas.corruption.api.demon.skill.SkillSet;
 import com.miophas.corruption.api.demon.skill.SpitCaster;
 import com.miophas.corruption.common.entity.skill.BlightSkill;
@@ -10,8 +12,8 @@ import com.miophas.corruption.common.entity.skill.PhaseDashSkill;
 import com.miophas.corruption.common.entity.skill.PsychicSkill;
 import com.miophas.corruption.common.entity.skill.SpikeFieldSkill;
 import com.miophas.corruption.common.entity.skill.UpheavalSkill;
-import com.miophas.corruption.core.demon.AmdusiasRules;
 import com.miophas.corruption.core.demon.AmdusiasRules.Skill;
+import com.miophas.corruption.core.demon.AmdusiasRules;
 import com.miophas.corruption.core.demon.BodyPart;
 import java.util.EnumSet;
 import java.util.List;

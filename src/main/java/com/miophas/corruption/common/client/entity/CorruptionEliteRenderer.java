@@ -1,6 +1,7 @@
 package com.miophas.corruption.common.client.entity;
 
 import com.miophas.corruption.Corruption;
+import com.miophas.corruption.api.elite.CorruptionElite;
 import com.miophas.corruption.common.entity.CorruptedAberration;
 import com.miophas.corruption.common.entity.CorruptedBlighthound;
 import com.miophas.corruption.common.entity.CorruptedBloater;
@@ -16,7 +17,6 @@ import com.miophas.corruption.common.entity.CorruptedNaiad;
 import com.miophas.corruption.common.entity.CorruptedScreecher;
 import com.miophas.corruption.common.entity.CorruptedSower;
 import com.miophas.corruption.common.entity.CorruptedStalker;
-import com.miophas.corruption.common.entity.CorruptionElite;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.LightTexture;

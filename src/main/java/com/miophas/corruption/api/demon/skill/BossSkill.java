@@ -20,6 +20,9 @@ public interface BossSkill<E extends Mob> {
     /** How it runs in time: its wind-up, how long it runs, its cooldown. */
     SkillTiming timing();
 
+    /** Resolves a registered replacement when a new skill set is assembled. */
+    default BossSkill<E> configured() { return this; }
+
     /** Whether it would serve against this quarry now: in reach, in sight, and the like. Whether it has come round is the set's to say. */
     boolean usable(E boss, LivingEntity target);
 

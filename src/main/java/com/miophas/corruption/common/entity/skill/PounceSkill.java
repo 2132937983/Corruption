@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.core.demon.skill.PounceRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
 import javax.annotation.Nullable;
@@ -22,7 +25,7 @@ import net.minecraft.world.phys.Vec3;
  * on the way is struck and thrown on along the leap, and the pounce is over; otherwise it is over when it is down, the
  * ground shaken where it lands.
  */
-public final class PounceSkill implements BossSkill<Mob> {
+public final class PounceSkill implements RegisteredSkill<PounceRules> {
     private final PounceRules rules;
     private final int colour, accent;
     @Nullable private Vec3 from, aim;
@@ -127,4 +130,7 @@ public final class PounceSkill implements BossSkill<Mob> {
         from = aim = null;
         boss.fallDistance = 0;
     }
+    @Override public BossSkillRegistry.Type<PounceRules> type() { return BossSkillApi.POUNCE; }
+    @Override public PounceRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

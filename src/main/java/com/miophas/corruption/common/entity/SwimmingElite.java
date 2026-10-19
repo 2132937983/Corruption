@@ -1,6 +1,7 @@
 package com.miophas.corruption.common.entity;
 
 import com.miophas.corruption.api.demon.skill.SpitCaster;
+import com.miophas.corruption.api.elite.CorruptionElite;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.FluidTags;

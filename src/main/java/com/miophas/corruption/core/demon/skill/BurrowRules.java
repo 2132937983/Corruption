@@ -36,4 +36,6 @@ public record BurrowRules(SkillTiming timing, double minRange, double maxRange, 
 
     /** Whether something this far from where it burst up (along the ground) and this far above or below it is caught. */
     public boolean catches(double flat, double dy) { return flat <= radius && dy >= -2 && dy <= radius + 2; }
+    /** Independent legacy defaults; callers may supply their own velocity policy to the skill. */
+    public DebrisRules debris() { return new DebrisRules(3.5, .9); }
 }

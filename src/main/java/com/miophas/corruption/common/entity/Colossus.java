@@ -5,6 +5,8 @@ import com.miophas.corruption.api.corruption.ColossusGait;
 import com.miophas.corruption.api.corruption.ColossusLegs;
 import com.miophas.corruption.api.corruption.ColossusPart;
 import com.miophas.corruption.api.corruption.CorruptionFactionApi;
+import com.miophas.corruption.api.demon.BossDeath;
+import com.miophas.corruption.api.demon.DemonBoss;
 import com.miophas.corruption.common.registry.ModEffects;
 import java.util.List;
 import java.util.Optional;

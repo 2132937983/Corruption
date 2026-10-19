@@ -1,7 +1,7 @@
 package com.miophas.corruption.common.client;
 
 import com.miophas.corruption.Corruption;
-import com.miophas.corruption.common.entity.DemonBoss;
+import com.miophas.corruption.api.demon.DemonBoss;
 import com.miophas.corruption.common.network.MindControlPayload;
 import com.miophas.corruption.core.demon.skill.MindControlRules;
 import net.minecraft.client.Minecraft;

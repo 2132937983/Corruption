@@ -1,8 +1,8 @@
 package com.miophas.corruption.common.block;
 
+import com.miophas.corruption.api.plant.AnchoredLivingPlant;
 import com.miophas.corruption.common.config.InfectionConfig;
 import com.miophas.corruption.common.entity.MaliceVine;
-import com.miophas.corruption.common.entity.AnchoredLivingPlant;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -22,6 +22,7 @@ public final class MaliceBlock extends CorruptionBlock implements BonemealableBl
         if (!level.isClientSide && !previous.is(this)) level.scheduleTick(pos, this, 20);
     }
     @Override protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        if (com.miophas.corruption.api.plant.PlantSprouts.sprout(level, pos)) return;
         int growth = com.miophas.corruption.api.corruption.MaliceApi.growthKind(random.nextDouble(), InfectionConfig.greedChance(), InfectionConfig.vineChance());
         if (growth == 2) com.miophas.corruption.common.entity.Greed.sprout(level, pos);
         else if (growth == 1) MaliceVine.sprout(level, pos);
@@ -30,7 +31,8 @@ public final class MaliceBlock extends CorruptionBlock implements BonemealableBl
         int direction = bonemealDirection(level, pos);
         if (level instanceof Level world) {
             AnchoredLivingPlant vine = world.getEntitiesOfClass(AnchoredLivingPlant.class,
-                    new net.minecraft.world.phys.AABB(pos).inflate(3, 11, 3),
+                    new net.minecraft.world.phys.AABB(pos).inflate(Math.max(3, com.miophas.corruption.api.plant.LivingPlantRegistry.maximumWidth()),
+                            com.miophas.corruption.api.plant.LivingPlantRegistry.maximumHeight() + 1, Math.max(3, com.miophas.corruption.api.plant.LivingPlantRegistry.maximumWidth())),
                     plant -> plant.isAlive() && plant.anchor().equals(pos)).stream().findFirst().orElse(null);
             return vine == null ? direction != 0 && MaliceVine.hasRoom(level, pos, direction, 2)
                     : vine.canGrow();
@@ -45,7 +47,7 @@ public final class MaliceBlock extends CorruptionBlock implements BonemealableBl
     private static int bonemealDirection(LevelReader level, BlockPos pos) {
         Integer clicked = BONEMEAL_FACE.get();
         if (clicked == null) return MaliceVine.direction(level, pos);
-        return com.miophas.corruption.api.plant.LivingPlantApi.direction(new com.miophas.corruption.common.entity.LevelLivingPlantSpace(level, pos), clicked);
+        return com.miophas.corruption.api.plant.LivingPlantApi.direction(new com.miophas.corruption.api.plant.LevelLivingPlantSpace(level, pos), clicked);
     }
     @Override protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
             BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,

@@ -1,5 +1,6 @@
 package com.miophas.corruption.common.altar;
 
+import com.miophas.corruption.api.altar.AltarRituals;
 import com.miophas.corruption.common.block.AltarOfferingBlock;
 import com.miophas.corruption.common.entity.CorruptLightning;
 import com.miophas.corruption.common.entity.PlayerCorruption;
@@ -16,6 +17,7 @@ import com.miophas.corruption.core.altar.AltarState;
 import com.miophas.corruption.core.altar.RitualRules;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -56,6 +58,12 @@ import net.minecraft.world.phys.Vec3;
  * over and over.
  */
 public final class AltarOfferingBlockEntity extends BlockEntity {
+    private AltarRituals.Context lastRitual;
+    public Optional<ResourceLocation> recipeId() { return Optional.ofNullable(working); }
+    private AltarRituals.Context context(ServerLevel level, ResourceLocation recipe, int duration) {
+        return new AltarRituals.Context(level, worldPosition, recipe, elapsed, duration,
+                pillars(level).stream().map(pillar -> pillar == null ? ItemStack.EMPTY : pillar.item()).toList(), Optional.ofNullable(bound));
+    }
     private int sinceCheck;
     /** The rite under way, and how many ticks it has run. */
     private ResourceLocation working;
@@ -233,8 +241,15 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
         }
         if (found == null || working != null && !found.id().equals(working)) stop();
         if (found == null) return;
-        working = found.id();
         AltarRecipe recipe = found.value();
+        var handlers = AltarRituals.handlers(found.id());
+        var context = handlers.isEmpty() ? null : context((ServerLevel) level, found.id(), recipe.time());
+        if (working == null && handlers.stream().anyMatch(handler -> !handler.canStart(context))) return;
+        boolean starting = working == null;
+        working = found.id();
+        lastRitual = context;
+        if (starting) for (var handler : handlers) handler.started(context);
+        for (var handler : handlers) handler.tick(context);
         switch (RitualRules.phase(elapsed, recipe.time())) {
             case GATHERING -> { if (elapsed % 4 == 0) gather(level); }
             case STRIKE -> strike(level);
@@ -245,10 +260,14 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
         setChanged();
     }
 
-    private void stop() {
+    private void stop() { stop(AltarRituals.End.INTERRUPTED); }
+    private void stop(AltarRituals.End reason) {
         if (working == null && elapsed == 0) return;
+        var ended = lastRitual;
+        lastRitual = null;
         working = null;
         elapsed = 0;
+        if (ended != null) for (var handler : AltarRituals.handlers(ended.recipe())) handler.ended(ended, reason);
         setChanged();
     }
 
@@ -275,6 +294,13 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
 
     /** What the rite took is gone (unless it only reads what lay there), what it brought forth appears, and the offering stops binding. */
     private void complete(Level level, AltarRecipe recipe, AltarInput input) {
+        var handlers = AltarRituals.handlers(working);
+        var context = handlers.isEmpty() ? null : context((ServerLevel) level, working, recipe.time());
+        if (handlers.stream().anyMatch(handler -> !handler.canComplete(context))) {
+            stop(AltarRituals.End.REJECTED);
+            return;
+        }
+        boolean replaceResult = handlers.stream().anyMatch(handler -> handler.replacesResult(context));
         // What it brings forth is made before what it takes is gone: it may keep what was set on one of those things.
         ItemStack made = recipe.assemble(input, level.registryAccess());
         int[] used = recipe.consumes() ? recipe.pillarsUsed(input) : null;
@@ -289,15 +315,16 @@ public final class AltarOfferingBlockEntity extends BlockEntity {
             bound.discard();
         }
         Vec3 top = top();
-        if (!made.isEmpty()) {
+        if (!replaceResult && !made.isEmpty()) {
             ItemEntity drop = new ItemEntity(level, top.x, top.y + .1, top.z, made, 0, .15, 0);
             drop.setDefaultPickUpDelay();
             level.addFreshEntity(drop);
         }
-        recipe.result().creature().ifPresent(type -> summon(level, type, top));
+        if (!replaceResult) recipe.result().creature().ifPresent(type -> summon(level, type, top));
+        for (var handler : handlers) handler.completed(context);
         level.playSound(null, worldPosition, SoundEvents.EVOKER_CAST_SPELL, SoundSource.BLOCKS, 1, .8F);
         spent = recipe.consumes() ? null : working;
-        stop();
+        stop(AltarRituals.End.COMPLETED);
         become(AltarRules.afterRite(state()), null);
     }
 

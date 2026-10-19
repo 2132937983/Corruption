@@ -6,7 +6,7 @@ import com.miophas.corruption.common.entity.Agares;
 import com.miophas.corruption.common.entity.Andromalius;
 import com.miophas.corruption.common.entity.Dantalion;
 import com.miophas.corruption.common.entity.Baal;
-import com.miophas.corruption.common.entity.BossDeath;
+import com.miophas.corruption.api.demon.BossDeath;
 import com.miophas.corruption.common.entity.Seere;
 import com.miophas.corruption.common.entity.SpellVisualEntity;
 import com.miophas.corruption.core.arcane.SpellAction;

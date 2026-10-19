@@ -2,6 +2,9 @@ package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BeamCaster;
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.entity.DemonBeamEntity;
 import com.miophas.corruption.common.registry.ModDamageTypes;
 import com.miophas.corruption.common.registry.ModEntities;
@@ -25,7 +28,7 @@ import net.minecraft.world.phys.Vec3;
  * quarry no faster than it may turn; every pulse it hurts whatever is within its width of its line, with the
  * corruption's own hurt, up to the first block in its way.
  */
-public final class BeamSkill implements BossSkill<Mob> {
+public final class BeamSkill implements RegisteredSkill<BeamRules> {
     private final BeamRules rules;
     private final int colour, accent;
     private DemonBeamEntity beam;
@@ -111,4 +114,7 @@ public final class BeamSkill implements BossSkill<Mob> {
 
     private static float yawOf(Vec3 way) { return (float) (Mth.atan2(way.z, way.x) * Mth.RAD_TO_DEG) - 90; }
     private static float pitchOf(Vec3 way) { return (float) -(Mth.atan2(way.y, way.horizontalDistance()) * Mth.RAD_TO_DEG); }
+    @Override public BossSkillRegistry.Type<BeamRules> type() { return BossSkillApi.BEAM; }
+    @Override public BeamRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.core.demon.skill.MeleeRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
 import javax.annotation.Nullable;
@@ -20,7 +23,7 @@ import net.minecraft.world.phys.Vec3;
  * quarry and holds still, drawn back or reared up as its model shows it; at the end of it, it strikes everything within
  * its reach before it, in its arc, and throws it off; and the ground where the blow comes down is shaken.
  */
-public final class MeleeSkill implements BossSkill<Mob> {
+public final class MeleeSkill implements RegisteredSkill<MeleeRules> {
     private final MeleeRules rules;
 
     public MeleeSkill(MeleeRules rules) { this.rules = rules; }
@@ -78,4 +81,7 @@ public final class MeleeSkill implements BossSkill<Mob> {
         boss.yBodyRot = yaw;
         boss.yHeadRot = yaw;
     }
+    @Override public BossSkillRegistry.Type<MeleeRules> type() { return BossSkillApi.MELEE; }
+    @Override public MeleeRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(0, 0, mob -> Integer.MAX_VALUE, false); }
 }

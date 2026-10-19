@@ -19,12 +19,20 @@ public final class SkillShows {
      */
     public static void show(ServerLevel level, Vec3 at, String effect, double radius, double height, int ticks, int colour, int accent, double shake,
                      float yaw, boolean grounded) {
-        SpellVisualEntity shown = ModEntities.SPELL_VISUAL.get().create(level);
-        if (shown == null) return;
-        shown.showing(new SpellAction.Visual("corruption:" + effect, radius, height, ticks, colour, accent, shake, ""), yaw);
-        double y = grounded ? SpellEffects.groundAt(level, BlockPos.containing(at)).getY() : at.y;
-        shown.moveTo(at.x, y, at.z, yaw, 0);
-        level.addFreshEntity(shown);
+        com.miophas.corruption.api.arcane.WorldVisuals.show(level, at,
+                new SpellAction.Visual(effect.contains(":") ? effect : "corruption:" + effect, radius, height, ticks, colour, accent, shake, ""), yaw, grounded);
+    }
+
+    public static void install() {
+        com.miophas.corruption.api.arcane.WorldVisuals.install((level, at, visual, yaw, grounded) -> {
+            SpellVisualEntity shown = ModEntities.SPELL_VISUAL.get().create(level);
+            if (shown == null) return;
+            shown.showing(visual, yaw);
+            double y = grounded ? SpellEffects.groundAt(level, BlockPos.containing(at)).getY() : at.y;
+            shown.moveTo(at.x, y, at.z, yaw, 0);
+            level.addFreshEntity(shown);
+            SpellEffects.sound(level, at, visual.sound());
+        });
     }
 
     /** Where the ground is under (or a little over) this place: the foot of a column of air on something solid. */

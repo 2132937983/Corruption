@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.registry.ModDamageTypes;
 import com.miophas.corruption.core.demon.skill.CrescendoRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
@@ -25,7 +28,7 @@ import net.minecraft.world.phys.Vec3;
  * (the effect "crescendo"), notes flying off its front as it goes. A ring catches what it passes, once each: everything
  * not of the caster's side (players in creative or spectator aside) is hurt with the corruption's hurt and thrown off.
  */
-public final class CrescendoSkill implements BossSkill<Mob> {
+public final class CrescendoSkill implements RegisteredSkill<CrescendoRules> {
     /** The pitch of each ring's note: a major chord, rising. */
     private static final float[] CHORD = {.7F, .89F, 1.06F, 1.41F};
 
@@ -103,4 +106,7 @@ public final class CrescendoSkill implements BossSkill<Mob> {
             level.sendParticles(ParticleTypes.NOTE, x, at.y + .4 + level.random.nextDouble(), z, 0, (ring * 7 + note) % 24 / 24.0, 0, 0, 1);
         }
     }
+    @Override public BossSkillRegistry.Type<CrescendoRules> type() { return BossSkillApi.CRESCENDO; }
+    @Override public CrescendoRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.registry.ModDamageTypes;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
 import com.miophas.corruption.core.demon.skill.SkyBeamRules;
@@ -24,7 +27,7 @@ import net.minecraft.world.phys.Vec3;
  * it. Each is hurt once a pulse, however many beams it stands in, and its hurt cooldown does not shield it. The effect
  * ({@link #effect}) draws the circles and beams where the same rules put them. Any boss may carry it.
  */
-public final class SkyBeamSkill implements BossSkill<Mob> {
+public final class SkyBeamSkill implements RegisteredSkill<SkyBeamRules> {
     private final SkyBeamRules rules;
     private final int colour, accent;
     @Nullable private Vec3 mark;
@@ -107,4 +110,7 @@ public final class SkyBeamSkill implements BossSkill<Mob> {
     }
 
     @Override public void end(Mob boss, boolean broken) { mark = null; }
+    @Override public BossSkillRegistry.Type<SkyBeamRules> type() { return BossSkillApi.SKY_BEAMS; }
+    @Override public SkyBeamRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

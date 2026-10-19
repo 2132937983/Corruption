@@ -62,6 +62,41 @@ com.miophas.corruption
 
 骨粉可以直接对活性植物实体使用，也可以对其缠念基座使用；成功时升一级，生存模式消耗一份。生长会替换占据新阶段空间的腐化花草、诡异脉络、怪诞藤及无碰撞的可替换植被，实心地形、流体和未加载区块仍会阻止生长。判定通过前不会清除装饰，成熟或受阻时不消耗骨粉。自然生长和骨粉使用相同的 core 判定规则，正向生长和倒挂均适用。
 
+## 分层与扩展约定
+
+三层依赖的约束与扩展入口：
+
+- `core` 保存规则、算法和技能状态机；`api` 定义契约、工厂和可继承的通用游戏适配器；`common` 组合具体内容，安装世界服务、配置与客户端表现。`core` 与 `api` 均不引用 `common`。感染调度保留对 Minecraft 坐标值类型的依赖，其余核心规则通过字节码检查禁止直接或经 API 间接访问游戏实现。
+- API 早期公开的 `core` 规则与值类型继续保留原包名，作为公开兼容契约维护。`src/test/resources/architecture/published-core-contracts.txt` 记录其签名与记录结构，测试阻止意外删除或变更；不要求为每个纯数值访问再增加一层转发接口。
+- 新技能使用 `BossSkillRegistry.Type<R>` 与 `register(type, factory)` 注册。每次创建返回独立技能实例。新增注册不会替换整套工厂；重复注册报错，确需覆盖时使用 `replace`，`unregister` 恢复内置默认。注册在默认初始化前后均可生效。原 `BossSkillApi.gaze` 等调用保持可用，新增 `burrow`、`ram`、`venus`。
+- 潜地与冲撞依赖宿主的 `BurrowingCaster` 能力，阶段推进分别由 `core` 的 `BurrowState`、`RamState` 控制。祝福默认作用于自己与盟友，也可通过 `BlessingCaster` 提供候选对象及特效原点。所罗门继续只选择原先的蛟龙对象。
+- 碎块抛射由独立 `DebrisRules` 控制，潜地、冲撞不再读取系尔的技能预设。技能构造器可单独提供碎块参数。
+- 新施法动作可使用 `ArcaneCasting.registerAction(id, handler)`，数据形式为 `{"type":"custom","id":"addon:action","parameters":{"power":"9"}}`，参数为字符串键值。它可放在普通法术、咒弹或光束的动作列表中。`registerHandler(ActionClass.class, handler)` 则替换一种已有动作的处理，不接管玩家腐化值或其他动作；重复注册报错，`replaceAction`/`replaceHandler` 显式覆盖。未安装世界实现时会在施法扣费前报出初始化错误。
+- 残躯动画的实体事件和代理 tick 由客户端 `SourceAnimationPlayback` 实现，通过 API 安装；核心动画策略只保存不透明驱动值和选择规则。NBT 与方块注册表解码放在 API 适配层。
+
+以上边界由 `LayerDependenciesTest` 检查编译后的类引用，包含嵌套类、匿名类、lambda 和方法签名，不只检查源码 `import`。
+
+### 附属模组接入
+
+附属代码依赖 `api` 及其公开签名中出现的 `core` 契约，不需要引用 `common`。API 中的实体基类是可继承的游戏适配器；世界服务、配置、原生实体注册和客户端缓存由 `common/extension/ExtensionServices` 与客户端初始化安装。附属使用下面的注册和调用入口，不需要重新安装整套服务。
+
+| 内容 | 公开入口与约定 |
+| --- | --- |
+| 技能 | `BossSkillApi` 提供 37 种技能及额外的目标位置施法、召唤计数范围模式，共 40 个默认工厂；原规则参数可直接复用。`BossSkillRegistry.register` 注册新增技能或替换内置工厂，`SkillSet` 与本体首领使用相同的解析入口。注册应在世界创建前完成，已经解析的运行实例不热替换。 |
+| 首领 | 继承 `api.demon.GoeticDemon`，或实现 `DemonBoss`。血条按公开接口识别；`emblemTexture()` 可提供附属自己的 24×24 徽章。`BossDeath` 描述死亡演出，客户端渲染器在实体脚下调用 `BossDeathVisuals.draw`，用 `bodyVisible` 决定身体是否继续显示。实体类型仍需加入相应阵营标签。 |
+| 精英 | 继承 `api.elite.CorruptionElite<E>`，提供技能集、技能选择与日常移动逻辑，即可复用技能计时、阵营、防护、动画同步和存档。类型加入 `corruption:elites` 与 `corruption:corrupted_remnants`。 |
+| 世界特效 | `WorldVisuals.show(level, position, visual, yaw, grounded)` 可由生物、方块或仪式调用，无需玩家或假玩家。它复用本体特效实体、声音及同步；附属绘制器仍通过 `SpellVisuals.register` 在客户端注册。 |
+| 感染 | `InfectionExtensions.registerSource` 注册腐化识别与传播条件；`registerConversion` 注册只读匹配条件与替换状态。优先级从高到低，相同时按注册 ID 排序；免疫标签优先于扩展转换。`WorldInfection` 操作本体实际的世界调度器，可检测、激活、停用或立即感染一个位置。扩展转换由本体完成方块更新和装饰，不另开扫描循环。 |
+| 活性植物 | 在两端初始化时用 `LivingPlantRegistry.register` 注册物种 ID、`LivingPlantDefinition` 与是否预留树冠空间，再继承 `api.plant.AnchoredLivingPlant` 并覆盖 `plantType()`、生长间隔。可复用阶段、骨粉、倒挂、锚定、空间检查与存档。默认支持方块由 `corruption:living_plant_supports` 标签决定，也可覆盖 `supportedBy`。`PlantSprouts.register` 可让新植物在缠念自然生长时参与生成。旧 `LivingPlantKind` 重载保留。 |
+| 残躯 | `RemnantSpawns.copy` 捕获现有生物，`raise` 按来源类型创建；返回尚未加入世界的实体，不自动处置来源。`RemnantExtensions.register` 为指定来源安装独立能力对象，`Context.data()` 自动随宿主保存，`removed` 清理临时资源。原 `RemnantAbilityApi` 继续用于选择已有能力。 |
+| 皮肤 | 客户端通过 `CorruptedTextures` 复用本体的纹理变换缓存、渲染层与资源重载清理，也支持玩家阶段纹理；纯像素算法仍由 `CrimsonSkinApi` 提供。此入口仅在客户端渲染线程调用。 |
+| 玩家腐化值 | `PlayerCorruptionHolder` 读写附件；需要增加腐化值并结算装备减免、满值转化时，使用 `PlayerCorruptionChanges.raise`，返回实际增加量。直接 `set` 不代替完整结算。 |
+| 祭坛 | 配方和结构继续通过数据包添加。`AltarApi` 查询祭坛、枚举与建造已加载区域中的结构；`AltarRituals.register` 按配方 ID 添加开始、推进、完成及中断回调。`canComplete` 可在消耗前拒绝，`replacesResult` 可保留正常消耗并由完成回调生成自定义结果。 |
+
+涉及世界的入口仅在服务端线程调用。感染条件必须廉价、无副作用，不主动加载区块；自然传播仍遵守本体的配置与预算。技能替换通过公开 `RegisteredSkill` 元数据解析，本体默认实例在没有替换时保持原有状态。
+
+`src/addonFixture/java` 是独立的附属示例源集，`compileAddonFixture` 使用构建后的模组 JAR 编译它。`AddonBoundaryTest` 检查示例及其内部类不引用 `common` 或未公开的核心类型，服务端测试覆盖感染、第三种植物、技能实体、原生首领技能替换、残躯能力和祭坛回调。它不打包进发行 JAR。
+
 ## 感染规则与性能
 
 使用 **服务端集中调度 + 自动注册的静态变体**。感染时直接替换为对应方块状态：
@@ -179,7 +214,7 @@ com.miophas.corruption
 
 （对照：腐化残躯默认 20 点生命、3 点攻击；最弱的首领安杜马利恩 160 点生命。腐化织念者的生命值比他还多，但任何伤害都能伤到它，而安杜马利恩只受咒术伤害。）
 
-所有精英的共同点（`common/entity/CorruptionElite`）：
+所有精英的共同点（`api/elite/CorruptionElite`）：
 
 - **属于腐化阵营，但不是首领**：类型同时在 `corruption:corrupted_remnants` 和新的实体类型标签 `corruption:elites` 中，不在 `corruption:bosses` 中。腐化阵营是它们的盟友，其他一切活物都是猎物，优先玩家；它们不会被腐化咒术转化，死后也不会再生成残躯。
 - **任何伤害都能伤到它们**：不需要首领那样的咒术伤害（不受 `[demons] arcaneOnly` 影响）。
@@ -426,7 +461,7 @@ com.miophas.corruption
   - 祭坛地面上 (2,2)、(2,-2)、(-2,-2)、(-2,2) 四处各放一个凋灵骷髅头（方块标签 `corruption:wither_skulls`，放在地上或挂在墙上都可以）；
   - 祭坛范围内（供台四周 4 格、高 3 格）需要站着一名腐化值至少为 3 的玩家（旁观者不算）；
   - 仪式持续 8 秒，完成后他出现在供台上。也可以用 `/summon corruption:andromalius` 召唤，没有自然生成和刷怪蛋。
-- **只受咒术伤害**：魔神首领（基类 `common/entity/GoeticDemon`）只承受带有咒术标记的伤害，即 `ArcaneDamage.isSpell` 认可的伤害：咒术自身的伤害类型 `corruption:arcane_spell`，以及伤害类型标签 `corruption:spell` 中的类型（目前包括腐化伤害 `corruption:corruption`，数据包可以追加）。带奥术印记的刀剑（物品标签 `corruption:arcane_weapons`，例如腐化能量剑）手持近战命中时同样有效，见“腐化之刃”一节；腐化奥术剑虽然也有印记，但它的腐化咒蚀会被首领挡下。其余刀剑、弓箭、三叉戟、火焰、药水与中毒、凋零、闪电、爆炸都会穿过他：发出一声金属响，攻击他的玩家会在动作栏看到“只有咒术才能伤害安杜马利恩”（每 3 秒最多一次）。注意 `corruption:corruption` 在这个标签里，所以造成腐化伤害的咒术（例如序章的腐化魔法）也能伤到他。玩家的范围咒术会伤到范围内的一切，包括他：对他身边的怪物施法时，他也会受伤。而腐化地面、腐化液体、腐化咒蚀效果、腐化植物和迷失之魂都不伤害腐化阵营，对他无效。咒术造成的火焰、闪电、爆炸不带咒术标记，同样无效。`/kill` 和虚空伤害仍然有效。
+- **只受咒术伤害**：魔神首领（基类 `api/demon/GoeticDemon`）只承受带有咒术标记的伤害，即 `ArcaneDamage.isSpell` 认可的伤害：咒术自身的伤害类型 `corruption:arcane_spell`，以及伤害类型标签 `corruption:spell` 中的类型（目前包括腐化伤害 `corruption:corruption`，数据包可以追加）。带奥术印记的刀剑（物品标签 `corruption:arcane_weapons`，例如腐化能量剑）手持近战命中时同样有效，见“腐化之刃”一节；腐化奥术剑虽然也有印记，但它的腐化咒蚀会被首领挡下。其余刀剑、弓箭、三叉戟、火焰、药水与中毒、凋零、闪电、爆炸都会穿过他：发出一声金属响，攻击他的玩家会在动作栏看到“只有咒术才能伤害安杜马利恩”（每 3 秒最多一次）。注意 `corruption:corruption` 在这个标签里，所以造成腐化伤害的咒术（例如序章的腐化魔法）也能伤到他。玩家的范围咒术会伤到范围内的一切，包括他：对他身边的怪物施法时，他也会受伤。而腐化地面、腐化液体、腐化咒蚀效果、腐化植物和迷失之魂都不伤害腐化阵营，对他无效。咒术造成的火焰、闪电、爆炸不带咒术标记，同样无效。`/kill` 和虚空伤害仍然有效。
 - **体型与属性**：按 16 像素一格的常规尺寸建模，前半身像眼镜蛇一样立起，头顶约 4 格高，尾巴在地上蜿蜒约 7 格。移动和碰撞用的判定箱是 2×4 格，它不能被选中；受击由沿着身体分布的 9 个部位承担（`AndromaliusRules.BODY`，NeoForge 的 `PartEntity`）：头、颈、盘起的身躯、五段尾巴和尾尖。各部位随他转身而移动，所以立起的头和身后的尾巴都打得中；打在任何部位上都算打在他身上，同样只有咒术有效。他死后各部位不能再被选中。生命值 160，护甲 8，移动速度 0.32（狩猎时再快六成），击退抗性 0.8，能跨上一格高的台阶，免疫火焰和摔落伤害，不会消失。显示红色、分十段的首领血条，按模组的样式绘制，徽记是展开头罩的眼镜蛇。
 - **阵营**：他属于腐化阵营（在标签 `corruption:corrupted_remnants` 中）。腐化残躯和其他腐化阵营成员是他的盟友，双方互不攻击；非腐化阵营的怪物与傀儡会攻击他。
 - **战术**：优先追击 48 格内的玩家，或伤害过他的生物；附近没有玩家时，也会像腐化残躯一样追击视线内任何非腐化阵营的生物（动物、村民、怪物与傀儡等）。每刻的攻击选择 `AndromaliusRules.choose` 和移动方式 `AndromaliusRules.intent` 都是纯规则，有单元测试。
@@ -450,7 +485,7 @@ com.miophas.corruption
   - 形体：S 形尾巴贴地，前半身呈眼镜蛇式立起，头罩半张，毒蛇头骨上有角冠、獠牙、可开合的下颌和会吐信的分叉舌头，尾端是带钩的尾刺。
   - 生成流程：`paint_texture.py` 绘制 512×256 的材质色板，`export_model.py` 生成模型并导出几何数据 `geo/andromalius.json`、`.bbmodel` 和预览图。凝视的画面由 `draw_gaze.py` 绘制。
 - **动画**（`AndromaliusModel`）：尾巴随移动波浪式摆动，静止时也会轻轻游动，尾刺不时颤动；前半身像眼镜蛇一样摇摆；分叉的舌头每隔几秒吐出一次。凝视时后仰并把头罩向前收拢、放大；吐火球时张大嘴，每吐一对头部后仰一下；撕咬时先后仰蓄力、再张大嘴向前下方猛扑；甩尾时整条尾巴先弯向一侧，再横扫到另一侧；冲锋时先压低头颈、角冠朝前，然后伸长脖子贴地猛冲，尾巴绷直拖在身后。
-- **分层**：`core/demon/AndromaliusRules` 是纯 Java，只引用 `java.*`（有测试保证），包含攻击与移动的选择、狩猎的开始与结束、齐射数量与节奏、预判瞄准与狂暴扇面、凝视范围、逼近速度与投射物威胁的判断、狂暴的数值和护盾计时；`common/entity/Andromalius` 是实体；`common/client/entity/AndromaliusModel` 与 `AndromaliusRenderer` 是模型和渲染；`common/client/visual/WardShell` 绘制护盾；`common/client/particle/GazeParticle` 绘制凝视画面；凝视与冲锋由招式模块 `common/entity/skill/GazeSkill` 与 `ChargeSkill` 执行。首领血条由 `common/entity/DemonBoss` 接口提供，巨像与魔神都实现了它。`common/entity/GoeticDemon` 是魔神首领的基类：只受咒术伤害、样式化的首领血条、不会消失、没有摔落伤害、不能拴绳、不能乘坐载具，还可以由多个受击部位组成（`core/demon/BodyPart`）。以后的魔神只需继承它。
+- **分层**：`core/demon/AndromaliusRules` 是纯 Java，只引用 `java.*`（有测试保证），包含攻击与移动的选择、狩猎的开始与结束、齐射数量与节奏、预判瞄准与狂暴扇面、凝视范围、逼近速度与投射物威胁的判断、狂暴的数值和护盾计时；`common/entity/Andromalius` 是实体；`common/client/entity/AndromaliusModel` 与 `AndromaliusRenderer` 是模型和渲染；`common/client/visual/WardShell` 绘制护盾；`common/client/particle/GazeParticle` 绘制凝视画面；凝视与冲锋由招式模块 `common/entity/skill/GazeSkill` 与 `ChargeSkill` 执行。首领血条由 `api/demon/DemonBoss` 接口提供，巨像与魔神都实现了它。`api/demon/GoeticDemon` 是魔神首领的基类：只受咒术伤害、样式化的首领血条、不会消失、没有摔落伤害、不能拴绳、不能乘坐载具，还可以由多个受击部位组成（`core/demon/BodyPart`）。以后的魔神只需继承它。
 
 ## 丹达利恩
 
@@ -1028,7 +1063,7 @@ com.miophas.corruption
 
 ## 首领之死
 
-每位首领的死亡都是一场演出，由 `common/entity/BossDeath` 描述：
+每位首领的死亡都是一场演出，由 `api/demon/BossDeath` 描述：
 - `ticks`：从倒下到躯体消失的刻数；
 - `linger`：躯体消失后再停留的刻数，让效果放完；
 - `scale`：效果整体放大的倍数；

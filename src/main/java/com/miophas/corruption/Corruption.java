@@ -1,19 +1,19 @@
 package com.miophas.corruption;
 
-import com.miophas.corruption.common.registry.ModBlocks;
-import com.miophas.corruption.common.registry.ModBlockEntities;
-import com.miophas.corruption.common.infection.InfectionEvents;
 import com.miophas.corruption.common.command.CorruptionCommands;
 import com.miophas.corruption.common.config.InfectionConfig;
+import com.miophas.corruption.common.infection.InfectionEvents;
+import com.miophas.corruption.common.registry.ModBlockEntities;
+import com.miophas.corruption.common.registry.ModBlocks;
 import com.miophas.corruption.common.registry.ModCreativeModeTabs;
+import com.miophas.corruption.common.registry.ModEntities;
 import com.miophas.corruption.common.registry.ModFeatures;
 import com.miophas.corruption.common.registry.ModItems;
 import com.miophas.corruption.common.registry.ModParticles;
-import com.miophas.corruption.common.registry.ModEntities;
 import com.miophas.corruption.common.worldgen.CorruptionRegion;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -24,6 +24,7 @@ public final class Corruption {
     public static final String MOD_ID = "corruption";
 
     public Corruption(IEventBus modEventBus, ModContainer modContainer) {
+        com.miophas.corruption.common.extension.ExtensionServices.install();
         modContainer.registerConfig(ModConfig.Type.SERVER, InfectionConfig.SPEC);
         modEventBus.addListener(InfectionConfig::onLoading);
         modEventBus.addListener(InfectionConfig::onReloading);

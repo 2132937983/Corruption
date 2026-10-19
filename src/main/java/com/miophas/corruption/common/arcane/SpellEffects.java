@@ -1,24 +1,23 @@
 package com.miophas.corruption.common.arcane;
 
 import com.miophas.corruption.api.arcane.ArcaneCasting;
-import com.miophas.corruption.common.registry.ModEntities;
-import net.minecraft.core.particles.ParticleOptions;
 import com.miophas.corruption.api.arcane.ArcaneDamage;
 import com.miophas.corruption.api.corruption.CorruptionFactionApi;
+import com.miophas.corruption.api.demon.DemonBoss;
+import com.miophas.corruption.common.block.CorruptionBlock;
+import com.miophas.corruption.common.block.StaticCorruptedBlock;
+import com.miophas.corruption.common.entity.CorruptedRemnant;
 import com.miophas.corruption.common.entity.PlayerCorruption;
 import com.miophas.corruption.common.entity.SpellBeamEntity;
 import com.miophas.corruption.common.entity.SpellProjectile;
 import com.miophas.corruption.common.entity.SpellVisualEntity;
-import com.miophas.corruption.common.block.CorruptionBlock;
-import com.miophas.corruption.common.block.StaticCorruptedBlock;
-import com.miophas.corruption.common.entity.CorruptedRemnant;
-import com.miophas.corruption.common.entity.DemonBoss;
 import com.miophas.corruption.common.infection.CorruptionConversions;
 import com.miophas.corruption.common.infection.CorruptionOreConversions;
 import com.miophas.corruption.common.infection.ServerInfectionWorld;
 import com.miophas.corruption.common.registry.ModBlocks;
-import com.miophas.corruption.common.registry.ModParticles;
 import com.miophas.corruption.common.registry.ModDamageTypes;
+import com.miophas.corruption.common.registry.ModEntities;
+import com.miophas.corruption.common.registry.ModParticles;
 import com.miophas.corruption.common.registry.ModTags;
 import com.miophas.corruption.core.arcane.SpellAction;
 import java.util.ArrayList;
@@ -30,6 +29,7 @@ import java.util.UUID;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -41,14 +41,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -59,7 +51,15 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.event.EventHooks;
@@ -88,10 +88,11 @@ public final class SpellEffects implements ArcaneCasting.World {
     private static final int MAX_QUELLED_BLOCKS = 128;
 
     /** Fits this as the world spells are carried out through. */
-    public static void install() { ArcaneCasting.install(new SpellEffects()); }
+    public static void install() { ArcaneCasting.installDefault(new SpellEffects()); }
 
     @Override public void perform(ServerPlayer caster, ArcaneCasting.Origin origin, SpellAction action) {
         switch (action) {
+            case SpellAction.Custom custom -> ArcaneCasting.performCustom(caster, origin, custom);
             case SpellAction.ApplyEffect effect -> applyEffect(caster, origin, effect);
             case SpellAction.Damage damage -> damage(caster, origin, damage);
             case SpellAction.Corrupt corrupt -> corrupt(caster, origin, corrupt);
@@ -125,7 +126,7 @@ public final class SpellEffects implements ArcaneCasting.World {
      */
     @Override public void corrupt(ServerPlayer caster, int gain) {
         if (gain <= 0 || caster.isCreative() || caster.isSpectator()) return;
-        PlayerCorruption.raise(caster, gain);
+        com.miophas.corruption.api.corruption.PlayerCorruptionChanges.raise(caster, gain);
     }
 
     /** Gives a mob effect to the caster alone, or to everything near the origin. */
@@ -429,15 +430,7 @@ public final class SpellEffects implements ArcaneCasting.World {
      * {@link SpellVisualEntity}), and sounds it there.
      */
     private void visual(ServerPlayer caster, ArcaneCasting.Origin origin, SpellAction.Visual action) {
-        ServerLevel level = caster.serverLevel();
-        Vec3 at = origin.at();
-        BlockPos ground = groundAt(level, BlockPos.containing(at));
-        SpellVisualEntity shown = ModEntities.SPELL_VISUAL.get().create(level);
-        if (shown == null) return;
-        shown.showing(action, caster.getYRot());
-        shown.moveTo(at.x, ground.getY(), at.z, caster.getYRot(), 0);
-        level.addFreshEntity(shown);
-        sound(level, at, action.sound());
+        com.miophas.corruption.api.arcane.WorldVisuals.show(caster.serverLevel(), origin.at(), action, caster.getYRot(), true);
     }
 
     /**
@@ -455,7 +448,7 @@ public final class SpellEffects implements ArcaneCasting.World {
     }
 
     /** Sounds a spell's sight where it shows, loud enough to be heard from afar; "" sounds nothing. */
-    private static void sound(ServerLevel level, Vec3 at, String named) {
+    public static void sound(ServerLevel level, Vec3 at, String named) {
         if (named.isEmpty()) return;
         ResourceLocation id = ResourceLocation.tryParse(named);
         SoundEvent sound = id == null ? null : BuiltInRegistries.SOUND_EVENT.get(id);

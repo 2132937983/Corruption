@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.registry.ModDamageTypes;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
 import com.miophas.corruption.core.demon.skill.SpikeFieldRules;
@@ -28,7 +31,7 @@ import net.minecraft.world.phys.Vec3;
  * spikes burst up at every mark, and everything standing in the field is hurt with the corruption's own hurt and
  * slowed.
  */
-public final class SpikeFieldSkill implements BossSkill<Mob> {
+public final class SpikeFieldSkill implements RegisteredSkill<SpikeFieldRules> {
     /** How far above or below the field's ground a creature may stand and still be caught in it. */
     private static final double REACH_UP = 3;
 
@@ -104,4 +107,7 @@ public final class SpikeFieldSkill implements BossSkill<Mob> {
         double along = to.x * ahead.x + to.z * ahead.z, across = to.x * -ahead.z + to.z * ahead.x;
         return Math.abs(to.y) <= REACH_UP && rules.covers(along, Math.max(0, Math.abs(across) - caught.getBbWidth() / 2));
     }
+    @Override public BossSkillRegistry.Type<SpikeFieldRules> type() { return BossSkillApi.SPIKE_FIELD; }
+    @Override public SpikeFieldRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

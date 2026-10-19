@@ -2,9 +2,9 @@ package com.miophas.corruption.common.client.visual;
 
 import com.miophas.corruption.api.arcane.client.SpellVisual;
 import com.miophas.corruption.api.arcane.client.SpellVisuals;
+import com.miophas.corruption.api.demon.BossDeath;
+import com.miophas.corruption.api.demon.DemonBoss;
 import com.miophas.corruption.common.client.entity.FarView;
-import com.miophas.corruption.common.entity.BossDeath;
-import com.miophas.corruption.common.entity.DemonBoss;
 import com.miophas.corruption.core.arcane.SpellAction;
 import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.List;
@@ -41,8 +41,11 @@ public final class DeathVisual {
     public record Dying(BossDeath death, float time, Vector3f heart, float yaw, long seed, Quaternionfc facing) {
         /** The boss as it stands this frame. */
         public static <T extends LivingEntity & DemonBoss> Dying of(T boss, float partial, Quaternionfc facing) {
-            Vec3 heart = boss.heart(partial).subtract(boss.getPosition(partial));
-            return new Dying(boss.death(), boss.deathTime + partial, new Vector3f((float) heart.x, (float) heart.y, (float) heart.z),
+            return of(boss, boss, partial, facing);
+        }
+        public static Dying of(LivingEntity boss, DemonBoss descriptor, float partial, Quaternionfc facing) {
+            Vec3 heart = descriptor.heart(partial).subtract(boss.getPosition(partial));
+            return new Dying(descriptor.death(), boss.deathTime + partial, new Vector3f((float) heart.x, (float) heart.y, (float) heart.z),
                     Mth.lerp(partial, boss.yBodyRotO, boss.yBodyRot), boss.getUUID().getLeastSignificantBits(), facing);
         }
     }

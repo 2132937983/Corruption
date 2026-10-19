@@ -218,6 +218,28 @@ tasks.named('test', Test).configure {
     useJUnitPlatform()
 }
 
+// Compile a real consumer against the packaged API, rather than main source output.
+def compileAddonFixture = tasks.register('compileAddonFixture', JavaCompile) {
+    dependsOn tasks.named('jar')
+    source fileTree('src/addonFixture/java') { include '**/*.java' }
+    classpath = files(tasks.named('jar').flatMap { it.archiveFile }) + sourceSets.main.compileClasspath
+    destinationDirectory = layout.buildDirectory.dir('classes/java/addonFixture')
+    options.encoding = 'UTF-8'
+}
+sourceSets.test.compileClasspath += files(compileAddonFixture.flatMap { it.destinationDirectory })
+tasks.named('compileTestJava').configure {
+    dependsOn compileAddonFixture
+    // NeoForge transforms the test module as one unit. A separate runtime path would
+    // load consumer entities through the parent class loader with different game classes.
+    doLast {
+        copy {
+            from compileAddonFixture.flatMap { it.destinationDirectory }
+            into destinationDirectory
+        }
+    }
+}
+tasks.named('check').configure { dependsOn compileAddonFixture }
+
 // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
 idea {
     module {

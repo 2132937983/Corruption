@@ -2,6 +2,7 @@ package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
 import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
 import com.miophas.corruption.core.demon.skill.BarrageRules;
 import com.miophas.corruption.core.demon.skill.BeamRules;
 import com.miophas.corruption.core.demon.skill.BeamVolleyRules;
@@ -37,7 +38,49 @@ import net.minecraft.world.entity.Mob;
 /** The mod's own boss skills, fitted to BossSkillApi as the game starts, so that an add-on's bosses can carry them. */
 public final class BossSkillMaker implements BossSkillApi.Maker {
     /** Fits these as what carries the api's skills out. */
-    public static void install() { BossSkillApi.install(new BossSkillMaker()); }
+    public static void install() {
+        BossSkillRegistry.registerDefault(BossSkillApi.FIREBALL, (rules, options) -> new FireballSkill(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.HANDS, (rules, options) -> new HandSkill(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.ELITE_CALL, (rules, options) -> new EliteCallSkill(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.DRAKE_RUSH, (rules, options) -> new DrakeRushSkill(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.SWOOP, (rules, options) -> new SwoopSkill(rules.timing(), rules.range(), rules.speed()));
+        BossSkillRegistry.registerDefault(BossSkillApi.TARGET_BLIGHT, (rules, options) -> new BlightSkill(rules, options.colour(), options.accent(), true));
+        BossSkillRegistry.registerDefault(BossSkillApi.TARGET_SCREECH, (rules, options) -> new ScreechSkill(rules, options.colour(), options.accent(), true));
+        BossSkillRegistry.registerDefault(BossSkillApi.COUNTED_SUMMON, (rules, options) -> new SummonSkill(rules.rules(), options.colour(), options.accent()).counting(rules.radius()));
+        BossSkillMaker defaults = new BossSkillMaker();
+        BossSkillRegistry.registerDefault(BossSkillApi.GAZE, (rules, options) -> defaults.gaze(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.CHARGE, (rules, options) -> defaults.charge(rules));
+        BossSkillRegistry.registerDefault(BossSkillApi.SUMMON, (rules, options) -> defaults.summon(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.BLINK, (rules, options) -> defaults.blink(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.STRIKE, (rules, options) -> defaults.strike(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.BEAM, (rules, options) -> defaults.beam(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.MIND_CONTROL, (rules, options) -> defaults.mindControl(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.MELEE, (rules, options) -> defaults.melee(rules));
+        BossSkillRegistry.registerDefault(BossSkillApi.PHASE_DASH, (rules, options) -> defaults.phaseDash(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.SPIKE_FIELD, (rules, options) -> defaults.spikeField(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.BEAM_VOLLEY, (rules, options) -> defaults.beamVolley(rules, options.count(), options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.SPIN_VOLLEY, (rules, options) -> defaults.spinVolley(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.SPIN, (rules, options) -> defaults.spin(rules));
+        BossSkillRegistry.registerDefault(BossSkillApi.SCREECH, (rules, options) -> defaults.screech(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.BARRAGE, (rules, options) -> defaults.barrage(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.DIVE_CHAIN, (rules, options) -> defaults.diveChain(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.DIVE, (rules, options) -> defaults.dive(rules, options.colour(), options.accent(), options.upAtOnce()));
+        BossSkillRegistry.registerDefault(BossSkillApi.CHARIOT, (rules, options) -> defaults.chariot(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.PSYCHIC, (rules, options) -> defaults.psychic(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.POUNCE, (rules, options) -> defaults.pounce(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.SPIT, (rules, options) -> defaults.spit(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.GRAB, (rules, options) -> defaults.grab(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.PSYCHIC_STREAM, (rules, options) -> defaults.psychicStream(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.BLIGHT, (rules, options) -> defaults.blight(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.SNARE, (rules, options) -> defaults.snare(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.UPHEAVAL, (rules, options) -> defaults.upheaval(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.FANFARE, (rules, options) -> defaults.fanfare(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.CRESCENDO, (rules, options) -> defaults.crescendo(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.SKY_BEAMS, (rules, options) -> defaults.skyBeams(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.BURROW, (rules, options) -> new BurrowSkill(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.RAM, (rules, options) -> new RamSkill(rules, options.colour(), options.accent()));
+        BossSkillRegistry.registerDefault(BossSkillApi.VENUS, (rules, options) -> new VenusSkill(rules, options.colour(), options.accent()));
+    }
 
     @Override public BossSkill<Mob> gaze(GazeRules rules, int colour, int accent) { return new GazeSkill(rules, colour, accent); }
     @Override public BossSkill<Mob> charge(ChargeRules rules) { return new ChargeSkill(rules); }

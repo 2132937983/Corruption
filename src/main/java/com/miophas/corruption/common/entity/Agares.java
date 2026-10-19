@@ -4,6 +4,7 @@ import com.miophas.corruption.api.corruption.AgaresApi;
 import com.miophas.corruption.api.corruption.AgaresAttack;
 import com.miophas.corruption.api.corruption.ColossusGait;
 import com.miophas.corruption.api.corruption.ColossusLegs;
+import com.miophas.corruption.api.demon.BossDeath;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

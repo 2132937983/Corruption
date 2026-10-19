@@ -9,8 +9,8 @@ import net.minecraft.world.phys.Vec3;
 /**
  * What casting a spell needs of the world, which the rules themselves cannot do: carrying out an action, and
  * reading and raising the caster's corruption. The mod's own side fits an implementation once at startup
- * (common.arcane.SpellEffects); an add-on with effects of its own may fit its own, or leave the default, under
- * which spells are paid for but do nothing.
+ * (common.arcane.SpellEffects); add-ons register individual actions without replacing the world adapter.
+ * An absent adapter is an initialization error, raised before casting pays.
  */
 public final class ArcaneCasting {
     /**
@@ -51,20 +51,60 @@ public final class ArcaneCasting {
         void corrupt(ServerPlayer caster, int gain);
     }
 
-    /** Until the mod fits its own: nothing happens, and none is corrupted. */
-    private static final World NONE = new World() {
-        @Override public void perform(ServerPlayer caster, Origin origin, SpellAction action) {}
-        @Override public int corruption(ServerPlayer caster) { return 0; }
-        @Override public void corrupt(ServerPlayer caster, int gain) {}
-    };
+    @FunctionalInterface public interface ActionHandler<A extends SpellAction> {
+        void perform(ServerPlayer caster, Origin origin, A action);
+    }
+    private static final java.util.Map<Class<?>, ActionHandler<?>> HANDLERS = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Map<net.minecraft.resources.ResourceLocation, ActionHandler<SpellAction.Custom>> CUSTOM = new java.util.concurrent.ConcurrentHashMap<>();
+    private static volatile World installed, defaults;
 
-    private static World world = NONE;
-
-    /** Fits the implementation spells are carried out through. */
-    public static void install(World implementation) { world = implementation == null ? NONE : implementation; }
-
-    /** The world casting works through. */
-    public static World world() { return world; }
-
+    /** Adds or overrides one built-in action kind without taking over corruption bookkeeping. */
+    public static <A extends SpellAction> void registerHandler(Class<A> type, ActionHandler<A> handler) {
+        if (HANDLERS.putIfAbsent(java.util.Objects.requireNonNull(type), java.util.Objects.requireNonNull(handler)) != null)
+            throw new IllegalStateException("Action handler already registered: " + type.getName());
+    }
+    public static <A extends SpellAction> void replaceHandler(Class<A> type, ActionHandler<A> handler) {
+        HANDLERS.put(java.util.Objects.requireNonNull(type), java.util.Objects.requireNonNull(handler));
+    }
+    public static void unregisterHandler(Class<? extends SpellAction> type) { HANDLERS.remove(type); }
+    /** Registers an add-on action for {type: custom, id: namespace:action, parameters: {...}}. */
+    public static void registerAction(net.minecraft.resources.ResourceLocation id, ActionHandler<SpellAction.Custom> handler) {
+        if (CUSTOM.putIfAbsent(java.util.Objects.requireNonNull(id), java.util.Objects.requireNonNull(handler)) != null)
+            throw new IllegalStateException("Custom action already registered: " + id);
+    }
+    public static void replaceAction(net.minecraft.resources.ResourceLocation id, ActionHandler<SpellAction.Custom> handler) {
+        CUSTOM.put(java.util.Objects.requireNonNull(id), java.util.Objects.requireNonNull(handler));
+    }
+    public static void unregisterAction(net.minecraft.resources.ResourceLocation id) { CUSTOM.remove(id); }
+    public static void performCustom(ServerPlayer caster, Origin origin, SpellAction.Custom action) {
+        var id = net.minecraft.resources.ResourceLocation.parse(action.id());
+        var handler = CUSTOM.get(id);
+        if (handler == null) throw new IllegalStateException("Custom spell action has not been registered: " + id);
+        handler.perform(caster, origin, action);
+    }
+    private record Dispatch(World base) implements World {
+        @Override public void perform(ServerPlayer caster, Origin origin, SpellAction action) {
+            ActionHandler<?> handler = HANDLERS.get(action.getClass());
+            if (handler != null) apply(handler, caster, origin, action);
+            else if (action instanceof SpellAction.Custom custom) performCustom(caster, origin, custom);
+            else base.perform(caster, origin, action);
+        }
+        @Override public int corruption(ServerPlayer caster) { return base.corruption(caster); }
+        @Override public void corrupt(ServerPlayer caster, int gain) { base.corrupt(caster, gain); }
+    }
+    @SuppressWarnings("unchecked")
+    private static <A extends SpellAction> void apply(ActionHandler<?> handler, ServerPlayer caster, Origin origin, A action) {
+        ((ActionHandler<A>) handler).perform(caster, origin, action);
+    }
+    /** Legacy whole-world replacement. New extensions should register individual actions instead. Null restores the default. */
+    @Deprecated public static void install(World implementation) { installed = implementation instanceof Dispatch dispatch ? dispatch.base() : implementation; }
+    /** Common setup installs the default without overwriting an add-on's replacement. */
+    public static void installDefault(World implementation) { defaults = java.util.Objects.requireNonNull(implementation); }
+    /** Fails before a casting tool pays if common setup has not installed a world adapter. */
+    public static World world() {
+        World base = installed != null ? installed : defaults;
+        if (base == null) throw new IllegalStateException("Spell world adapter must be installed before casting");
+        return new Dispatch(base);
+    }
     private ArcaneCasting() {}
 }

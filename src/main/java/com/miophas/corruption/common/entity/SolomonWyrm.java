@@ -1,6 +1,10 @@
 package com.miophas.corruption.common.entity;
 
+import com.miophas.corruption.api.demon.BossDeath;
+import com.miophas.corruption.api.demon.GoeticDemon;
 import com.miophas.corruption.api.demon.skill.BeamCaster;
+import com.miophas.corruption.api.demon.skill.BlessingCaster;
+import com.miophas.corruption.api.demon.skill.BurrowingCaster;
 import com.miophas.corruption.api.demon.skill.SkillSet;
 import com.miophas.corruption.api.demon.skill.SpitCaster;
 import com.miophas.corruption.common.entity.skill.BarrageSkill;
@@ -15,8 +19,8 @@ import com.miophas.corruption.common.entity.skill.StrikeSkill;
 import com.miophas.corruption.common.entity.skill.VenusSkill;
 import com.miophas.corruption.common.registry.ModDamageTypes;
 import com.miophas.corruption.common.registry.ModTags;
-import com.miophas.corruption.core.demon.SolomonRules;
 import com.miophas.corruption.core.demon.SolomonRules.Wyrm;
+import com.miophas.corruption.core.demon.SolomonRules;
 import com.miophas.corruption.core.demon.WyrmChain;
 import com.miophas.corruption.core.demon.WyrmPose;
 import com.miophas.corruption.core.demon.WyrmWake;
@@ -85,7 +89,7 @@ import net.neoforged.neoforge.event.EventHooks;
  *
  * <p>It falls apart from the tail up when it dies, and tells its seal it has fallen.
  */
-public final class SolomonWyrm extends GoeticDemon implements BeamCaster, SpitCaster, IEntityWithComplexSpawn {
+public final class SolomonWyrm extends GoeticDemon implements BeamCaster, SpitCaster, BurrowingCaster, BlessingCaster, IEntityWithComplexSpawn {
     /** Its death: its body crumbling from the tail up, a burst of its light at its head when the last of it goes. */
     public static final BossDeath DEATH = new BossDeath(SolomonRules.WYRM_DEATH_TICKS, 20, 1.6F, new BossDeath.Rays(12, 8, SolomonRules.GOLD, SolomonRules.VIOLET),
             .2F, List.of(
@@ -739,4 +743,8 @@ public final class SolomonWyrm extends GoeticDemon implements BeamCaster, SpitCa
         @Override public EntityDimensions getDimensions(Pose pose) { return size == null ? super.getDimensions(pose) : size; }
         @Override public boolean hurt(DamageSource source, float amount) { return !isInvulnerableTo(source) && getParent().hurt(source, amount); }
     }
+    @Override public Iterable<? extends LivingEntity> blessingTargets(double radius) {
+        return level().getEntitiesOfClass(SolomonWyrm.class, getBoundingBox().inflate(radius), kin -> kin.isAlive());
+    }
+    @Override public Vec3 blessingOrigin() { return headCentre(); }
 }

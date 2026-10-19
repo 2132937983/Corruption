@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.core.demon.skill.DiveChainRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
 import javax.annotation.Nullable;
@@ -18,7 +21,7 @@ import net.minecraft.world.phys.Vec3;
  * strikes, and at once climbs for the next. A dive that has not come down in its time is given up and the next begun.
  * It is over as soon as the last has struck. While it runs, it moves the boss itself.
  */
-public final class DiveChainSkill implements BossSkill<Mob> {
+public final class DiveChainSkill implements RegisteredSkill<DiveChainRules> {
     /** How near the mark the boss must come for a dive to strike there, in blocks. */
     private static final double THERE = 1.2;
 
@@ -101,4 +104,7 @@ public final class DiveChainSkill implements BossSkill<Mob> {
         aim = null;
         boss.setXRot(0);
     }
+    @Override public BossSkillRegistry.Type<DiveChainRules> type() { return BossSkillApi.DIVE_CHAIN; }
+    @Override public DiveChainRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

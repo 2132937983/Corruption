@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.registry.ModParticles;
 import com.miophas.corruption.core.demon.skill.GazeRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
@@ -21,7 +24,7 @@ import net.minecraft.world.phys.Vec3;
  * Providence open (one over the boss, the rest in a ring round its quarry, staring at whoever looks) and stay open
  * through the wind-up; when the wind-up is over, if the boss still sees its quarry within reach, it {@link #stare stares}.
  */
-public final class GazeSkill implements BossSkill<Mob> {
+public final class GazeSkill implements RegisteredSkill<GazeRules> {
     private final GazeRules rules;
     private final int colour, accent;
 
@@ -72,4 +75,7 @@ public final class GazeSkill implements BossSkill<Mob> {
         target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, rules.blindnessTicks()), boss);
         if (rules.withers()) target.addEffect(new MobEffectInstance(MobEffects.WITHER, rules.witherTicks(), rules.witherLevel()), boss);
     }
+    @Override public BossSkillRegistry.Type<GazeRules> type() { return BossSkillApi.GAZE; }
+    @Override public GazeRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

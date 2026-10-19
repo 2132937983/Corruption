@@ -1,6 +1,6 @@
 package com.miophas.corruption.common.client.entity;
 
-import com.miophas.corruption.common.entity.CorruptionElite;
+import com.miophas.corruption.api.elite.CorruptionElite;
 import com.miophas.corruption.common.entity.Lashing;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.core.demon.skill.ChargeRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
 import java.util.HashSet;
@@ -27,7 +30,7 @@ import net.neoforged.neoforge.event.EventHooks;
  * creatures break blocks: the mobGriefing rule) and ramming whatever it meets, once each. What will not give way stops
  * it with a crash.
  */
-public final class ChargeSkill implements BossSkill<Mob> {
+public final class ChargeSkill implements RegisteredSkill<ChargeRules> {
     /** Its feet clear the ground by this much, so it breaks what stands in its way, not what it runs on. */
     private static final double FEET = .3;
 
@@ -142,4 +145,7 @@ public final class ChargeSkill implements BossSkill<Mob> {
         boss.yBodyRot = yaw;
         boss.yHeadRot = yaw;
     }
+    @Override public BossSkillRegistry.Type<ChargeRules> type() { return BossSkillApi.CHARGE; }
+    @Override public ChargeRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(0, 0, mob -> Integer.MAX_VALUE, false); }
 }

@@ -1,6 +1,7 @@
 package com.miophas.corruption.common.entity;
 
 import com.miophas.corruption.Corruption;
+import com.miophas.corruption.api.elite.CorruptionElite;
 import com.miophas.corruption.common.registry.ModEffects;
 import com.miophas.corruption.common.registry.ModParticles;
 import com.miophas.corruption.core.elite.BloaterRules;

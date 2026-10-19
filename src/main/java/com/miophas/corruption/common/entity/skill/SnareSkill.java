@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.infection.CorruptionConversions;
 import com.miophas.corruption.common.registry.ModDamageTypes;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
@@ -29,7 +32,7 @@ import net.minecraft.world.phys.Vec3;
  * not of the caster's side (players in creative or spectator aside) is hurt with the corruption's hurt, held fast with
  * Slowness (twice as long on the corruption's own ground) and thrown a little up. The ground is left as it was.
  */
-public final class SnareSkill implements BossSkill<Mob> {
+public final class SnareSkill implements RegisteredSkill<SnareRules> {
     private final SnareRules rules;
     private final int colour, accent;
     @Nullable private Vec3 mark;
@@ -89,4 +92,7 @@ public final class SnareSkill implements BossSkill<Mob> {
     }
 
     @Override public void end(Mob boss, boolean broken) { mark = null; }
+    @Override public BossSkillRegistry.Type<SnareRules> type() { return BossSkillApi.SNARE; }
+    @Override public SnareRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

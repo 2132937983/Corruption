@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.entity.DemonBolt;
 import com.miophas.corruption.core.demon.skill.BarrageRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
@@ -17,7 +20,7 @@ import net.minecraft.world.phys.Vec3;
  * gathers itself, facing it; then it looses the bolts ({@link DemonBolt}), a few a tick from either side of it by turns
  * (a bird's two wings), each thrown up and over to come down on its own place within the mark.
  */
-public final class BarrageSkill implements BossSkill<Mob> {
+public final class BarrageSkill implements RegisteredSkill<BarrageRules> {
     private final BarrageRules rules;
     private final int colour, accent;
     private Vec3 mark;
@@ -68,4 +71,7 @@ public final class BarrageSkill implements BossSkill<Mob> {
     }
 
     @Override public void end(Mob boss, boolean broken) { mark = null; }
+    @Override public BossSkillRegistry.Type<BarrageRules> type() { return BossSkillApi.BARRAGE; }
+    @Override public BarrageRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

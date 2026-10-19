@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.api.demon.skill.SpitCaster;
 import com.miophas.corruption.common.entity.DemonBolt;
 import com.miophas.corruption.core.demon.skill.FanfareRules;
@@ -21,7 +24,7 @@ import net.minecraft.world.phys.Vec3;
  * ({@link DemonBolt}) pour out of there, two arms of them sweeping back and forth across where the quarry is as each is
  * loosed, a fan straight at it now and then, notes flying off the horn and its call sounding again and again.
  */
-public final class FanfareSkill implements BossSkill<Mob> {
+public final class FanfareSkill implements RegisteredSkill<FanfareRules> {
     private final FanfareRules rules;
     private final int colour, accent;
     private int loosed;
@@ -80,4 +83,7 @@ public final class FanfareSkill implements BossSkill<Mob> {
     private static Vec3 from(Mob boss) {
         return boss instanceof SpitCaster caster ? caster.spitFrom(0) : boss.getEyePosition().add(Vec3.directionFromRotation(0, boss.getYRot()).scale(boss.getBbWidth() * .6));
     }
+    @Override public BossSkillRegistry.Type<FanfareRules> type() { return BossSkillApi.FANFARE; }
+    @Override public FanfareRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

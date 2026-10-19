@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.api.demon.skill.SpitCaster;
 import com.miophas.corruption.common.registry.ModDamageTypes;
 import com.miophas.corruption.core.demon.skill.PsychicStreamRules;
@@ -25,7 +28,7 @@ import org.joml.Vector3f;
  * took; a ringing over the quarry's head now and then. Pulses that find the quarry gone, hidden or out of reach, as many
  * one after another as the rules allow, break the thread, and the skill is over.
  */
-public final class PsychicStreamSkill implements BossSkill<Mob> {
+public final class PsychicStreamSkill implements RegisteredSkill<PsychicStreamRules> {
     /** How far apart the motes of light along the thread are, in blocks. */
     private static final double MOTES = .4;
 
@@ -103,4 +106,7 @@ public final class PsychicStreamSkill implements BossSkill<Mob> {
         }
         level.sendParticles(ParticleTypes.SCULK_SOUL, to.x, to.y + .2, to.z, 2, .2, .1, .2, .01);
     }
+    @Override public BossSkillRegistry.Type<PsychicStreamRules> type() { return BossSkillApi.PSYCHIC_STREAM; }
+    @Override public PsychicStreamRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

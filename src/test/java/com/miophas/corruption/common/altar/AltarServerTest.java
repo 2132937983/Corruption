@@ -415,4 +415,55 @@ class AltarServerTest {
             clear(level, offering);
         });
     }
+
+    @Test void addonRitualCallbacksReplaceOutputsAfterNormalConsumption(MinecraftServer server) {
+        var phases = new java.util.ArrayList<String>();
+        fixture.corruption.AddonContent.registerRitual(ResourceLocation.parse("corruption:altar/corruption_remain"), new com.miophas.corruption.api.altar.AltarRituals.Handler() {
+            public void started(com.miophas.corruption.api.altar.AltarRituals.Context context) { phases.add("start"); }
+            public boolean replacesResult(com.miophas.corruption.api.altar.AltarRituals.Context context) { return true; }
+            public void completed(com.miophas.corruption.api.altar.AltarRituals.Context context) {
+                phases.add("complete");
+                assertTrue(context.offerings().stream().anyMatch(stack -> stack.is(Items.BONE)), "Callback receives offering snapshots");
+            }
+            public void ended(com.miophas.corruption.api.altar.AltarRituals.Context context, com.miophas.corruption.api.altar.AltarRituals.End end) { phases.add(end.name()); }
+        });
+        try {
+            TestWorld.onServer(server, level -> {
+                var offering = raise(level, 46_000); tick(level, offering, AltarRules.CHECK_TICKS);
+                pillar(level, offering, 0).set(new ItemStack(Items.ROTTEN_FLESH));
+                pillar(level, offering, 1).set(new ItemStack(Items.BONE));
+                pillar(level, offering, 2).set(new ItemStack(Items.SPIDER_EYE));
+                pillar(level, offering, 3).set(new ItemStack(ModItems.CORRUPTION_DUST.get()));
+                var joined = tickCatching(level, offering, RitualRules.DEFAULT_TICKS + RitualRules.AFTER_STRIKE + 4);
+                assertEquals(java.util.List.of("start", "complete", "COMPLETED"), phases);
+                assertTrue(joined.stream().noneMatch(entity -> entity instanceof ItemEntity), "Native output suppressed");
+                for (int slot = 0; slot < 4; slot++) assertTrue(pillar(level, offering, slot).isEmpty());
+                var view = com.miophas.corruption.api.altar.AltarApi.find(level, offering.getBlockPos()).orElseThrow();
+                assertEquals(offering.form(), view.form()); assertTrue(view.recipe().isEmpty());
+                assertFalse(com.miophas.corruption.api.altar.AltarApi.structures(level).isEmpty());
+                clear(level, offering);
+            });
+        } finally { com.miophas.corruption.api.altar.AltarRituals.unregister(fixture.corruption.AddonContent.id("ritual")); }
+    }
+
+    @Test void addonVetoStopsARitualBeforeItConsumesOfferings(MinecraftServer server) {
+        var ends = new java.util.ArrayList<com.miophas.corruption.api.altar.AltarRituals.End>();
+        fixture.corruption.AddonContent.registerRitual(ResourceLocation.parse("corruption:altar/corruption_remain"), new com.miophas.corruption.api.altar.AltarRituals.Handler() {
+            public boolean canComplete(com.miophas.corruption.api.altar.AltarRituals.Context context) { return false; }
+            public void ended(com.miophas.corruption.api.altar.AltarRituals.Context context, com.miophas.corruption.api.altar.AltarRituals.End end) { ends.add(end); }
+        });
+        try {
+            TestWorld.onServer(server, level -> {
+                var offering = raise(level, 46_032); tick(level, offering, AltarRules.CHECK_TICKS);
+                pillar(level, offering, 0).set(new ItemStack(Items.ROTTEN_FLESH));
+                pillar(level, offering, 1).set(new ItemStack(Items.BONE));
+                pillar(level, offering, 2).set(new ItemStack(Items.SPIDER_EYE));
+                pillar(level, offering, 3).set(new ItemStack(ModItems.CORRUPTION_DUST.get()));
+                tick(level, offering, RitualRules.DEFAULT_TICKS + RitualRules.AFTER_STRIKE + 1);
+                assertTrue(ends.contains(com.miophas.corruption.api.altar.AltarRituals.End.REJECTED));
+                for (int slot = 0; slot < 4; slot++) assertFalse(pillar(level, offering, slot).isEmpty());
+                clear(level, offering);
+            });
+        } finally { com.miophas.corruption.api.altar.AltarRituals.unregister(fixture.corruption.AddonContent.id("ritual")); }
+    }
 }

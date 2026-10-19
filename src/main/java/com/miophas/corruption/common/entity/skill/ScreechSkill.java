@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.registry.ModEffects;
 import com.miophas.corruption.core.demon.skill.ScreechRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
@@ -25,7 +28,7 @@ import net.minecraft.world.phys.Vec3;
  * <p>Worked at the quarry ({@link #ScreechSkill(ScreechRules, int, int, boolean)}), the scream breaks over the quarry, wherever
  * it is when it comes, rather than about the boss: everything within reach of it is stunned.
  */
-public final class ScreechSkill implements BossSkill<Mob> {
+public final class ScreechSkill implements RegisteredSkill<ScreechRules> {
     private final ScreechRules rules;
     private final int colour, accent;
     private final boolean atQuarry;
@@ -73,4 +76,7 @@ public final class ScreechSkill implements BossSkill<Mob> {
         SkillShows.sound(boss, SoundEvents.PHANTOM_DEATH, 4, .55F);
         SkillShows.sound(boss, SoundEvents.RAVAGER_ROAR, 3, 1.7F);
     }
+    @Override public BossSkillRegistry.Type<ScreechRules> type() { return atQuarry ? BossSkillApi.TARGET_SCREECH : BossSkillApi.SCREECH; }
+    @Override public ScreechRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

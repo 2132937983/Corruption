@@ -5,30 +5,39 @@ import com.miophas.corruption.core.demon.skill.BeamRules;
 import com.miophas.corruption.core.demon.skill.BeamVolleyRules;
 import com.miophas.corruption.core.demon.skill.BlightRules;
 import com.miophas.corruption.core.demon.skill.BlinkRules;
+import com.miophas.corruption.core.demon.skill.BurrowRules;
 import com.miophas.corruption.core.demon.skill.ChargeRules;
 import com.miophas.corruption.core.demon.skill.ChariotRules;
+import com.miophas.corruption.core.demon.skill.CountedSummonRules;
 import com.miophas.corruption.core.demon.skill.CrescendoRules;
 import com.miophas.corruption.core.demon.skill.DiveChainRules;
 import com.miophas.corruption.core.demon.skill.DiveRules;
+import com.miophas.corruption.core.demon.skill.DrakeRushRules;
+import com.miophas.corruption.core.demon.skill.EliteCallRules;
 import com.miophas.corruption.core.demon.skill.FanfareRules;
+import com.miophas.corruption.core.demon.skill.FireballRules;
+import com.miophas.corruption.core.demon.skill.FlyingStrikeRules;
 import com.miophas.corruption.core.demon.skill.GazeRules;
 import com.miophas.corruption.core.demon.skill.GrabRules;
+import com.miophas.corruption.core.demon.skill.HandRules;
 import com.miophas.corruption.core.demon.skill.MeleeRules;
 import com.miophas.corruption.core.demon.skill.MindControlRules;
 import com.miophas.corruption.core.demon.skill.PhaseDashRules;
 import com.miophas.corruption.core.demon.skill.PounceRules;
 import com.miophas.corruption.core.demon.skill.PsychicRules;
 import com.miophas.corruption.core.demon.skill.PsychicStreamRules;
+import com.miophas.corruption.core.demon.skill.RamRules;
 import com.miophas.corruption.core.demon.skill.ScreechRules;
+import com.miophas.corruption.core.demon.skill.SkyBeamRules;
 import com.miophas.corruption.core.demon.skill.SnareRules;
 import com.miophas.corruption.core.demon.skill.SpikeFieldRules;
 import com.miophas.corruption.core.demon.skill.SpinRules;
 import com.miophas.corruption.core.demon.skill.SpinVolleyRules;
 import com.miophas.corruption.core.demon.skill.SpitRules;
-import com.miophas.corruption.core.demon.skill.SkyBeamRules;
 import com.miophas.corruption.core.demon.skill.StrikeRules;
 import com.miophas.corruption.core.demon.skill.SummonRules;
 import com.miophas.corruption.core.demon.skill.UpheavalRules;
+import com.miophas.corruption.core.demon.skill.VenusRules;
 import java.util.function.ToIntFunction;
 import net.minecraft.world.entity.Mob;
 
@@ -120,51 +129,138 @@ public final class BossSkillApi {
         BossSkill<Mob> skyBeams(SkyBeamRules rules, int colour, int accent);
     }
 
-    private static Maker maker;
+    public static final BossSkillRegistry.Type<BlightRules> TARGET_BLIGHT = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:target_blight"), BlightRules.class);
+    public static final BossSkillRegistry.Type<ScreechRules> TARGET_SCREECH = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:target_screech"), ScreechRules.class);
+    public static final BossSkillRegistry.Type<CountedSummonRules> COUNTED_SUMMON = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:counted_summon"), CountedSummonRules.class);
+    public static final BossSkillRegistry.Type<FlyingStrikeRules> SWOOP = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:swoop"), FlyingStrikeRules.class);
+    public static final BossSkillRegistry.Type<DrakeRushRules> DRAKE_RUSH = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:drake_rush"), DrakeRushRules.class);
+    public static final BossSkillRegistry.Type<EliteCallRules> ELITE_CALL = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:elite_call"), EliteCallRules.class);
+    public static final BossSkillRegistry.Type<HandRules> HANDS = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:hands"), HandRules.class);
+    public static final BossSkillRegistry.Type<FireballRules> FIREBALL = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:fireball"), FireballRules.class);
+    public static final BossSkillRegistry.Type<GazeRules> GAZE = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:gaze"), GazeRules.class);
+    public static final BossSkillRegistry.Type<ChargeRules> CHARGE = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:charge"), ChargeRules.class);
+    public static final BossSkillRegistry.Type<SummonRules> SUMMON = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:summon"), SummonRules.class);
+    public static final BossSkillRegistry.Type<BlinkRules> BLINK = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:blink"), BlinkRules.class);
+    public static final BossSkillRegistry.Type<StrikeRules> STRIKE = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:strike"), StrikeRules.class);
+    public static final BossSkillRegistry.Type<BeamRules> BEAM = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:beam"), BeamRules.class);
+    public static final BossSkillRegistry.Type<MindControlRules> MIND_CONTROL = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:mind_control"), MindControlRules.class);
+    public static final BossSkillRegistry.Type<MeleeRules> MELEE = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:melee"), MeleeRules.class);
+    public static final BossSkillRegistry.Type<PhaseDashRules> PHASE_DASH = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:phase_dash"), PhaseDashRules.class);
+    public static final BossSkillRegistry.Type<SpikeFieldRules> SPIKE_FIELD = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:spike_field"), SpikeFieldRules.class);
+    public static final BossSkillRegistry.Type<DiveRules> DIVE = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:dive"), DiveRules.class);
+    public static final BossSkillRegistry.Type<BeamVolleyRules> BEAM_VOLLEY = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:beam_volley"), BeamVolleyRules.class);
+    public static final BossSkillRegistry.Type<SpinVolleyRules> SPIN_VOLLEY = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:spin_volley"), SpinVolleyRules.class);
+    public static final BossSkillRegistry.Type<SpinRules> SPIN = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:spin"), SpinRules.class);
+    public static final BossSkillRegistry.Type<ScreechRules> SCREECH = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:screech"), ScreechRules.class);
+    public static final BossSkillRegistry.Type<BarrageRules> BARRAGE = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:barrage"), BarrageRules.class);
+    public static final BossSkillRegistry.Type<DiveChainRules> DIVE_CHAIN = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:dive_chain"), DiveChainRules.class);
+    public static final BossSkillRegistry.Type<ChariotRules> CHARIOT = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:chariot"), ChariotRules.class);
+    public static final BossSkillRegistry.Type<PsychicRules> PSYCHIC = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:psychic"), PsychicRules.class);
+    public static final BossSkillRegistry.Type<PounceRules> POUNCE = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:pounce"), PounceRules.class);
+    public static final BossSkillRegistry.Type<SpitRules> SPIT = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:spit"), SpitRules.class);
+    public static final BossSkillRegistry.Type<GrabRules> GRAB = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:grab"), GrabRules.class);
+    public static final BossSkillRegistry.Type<PsychicStreamRules> PSYCHIC_STREAM = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:psychic_stream"), PsychicStreamRules.class);
+    public static final BossSkillRegistry.Type<BlightRules> BLIGHT = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:blight"), BlightRules.class);
+    public static final BossSkillRegistry.Type<SnareRules> SNARE = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:snare"), SnareRules.class);
+    public static final BossSkillRegistry.Type<UpheavalRules> UPHEAVAL = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:upheaval"), UpheavalRules.class);
+    public static final BossSkillRegistry.Type<FanfareRules> FANFARE = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:fanfare"), FanfareRules.class);
+    public static final BossSkillRegistry.Type<CrescendoRules> CRESCENDO = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:crescendo"), CrescendoRules.class);
+    public static final BossSkillRegistry.Type<SkyBeamRules> SKY_BEAMS = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:sky_beams"), SkyBeamRules.class);
+    public static final BossSkillRegistry.Type<BurrowRules> BURROW = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:burrow"), BurrowRules.class);
+    public static final BossSkillRegistry.Type<RamRules> RAM = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:ram"), RamRules.class);
+    public static final BossSkillRegistry.Type<VenusRules> VENUS = new BossSkillRegistry.Type<>(net.minecraft.resources.ResourceLocation.parse("corruption:venus"), VenusRules.class);
 
-    /** Fits what carries the skills out. The mod does so as the game starts; a second fitting replaces the first. */
-    public static void install(Maker made) { maker = made; }
-
-    private static Maker maker() {
-        if (maker == null) throw new IllegalStateException("The mod's boss skills are fitted as the game starts; ask for them after that");
-        return maker;
+    /** Legacy whole-provider replacement. Prefer registering a single factory in BossSkillRegistry. */
+    @Deprecated
+    public static void install(Maker made) {
+        java.util.Objects.requireNonNull(made);
+        BossSkillRegistry.replace(GAZE, (rules, options) -> made.gaze(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(CHARGE, (rules, options) -> made.charge(rules));
+        BossSkillRegistry.replace(SUMMON, (rules, options) -> made.summon(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(BLINK, (rules, options) -> made.blink(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(STRIKE, (rules, options) -> made.strike(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(BEAM, (rules, options) -> made.beam(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(MIND_CONTROL, (rules, options) -> made.mindControl(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(MELEE, (rules, options) -> made.melee(rules));
+        BossSkillRegistry.replace(PHASE_DASH, (rules, options) -> made.phaseDash(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(SPIKE_FIELD, (rules, options) -> made.spikeField(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(BEAM_VOLLEY, (rules, options) -> made.beamVolley(rules, options.count(), options.colour(), options.accent()));
+        BossSkillRegistry.replace(SPIN_VOLLEY, (rules, options) -> made.spinVolley(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(SPIN, (rules, options) -> made.spin(rules));
+        BossSkillRegistry.replace(SCREECH, (rules, options) -> made.screech(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(BARRAGE, (rules, options) -> made.barrage(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(DIVE_CHAIN, (rules, options) -> made.diveChain(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(DIVE, (rules, options) -> made.dive(rules, options.colour(), options.accent(), options.upAtOnce()));
+        BossSkillRegistry.replace(CHARIOT, (rules, options) -> made.chariot(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(PSYCHIC, (rules, options) -> made.psychic(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(POUNCE, (rules, options) -> made.pounce(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(SPIT, (rules, options) -> made.spit(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(GRAB, (rules, options) -> made.grab(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(PSYCHIC_STREAM, (rules, options) -> made.psychicStream(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(BLIGHT, (rules, options) -> made.blight(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(SNARE, (rules, options) -> made.snare(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(UPHEAVAL, (rules, options) -> made.upheaval(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(FANFARE, (rules, options) -> made.fanfare(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(CRESCENDO, (rules, options) -> made.crescendo(rules, options.colour(), options.accent()));
+        BossSkillRegistry.replace(SKY_BEAMS, (rules, options) -> made.skyBeams(rules, options.colour(), options.accent()));
     }
 
-    public static BossSkill<Mob> gaze(GazeRules rules, int colour, int accent) { return maker().gaze(rules, colour, accent); }
-    public static BossSkill<Mob> charge(ChargeRules rules) { return maker().charge(rules); }
-    public static BossSkill<Mob> summon(SummonRules rules, int colour, int accent) { return maker().summon(rules, colour, accent); }
-    public static BossSkill<Mob> blink(BlinkRules rules, int colour, int accent) { return maker().blink(rules, colour, accent); }
-    public static BossSkill<Mob> strike(StrikeRules rules, int colour, int accent) { return maker().strike(rules, colour, accent); }
-    public static BossSkill<Mob> beam(BeamRules rules, int colour, int accent) { return maker().beam(rules, colour, accent); }
-    public static BossSkill<Mob> mindControl(MindControlRules rules, int colour, int accent) { return maker().mindControl(rules, colour, accent); }
-    public static BossSkill<Mob> melee(MeleeRules rules) { return maker().melee(rules); }
-    public static BossSkill<Mob> phaseDash(PhaseDashRules rules, int colour, int accent) { return maker().phaseDash(rules, colour, accent); }
-    public static BossSkill<Mob> spikeField(SpikeFieldRules rules, int colour, int accent) { return maker().spikeField(rules, colour, accent); }
-    public static BossSkill<Mob> dive(DiveRules rules, int colour, int accent) { return maker().dive(rules, colour, accent); }
+    public static BossSkill<Mob> gaze(GazeRules rules, int colour, int accent) { return BossSkillRegistry.create(GAZE, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> charge(ChargeRules rules) { return BossSkillRegistry.create(CHARGE, rules, new BossSkillRegistry.Options(0, 0)); }
+    public static BossSkill<Mob> summon(SummonRules rules, int colour, int accent) { return BossSkillRegistry.create(SUMMON, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> blink(BlinkRules rules, int colour, int accent) { return BossSkillRegistry.create(BLINK, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> strike(StrikeRules rules, int colour, int accent) { return BossSkillRegistry.create(STRIKE, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> beam(BeamRules rules, int colour, int accent) { return BossSkillRegistry.create(BEAM, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> mindControl(MindControlRules rules, int colour, int accent) { return BossSkillRegistry.create(MIND_CONTROL, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> melee(MeleeRules rules) { return BossSkillRegistry.create(MELEE, rules, new BossSkillRegistry.Options(0, 0)); }
+    public static BossSkill<Mob> phaseDash(PhaseDashRules rules, int colour, int accent) { return BossSkillRegistry.create(PHASE_DASH, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> spikeField(SpikeFieldRules rules, int colour, int accent) { return BossSkillRegistry.create(SPIKE_FIELD, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> dive(DiveRules rules, int colour, int accent) { return BossSkillRegistry.create(DIVE, rules, new BossSkillRegistry.Options(colour, accent)); }
     /** @param count how many beams the boss fires each time, asked as it begins (one to the rules' most) */
-    public static BossSkill<Mob> beamVolley(BeamVolleyRules rules, ToIntFunction<Mob> count, int colour, int accent) {
-        return maker().beamVolley(rules, count, colour, accent);
-    }
+    public static BossSkill<Mob> beamVolley(BeamVolleyRules rules, ToIntFunction<Mob> count, int colour, int accent) { return BossSkillRegistry.create(BEAM_VOLLEY, rules, new BossSkillRegistry.Options(colour, accent, count, false)); }
 
-    public static BossSkill<Mob> spinVolley(SpinVolleyRules rules, int colour, int accent) { return maker().spinVolley(rules, colour, accent); }
-    public static BossSkill<Mob> spin(SpinRules rules) { return maker().spin(rules); }
-    public static BossSkill<Mob> screech(ScreechRules rules, int colour, int accent) { return maker().screech(rules, colour, accent); }
-    public static BossSkill<Mob> barrage(BarrageRules rules, int colour, int accent) { return maker().barrage(rules, colour, accent); }
-    public static BossSkill<Mob> diveChain(DiveChainRules rules, int colour, int accent) { return maker().diveChain(rules, colour, accent); }
+    public static BossSkill<Mob> spinVolley(SpinVolleyRules rules, int colour, int accent) { return BossSkillRegistry.create(SPIN_VOLLEY, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> spin(SpinRules rules) { return BossSkillRegistry.create(SPIN, rules, new BossSkillRegistry.Options(0, 0)); }
+    public static BossSkill<Mob> screech(ScreechRules rules, int colour, int accent) { return BossSkillRegistry.create(SCREECH, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> barrage(BarrageRules rules, int colour, int accent) { return BossSkillRegistry.create(BARRAGE, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> diveChain(DiveChainRules rules, int colour, int accent) { return BossSkillRegistry.create(DIVE_CHAIN, rules, new BossSkillRegistry.Options(colour, accent)); }
     /** @param upAtOnce whether it is over as soon as it strikes (no rest after it), rather than running out its time */
-    public static BossSkill<Mob> dive(DiveRules rules, int colour, int accent, boolean upAtOnce) { return maker().dive(rules, colour, accent, upAtOnce); }
-    public static BossSkill<Mob> chariot(ChariotRules rules, int colour, int accent) { return maker().chariot(rules, colour, accent); }
-    public static BossSkill<Mob> psychic(PsychicRules rules, int colour, int accent) { return maker().psychic(rules, colour, accent); }
-    public static BossSkill<Mob> pounce(PounceRules rules, int colour, int accent) { return maker().pounce(rules, colour, accent); }
-    public static BossSkill<Mob> spit(SpitRules rules, int colour, int accent) { return maker().spit(rules, colour, accent); }
-    public static BossSkill<Mob> grab(GrabRules rules, int colour, int accent) { return maker().grab(rules, colour, accent); }
-    public static BossSkill<Mob> psychicStream(PsychicStreamRules rules, int colour, int accent) { return maker().psychicStream(rules, colour, accent); }
-    public static BossSkill<Mob> blight(BlightRules rules, int colour, int accent) { return maker().blight(rules, colour, accent); }
-    public static BossSkill<Mob> snare(SnareRules rules, int colour, int accent) { return maker().snare(rules, colour, accent); }
-    public static BossSkill<Mob> upheaval(UpheavalRules rules, int colour, int accent) { return maker().upheaval(rules, colour, accent); }
-    public static BossSkill<Mob> fanfare(FanfareRules rules, int colour, int accent) { return maker().fanfare(rules, colour, accent); }
-    public static BossSkill<Mob> crescendo(CrescendoRules rules, int colour, int accent) { return maker().crescendo(rules, colour, accent); }
-    public static BossSkill<Mob> skyBeams(SkyBeamRules rules, int colour, int accent) { return maker().skyBeams(rules, colour, accent); }
+    public static BossSkill<Mob> dive(DiveRules rules, int colour, int accent, boolean upAtOnce) { return BossSkillRegistry.create(DIVE, rules, new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, upAtOnce)); }
+    public static BossSkill<Mob> chariot(ChariotRules rules, int colour, int accent) { return BossSkillRegistry.create(CHARIOT, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> psychic(PsychicRules rules, int colour, int accent) { return BossSkillRegistry.create(PSYCHIC, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> pounce(PounceRules rules, int colour, int accent) { return BossSkillRegistry.create(POUNCE, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> spit(SpitRules rules, int colour, int accent) { return BossSkillRegistry.create(SPIT, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> grab(GrabRules rules, int colour, int accent) { return BossSkillRegistry.create(GRAB, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> psychicStream(PsychicStreamRules rules, int colour, int accent) { return BossSkillRegistry.create(PSYCHIC_STREAM, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> blight(BlightRules rules, int colour, int accent) { return BossSkillRegistry.create(BLIGHT, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> snare(SnareRules rules, int colour, int accent) { return BossSkillRegistry.create(SNARE, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> upheaval(UpheavalRules rules, int colour, int accent) { return BossSkillRegistry.create(UPHEAVAL, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> fanfare(FanfareRules rules, int colour, int accent) { return BossSkillRegistry.create(FANFARE, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> crescendo(CrescendoRules rules, int colour, int accent) { return BossSkillRegistry.create(CRESCENDO, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> skyBeams(SkyBeamRules rules, int colour, int accent) { return BossSkillRegistry.create(SKY_BEAMS, rules, new BossSkillRegistry.Options(colour, accent)); }
 
+    public static BossSkill<Mob> burrow(BurrowRules rules, int colour, int accent) { return BossSkillRegistry.create(BURROW, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> ram(RamRules rules, int colour, int accent) { return BossSkillRegistry.create(RAM, rules, new BossSkillRegistry.Options(colour, accent)); }
+    public static BossSkill<Mob> venus(VenusRules rules, int colour, int accent) { return BossSkillRegistry.create(VENUS, rules, new BossSkillRegistry.Options(colour, accent)); }
+
+    public static BossSkill<Mob> fireball(FireballRules rules, int colour, int accent) { return BossSkillRegistry.create(FIREBALL, rules, new BossSkillRegistry.Options(colour, accent)); }
+
+    public static BossSkill<Mob> hands(HandRules rules, int colour, int accent) { return BossSkillRegistry.create(HANDS, rules, new BossSkillRegistry.Options(colour, accent)); }
+
+    public static BossSkill<Mob> eliteCall(EliteCallRules rules, int colour, int accent) { return BossSkillRegistry.create(ELITE_CALL, rules, new BossSkillRegistry.Options(colour, accent)); }
+
+    public static BossSkill<Mob> drakeRush(DrakeRushRules rules, int colour, int accent) { return BossSkillRegistry.create(DRAKE_RUSH, rules, new BossSkillRegistry.Options(colour, accent)); }
+
+    public static BossSkill<Mob> swoop(FlyingStrikeRules rules, int colour, int accent) { return BossSkillRegistry.create(SWOOP, rules, new BossSkillRegistry.Options(colour, accent)); }
+
+    public static BossSkill<Mob> blight(BlightRules rules, int colour, int accent, boolean atTarget) {
+        return BossSkillRegistry.create(atTarget ? TARGET_BLIGHT : BLIGHT, rules, new BossSkillRegistry.Options(colour, accent));
+    }
+    public static BossSkill<Mob> screech(ScreechRules rules, int colour, int accent, boolean atTarget) {
+        return BossSkillRegistry.create(atTarget ? TARGET_SCREECH : SCREECH, rules, new BossSkillRegistry.Options(colour, accent));
+    }
+    public static BossSkill<Mob> summon(SummonRules rules, int colour, int accent, double countRadius) {
+        return BossSkillRegistry.create(COUNTED_SUMMON, new CountedSummonRules(rules, countRadius), new BossSkillRegistry.Options(colour, accent));
+    }
     private BossSkillApi() {}
 }

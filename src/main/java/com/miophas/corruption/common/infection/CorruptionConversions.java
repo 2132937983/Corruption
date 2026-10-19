@@ -1,21 +1,21 @@
 package com.miophas.corruption.common.infection;
 
-import com.miophas.corruption.common.registry.ModBlocks;
 import com.miophas.corruption.common.block.CorruptionBlock;
+import com.miophas.corruption.common.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.LeavesBlock;
-import net.minecraft.world.level.block.SoulSandBlock;
 import net.minecraft.world.level.block.DirtPathBlock;
 import net.minecraft.world.level.block.LadderBlock;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SoulSandBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -29,6 +29,8 @@ public final class CorruptionConversions {
     }
 
     public static boolean canConvert(BlockState state, BlockGetter level, BlockPos pos) {
+        if (!state.is(IMMUNE) && !isCorrupted(state)
+                && com.miophas.corruption.api.infection.InfectionExtensions.conversion(level, pos, state).isPresent()) return true;
         if (state.is(IMMUNE) || isCorrupted(state) || state.getBlock() instanceof com.miophas.corruption.common.block.CorruptionPlantBlock
                 || state.getBlock() instanceof LeavesBlock || state.is(BlockTags.LEAVES)) return false;
         if (state.is(net.minecraft.world.level.block.Blocks.WATER) || state.is(net.minecraft.world.level.block.Blocks.LAVA)) return true;
@@ -48,12 +50,14 @@ public final class CorruptionConversions {
     }
 
     public static boolean isCorrupted(BlockState state) {
-        return state.getBlock() instanceof CorruptionBlock || state.getBlock() instanceof com.miophas.corruption.common.block.CorruptedLiquidBlock;
+        return com.miophas.corruption.api.infection.InfectionExtensions.isCorrupted(state) || state.getBlock() instanceof CorruptionBlock || state.getBlock() instanceof com.miophas.corruption.common.block.CorruptedLiquidBlock;
     }
 
     /** Whether this is a source of the infection: corrupted, and of a corruption that spreads (not the dormant corruption). */
     public static boolean isSource(BlockState state) {
-        return isCorrupted(state) && !(state.getBlock() instanceof CorruptionBlock corruption && !corruption.spreads());
+        return com.miophas.corruption.api.infection.InfectionExtensions.isSource(state)
+                || (state.getBlock() instanceof CorruptionBlock corruption ? corruption.spreads()
+                : state.getBlock() instanceof com.miophas.corruption.common.block.CorruptedLiquidBlock);
     }
 
     private CorruptionConversions() {}

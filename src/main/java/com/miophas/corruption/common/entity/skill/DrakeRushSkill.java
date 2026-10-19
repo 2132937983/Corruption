@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.entity.SolomonDrake;
 import com.miophas.corruption.core.demon.skill.DrakeRushRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
@@ -18,7 +21,7 @@ import net.minecraft.world.phys.Vec3;
  * wind-up the place its quarry stands is marked with a circle of runes, and the drakes ({@link SolomonDrake}) appear about it on
  * the compass, facing it; a moment later they rush through it all at once and on to the far side, where they are gone.
  */
-public final class DrakeRushSkill implements BossSkill<Mob> {
+public final class DrakeRushSkill implements RegisteredSkill<DrakeRushRules> {
     private final DrakeRushRules rules;
     private final int colour, accent;
     private final List<SolomonDrake> sent = new ArrayList<>();
@@ -56,4 +59,7 @@ public final class DrakeRushSkill implements BossSkill<Mob> {
         SkillShows.show(level, SkillShows.ground(level, mark), "magic_circle", 3, .5, rules.gather() + 20, colour, accent, 0, 0, true);
         SkillShows.sound(level, mark, SoundEvents.ENDER_DRAGON_FLAP, 4, 1.6F);
     }
+    @Override public BossSkillRegistry.Type<DrakeRushRules> type() { return BossSkillApi.DRAKE_RUSH; }
+    @Override public DrakeRushRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

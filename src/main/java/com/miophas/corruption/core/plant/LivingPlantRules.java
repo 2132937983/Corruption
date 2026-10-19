@@ -23,23 +23,30 @@ public final class LivingPlantRules {
                 && space.canOccupy(0, requested, 0) ? requested : 0;
     }
     public static boolean hasRoom(LivingPlantKind kind, int stage, int direction, LivingPlantSpace space) {
+        return hasRoom(definition(kind), kind == LivingPlantKind.GREED, stage, direction, space);
+    }
+    public static boolean hasRoom(LivingPlantDefinition definition, boolean canopy, int stage, int direction, LivingPlantSpace space) {
         if (direction != 1 && direction != -1) return false;
-        LivingPlantDefinition definition = definition(kind);
-        // Vines retain their narrow stem; greed reserves its widening canopy.
-        int radius = kind == LivingPlantKind.GREED ? (int) Math.ceil((definition.width(stage) - 1) / 2) : 0;
+        int radius = canopy ? (int) Math.ceil((definition.width(stage) - 1) / 2) : 0;
         for (int y = 1; y <= definition.height(stage); y++)
             for (int x = -radius; x <= radius; x++) for (int z = -radius; z <= radius; z++)
                 if (!space.available(x, y * direction, z) || !space.canOccupy(x, y * direction, z)) return false;
         return true;
     }
-    public static boolean canGrow(LivingPlantKind kind, int stage, boolean alive, boolean supported,
+    public static boolean canGrow(LivingPlantKind kind, int stage, boolean alive, boolean supported, int direction, LivingPlantSpace space) {
+        return canGrow(definition(kind), kind == LivingPlantKind.GREED, stage, alive, supported, direction, space);
+    }
+    public static boolean canGrow(LivingPlantDefinition definition, boolean canopy, int stage, boolean alive, boolean supported,
             int direction, LivingPlantSpace space) {
-        return alive && supported && stage < definition(kind).stages() - 1 && hasRoom(kind, stage + 1, direction, space);
+        return alive && supported && stage < definition.stages() - 1 && hasRoom(definition, canopy, stage + 1, direction, space);
     }
     public static boolean prepareGrowth(LivingPlantKind kind, int stage, int direction, LivingPlantSpace space) {
-        if (!hasRoom(kind, stage, direction, space)) return false;
-        int radius = kind == LivingPlantKind.GREED ? (int) Math.ceil((definition(kind).width(stage) - 1) / 2) : 0;
-        for (int y = 1; y <= definition(kind).height(stage); y++)
+        return prepareGrowth(definition(kind), kind == LivingPlantKind.GREED, stage, direction, space);
+    }
+    public static boolean prepareGrowth(LivingPlantDefinition definition, boolean canopy, int stage, int direction, LivingPlantSpace space) {
+        if (!hasRoom(definition, canopy, stage, direction, space)) return false;
+        int radius = canopy ? (int) Math.ceil((definition.width(stage) - 1) / 2) : 0;
+        for (int y = 1; y <= definition.height(stage); y++)
             for (int x = -radius; x <= radius; x++) for (int z = -radius; z <= radius; z++)
                 space.clearDecoration(x, y * direction, z);
         return true;

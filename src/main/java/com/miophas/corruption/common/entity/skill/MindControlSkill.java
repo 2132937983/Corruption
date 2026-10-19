@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.network.MindControlPayload;
 import com.miophas.corruption.core.demon.skill.MindControlRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
@@ -21,7 +24,7 @@ import net.minecraft.world.entity.Mob;
  * once the mind is taken, and the boss is free to use its others on the player; the hold lingers on ({@link #linger})
  * until its time is up or the player gets away, and is let go at once if the taking is broken off or the boss is gone.
  */
-public final class MindControlSkill implements BossSkill<Mob> {
+public final class MindControlSkill implements RegisteredSkill<MindControlRules> {
     /** How much further than its reach a held player may get before the hold breaks. */
     private static final double SLIPS = 1.5;
 
@@ -88,4 +91,7 @@ public final class MindControlSkill implements BossSkill<Mob> {
         if (boss.level() instanceof ServerLevel level)
             SkillShows.show(level, player.position(), "eye", 1.2, player.getBbHeight() + 1.6, rules.holds(), colour, accent, 0, 0, false);
     }
+    @Override public BossSkillRegistry.Type<MindControlRules> type() { return BossSkillApi.MIND_CONTROL; }
+    @Override public MindControlRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

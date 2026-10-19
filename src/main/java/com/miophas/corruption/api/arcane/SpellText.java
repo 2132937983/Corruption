@@ -49,6 +49,7 @@ public final class SpellText {
     /** One action, in words. */
     private static Component line(SpellAction action, String indent) {
         return switch (action) {
+            case SpellAction.Custom custom -> Component.literal(indent + custom.id()).withStyle(ChatFormatting.GRAY);
             case SpellAction.ApplyEffect effect -> effect.target() == SpellAction.Target.SELF
                     ? tell(indent, "spell.corruption.effect_self", effectName(effect.effect()), seconds(effect.duration()))
                     : tell(indent, "spell.corruption.effect_nearby", effectName(effect.effect()), number(effect.radius()), seconds(effect.duration()));

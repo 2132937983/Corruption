@@ -45,4 +45,6 @@ public record RamRules(SkillTiming timing, double minRange, double maxRange, dou
 
     /** What its burst out of the ground does to what it catches: half its ram's hurt. */
     public double burstDamage() { return damage / 2; }
+    /** Independent legacy defaults; callers may supply their own velocity policy to the skill. */
+    public DebrisRules debris() { return new DebrisRules(3.5, .9); }
 }

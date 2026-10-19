@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.entity.FieryChariot;
 import com.miophas.corruption.core.demon.skill.ChariotRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
@@ -19,7 +22,7 @@ import net.minecraft.world.phys.Vec3;
  * coming and get out of its way. When the wind-up is over the chariot ({@link FieryChariot}) is there at the start of the
  * line, and runs it on its own, whatever the boss does next.
  */
-public final class ChariotSkill implements BossSkill<Mob> {
+public final class ChariotSkill implements RegisteredSkill<ChariotRules> {
     /** How far apart the flames marking its line are, in blocks. */
     private static final double MARKS = 3;
 
@@ -70,4 +73,7 @@ public final class ChariotSkill implements BossSkill<Mob> {
         if (start == null || !rules.timing().strikes(elapsed) || !(boss.level() instanceof ServerLevel level)) return;
         driven = FieryChariot.drive(level, boss, start, end, rules, colour, accent);
     }
+    @Override public BossSkillRegistry.Type<ChariotRules> type() { return BossSkillApi.CHARIOT; }
+    @Override public ChariotRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

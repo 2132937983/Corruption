@@ -1,6 +1,9 @@
 package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
 import com.miophas.corruption.common.registry.ModDamageTypes;
 import com.miophas.corruption.core.demon.skill.PsychicRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
@@ -25,7 +28,7 @@ import net.minecraft.world.phys.Vec3;
  * another blow does not keep it off), its sight swimming and darkening, its limbs heavy; and the strike rings out over
  * each.
  */
-public final class PsychicSkill implements BossSkill<Mob> {
+public final class PsychicSkill implements RegisteredSkill<PsychicRules> {
     private final PsychicRules rules;
     private final int colour, accent;
     private final List<LivingEntity> struck = new ArrayList<>();
@@ -76,4 +79,7 @@ public final class PsychicSkill implements BossSkill<Mob> {
         level.sendParticles(ParticleTypes.SCULK_SOUL, head.x, head.y + .3, head.z, 6, .3, .2, .3, .02);
         struck.add(mind);
     }
+    @Override public BossSkillRegistry.Type<PsychicRules> type() { return BossSkillApi.PSYCHIC; }
+    @Override public PsychicRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }

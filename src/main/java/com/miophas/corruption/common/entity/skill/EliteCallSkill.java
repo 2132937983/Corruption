@@ -2,8 +2,11 @@ package com.miophas.corruption.common.entity.skill;
 
 import com.miophas.corruption.api.corruption.CorruptionFactionApi;
 import com.miophas.corruption.api.corruption.CorruptionVeilApi;
-import com.miophas.corruption.api.plant.MaliceVineApi;
 import com.miophas.corruption.api.demon.skill.BossSkill;
+import com.miophas.corruption.api.demon.skill.BossSkillApi;
+import com.miophas.corruption.api.demon.skill.BossSkillRegistry;
+import com.miophas.corruption.api.demon.skill.RegisteredSkill;
+import com.miophas.corruption.api.plant.MaliceVineApi;
 import com.miophas.corruption.core.demon.skill.EliteCallRules;
 import com.miophas.corruption.core.demon.skill.SkillTiming;
 import java.util.ArrayList;
@@ -30,7 +33,7 @@ import net.neoforged.neoforge.event.EventHooks;
  * (the tag corruption:vine_brood), rise in a miasma on the ground about it and turn on it. A boss no robe deceives calls up
  * elites no robe deceives (CorruptionVeilApi).
  */
-public final class EliteCallSkill implements BossSkill<Mob> {
+public final class EliteCallSkill implements RegisteredSkill<EliteCallRules> {
     private final EliteCallRules rules;
     private final int colour, accent;
     private final List<Mob> called = new ArrayList<>();
@@ -97,4 +100,7 @@ public final class EliteCallSkill implements BossSkill<Mob> {
         }
         return null;
     }
+    @Override public BossSkillRegistry.Type<EliteCallRules> type() { return BossSkillApi.ELITE_CALL; }
+    @Override public EliteCallRules configuration() { return rules; }
+    @Override public BossSkillRegistry.Options options() { return new BossSkillRegistry.Options(colour, accent, mob -> Integer.MAX_VALUE, false); }
 }
